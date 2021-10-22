@@ -1349,18 +1349,25 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Collection<ServerTextChannel> getServerTextChannels();
 
     /**
-     * Gets a collection with all the private threads of the bot.
+     * Gets a set with all the server thread channels of the bot.
      *
-     * @return A collection with all private threads of the bot.
+     * @return A set with all server thread channels of the bot.
      */
-    List<ServerThreadChannel> getPrivateServerThreadChannels();
+    Set<ServerThreadChannel> getServerThreadChannels();
+    
+    /**
+     * Gets a set with all the private threads of the bot.
+     *
+     * @return A set with all private threads of the bot.
+     */
+    Set<ServerThreadChannel> getPrivateServerThreadChannels();
 
     /**
-     * Gets a collection with all the public threads of the bot.
+     * Gets a set with all the public threads of the bot.
      *
-     * @return A collection with all the public threads of the bot.
+     * @return A set with all the public threads of the bot.
      */
-    List<ServerThreadChannel> getPublicServerThreadChannels();
+    Set<ServerThreadChannel> getPublicServerThreadChannels();
 
     /**
      * Gets a collection with all server voice channels of the bot.
@@ -1698,6 +1705,58 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
                 getServerTextChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
+    }
+    
+    /**
+     * Gets a server thread channel by its id.
+     *
+     * @param id The id of the server thread channel.
+     * @return The server thread channel with the given id.
+     */
+    default Optional<ServerThreadChannel> getServerThreadChannelById(long id) {
+        return getChannelById(id).flatMap(Channel::asServerThreadChannel);
+    }
+    
+    /**
+     * Gets a server thread channel by its id.
+     *
+     * @param id The id of the server thread channel.
+     * @return The server thread channel with the given id.
+     */
+    default Optional<ServerThreadChannel> getServerThreadChannelById(String id) {
+        try {
+            return getServerThreadChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+    
+    /**
+     * Gets a set with all server thread channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the server thread channels.
+     * @return A set with all server thread channels with the given name.
+     */
+    default Set<ServerThreadChannel> getServerThreadChannelsByName(String name) {
+        return Collections.unmodifiableSet(
+                getServerThreadChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toSet()));
+    }
+    
+    /**
+     * Gets a set with all server thread channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the server thread channels.
+     * @return A set with all server thread channels with the given name.
+     */
+    default Set<ServerThreadChannel> getServerThreadChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
+                getServerThreadChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toSet()));
     }
 
     /**
