@@ -1,7 +1,11 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.channel.ChannelType;
+
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +56,14 @@ public interface SlashCommandOption {
      * @return A list with the nested options.
      */
     List<SlashCommandOption> getOptions();
+
+    /**
+     * If the option is of type {@link SlashCommandOptionType#CHANNEL}, the channels shown will be restricted to these
+     * types.
+     *
+     * @return A set with the channel types that are shown.
+     */
+    Set<ChannelType> getChannelTypes();
 
     /**
      * Create a new slash command option to be used with a slash command builder.
@@ -178,5 +190,28 @@ public interface SlashCommandOption {
             .setRequired(required)
             .setChoices(choices)
             .build();
+    }
+
+    /**
+     * Create a new slash command option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name The name of the option.
+     * @param description The description of the option.
+     * @param required Whether this option is required.
+     * @param channelTypes Channel types that are shown.
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createChannelOption(String name,
+                                                  String description,
+                                                  boolean required,
+                                                  Collection<ChannelType> channelTypes) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.CHANNEL)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
+                .setChannelTypes(channelTypes)
+                .build();
     }
 }

@@ -1,10 +1,12 @@
 package org.javacord.api.interaction.internal;
 
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionBuilder;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionType;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,6 +70,20 @@ public interface SlashCommandOptionBuilderDelegate {
      * @param options The options.
      */
     void setOptions(List<SlashCommandOption> options);
+
+    /**
+     * Add a channel type to the slash command option.
+     *
+     * @param channelType The channel type.
+     */
+    void addChannelType(ChannelType channelType);
+
+    /**
+     * Sets the channel types for the slash command option.
+     *
+     * @param channelTypes The channel types.
+     */
+    void setChannelTypes(Collection<ChannelType> channelTypes);
 
     /**
      * Build the slash command option.
