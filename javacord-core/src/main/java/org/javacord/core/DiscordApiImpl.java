@@ -1945,27 +1945,23 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public Collection<ServerTextChannel> getServerTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
     }
-
+    
     @Override
-    public List<ServerThreadChannel> getPrivateServerThreadChannels() {
-        return Collections.unmodifiableList(
-                entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD)
-                .stream()
-                .map(Channel::asServerThreadChannel)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()));
+    public Set<ServerThreadChannel> getServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(
+                        ChannelType.SERVER_PRIVATE_THREAD,
+                        ChannelType.SERVER_PUBLIC_THREAD,
+                        ChannelType.SERVER_NEWS_THREAD);
     }
 
     @Override
-    public List<ServerThreadChannel> getPublicServerThreadChannels() {
-        return Collections.unmodifiableList(
-                entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD)
-                .stream()
-                .map(Channel::asServerThreadChannel)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList()));
+    public Set<ServerThreadChannel> getPrivateServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD);
+    }
+
+    @Override
+    public Set<ServerThreadChannel> getPublicServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD);
     }
 
     @Override

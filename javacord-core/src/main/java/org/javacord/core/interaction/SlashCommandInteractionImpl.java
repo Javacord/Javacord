@@ -2,14 +2,20 @@ package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.user.MemberImpl;
+import org.javacord.core.entity.user.UserImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SlashCommandInteractionImpl extends InteractionImpl implements SlashCommandInteraction {
 
@@ -28,12 +34,34 @@ public class SlashCommandInteractionImpl extends InteractionImpl implements Slas
         super(api, channel, jsonData);
 
         JsonNode data = jsonData.get("data");
+        JsonNode resolved = data.get("resolved");
+        Map<Long, User> resolvedUsers = new HashMap<>();
+        if (jsonData.has("guild_id")) {
+            ServerImpl server = (ServerImpl) api.getServerById(jsonData.get("guild_id").asLong())
+                    .orElseThrow(AssertionError::new);
+            if (resolved.has("members")) {
+                resolved.get("members").fields().forEachRemaining(memberNode -> {
+                    Long id = Long.parseLong(memberNode.getKey());
+                    JsonNode userData = resolved.get("users").get(String.valueOf(id));
+                    resolvedUsers.put(id, new UserImpl(api, userData, memberNode.getValue(), server));
+                });
+            }
+        }
+        if (resolved.has("users")) {
+            resolved.get("users").fields().forEachRemaining(userNode -> {
+                JsonNode userData = userNode.getValue();
+                Long id = Long.parseLong(userNode.getKey());
+                if (!resolvedUsers.containsKey(id)) {
+                    resolvedUsers.put(id, new UserImpl(api, userData, (MemberImpl) null, null));
+                }
+            });
+        }
         commandId = data.get("id").asLong();
         commandName = data.get("name").asText();
         options = new ArrayList<>();
         if (data.has("options") && data.get("options").isArray()) {
             for (JsonNode optionJson : data.get("options")) {
-                options.add(new SlashCommandInteractionOptionImpl(api, optionJson));
+                options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers));
             }
         }
     }

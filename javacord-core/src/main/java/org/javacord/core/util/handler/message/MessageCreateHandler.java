@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
@@ -52,6 +53,11 @@ public class MessageCreateHandler extends PacketHandler {
                 Optional<ServerTextChannel> serverTextChannel = api.getServerTextChannelById(channelId);
                 if (serverTextChannel.isPresent()) {
                     handle(serverTextChannel.get(), packet);
+                    return;
+                }
+                Optional<ServerThreadChannel> serverThreadChannel = api.getServerThreadChannelById(channelId);
+                if (serverThreadChannel.isPresent()) {
+                    handle(serverThreadChannel.get(), packet);
                     return;
                 }
             }
