@@ -13,6 +13,7 @@ import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 import org.javacord.api.event.user.UserChangePendingEvent;
+import org.javacord.api.event.user.UserChangeServerAvatarEvent;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
@@ -24,6 +25,7 @@ import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
 import org.javacord.core.event.user.UserChangePendingEventImpl;
+import org.javacord.core.event.user.UserChangeServerAvatarEventImpl;
 import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
@@ -73,6 +75,14 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 new UserChangeNicknameEventImpl(newMember, oldMember);
 
                         api.getEventDispatcher().dispatchUserChangeNicknameEvent(
+                                server, server, newMember.getUser(), event);
+                    }
+
+                    if (!newMember.getServerAvatarHash().equals(oldMember.getServerAvatarHash())) {
+                        UserChangeServerAvatarEvent event =
+                                new UserChangeServerAvatarEventImpl(newMember, oldMember);
+
+                        api.getEventDispatcher().dispatchUserChangeServerAvatarEvent(
                                 server, server, newMember.getUser(), event);
                     }
 
