@@ -1349,25 +1349,25 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Collection<ServerTextChannel> getServerTextChannels();
 
     /**
-     * Gets a collection with all the server thread channels of the bot.
+     * Gets a set with all the server thread channels of the bot.
      *
-     * @return A collection with all server thread channels of the bot.
+     * @return A set with all server thread channels of the bot.
      */
-    Collection<ServerThreadChannel> getServerThreadChannels();
+    Set<ServerThreadChannel> getServerThreadChannels();
     
     /**
-     * Gets a collection with all the private threads of the bot.
+     * Gets a set with all the private threads of the bot.
      *
-     * @return A collection with all private threads of the bot.
+     * @return A set with all private threads of the bot.
      */
-    Collection<ServerThreadChannel> getPrivateServerThreadChannels();
+    Set<ServerThreadChannel> getPrivateServerThreadChannels();
 
     /**
-     * Gets a collection with all the public threads of the bot.
+     * Gets a set with all the public threads of the bot.
      *
-     * @return A collection with all the public threads of the bot.
+     * @return A set with all the public threads of the bot.
      */
-    Collection<ServerThreadChannel> getPublicServerThreadChannels();
+    Set<ServerThreadChannel> getPublicServerThreadChannels();
 
     /**
      * Gets a collection with all server voice channels of the bot.
@@ -1732,31 +1732,31 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
     
     /**
-     * Gets a collection with all server thread channels with the given name.
+     * Gets a set with all server thread channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server thread channels.
-     * @return A collection with all server thread channels with the given name.
+     * @return A set with all server thread channels with the given name.
      */
-    default Collection<ServerThreadChannel> getServerThreadChannelsByName(String name) {
-        return Collections.unmodifiableList(
+    default Set<ServerThreadChannel> getServerThreadChannelsByName(String name) {
+        return Collections.unmodifiableSet(
                 getServerThreadChannels().stream()
                         .filter(channel -> channel.getName().equals(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
     
     /**
-     * Gets a collection with all server thread channels with the given name.
+     * Gets a set with all server thread channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server thread channels.
-     * @return A collection with all server thread channels with the given name.
+     * @return A set with all server thread channels with the given name.
      */
-    default Collection<ServerThreadChannel> getServerThreadChannelsByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(
+    default Set<ServerThreadChannel> getServerThreadChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
                 getServerThreadChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**

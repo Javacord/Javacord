@@ -1947,18 +1947,20 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
     
     @Override
-    public Collection<ServerThreadChannel> getServerThreadChannels() {
-        return entityCache.get().getChannelCache()
-                          .getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD, ChannelType.SERVER_PUBLIC_THREAD);
+    public Set<ServerThreadChannel> getServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(
+                        ChannelType.SERVER_PRIVATE_THREAD,
+                        ChannelType.SERVER_PUBLIC_THREAD,
+                        ChannelType.SERVER_NEWS_THREAD);
     }
 
     @Override
-    public Collection<ServerThreadChannel> getPrivateServerThreadChannels() {
+    public Set<ServerThreadChannel> getPrivateServerThreadChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD);
     }
 
     @Override
-    public Collection<ServerThreadChannel> getPublicServerThreadChannels() {
+    public Set<ServerThreadChannel> getPublicServerThreadChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD);
     }
 
