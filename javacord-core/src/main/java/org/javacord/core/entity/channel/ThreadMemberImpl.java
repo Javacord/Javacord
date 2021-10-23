@@ -47,10 +47,24 @@ public class ThreadMemberImpl implements ThreadMember {
      * @param data   The JSON data from which to parse this object.
      */
     public ThreadMemberImpl(final DiscordApi api, final Server server, final JsonNode data) {
+        this(api, server, data, data.get("id").asLong(), data.get("userId").asLong());
+    }
+    
+    /**
+     * Creates a new Thread Member object.
+     *
+     * @param api    The discord api.
+     * @param server The server.
+     * @param data   The JSON data from which to parse this object.
+     * @param id     The id of the thread
+     * @param userId The id of the user
+     */
+    public ThreadMemberImpl(final DiscordApi api, final Server server, final JsonNode data,
+            final long id, final long userId) {
         this.api = api;
         this.server = server;
-        id = data.get("id").asLong();
-        userId = data.get("id").asLong();
+        this.id = id;
+        this.userId = userId;
         joinTimestamp = OffsetDateTime.parse(data.get("join_timestamp").asText()).toInstant();
         flags = data.get("flags").asInt();
     }
