@@ -34,27 +34,29 @@ public class SlashCommandInteractionImpl extends InteractionImpl implements Slas
         super(api, channel, jsonData);
 
         JsonNode data = jsonData.get("data");
-        JsonNode resolved = data.get("resolved");
         Map<Long, User> resolvedUsers = new HashMap<>();
-        if (jsonData.has("guild_id")) {
-            ServerImpl server = (ServerImpl) api.getServerById(jsonData.get("guild_id").asLong())
-                    .orElseThrow(AssertionError::new);
-            if (resolved.has("members")) {
-                resolved.get("members").fields().forEachRemaining(memberNode -> {
-                    Long id = Long.parseLong(memberNode.getKey());
-                    JsonNode userData = resolved.get("users").get(String.valueOf(id));
-                    resolvedUsers.put(id, new UserImpl(api, userData, memberNode.getValue(), server));
+        if (jsonData.has("resolved")) {
+            JsonNode resolved = data.get("resolved");
+            if (jsonData.has("guild_id")) {
+                ServerImpl server = (ServerImpl) api.getServerById(jsonData.get("guild_id").asLong())
+                        .orElseThrow(AssertionError::new);
+                if (resolved.has("members")) {
+                    resolved.get("members").fields().forEachRemaining(memberNode -> {
+                        Long id = Long.parseLong(memberNode.getKey());
+                        JsonNode userData = resolved.get("users").get(String.valueOf(id));
+                        resolvedUsers.put(id, new UserImpl(api, userData, memberNode.getValue(), server));
+                    });
+                }
+            }
+            if (resolved.has("users")) {
+                resolved.get("users").fields().forEachRemaining(userNode -> {
+                    JsonNode userData = userNode.getValue();
+                    Long id = Long.parseLong(userNode.getKey());
+                    if (!resolvedUsers.containsKey(id)) {
+                        resolvedUsers.put(id, new UserImpl(api, userData, (MemberImpl) null, null));
+                    }
                 });
             }
-        }
-        if (resolved.has("users")) {
-            resolved.get("users").fields().forEachRemaining(userNode -> {
-                JsonNode userData = userNode.getValue();
-                Long id = Long.parseLong(userNode.getKey());
-                if (!resolvedUsers.containsKey(id)) {
-                    resolvedUsers.put(id, new UserImpl(api, userData, (MemberImpl) null, null));
-                }
-            });
         }
         commandId = data.get("id").asLong();
         commandName = data.get("name").asText();
