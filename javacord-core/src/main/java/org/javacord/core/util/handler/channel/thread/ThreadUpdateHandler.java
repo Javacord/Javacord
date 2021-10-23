@@ -51,14 +51,8 @@ public class ThreadUpdateHandler extends PacketHandler {
             return;
         }
 
-        final ServerThreadChannelImpl thread = server.getChannelById(channelId)
-                .map(ServerThreadChannelImpl.class::cast)
-                .orElse(null);
-
-        if (thread == null) {
-            logger.warn("Unable to find thread with id {}", channelId);
-            return;
-        }
+        final ServerThreadChannelImpl thread = 
+                (ServerThreadChannelImpl) server.getOrCreateServerThreadChannel(jsonChannel);
 
         //Handling whether the name has changed
         final String oldName = thread.getName();
