@@ -92,7 +92,15 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
 
         members = new ArrayList<>();
         if (data.hasNonNull("member")) {
-            members.add(new ThreadMemberImpl(api, server, data.get("member")));
+            // If userId is not included, that means this came from a GUILD_CREATE event
+            // This means the userId is the bot's and the thread id is from this thread
+            // See https://github.com/Javacord/Javacord/issues/898
+            if (data.get("member").hasNonNull("userId")) {
+                members.add(new ThreadMemberImpl(api, server, data.get("member")));
+            } else {
+                members.add(new ThreadMemberImpl(api, server, data.get("member"),
+                        getId(), api.getYourself().getId()));
+            }
         }
 
         final JsonNode threadMetadata = data.get("thread_metadata");
