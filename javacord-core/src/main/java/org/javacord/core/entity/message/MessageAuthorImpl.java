@@ -97,6 +97,11 @@ public class MessageAuthorImpl implements MessageAuthor {
     }
 
     @Override
+    public Icon getAvatar(int size) {
+        return UserImpl.getAvatar(message.getApi(), avatarId, discriminator, id, size);
+    }
+
+    @Override
     public boolean isUser() {
         return webhookId == null;
     }
