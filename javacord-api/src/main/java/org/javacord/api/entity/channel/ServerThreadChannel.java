@@ -192,4 +192,12 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
      */
     CompletableFuture<List<ThreadMember>> getThreadMembers();
 
+    /**
+     * Creates an updater for this thread.
+     *
+     * @return An updater for this thread.
+     */
+    default ServerThreadUpdater createThreadUpdater() {
+        return new ServerThreadUpdater(this);
+    }
 }
