@@ -36,6 +36,8 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.internal.ServerBuilderDelegate;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
+import org.javacord.api.entity.sticker.internal.StickerBuilderDelegate;
+import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
@@ -352,4 +354,21 @@ public interface DelegateFactoryDelegate {
      * @return A new select menu option builder delegate.
      */
     SelectMenuOptionBuilderDelegate createSelectMenuOptionBuilderDelegate();
+
+    /**
+     * Creates a new sticker builder delegate.
+     *
+     * @param server The server that owns the sticker.
+     * @return A new sticker builder delegate.
+     */
+    StickerBuilderDelegate createStickerBuilderDelegate(Server server);
+
+    /**
+     * Creates a new sticker sticker updater delegate.
+     *
+     * @param server The server that owns the sticker.
+     * @param id     The ID of the sticker.
+     * @return A new sticker updater delegate.
+     */
+    StickerUpdaterDelegate createStickerUpdaterDelegate(Server server, long id);
 }

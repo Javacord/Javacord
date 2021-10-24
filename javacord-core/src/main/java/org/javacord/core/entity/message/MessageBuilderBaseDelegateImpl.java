@@ -44,8 +44,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -118,6 +121,10 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      */
     protected Long replyingTo = null;
 
+    /**
+     * The stickers attached to the message.
+     */
+    protected Set<Long> stickerIds = new HashSet<>();
 
     @Override
     public void addComponents(HighLevelComponent... highLevelComponents) {
@@ -422,6 +429,16 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void addSticker(long stickerId) {
+        this.stickerIds.add(stickerId);
+    }
+
+    @Override
+    public void addStickers(Collection<Long> stickerIds) {
+        this.stickerIds.addAll(stickerIds);
+    }
+
+    @Override
     public StringBuilder getStringBuilder() {
         return strBuilder;
     }
@@ -467,6 +484,14 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         if (nonce != null) {
             body.put("nonce", nonce);
+        }
+
+        if (!stickerIds.isEmpty()) {
+            ArrayNode stickersNode = JsonNodeFactory.instance.objectNode().arrayNode();
+            for (long stickerId : stickerIds) {
+                stickersNode.add(stickerId);
+            }
+            body.set("sticker_ids", stickersNode);
         }
 
         if (replyingTo != null) {

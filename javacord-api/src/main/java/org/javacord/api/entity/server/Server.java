@@ -28,6 +28,7 @@ import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
@@ -47,6 +48,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -3017,4 +3019,87 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     CompletableFuture<ActiveThreads> getActiveThreads();
 
+    /**
+     * Gets the stickers of this server.
+     *
+     * @return The stickers of this server.
+     */
+    Set<Sticker> getStickers();
+
+    /**
+     * Requests the sticker of this server from the Discord API without checking the cache.
+     *
+     * @return The stickers of this server.
+     */
+    CompletableFuture<Set<Sticker>> requestStickers();
+
+    /**
+     * Gets a sticker by its ID.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    default Optional<Sticker> getStickerById(long id) {
+        return getStickers().stream().filter(sticker -> sticker.getId() == id).findAny();
+    }
+
+    /**
+     * Gets a sticker by its ID.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    default Optional<Sticker> getStickerById(String id) {
+        try {
+            return getStickerById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a list of sticker by their name. The name is case-sensitive!
+     *
+     * @param name The name of the stickers.
+     * @return A list of stickers with the given name.
+     */
+    default Set<Sticker> getStickersByName(String name) {
+        return getStickers().stream()
+                .filter(sticker -> sticker.getName().equals(name))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets a list of sticker by their name. The name is case-insensitive!
+     *
+     * @param name The name of the stickers.
+     * @return A list of stickers with the given name.
+     */
+    default Set<Sticker> getStickersByNameIgnoreCase(String name) {
+        return getStickers().stream()
+                .filter(sticker -> sticker.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Requests a sticker by its ID from the Discord API without checking the cache.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    CompletableFuture<Sticker> requestStickerById(long id);
+
+    /**
+     * Requests a sticker by its ID from the Discord API without checking the cache.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    default CompletableFuture<Sticker> requestStickerById(String id) {
+        try {
+            return requestStickerById(Long.parseLong(id));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("The ID must be a number.");
+        }
+    }
 }

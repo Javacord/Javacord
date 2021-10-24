@@ -16,6 +16,7 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
@@ -23,6 +24,7 @@ import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.component.ActionRowImpl;
 import org.javacord.core.entity.message.embed.EmbedImpl;
 import org.javacord.core.entity.server.ServerImpl;
+import org.javacord.core.entity.sticker.StickerItemImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
@@ -33,9 +35,11 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 
@@ -149,6 +153,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private final List<Role> roleMentions = new ArrayList<>();
 
     /**
+     * The sticker items in this message.
+     */
+    private final Set<StickerItem> stickerItems = new HashSet<>();
+
+    /**
      * Creates a new message object.
      *
      * @param api The discord api instance.
@@ -232,6 +241,12 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             nonce = data.get("nonce").asText();
         } else {
             nonce = null;
+        }
+
+        if (data.hasNonNull("sticker_items")) {
+            for (JsonNode stickerItemJson : data.get("sticker_items")) {
+                stickerItems.add(new StickerItemImpl(api, stickerItemJson));
+            }
         }
 
         if (data.hasNonNull("referenced_message")) {
@@ -471,6 +486,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public Optional<String> getNonce() {
         return Optional.ofNullable(nonce);
+    }
+
+    @Override
+    public Set<StickerItem> getStickerItems() {
+        return Collections.unmodifiableSet(stickerItems);
     }
 
     @Override

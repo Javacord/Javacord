@@ -36,6 +36,8 @@ import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
+import org.javacord.api.entity.sticker.Sticker;
+import org.javacord.api.entity.sticker.StickerPack;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -62,6 +64,8 @@ import org.javacord.core.entity.message.MessageSetImpl;
 import org.javacord.core.entity.message.UncachedMessageUtilImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.sticker.StickerImpl;
+import org.javacord.core.entity.sticker.StickerPackImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -354,6 +358,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * A map with all known custom emoji.
      */
     private final ConcurrentHashMap<Long, KnownCustomEmoji> customEmojis = new ConcurrentHashMap<>();
+
+    /**
+     * A map with all stickers.
+     */
+    private static final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
     /**
      * A map with all cached messages.
@@ -1107,6 +1116,38 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public void removeCustomEmoji(KnownCustomEmoji emoji) {
         customEmojis.remove(emoji.getId());
+    }
+
+    /**
+     * Gets or creates a new sticker object.
+     *
+     * @param data The json data of the sticker.
+     * @return The created sticker.
+     */
+    public Sticker getOrCreateSticker(JsonNode data) {
+        long id = data.get("id").asLong();
+        return stickers.computeIfAbsent(id, key -> new StickerImpl(this, data));
+    }
+
+    /**
+     * Removes a sticker object.
+     *
+     * @param sticker The sticker to remove.
+     */
+    public void removeSticker(Sticker sticker) {
+        stickers.remove(sticker.getId());
+    }
+
+    @Override
+    public Optional<Sticker> getStickerById(long id) {
+        return Optional.ofNullable(stickers.get(id));
+    }
+
+    @Override
+    public CompletableFuture<Sticker> requestStickerById(long id) {
+        return new RestRequest<Sticker>(this, RestMethod.GET, RestEndpoint.STICKER)
+                .setUrlParameters(String.valueOf(id))
+                .execute(result -> new StickerImpl(this, result.getJsonBody()));
     }
 
     /**
@@ -1914,6 +1955,19 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Optional<KnownCustomEmoji> getCustomEmojiById(long id) {
         return Optional.ofNullable(customEmojis.get(id));
+    }
+
+    @Override
+    public CompletableFuture<Set<StickerPack>> getNitroStickerPacks() {
+        return new RestRequest<Set<StickerPack>>(this, RestMethod.GET, RestEndpoint.STICKER_PACK)
+                .execute(result -> {
+                    Set<StickerPack> stickerPacks = new HashSet<>();
+                    for (JsonNode stickerPackJson : result.getJsonBody().get("sticker_packs")) {
+                        stickerPacks.add(new StickerPackImpl(this, stickerPackJson));
+                    }
+
+                    return stickerPacks;
+                });
     }
 
     @Override

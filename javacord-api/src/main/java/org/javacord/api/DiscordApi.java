@@ -26,6 +26,8 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerBuilder;
 import org.javacord.api.entity.server.invite.Invite;
+import org.javacord.api.entity.sticker.Sticker;
+import org.javacord.api.entity.sticker.StickerPack;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -1238,6 +1240,57 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return the new (unknown) custom emoji instance
      */
     CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(long id, String name, boolean animated);
+
+    /**
+     * Gets a list of all default sticker packs, which are available to nitro users.
+     *
+     * @return The nitro packs available to nitro users.
+     */
+    CompletableFuture<Set<StickerPack>> getNitroStickerPacks();
+
+    /**
+     * Gets a sticker by its ID.
+     *
+     * @param id The ID of the sticker.
+     * @return A future of the sticker.
+     */
+    Optional<Sticker> getStickerById(long id);
+
+    /**
+     * Gets a sticker by its ID.
+     *
+     * @param id The ID of the sticker.
+     * @return A future of the sticker.
+     */
+    default Optional<Sticker> getStickerById(String id) {
+        try {
+            return getStickerById(Long.parseLong(id));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("The id must be a number!");
+        }
+    }
+
+    /**
+     * Requests a sticker by its ID from the Discord API.
+     *
+     * @param id The ID of the sticker to request.
+     * @return A future of the sticker.
+     */
+    CompletableFuture<Sticker> requestStickerById(long id);
+
+    /**
+     * Requests a sticker by its ID from the Discord API.
+     *
+     * @param id The ID of the sticker to request.
+     * @return A future of the sticker.
+     */
+    default CompletableFuture<Sticker> requestStickerById(String id) {
+        try {
+            return requestStickerById(Long.parseLong(id));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("The ID must be a number!");
+        }
+    }
 
     /**
      * Gets a collection with all roles the bot knows.
