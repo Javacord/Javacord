@@ -6,6 +6,7 @@ import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PositionableServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
@@ -13,6 +14,7 @@ import org.javacord.api.entity.channel.internal.PositionableServerChannelUpdater
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerThreadUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -62,6 +64,7 @@ import org.javacord.core.entity.channel.PositionableServerChannelUpdaterDelegate
 import org.javacord.core.entity.channel.ServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelUpdaterDelegateImpl;
+import org.javacord.core.entity.channel.ServerThreadUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiBuilderDelegateImpl;
@@ -214,6 +217,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(ServerVoiceChannel channel) {
         return new ServerVoiceChannelUpdaterDelegateImpl(channel);
+    }
+
+    @Override
+    public ServerThreadUpdaterDelegate createServerThreadUpdaterDelegate(ServerThreadChannel thread) {
+        return new ServerThreadUpdaterDelegateImpl(thread);
     }
 
     @Override

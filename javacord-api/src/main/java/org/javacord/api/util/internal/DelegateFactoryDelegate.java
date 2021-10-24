@@ -6,6 +6,7 @@ import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PositionableServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
@@ -13,6 +14,7 @@ import org.javacord.api.entity.channel.internal.PositionableServerChannelUpdater
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerThreadUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -236,6 +238,14 @@ public interface DelegateFactoryDelegate {
      */
     ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(ServerVoiceChannel channel);
 
+    /**
+     * Creates a new server thread updater delegate.
+     *
+     * @param thread The thread to update.
+     * @return A new server thread updater delegate.
+     */
+    ServerThreadUpdaterDelegate createServerThreadUpdaterDelegate(ServerThreadChannel thread);
+    
     /**
      * Creates a new custom emoji updater delegate.
      *
