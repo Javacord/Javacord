@@ -1,13 +1,17 @@
 package org.javacord.api.entity.message;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.util.DiscordRegexPattern;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 /**
  * This class can help you to create messages.
@@ -52,6 +56,59 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      */
     public MessageBuilder setTts(boolean tts) {
         delegate.setTts(tts);
+        return this;
+    }
+
+    /**
+     * Adds a sticker to the message. This will only work if the sticker is from the same server as the message will
+     * be sent on, or if it is a default sticker.
+     *
+     * @param stickerId The ID of the sticker to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addSticker(long stickerId) {
+        delegate.addSticker(stickerId);
+        return this;
+    }
+
+    /**
+     * Adds a sticker to the message. This will only work if the sticker is from the same server as the message will
+     * be sent on, or if it is a default sticker.
+     *
+     * @param sticker The sticker to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addSticker(Sticker sticker) {
+        delegate.addSticker(sticker.getId());
+        return this;
+    }
+
+    /**
+     * Adds stickers to the message. You can add up to 3 different stickers per message.
+     * Adding the same sticker twice or more will just add the sticker once. This will only work if the stickers are
+     * from the same server as the message will be sent on, or if they are default stickers.
+     *
+     * @param stickerIds The IDs of the stickers to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addStickers(long... stickerIds) {
+        for (long stickerId : stickerIds) {
+            delegate.addSticker(stickerId);
+        }
+
+        return this;
+    }
+
+    /**
+     * Adds stickers to the message. You can add up to 3 different stickers per message.
+     * Adding the same sticker twice or more will just add the sticker once. This will only work if the stickers are
+     * from the same server as the message will be sent on, or if they are default stickers.
+     *
+     * @param stickers The IDs of the stickers to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder addStickers(Collection<Sticker> stickers) {
+        delegate.addStickers(stickers.stream().map(DiscordEntity::getId).collect(Collectors.toList()));
         return this;
     }
 

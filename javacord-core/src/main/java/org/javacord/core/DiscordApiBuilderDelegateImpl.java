@@ -132,7 +132,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * Whether the user cache should be enabled or not.
      */
-    private boolean userCacheEnabled = false;
+    private boolean userCacheEnabled = true;
 
     /**
      * The globally attachable listeners to register for every created DiscordApi instance.

@@ -60,15 +60,16 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
-     * Gets the integer value of the first option (if present).
+     * Gets the long value of the first option (if present).
+     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
      *
-     * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
-     * @deprecated Use {@link #getOptions() getOptions().get(0).getIntValue()}
-     *     or {@link #getOptionIntValueByIndex(int) getOptionIntValueByIndex(0)} instead.
+     * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getLongValue()}
+     *     or {@link #getOptionLongValueByIndex(int) getOptionLongValueByIndex(0)} instead.
      */
     @Deprecated
-    default Optional<Integer> getFirstOptionIntValue() {
-        return getFirstOption().flatMap(SlashCommandInteractionOption::getIntValue);
+    default Optional<Long> getFirstOptionLongValue() {
+        return getFirstOption().flatMap(SlashCommandInteractionOption::getLongValue);
     }
 
     /**
@@ -212,15 +213,16 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
-     * Gets the integer value of the second option (if present).
+     * Gets the long value of the second option (if present).
+     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
      *
-     * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
-     * @deprecated Use {@link #getOptions() getOptions().get(1).getIntValue()}
-     *     or {@link #getOptionIntValueByIndex(int) getOptionIntValueByIndex(1)} instead.
+     * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getLongValue()}
+     *     or {@link #getOptionLongValueByIndex(int) getOptionLongValueByIndex(1)} instead.
      */
     @Deprecated
-    default Optional<Integer> getSecondOptionIntValue() {
-        return getSecondOption().flatMap(SlashCommandInteractionOption::getIntValue);
+    default Optional<Long> getSecondOptionLongValue() {
+        return getSecondOption().flatMap(SlashCommandInteractionOption::getLongValue);
     }
 
     /**
@@ -364,15 +366,16 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
-     * Gets the integer value of the third option (if present).
+     * Gets the long value of the third option (if present).
+     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
      *
-     * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
-     * @deprecated Use {@link #getOptions() getOptions().get(2).getIntValue()}
-     *     or {@link #getOptionIntValueByIndex(int) getOptionIntValueByIndex(2)} instead.
+     * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getLongValue()}
+     *     or {@link #getOptionLongValueByIndex(int) getOptionLongValueByIndex(2)} instead.
      */
     @Deprecated
-    default Optional<Integer> getThirdOptionIntValue() {
-        return getThirdOption().flatMap(SlashCommandInteractionOption::getIntValue);
+    default Optional<Long> getThirdOptionLongValue() {
+        return getThirdOption().flatMap(SlashCommandInteractionOption::getLongValue);
     }
 
     /**
@@ -513,13 +516,14 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
-     * Gets the integer value of an option having the specified name.
+     * Gets the long value of an option having the specified name.
+     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
      *
      * @param name The name of the option to search for.
-     * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
+     * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
      */
-    default Optional<Integer> getOptionIntValueByName(String name) {
-        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getIntValue);
+    default Optional<Long> getOptionLongValueByName(String name) {
+        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getLongValue);
     }
 
     /**
@@ -641,13 +645,14 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
-     * Gets the integer value of an option at the specified index.
+     * Gets the long value of an option at the specified index.
+     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
      *
      * @param index The index of the option to search for.
-     * @return An Optional with the integer value of such an option if it exists; an empty Optional otherwise
+     * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
      */
-    default Optional<Integer> getOptionIntValueByIndex(int index) {
-        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getIntValue);
+    default Optional<Long> getOptionLongValueByIndex(int index) {
+        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getLongValue);
     }
 
     /**

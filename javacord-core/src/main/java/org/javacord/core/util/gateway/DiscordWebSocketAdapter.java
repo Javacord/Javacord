@@ -54,6 +54,7 @@ import org.javacord.core.util.handler.guild.GuildMemberAddHandler;
 import org.javacord.core.util.handler.guild.GuildMemberRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildMemberUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildMembersChunkHandler;
+import org.javacord.core.util.handler.guild.GuildStickersUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildUpdateHandler;
 import org.javacord.core.util.handler.guild.VoiceServerUpdateHandler;
 import org.javacord.core.util.handler.guild.VoiceStateUpdateHandler;
@@ -811,6 +812,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         // emoji
         addHandler(new GuildEmojisUpdateHandler(api));
+
+        // sticker
+        addHandler(new GuildStickersUpdateHandler(api));
 
         // channel
         addHandler(new ChannelCreateHandler(api));

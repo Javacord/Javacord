@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -319,6 +320,23 @@ public interface MessageBuilderBaseDelegate {
      * @param nonce The nonce to set.
      */
     void setNonce(String nonce);
+
+    /**
+     * Adds a sticker to the message. This will only work if the sticker is from the same server as the message will
+     * be sent on, or if it is a default sticker.
+     *
+     * @param stickerId The ID of the sticker to add.
+     */
+    void addSticker(long stickerId);
+
+    /**
+     * Adds stickers to the message. You can add up to 3 different stickers per message.
+     * Adding the same sticker twice or more will just add the sticker once. This will only work if the stickers are
+     * from the same server as the message will be sent on, or if they are default stickers.
+     *
+     * @param stickerIds The stickers to add.
+     */
+    void addStickers(Collection<Long> stickerIds);
 
     /**
      * Gets the {@link StringBuilder} which is used to build the message.

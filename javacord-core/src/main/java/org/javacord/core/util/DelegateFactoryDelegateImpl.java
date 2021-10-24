@@ -36,6 +36,8 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.internal.ServerBuilderDelegate;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
+import org.javacord.api.entity.sticker.internal.StickerBuilderDelegate;
+import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
@@ -80,6 +82,8 @@ import org.javacord.core.entity.server.ServerBuilderDelegateImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.ServerUpdaterDelegateImpl;
 import org.javacord.core.entity.server.invite.InviteBuilderDelegateImpl;
+import org.javacord.core.entity.sticker.StickerBuilderDelegateImpl;
+import org.javacord.core.entity.sticker.StickerUpdaterDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookBuilderDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
 import org.javacord.core.interaction.SlashCommandBuilderDelegateImpl;
@@ -281,6 +285,16 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public SelectMenuOptionBuilderDelegate createSelectMenuOptionBuilderDelegate() {
         return new SelectMenuOptionBuilderDelegateImpl();
+    }
+
+    @Override
+    public StickerBuilderDelegate createStickerBuilderDelegate(Server server) {
+        return new StickerBuilderDelegateImpl((ServerImpl) server);
+    }
+
+    @Override
+    public StickerUpdaterDelegate createStickerUpdaterDelegate(Server server, long id) {
+        return new StickerUpdaterDelegateImpl((ServerImpl) server, id);
     }
 
     @Override

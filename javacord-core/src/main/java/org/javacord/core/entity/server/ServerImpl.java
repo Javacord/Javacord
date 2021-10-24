@@ -39,6 +39,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerFeature;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -58,6 +59,7 @@ import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.sticker.StickerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -228,6 +230,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * A list with all features from this server.
      */
     private final Collection<ServerFeature> serverFeatures = new ArrayList<>();
+
+    /**
+     * A map with all stickers from this server.
+     */
+    private final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
     /**
      * The premium tier level of the server.
@@ -428,6 +435,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             for (JsonNode emojiJson : data.get("emojis")) {
                 KnownCustomEmoji emoji = api.getOrCreateKnownCustomEmoji(this, emojiJson);
                 addCustomEmoji(emoji);
+            }
+        }
+
+        if (data.has("stickers")) {
+            for (JsonNode stickerJson : data.get("stickers")) {
+                Sticker sticker = api.getOrCreateSticker(stickerJson);
+                addSticker(sticker);
             }
         }
 
@@ -1719,12 +1733,57 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Set<Sticker> getStickers() {
+        return Collections.unmodifiableSet(new HashSet<>(stickers.values()));
+    }
+
+    @Override
+    public CompletableFuture<Set<Sticker>> requestStickers() {
+        return new RestRequest<Set<Sticker>>(api, RestMethod.GET, RestEndpoint.SERVER_STICKER)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    Set<Sticker> stickers = new HashSet<>();
+                    for (JsonNode stickerJson : result.getJsonBody()) {
+                        stickers.add(new StickerImpl(api, stickerJson));
+                    }
+
+                    return stickers;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Sticker> requestStickerById(long id) {
+        return new RestRequest<Sticker>(api, RestMethod.GET, RestEndpoint.SERVER_STICKER)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> new StickerImpl(api, result.getJsonBody()));
+    }
+
+    /**
+     * Adds a sticker to the server's cache.
+     *
+     * @param sticker The sticker to add to the server's cache.
+     */
+    public void addSticker(Sticker sticker) {
+        stickers.put(sticker.getId(), sticker);
+    }
+
+    /**
+     * Removes a sticker from the server's cache.
+     *
+     * @param sticker The sticker to remove from the server's cache.
+     */
+    public void removeSticker(Sticker sticker) {
+        stickers.remove(sticker.getId());
+    }
+
+    @Override
     public void cleanup() {
         getUnorderedChannels().stream()
                 .map(ServerChannel::getId)
                 .forEach(api::removeChannelFromCache);
 
         getMembers().forEach(user -> removeMember(user.getId()));
+        stickers.values().forEach(api::removeSticker);
     }
 
     @Override

@@ -25,7 +25,11 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     private final String name;
     private final String stringRepresentation;
     private final String stringValue;
-    private final Integer intValue;
+    /**
+     * This is {@link SlashCommandOptionType#INTEGER} but it can be any integer between -2^53 and 2^53 and
+     * therefore exceeds Javas Integer range.
+     */
+    private final Long longValue;
     private final Boolean booleanValue;
     private final Long userValue;
     private final Long channelValue;
@@ -40,8 +44,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     /**
      * Class constructor.
      *
-     * @param api      The DiscordApi instance.
-     * @param jsonData The json data of the option.
+     * @param api           The DiscordApi instance.
+     * @param jsonData      The json data of the option.
      * @param resolvedUsers The map of resolved users and their ID.
      */
     public SlashCommandInteractionOptionImpl(final DiscordApi api, final JsonNode jsonData,
@@ -54,7 +58,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
         String localStringRepresentation = null;
         String localStringValue = null;
-        Integer localIntValue = null;
+        Long localLongValue = null;
         Boolean localBooleanValue = null;
         Long localUserValue = null;
         Long localChannelValue = null;
@@ -78,8 +82,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
                 localStringRepresentation = localStringValue;
                 break;
             case INTEGER:
-                localIntValue = valueNode.asInt();
-                localStringRepresentation = String.valueOf(localIntValue);
+                localLongValue = valueNode.asLong();
+                localStringRepresentation = String.valueOf(localLongValue);
                 break;
             case BOOLEAN:
                 localBooleanValue = valueNode.asBoolean();
@@ -112,7 +116,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
         stringRepresentation = localStringRepresentation;
         stringValue = localStringValue;
-        intValue = localIntValue;
+        longValue = localLongValue;
         booleanValue = localBooleanValue;
         userValue = localUserValue;
         channelValue = localChannelValue;
@@ -137,8 +141,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     }
 
     @Override
-    public Optional<Integer> getIntValue() {
-        return Optional.ofNullable(intValue);
+    public Optional<Long> getLongValue() {
+        return Optional.ofNullable(longValue);
     }
 
     @Override

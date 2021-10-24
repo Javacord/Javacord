@@ -46,6 +46,9 @@ public enum RestEndpoint {
     CURRENT_USER("/users/@me"),
     AUDIT_LOG("/guilds/%s/audit-logs", 0),
     CUSTOM_EMOJI("/guilds/%s/emojis", 0),
+    STICKER("/stickers"),
+    STICKER_PACK("/sticker-packs"),
+    SERVER_STICKER("/guilds/%s/stickers", 0),
     // interactions
     INTERACTION_RESPONSE("/interactions/%s/%s/callback", 0),
     ORIGINAL_INTERACTION_RESPONSE("/webhooks/%s/%s/messages/@original",0),

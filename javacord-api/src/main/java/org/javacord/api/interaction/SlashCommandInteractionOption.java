@@ -50,14 +50,14 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
     Optional<String> getStringValue();
 
     /**
-     * Gets the integer value of this option.
+     * Gets the long value of this option.
      *
-     * <p>If this option does not have an integer value or the option itself is a subcommand or group,
+     * <p>If this option does not have a long value or the option itself is a subcommand or group,
      *     the optional will be empty.
      *
-     * @return The integer value of this option.
+     * @return The long value of this option.
      */
-    Optional<Integer> getIntValue();
+    Optional<Long> getLongValue();
 
     /**
      * Gets the boolean value of this option.
