@@ -68,6 +68,14 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     Icon getAvatar();
 
     /**
+     * Gets the avatar of the user.
+     *
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The avatar of the user.
+     */
+    Icon getAvatar(int size);
+
+    /**
      * Gets the voice channel this MessageAuthor (if it is a User)
      * is connected to on the server where the message has been sent.
      *
