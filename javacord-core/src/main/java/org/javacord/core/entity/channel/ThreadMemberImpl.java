@@ -47,7 +47,7 @@ public class ThreadMemberImpl implements ThreadMember {
      * @param data   The JSON data from which to parse this object.
      */
     public ThreadMemberImpl(final DiscordApi api, final Server server, final JsonNode data) {
-        this(api, server, data, data.get("id").asLong(), data.get("userId").asLong());
+        this(api, server, data, data.get("id").asLong(), data.get("user_id").asLong());
     }
     
     /**
