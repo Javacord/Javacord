@@ -133,8 +133,7 @@ public class ServerTextChannelImpl extends PositionableServerChannelImpl
         return new RestRequest<ServerThreadChannel>(getApi(), RestMethod.POST, RestEndpoint.START_THREAD_WITH_MESSAGE)
                 .setUrlParameters(getIdAsString(), String.valueOf(messageId))
                 .setBody(body)
-                .execute(result -> new ServerThreadChannelImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
-                        result.getJsonBody()));
+                .execute(result -> ((ServerImpl) getServer()).getOrCreateServerThreadChannel(result.getJsonBody()));
     }
 
     @Override
@@ -152,8 +151,7 @@ public class ServerTextChannelImpl extends PositionableServerChannelImpl
                 RestEndpoint.START_THREAD_WITHOUT_MESSAGE)
                 .setUrlParameters(getIdAsString())
                 .setBody(body)
-                .execute(result -> new ServerThreadChannelImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
-                        result.getJsonBody()));
+                .execute(result -> ((ServerImpl) getServer()).getOrCreateServerThreadChannel(result.getJsonBody()));
     }
 
     @Override

@@ -112,6 +112,8 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
+
+        api.addChannelToCache(this);
     }
 
     @Override

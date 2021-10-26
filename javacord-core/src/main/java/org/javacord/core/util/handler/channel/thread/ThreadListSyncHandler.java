@@ -8,7 +8,6 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.thread.ThreadListSyncEvent;
-import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.thread.ThreadListSyncEventImpl;
@@ -50,7 +49,7 @@ public class ThreadListSyncHandler extends PacketHandler {
 
         final List<ServerThreadChannel> threads = new ArrayList<>();
         for (final JsonNode thread : packet.get("threads")) {
-            threads.add(new ServerThreadChannelImpl(api, server, thread));
+            threads.add(server.getOrCreateServerThreadChannel(thread));
         }
 
         final List<Long> threadIds = new ArrayList<>();
@@ -61,10 +60,6 @@ public class ThreadListSyncHandler extends PacketHandler {
         final List<ThreadMember> members = new ArrayList<>();
         for (final JsonNode member : packet.get("members")) {
             members.add(new ThreadMemberImpl(api, server, member));
-        }
-
-        for (final ServerThreadChannel thread : threads) {
-            api.addChannelToCache(thread);
         }
 
         //Removes lost threads from cache

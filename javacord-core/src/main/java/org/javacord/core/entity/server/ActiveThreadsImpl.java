@@ -5,7 +5,6 @@ import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.entity.server.ActiveThreads;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +32,7 @@ public class ActiveThreadsImpl implements ActiveThreads {
     public ActiveThreadsImpl(final DiscordApiImpl api, final ServerImpl server, final JsonNode data) {
         serverThreadChannels = new ArrayList<>();
         for (final JsonNode jsonNode : data.get("threads")) {
-            serverThreadChannels.add(new ServerThreadChannelImpl(api, server, jsonNode));
+            serverThreadChannels.add(server.getOrCreateServerThreadChannel(jsonNode));
         }
 
         threadMembers = new ArrayList<>();
