@@ -38,6 +38,13 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     String getName();
 
     /**
+     * Gets the description of this command.
+     *
+     * @return The description of this command.
+     */
+    String getDescription();
+
+    /**
      * Gets the default permission of this command.
      *
      * @return The default permission of this command.

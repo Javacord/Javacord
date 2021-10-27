@@ -3,7 +3,6 @@ package org.javacord.api.interaction.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
-
 import java.util.concurrent.CompletableFuture;
 
 public interface ApplicationCommandBuilderDelegate<T extends ApplicationCommand> {

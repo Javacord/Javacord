@@ -10,7 +10,6 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,7 +69,7 @@ public class SlashCommandInteractionImpl extends InteractionImpl implements Slas
 
     @Override
     public InteractionType getType() {
-        return InteractionType.SLASH_COMMAND;
+        return InteractionType.APPLICATION_COMMAND;
     }
 
     @Override

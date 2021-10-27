@@ -46,7 +46,6 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
 import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;

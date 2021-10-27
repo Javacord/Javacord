@@ -38,16 +38,15 @@ import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.interaction.ApplicationCommandUpdater;
 import org.javacord.api.interaction.MessageContextMenu;
 import org.javacord.api.interaction.ServerApplicationCommandPermissions;
-import org.javacord.api.interaction.ServerApplicationCommandPermissions;
 import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
+import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
 import org.javacord.api.util.ratelimit.LocalRatelimiter;
 import org.javacord.api.util.ratelimit.Ratelimiter;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -108,6 +107,38 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * Gets a list with all global commands for the application.
      *
      * @return A list with all global commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands();
+
+    /**
+     * Gets an application command by its id.
+     *
+     * @param applicationCommandId The id of the application command.
+     * @return The application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long applicationCommandId);
+
+    /**
+     * Gets a list with all application commands for the given server.
+     *
+     * @param server The server to get the application commands from.
+     * @return A list with all application commands from the server.
+     */
+    CompletableFuture<List<ApplicationCommand>> getServerApplicationCommands(Server server);
+
+    /**
+     * Gets a server application command by its id.
+     *
+     * @param server The server to get the application commands from.
+     * @param applicationCommandId The id of the server application command.
+     * @return The server application command with the given id.
+     */
+    CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long applicationCommandId);
+
+    /**
+     * Gets a list with all global slash commands for the application.
+     *
+     * @return A list with all global slash commands.
      */
     CompletableFuture<List<SlashCommand>> getGlobalSlashCommands();
 
@@ -232,29 +263,36 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     /**
      * Bulk overwrites the global application commands.
      * This should be preferably used when updating and/or creating multiple
-     * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)} (DiscordApi)}
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)}
      * and {@link ApplicationCommandBuilder#createGlobal(DiscordApi)}
      *
      * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders
-     *     which should should be used to perform the bulk overwrite.
+     *                                      which should be used to perform the bulk overwrite.
      * @return A list containing all application commands.
      */
-    CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList);
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder<? extends ApplicationCommand,
+                    ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
+                    ? extends ApplicationCommandBuilder<?, ?, ?>>>
+                    applicationCommandBuilderList);
 
     /**
      * Bulk overwrites the servers application commands.
      * This should be preferably used when updating and/or creating multiple
-     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)} (Server)
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)}
      * and {@link ApplicationCommandBuilder#createForServer(Server)}
      *
      * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
-     * @param server The server where the bulk overwrite should be performed on
-     *     which should be used to perform the bulk overwrite.
+     * @param server                        The server where the bulk overwrite should be performed on
+     *                                      which should be used to perform the bulk overwrite.
      * @return A list containing all application commands.
      */
-    CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server, List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList);
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            Server server,
+            List<ApplicationCommandBuilder<? extends ApplicationCommand,
+                    ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
+                    ? extends ApplicationCommandBuilder<?, ?, ?>>>
+                    applicationCommandBuilderList);
 
     /**
      * Gets a utility class to interact with uncached messages.
