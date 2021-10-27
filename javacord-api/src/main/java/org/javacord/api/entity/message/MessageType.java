@@ -44,7 +44,7 @@ public enum MessageType {
     /**
      * The int representing the type.
      */
-    final int type;
+    private final int type;
 
     /**
      * Creates a new message type.
@@ -58,7 +58,7 @@ public enum MessageType {
     /**
      * Gets the type by its int representation.
      *
-     * @param type The int representation.
+     * @param type    The int representation.
      * @param webhook Whether the message was sent by a webhook or not.
      * @return The message type.
      */

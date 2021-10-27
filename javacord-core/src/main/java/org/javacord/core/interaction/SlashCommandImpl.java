@@ -12,7 +12,6 @@ import java.util.List;
 
 public class SlashCommandImpl extends ApplicationCommandImpl implements SlashCommand {
 
-    private final String description;
     private final List<SlashCommandOption> options;
 
     /**
@@ -23,7 +22,6 @@ public class SlashCommandImpl extends ApplicationCommandImpl implements SlashCom
      */
     public SlashCommandImpl(DiscordApiImpl api, JsonNode data) {
         super(api, data);
-        description = data.get("description").asText();
         options = new ArrayList<>();
         if (data.has("options")) {
             for (JsonNode optionJson : data.get("options")) {
@@ -35,11 +33,6 @@ public class SlashCommandImpl extends ApplicationCommandImpl implements SlashCom
     @Override
     public ApplicationCommandType getType() {
         return ApplicationCommandType.SLASH;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
     }
 
     @Override

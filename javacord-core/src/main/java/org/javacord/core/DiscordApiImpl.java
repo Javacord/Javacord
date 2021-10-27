@@ -52,6 +52,7 @@ import org.javacord.api.interaction.ServerApplicationCommandPermissions;
 import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
+import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -78,6 +79,7 @@ import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandImpl;
 import org.javacord.core.interaction.ApplicationCommandPermissionsImpl;
 import org.javacord.core.interaction.MessageContextMenuImpl;
 import org.javacord.core.interaction.ServerApplicationCommandPermissionsImpl;
@@ -1414,6 +1416,34 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
+    public CompletableFuture<List<ApplicationCommand>> getGlobalApplicationCommands() {
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId) {
+        return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .execute(result -> jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> getServerApplicationCommands(Server server) {
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId) {
+        return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
     public CompletableFuture<List<SlashCommand>> getGlobalSlashCommands() {
         return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId))
@@ -1424,7 +1454,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<SlashCommand> getGlobalSlashCommandById(long commandId) {
         return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
-                .execute(result -> new SlashCommandImpl(this, result.getJsonBody()));
+                .execute(result -> (SlashCommand) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
@@ -1438,7 +1468,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId) {
         return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
-                .execute(result -> new SlashCommandImpl(this, result.getJsonBody()));
+                .execute(result -> (SlashCommand) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
@@ -1452,7 +1482,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<UserContextMenu> getGlobalUserContextMenuById(long commandId) {
         return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
-                .execute(result -> new UserContextMenuImpl(this, result.getJsonBody()));
+                .execute(result -> (UserContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
@@ -1466,7 +1496,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<UserContextMenu> getServerUserContextMenuById(Server server, long commandId) {
         return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
-                .execute(result -> new UserContextMenuImpl(this, result.getJsonBody()));
+                .execute(result -> (UserContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
@@ -1480,7 +1510,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<MessageContextMenu> getGlobalMessageContextMenuById(long commandId) {
         return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
-                .execute(result -> new MessageContextMenuImpl(this, result.getJsonBody()));
+                .execute(result -> (MessageContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
@@ -1494,7 +1524,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<MessageContextMenu> getServerMessageContextMenuById(Server server, long commandId) {
         return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
-                .execute(result -> new MessageContextMenuImpl(this, result.getJsonBody()));
+                .execute(result -> (MessageContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
@@ -1503,7 +1533,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         return new RestRequest<List<ServerApplicationCommandPermissions>>(this, RestMethod.GET,
                 RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
-                .execute(result -> jsonToServerSlashCommandPermissionsList(result.getJsonBody()));
+                .execute(result -> jsonToServerApplicationCommandPermissionsList(result.getJsonBody()));
     }
 
     @Override
@@ -1533,10 +1563,55 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
                 .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
                 .setBody(body)
-                .execute(result -> jsonToServerSlashCommandPermissionsList(result.getJsonBody()));
+                .execute(result -> jsonToServerApplicationCommandPermissionsList(result.getJsonBody()));
     }
 
-    private List<ServerApplicationCommandPermissions> jsonToServerSlashCommandPermissionsList(
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            List<ApplicationCommandBuilder<? extends ApplicationCommand,
+                    ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
+                    ? extends ApplicationCommandBuilder<?, ?, ?>>>
+                    applicationCommandBuilderList) {
+
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId))
+                .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            Server server, List<ApplicationCommandBuilder<? extends ApplicationCommand,
+            ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
+            ? extends ApplicationCommandBuilder<?, ?, ?>>> applicationCommandBuilderList) {
+
+        return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    //////////////////////////////////////////////
+    //Internal Application Command Utility methods
+    //////////////////////////////////////////////
+
+    private ArrayNode applicationCommandBuildersToArrayNode(List<ApplicationCommandBuilder<
+            ? extends ApplicationCommand,
+            ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
+            ? extends ApplicationCommandBuilder<?, ?, ?>>> applicationCommandBuilderList) {
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        for (ApplicationCommandBuilder<? extends ApplicationCommand,
+                ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
+                ? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilder
+                : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl<? extends ApplicationCommand>)
+                    applicationCommandBuilder.getDelegate())
+                    .getJsonBodyForApplicationCommand());
+        }
+        return body;
+    }
+
+    private List<ServerApplicationCommandPermissions> jsonToServerApplicationCommandPermissionsList(
             JsonNode resultJson) {
         List<ServerApplicationCommandPermissions> permissions = new ArrayList<>();
         for (JsonNode jsonNode : resultJson) {
@@ -1548,88 +1623,48 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private List<ApplicationCommand> jsonToApplicationCommandList(JsonNode resultJson) {
         List<ApplicationCommand> applicationCommands = new ArrayList<>();
         for (JsonNode applicationCommandJson : resultJson) {
-            ApplicationCommandType type = ApplicationCommandType.fromValue(applicationCommandJson.get("type").asInt());
-            if (type.equals(ApplicationCommandType.SLASH)) {
-                applicationCommands.add(new SlashCommandImpl(this, applicationCommandJson));
-            }
-            if (type.equals(ApplicationCommandType.USER)) {
-                applicationCommands.add(new UserContextMenuImpl(this, applicationCommandJson));
-            }
-            if (type.equals(ApplicationCommandType.MESSAGE)) {
-                applicationCommands.add(new MessageContextMenuImpl(this, applicationCommandJson));
-            }
+            applicationCommands.add(jsonToApplicationCommand(applicationCommandJson));
         }
         return Collections.unmodifiableList(applicationCommands);
     }
 
-    private List<SlashCommand> jsonToSlashCommandList(JsonNode resultJson) {
-        List<SlashCommand> slashCommands = new ArrayList<>();
-        for (JsonNode slashCommandJson : resultJson) {
-            if (ApplicationCommandType.fromValue(slashCommandJson.get("type").asInt())
-                    .equals(ApplicationCommandType.SLASH)) {
-                slashCommands.add(new SlashCommandImpl(this, slashCommandJson));
-            }
+    private ApplicationCommand jsonToApplicationCommand(JsonNode applicationCommandJson) {
+        ApplicationCommandType type = ApplicationCommandType.fromValue(applicationCommandJson.get("type").asInt());
+        if (type == ApplicationCommandType.SLASH) {
+            return new SlashCommandImpl(this, applicationCommandJson);
+        } else if (type == ApplicationCommandType.USER) {
+            return new UserContextMenuImpl(this, applicationCommandJson);
+        } else if (type == ApplicationCommandType.MESSAGE) {
+            return new MessageContextMenuImpl(this, applicationCommandJson);
+        } else {
+            return new ApplicationCommandImpl(this, applicationCommandJson) {
+                @Override
+                public ApplicationCommandType getType() {
+                    return ApplicationCommandType.APPLICATION_COMMAND;
+                }
+            };
         }
-        return Collections.unmodifiableList(slashCommands);
+    }
+
+    private List<SlashCommand> jsonToSlashCommandList(JsonNode resultJson) {
+        return jsonToApplicationCommandList(resultJson).stream()
+                .filter(applicationCommand -> applicationCommand.getType() == ApplicationCommandType.SLASH)
+                .map(SlashCommand.class::cast)
+                .collect(Collectors.toList());
     }
 
     private List<UserContextMenu> jsonToUserContextMenuList(JsonNode resultJson) {
-        List<UserContextMenu> userContextMenus = new ArrayList<>();
-        for (JsonNode userContextMenuJson : resultJson) {
-            if (ApplicationCommandType.fromValue(userContextMenuJson.get("type").asInt())
-                    .equals(ApplicationCommandType.USER)) {
-                userContextMenus.add(new UserContextMenuImpl(this, userContextMenuJson));
-            }
-        }
-        return Collections.unmodifiableList(userContextMenus);
+        return jsonToApplicationCommandList(resultJson).stream()
+                .filter(applicationCommand -> applicationCommand.getType() == ApplicationCommandType.USER)
+                .map(UserContextMenu.class::cast)
+                .collect(Collectors.toList());
     }
 
     private List<MessageContextMenu> jsonToMessageContextMenuList(JsonNode resultJson) {
-        List<MessageContextMenu> messageContextMenus = new ArrayList<>();
-        for (JsonNode messageContextMenuJson : resultJson) {
-            if (ApplicationCommandType.fromValue(messageContextMenuJson.get("type").asInt())
-                    .equals(ApplicationCommandType.MESSAGE)) {
-                messageContextMenus.add(new MessageContextMenuImpl(this, messageContextMenuJson));
-            }
-        }
-        return Collections.unmodifiableList(messageContextMenus);
-    }
-
-    @Override
-    public CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (ApplicationCommandBuilder<? extends ApplicationCommand>
-                applicationCommandBuilder : applicationCommandBuilderList) {
-            body.add(((ApplicationCommandBuilderDelegateImpl<? extends ApplicationCommand>)
-                    applicationCommandBuilder.getDelegate())
-                    .getJsonBodyForApplicationCommand());
-        }
-
-        return new RestRequest<List<? extends ApplicationCommand>>(this,
-                RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
-                .setBody(body)
-                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
-    }
-
-    @Override
-    public CompletableFuture<List<? extends ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server,
-            List<ApplicationCommandBuilder<? extends ApplicationCommand>> applicationCommandBuilderList) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (ApplicationCommandBuilder<? extends ApplicationCommand>
-                applicationCommandBuilder : applicationCommandBuilderList) {
-            body.add(((ApplicationCommandBuilderDelegateImpl<? extends ApplicationCommand>)
-                    applicationCommandBuilder.getDelegate())
-                    .getJsonBodyForApplicationCommand());
-        }
-
-        return new RestRequest<List<? extends ApplicationCommand>>(this, RestMethod.PUT,
-                RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
-                .setBody(body)
-                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+        return jsonToApplicationCommandList(resultJson).stream()
+                .filter(applicationCommand -> applicationCommand.getType() == ApplicationCommandType.MESSAGE)
+                .map(MessageContextMenu.class::cast)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -2115,13 +2150,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public Collection<ServerTextChannel> getServerTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
     }
-    
+
     @Override
     public Set<ServerThreadChannel> getServerThreadChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(
-                        ChannelType.SERVER_PRIVATE_THREAD,
-                        ChannelType.SERVER_PUBLIC_THREAD,
-                        ChannelType.SERVER_NEWS_THREAD);
+                ChannelType.SERVER_PRIVATE_THREAD,
+                ChannelType.SERVER_PUBLIC_THREAD,
+                ChannelType.SERVER_NEWS_THREAD);
     }
 
     @Override

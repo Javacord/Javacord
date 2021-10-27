@@ -2,6 +2,11 @@ package org.javacord.api.interaction;
 
 public enum ApplicationCommandType {
 
+    /**
+     * This is not an official type and can be any application command type.
+     * This is also used as a fallback for new types.
+     */
+    APPLICATION_COMMAND(0),
     SLASH(1),
     USER(2),
     MESSAGE(3),

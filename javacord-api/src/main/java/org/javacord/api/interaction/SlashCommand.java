@@ -10,13 +10,6 @@ import java.util.stream.Collectors;
 public interface SlashCommand extends ApplicationCommand {
 
     /**
-     * Gets the description of this command.
-     *
-     * @return The description of this command.
-     */
-    String getDescription();
-
-    /**
      * Gets a list with all options (i.e., parameters) for this command.
      *
      * @return A list with all options (i.e., parameters) for this command.
