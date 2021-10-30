@@ -54,16 +54,16 @@ public enum PermissionType {
     START_EMBEDDED_ACTIVITIES(0x8000000000);
 
     /**
-     * The value of the permission. An integer where only one bit is set (e.g. <code>0b1000</code>).
+     * The value of the permission. An long where only one bit is set (e.g. <code>0b1000</code>).
      */
-    private final int value;
+    private final long value;
 
     /**
      * Creates a new permission type.
      *
      * @param value The value of the permission type.
      */
-    PermissionType(int value) {
+    PermissionType(long value) {
         this.value = value;
     }
 
@@ -72,7 +72,7 @@ public enum PermissionType {
      *
      * @return The value.
      */
-    public int getValue() {
+    public long getValue() {
         return value;
     }
 
