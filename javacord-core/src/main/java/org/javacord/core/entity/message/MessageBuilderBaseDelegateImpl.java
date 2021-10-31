@@ -245,8 +245,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
     @Override
     public void addEmbeds(List<EmbedBuilder> embeds) {
-        this.embeds.addAll(embeds);
-        embedsChanged = true;
+        embeds.forEach(this::addEmbed);
     }
 
     @Override
