@@ -208,6 +208,46 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
                                  EmbedBuilder embed, boolean updateEmbed);
 
     /**
+     * Updates the content of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> editContent(long channelId, long messageId, String content);
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> editContent(String channelId, String messageId, String content);
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> editEmbed(long channelId, long messageId, EmbedBuilder embed);
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> editEmbed(String channelId, String messageId, EmbedBuilder embed);
+
+    /**
      * Removes the content of the message.
      *
      * @param channelId The id of the message's channel.

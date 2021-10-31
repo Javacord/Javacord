@@ -359,6 +359,26 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Updates the content of the message.
+     * 
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> editContent(String content) {
+        return Message.edit(getApi(), getChannel().getId(), getId(), content, true, null, false);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param embed The new embed of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> editEmbed(EmbedBuilder embed) {
+        return Message.edit(getApi(), getChannel().getId(), getId(), null, false, embed, true);
+    }
+
+    /**
      * Removes the content of the message.
      *
      * @param api The discord api instance.
