@@ -3,23 +3,25 @@ package org.javacord.api.util.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.GroupChannel;
-import org.javacord.api.entity.channel.PositionableServerChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.GroupChannelUpdaterDelegate;
-import org.javacord.api.entity.channel.internal.PositionableServerChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
-import org.javacord.api.entity.channel.internal.ServerThreadUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
+import org.javacord.api.entity.channel.internal.ServerThreadChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
@@ -53,7 +55,6 @@ import org.javacord.api.internal.AccountUpdaterDelegate;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.util.exception.DiscordExceptionValidator;
 import org.javacord.api.util.logging.internal.ExceptionLoggerDelegate;
-
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -229,6 +230,27 @@ public class DelegateFactory {
     }
 
     /**
+     * Creates a new server thread channel builder delegate.
+     *
+     * @param serverTextChannel The server text channel where the thread will be created in.
+     * @return A new server thread channel builder delegate.
+     */
+    public static ServerThreadChannelBuilderDelegate createServerThreadChannelBuilderDelegate(
+            ServerTextChannel serverTextChannel) {
+        return delegateFactoryDelegate.createServerThreadChannelBuilderDelegate(serverTextChannel);
+    }
+
+    /**
+     * Creates a new server thread channel builder delegate.
+     *
+     * @param message The message where this thread should be created for.
+     * @return A new server thread channel builder delegate.
+     */
+    public static ServerThreadChannelBuilderDelegate createServerThreadChannelBuilderDelegate(Message message) {
+        return delegateFactoryDelegate.createServerThreadChannelBuilderDelegate(message);
+    }
+
+    /**
      * Creates a new server voice channel builder delegate.
      *
      * @param server The server of the server voice channel.
@@ -329,14 +351,14 @@ public class DelegateFactory {
     }
 
     /**
-     * Creates a new positionable server channel updater delegate.
+     * Creates a new regular server channel updater delegate.
      *
      * @param channel The channel to update.
-     * @return A new positionable server channel updater delegate.
+     * @return A new regular server channel updater delegate.
      */
-    public static PositionableServerChannelUpdaterDelegate createPositionableServerChannelUpdaterDelegate(
-            PositionableServerChannel channel) {
-        return delegateFactoryDelegate.createPositionableServerChannelUpdaterDelegate(channel);
+    public static RegularServerChannelUpdaterDelegate createRegularServerChannelUpdaterDelegate(
+            RegularServerChannel channel) {
+        return delegateFactoryDelegate.createRegularServerChannelUpdaterDelegate(channel);
     }
 
     /**
@@ -361,14 +383,14 @@ public class DelegateFactory {
     }
 
     /**
-     * Creates a new server thread updater delegate.
+     * Creates a new server thread channel updater delegate.
      *
      * @param thread The thread to update.
-     * @return A new server thread updater delegate.
+     * @return A new server thread channel updater delegate.
      */
-    public static ServerThreadUpdaterDelegate createServerThreadUpdaterDelegate(
+    public static ServerThreadChannelUpdaterDelegate createServerThreadChannelUpdaterDelegate(
             ServerThreadChannel thread) {
-        return delegateFactoryDelegate.createServerThreadUpdaterDelegate(thread);
+        return delegateFactoryDelegate.createServerThreadChannelUpdaterDelegate(thread);
     }
 
     /**

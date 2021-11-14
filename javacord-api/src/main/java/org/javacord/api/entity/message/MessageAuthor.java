@@ -356,7 +356,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     default boolean canCreateInstantInviteToTextChannel() {
         return getMessage()
                 .getChannel()
-                .asServerChannel()
+                .asRegularServerChannel()
                 .flatMap(serverChannel -> asUser().map(serverChannel::canCreateInstantInvite))
                 .orElse(false);
     }

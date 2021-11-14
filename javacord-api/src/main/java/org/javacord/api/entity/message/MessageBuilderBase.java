@@ -20,7 +20,7 @@ import java.util.List;
 abstract class MessageBuilderBase<T> {
     private final Class<T> myClass;
 
-    public MessageBuilderBase(Class<T> myClass) {
+    protected MessageBuilderBase(Class<T> myClass) {
         this.myClass = myClass;
     }
 

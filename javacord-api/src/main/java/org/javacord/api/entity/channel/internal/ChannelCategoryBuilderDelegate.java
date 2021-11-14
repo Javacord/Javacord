@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
  * You usually don't want to interact with this object.
  */
 public interface ChannelCategoryBuilderDelegate extends
-        ServerChannelBuilderDelegate {
+        RegularServerChannelBuilderDelegate {
 
     /**
      * Creates the channel category.

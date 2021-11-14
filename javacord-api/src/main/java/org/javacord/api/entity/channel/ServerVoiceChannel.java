@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server voice channel.
  */
-public interface ServerVoiceChannel extends PositionableServerChannel, VoiceChannel, Categorizable,
+public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, Categorizable,
                                             ServerVoiceChannelAttachableListenerManager {
 
     /**
@@ -165,13 +165,13 @@ public interface ServerVoiceChannel extends PositionableServerChannel, VoiceChan
     }
 
     @Override
-    default Optional<ServerVoiceChannel> getCurrentCachedInstance() {
+    default Optional<? extends ServerVoiceChannel> getCurrentCachedInstance() {
         return getApi().getServerById(getServer().getId()).flatMap(server -> server.getVoiceChannelById(getId()));
     }
 
     @Override
-    default CompletableFuture<ServerVoiceChannel> getLatestInstance() {
-        Optional<ServerVoiceChannel> currentCachedInstance = getCurrentCachedInstance();
+    default CompletableFuture<? extends ServerVoiceChannel> getLatestInstance() {
+        Optional<? extends ServerVoiceChannel> currentCachedInstance = getCurrentCachedInstance();
         if (currentCachedInstance.isPresent()) {
             return CompletableFuture.completedFuture(currentCachedInstance.get());
         } else {

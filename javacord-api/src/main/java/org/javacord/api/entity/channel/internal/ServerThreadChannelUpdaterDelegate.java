@@ -1,25 +1,16 @@
 package org.javacord.api.entity.channel.internal;
 
 import org.javacord.api.entity.channel.AutoArchiveDuration;
-import org.javacord.api.entity.channel.ServerThreadUpdater;
-
-import java.util.concurrent.CompletableFuture;
+import org.javacord.api.entity.channel.ServerThreadChannelUpdater;
 
 /**
- * This class is internally used by the {@link ServerThreadUpdater} to update server thread channels.
+ * This class is internally used by the {@link ServerThreadChannelUpdater} to update server thread channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerThreadUpdaterDelegate {
+public interface ServerThreadChannelUpdaterDelegate extends ServerChannelUpdaterDelegate {
 
     /**
-     * Queues the name to be updated.
-     *
-     * @param name The new name of the thread.
-     */
-    void setName(String name);
-    
-    /**
-     * Queues the archived to be updated.
+     * Queues the archived flag to be updated.
      *
      * @param archived The new archived flag of the thread.
      */
@@ -31,16 +22,16 @@ public interface ServerThreadUpdaterDelegate {
      * @param autoArchiveDuration The new auto archive duration of the thread.
      */
     void setAutoArchiveDuration(AutoArchiveDuration autoArchiveDuration);
-    
+
     /**
-     * Queues the locked to be updated.
+     * Queues the locked flag to be updated.
      *
      * @param locked The new locked flag of the thread.
      */
     void setLockedFlag(boolean locked);
-    
+
     /**
-     * Queues the invitable to be updated.
+     * Queues the invitable flag to be updated.
      *
      * @param invitable The new invitable flag of the thread.
      */
@@ -52,18 +43,5 @@ public interface ServerThreadUpdaterDelegate {
      * @param delay The delay in seconds.
      */
     void setSlowmodeDelayInSeconds(int delay);
-    
-    /**
-     * Sets the reason for this update. This reason will be visible in the audit log entry(s).
-     *
-     * @param reason The reason for this update.
-     */
-    void setAuditLogReason(String reason);
-    
-    /**
-     * Performs the queued updates.
-     *
-     * @return A future to check if the update was successful.
-     */
-    CompletableFuture<Void> update();
+
 }

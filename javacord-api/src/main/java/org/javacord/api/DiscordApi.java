@@ -8,6 +8,7 @@ import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -1388,6 +1389,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Collection<ServerChannel> getServerChannels();
 
     /**
+     * Gets a collection with all regular server channels of the bot.
+     *
+     * @return A collection with all regular server channels of the bot.
+     */
+    Collection<RegularServerChannel> getRegularServerChannels();
+
+    /**
      * Gets a collection with all channel categories of the bot.
      *
      * @return A collection with all channel categories of the bot.
@@ -1652,6 +1660,58 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     default Collection<ServerChannel> getServerChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getServerChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a regular server channel by its id.
+     *
+     * @param id The id of the regular server channel.
+     * @return The regular server channel with the given id.
+     */
+    default Optional<RegularServerChannel> getRegularServerChannelById(long id) {
+        return getChannelById(id).flatMap(Channel::asRegularServerChannel);
+    }
+
+    /**
+     * Gets a regular server channel by its id.
+     *
+     * @param id The id of the regular server channel.
+     * @return The regular server channel with the given id.
+     */
+    default Optional<RegularServerChannel> getRegularServerChannelById(String id) {
+        try {
+            return getRegularServerChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all regular server channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the regular server channels.
+     * @return A collection with all regular server channels with the given name.
+     */
+    default Collection<RegularServerChannel> getRegularServerChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getRegularServerChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a collection with all regular server channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the regular server channels.
+     * @return A collection with all regular server channels with the given name.
+     */
+    default Collection<RegularServerChannel> getRegularServerChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getRegularServerChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }

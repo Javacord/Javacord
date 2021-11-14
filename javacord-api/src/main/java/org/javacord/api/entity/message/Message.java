@@ -25,7 +25,6 @@ import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -1605,8 +1604,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default CompletableFuture<ServerThreadChannel> createThread(String name, AutoArchiveDuration autoArchiveDuration) {
         return getServerTextChannel()
-                .map(serverTextChannel -> serverTextChannel.createThreadForMessage(getId(), name,
-                        autoArchiveDuration.asInt()))
+                .map(serverTextChannel -> serverTextChannel.createThreadForMessage(this, name, autoArchiveDuration))
                 .orElseThrow(() -> new IllegalStateException(
                         "In order to create a thread the channel of this message must be a ServerTextChannel"));
     }
@@ -1620,7 +1618,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default CompletableFuture<ServerThreadChannel> createThread(String name, Integer autoArchiveDuration) {
         return getServerTextChannel()
-                .map(serverTextChannel -> serverTextChannel.createThreadForMessage(getId(), name, autoArchiveDuration))
+                .map(serverTextChannel -> serverTextChannel.createThreadForMessage(this, name, autoArchiveDuration))
                 .orElseThrow(() -> new IllegalStateException(
                         "In order to create a thread the channel of this message must be a ServerTextChannel"));
     }

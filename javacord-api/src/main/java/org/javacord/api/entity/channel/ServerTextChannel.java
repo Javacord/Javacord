@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server text channel.
  */
-public interface ServerTextChannel extends PositionableServerChannel, TextChannel, Mentionable, Categorizable,
+public interface ServerTextChannel extends RegularServerChannel, TextChannel, Mentionable, Categorizable,
         ServerTextChannelAttachableListenerManager {
 
     /**
@@ -173,19 +173,21 @@ public interface ServerTextChannel extends PositionableServerChannel, TextChanne
      */
     default CompletableFuture<ServerThreadChannel> createThreadForMessage(Message message, String name,
                                                                           AutoArchiveDuration autoArchiveDuration) {
-        return createThreadForMessage(message.getId(), name, autoArchiveDuration.asInt());
+        return createThreadForMessage(message, name, autoArchiveDuration.asInt());
     }
 
     /**
      * Creates a thread for a message in this ServerTextChannel.
      *
-     * @param messageId           The message ID to create the thread for.
+     * @param message             The message to create the thread for.
      * @param name                The Thread name.
      * @param autoArchiveDuration Duration in minutes to automatically archive the thread after recent activity.
      * @return The created ServerThreadChannel.
      */
-    CompletableFuture<ServerThreadChannel> createThreadForMessage(long messageId, String name,
-                                                                  Integer autoArchiveDuration);
+    default CompletableFuture<ServerThreadChannel> createThreadForMessage(Message message, String name,
+                                                                          Integer autoArchiveDuration) {
+        return new ServerThreadChannelBuilder(message, name).setAutoArchiveDuration(autoArchiveDuration).create();
+    }
 
     /**
      * Creates a thread which is not related to a message.
@@ -235,9 +237,13 @@ public interface ServerTextChannel extends PositionableServerChannel, TextChanne
      *                            only available when creating a private thread.
      * @return The created ServerThreadChannel.
      */
-    CompletableFuture<ServerThreadChannel> createThread(ChannelType channelType, String name,
-                                                        Integer autoArchiveDuration,
-                                                        Boolean inviteable);
+    default CompletableFuture<ServerThreadChannel> createThread(ChannelType channelType, String name,
+                                                                Integer autoArchiveDuration,
+                                                                Boolean inviteable) {
+        return new ServerThreadChannelBuilder(this, channelType, name)
+                .setAutoArchiveDuration(autoArchiveDuration)
+                .setInvitableFlag(inviteable).create();
+    }
 
     /**
      * Creates a thread which is not related to a message.

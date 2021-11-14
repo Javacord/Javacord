@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ServerVoiceChannelImpl extends PositionableServerChannelImpl
+public class ServerVoiceChannelImpl extends RegularServerChannelImpl
         implements ServerVoiceChannel, InternalServerVoiceChannelAttachableListenerManager {
 
     /**
