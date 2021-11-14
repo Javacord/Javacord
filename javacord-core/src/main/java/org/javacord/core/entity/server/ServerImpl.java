@@ -19,7 +19,7 @@ import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.api.entity.channel.PositionableServerChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -52,7 +52,7 @@ import org.javacord.core.entity.VanityUrlCodeImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
-import org.javacord.core.entity.channel.PositionableServerChannelImpl;
+import org.javacord.core.entity.channel.RegularServerChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
@@ -1650,12 +1650,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .filter(channel -> channel.asCategorizable()
                         .map(categorizable -> !categorizable.getCategory().isPresent())
                         .orElse(false))
-                .map(Channel::asPositionableServerChannel)
+                .map(Channel::asRegularServerChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .sorted(Comparator
-                        .<PositionableServerChannel>comparingInt(channel -> channel.getType().getId())
-                        .thenComparing(PositionableServerChannelImpl.COMPARE_BY_RAW_POSITION))
+                        .<RegularServerChannel>comparingInt(channel -> channel.getType().getId())
+                        .thenComparing(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION))
                 .collect(Collectors.toList());
         getChannelCategories().forEach(category -> {
             channels.add(category);
@@ -1686,7 +1686,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .map(Channel::asChannelCategory)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .sorted(PositionableServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .collect(Collectors.toList()));
     }
 
@@ -1697,7 +1697,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .map(Channel::asServerTextChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .sorted(PositionableServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .collect(Collectors.toList()));
     }
 
@@ -1708,7 +1708,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .map(Channel::asServerVoiceChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .sorted(PositionableServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .collect(Collectors.toList()));
     }
 

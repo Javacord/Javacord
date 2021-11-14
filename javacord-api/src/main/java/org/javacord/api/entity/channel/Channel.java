@@ -52,12 +52,12 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     }
 
     /**
-     * Gets the channel as positionable server channel.
+     * Gets the channel as regular server channel.
      *
      * @return The channel as server text channel.
      */
-    default Optional<PositionableServerChannel> asPositionableServerChannel() {
-        return as(PositionableServerChannel.class);
+    default Optional<RegularServerChannel> asRegularServerChannel() {
+        return as(RegularServerChannel.class);
     }
 
     /**
@@ -150,7 +150,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
         if (groupChannel.isPresent()) {
             return user.isYourself() || groupChannel.get().getMembers().contains(user);
         }
-        Optional<ServerChannel> severChannel = asServerChannel();
+        Optional<RegularServerChannel> severChannel = asRegularServerChannel();
         return !severChannel.isPresent()
                 || severChannel.get().hasAnyPermission(user,
                                                        PermissionType.ADMINISTRATOR,

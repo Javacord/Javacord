@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ServerVoiceChannelBuilderDelegate}.
  */
-public class ServerVoiceChannelBuilderDelegateImpl extends ServerChannelBuilderDelegateImpl
+public class ServerVoiceChannelBuilderDelegateImpl extends RegularServerChannelBuilderDelegateImpl
         implements ServerVoiceChannelBuilderDelegate {
 
     /**

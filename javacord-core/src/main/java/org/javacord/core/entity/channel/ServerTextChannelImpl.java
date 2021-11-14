@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ChannelCategory;
-import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerTextChannel;
-import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.server.ArchivedThreads;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
@@ -26,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ServerTextChannel}.
  */
-public class ServerTextChannelImpl extends PositionableServerChannelImpl
+public class ServerTextChannelImpl extends RegularServerChannelImpl
         implements ServerTextChannel, Cleanupable, InternalTextChannel,
         InternalServerTextChannelAttachableListenerManager {
 
@@ -121,37 +119,6 @@ public class ServerTextChannelImpl extends PositionableServerChannelImpl
     @Override
     public int getSlowmodeDelayInSeconds() {
         return delay;
-    }
-
-    @Override
-    public CompletableFuture<ServerThreadChannel> createThreadForMessage(long messageId, String name,
-                                                                         Integer autoArchiveDuration) {
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
-        body.put("name", name);
-        body.put("auto_archive_duration", autoArchiveDuration);
-
-        return new RestRequest<ServerThreadChannel>(getApi(), RestMethod.POST, RestEndpoint.START_THREAD_WITH_MESSAGE)
-                .setUrlParameters(getIdAsString(), String.valueOf(messageId))
-                .setBody(body)
-                .execute(result -> ((ServerImpl) getServer()).getOrCreateServerThreadChannel(result.getJsonBody()));
-    }
-
-    @Override
-    public CompletableFuture<ServerThreadChannel> createThread(ChannelType channelType, String name,
-                                                               Integer autoArchiveDuration, Boolean inviteable) {
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
-        body.put("name", name);
-        body.put("auto_archive_duration", autoArchiveDuration);
-        body.put("type", channelType.getId());
-        if (inviteable != null) {
-            body.put("invitable", inviteable);
-        }
-
-        return new RestRequest<ServerThreadChannel>(getApi(), RestMethod.POST,
-                RestEndpoint.START_THREAD_WITHOUT_MESSAGE)
-                .setUrlParameters(getIdAsString())
-                .setBody(body)
-                .execute(result -> ((ServerImpl) getServer()).getOrCreateServerThreadChannel(result.getJsonBody()));
     }
 
     @Override

@@ -1,18 +1,14 @@
 package org.javacord.api.entity.channel;
 
-import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
-import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.internal.DelegateFactory;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is used to create new server voice channels.
  */
-public class ServerVoiceChannelBuilder extends ServerChannelBuilder {
+public class ServerVoiceChannelBuilder extends RegularServerChannelBuilder<ServerVoiceChannelBuilder> {
 
     /**
      * The server text channel delegate used by this instance.
@@ -25,21 +21,9 @@ public class ServerVoiceChannelBuilder extends ServerChannelBuilder {
      * @param server The server of the server text channel.
      */
     public ServerVoiceChannelBuilder(Server server) {
-        delegate = DelegateFactory.createServerVoiceChannelBuilderDelegate(server);
+        super(ServerVoiceChannelBuilder.class, DelegateFactory.createServerVoiceChannelBuilderDelegate(server));
+        delegate = (ServerVoiceChannelBuilderDelegate) super.delegate;
     }
-
-    @Override
-    public ServerVoiceChannelBuilder setAuditLogReason(String reason) {
-        delegate.setAuditLogReason(reason);
-        return this;
-    }
-
-    @Override
-    public ServerVoiceChannelBuilder setName(String name) {
-        delegate.setName(name);
-        return this;
-    }
-
 
     /**
      * Sets the category of the channel.
@@ -71,20 +55,6 @@ public class ServerVoiceChannelBuilder extends ServerChannelBuilder {
      */
     public ServerVoiceChannelBuilder setUserlimit(int userlimit) {
         delegate.setUserlimit(userlimit);
-        return this;
-    }
-
-    @Override
-    public <T extends Permissionable & DiscordEntity> ServerVoiceChannelBuilder addPermissionOverwrite(
-            T permissionable, Permissions permissions) {
-        delegate.addPermissionOverwrite(permissionable, permissions);
-        return this;
-    }
-
-    @Override
-    public <T extends Permissionable & DiscordEntity> ServerVoiceChannelBuilder removePermissionOverwrite(
-            T permissionable) {
-        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

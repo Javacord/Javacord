@@ -3,7 +3,6 @@ package org.javacord.api.entity.channel;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.ServerThreadChannelAttachableListenerManager;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -197,7 +196,9 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
      *
      * @return An updater for this thread.
      */
-    default ServerThreadUpdater createThreadUpdater() {
-        return new ServerThreadUpdater(this);
+    @Override
+    default ServerThreadChannelUpdater createUpdater() {
+        return new ServerThreadChannelUpdater(this);
     }
+
 }
