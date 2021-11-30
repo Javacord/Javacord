@@ -152,46 +152,46 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Sets the minimum value permitted for the {@link SlashCommandOptionType#INTEGER} slash command option.
+     * Sets the minimum value permitted for the {@link SlashCommandOptionType#LONG} slash command option.
      *
-     * @param integerMinValue The minimum value permitted.
+     * @param longMinValue The minimum value permitted.
      * @return The current instance in order to chain call methods
      */
-    public SlashCommandOptionBuilder setIntegerMinValue(long integerMinValue) {
-        delegate.setIntegerMinValue(integerMinValue);
+    public SlashCommandOptionBuilder setLongMinValue(long longMinValue) {
+        delegate.setLongMinValue(longMinValue);
         return this;
     }
 
     /**
-     * Sets the maximum value permitted for the {@link SlashCommandOptionType#INTEGER} slash command option.
+     * Sets the maximum value permitted for the {@link SlashCommandOptionType#LONG} slash command option.
      *
-     * @param integerMaxValue The maximum value permitted.
+     * @param longMaxValue The maximum value permitted.
      * @return The current instance in order to chain call methods
      */
-    public SlashCommandOptionBuilder setIntegerMaxValue(long integerMaxValue) {
-        delegate.setIntegerMaxValue(integerMaxValue);
+    public SlashCommandOptionBuilder setLongMaxValue(long longMaxValue) {
+        delegate.setLongMaxValue(longMaxValue);
         return this;
     }
 
     /**
-     * Sets the minimum value permitted for the {@link SlashCommandOptionType#NUMBER} slash command option.
+     * Sets the minimum value permitted for the {@link SlashCommandOptionType#DECIMAL} slash command option.
      *
-     * @param numberMinValue The minimum value permitted.
+     * @param decimalMinValue The minimum value permitted.
      * @return The current instance in order to chain call methods
      */
-    public SlashCommandOptionBuilder setNumberMinValue(double numberMinValue) {
-        delegate.setNumberMinValue(numberMinValue);
+    public SlashCommandOptionBuilder setDecimalMinValue(double decimalMinValue) {
+        delegate.setDecimalMinValue(decimalMinValue);
         return this;
     }
 
     /**
-     * Sets the maximum value permitted for the {@link SlashCommandOptionType#NUMBER} slash command option.
+     * Sets the maximum value permitted for the {@link SlashCommandOptionType#DECIMAL} slash command option.
      *
-     * @param numberMaxValue The maximum value permitted.
+     * @param decimalMaxValue The maximum value permitted.
      * @return The current instance in order to chain call methods
      */
-    public SlashCommandOptionBuilder setNumberMaxValue(double numberMaxValue) {
-        delegate.setNumberMaxValue(numberMaxValue);
+    public SlashCommandOptionBuilder setDecimalMaxValue(double decimalMaxValue) {
+        delegate.setDecimalMaxValue(decimalMaxValue);
         return this;
     }
 

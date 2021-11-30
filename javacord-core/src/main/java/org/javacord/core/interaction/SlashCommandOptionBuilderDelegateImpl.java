@@ -21,10 +21,10 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     private List<SlashCommandOptionChoice> choices = new ArrayList<>();
     private List<SlashCommandOption> options = new ArrayList<>();
     private Set<ChannelType> channelTypes = new HashSet<>();
-    private Long integerMinValue;
-    private Long integerMaxValue;
-    private Double numberMinValue;
-    private Double numberMaxValue;
+    private Long longMinValue;
+    private Long longMaxValue;
+    private Double decimalMinValue;
+    private Double decimalMaxValue;
 
     @Override
     public void setType(SlashCommandOptionType type) {
@@ -89,28 +89,28 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     }
 
     @Override
-    public void setIntegerMinValue(long integerMinValue) {
-        this.integerMinValue = integerMinValue;
+    public void setLongMinValue(long longMinValue) {
+        this.longMinValue = longMinValue;
     }
 
     @Override
-    public void setIntegerMaxValue(long integerMaxValue) {
-        this.integerMaxValue = integerMaxValue;
+    public void setLongMaxValue(long longMaxValue) {
+        this.longMaxValue = longMaxValue;
     }
 
     @Override
-    public void setNumberMinValue(double numberMinValue) {
-        this.numberMinValue = numberMinValue;
+    public void setDecimalMinValue(double decimalMinValue) {
+        this.decimalMinValue = decimalMinValue;
     }
 
     @Override
-    public void setNumberMaxValue(double numberMaxValue) {
-        this.numberMaxValue = numberMaxValue;
+    public void setDecimalMaxValue(double decimalMaxValue) {
+        this.decimalMaxValue = decimalMaxValue;
     }
 
     @Override
     public SlashCommandOption build() {
         return new SlashCommandOptionImpl(type, name, description, required, choices, options, channelTypes,
-                integerMinValue, integerMaxValue, numberMinValue, numberMaxValue);
+                longMinValue, longMaxValue, decimalMinValue, decimalMaxValue);
     }
 }

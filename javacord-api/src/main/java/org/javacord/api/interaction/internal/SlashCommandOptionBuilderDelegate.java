@@ -86,32 +86,32 @@ public interface SlashCommandOptionBuilderDelegate {
     void setChannelTypes(Collection<ChannelType> channelTypes);
 
     /**
-     * Sets the {@link SlashCommandOptionType#INTEGER} min value for the slash command option.
+     * Sets the {@link SlashCommandOptionType#LONG} min value for the slash command option.
      *
-     * @param integerMinValue The integer min value.
+     * @param longMinValue The long min value.
      */
-    void setIntegerMinValue(long integerMinValue);
+    void setLongMinValue(long longMinValue);
 
     /**
-     * Sets the {@link SlashCommandOptionType#INTEGER} max value for the slash command option.
+     * Sets the {@link SlashCommandOptionType#LONG} max value for the slash command option.
      *
-     * @param integerMaxValue The integer max value.
+     * @param longMaxValue The long max value.
      */
-    void setIntegerMaxValue(long integerMaxValue);
+    void setLongMaxValue(long longMaxValue);
 
     /**
-     * Sets the {@link SlashCommandOptionType#NUMBER} min value for the slash command option.
+     * Sets the {@link SlashCommandOptionType#DECIMAL} min value for the slash command option.
      *
-     * @param numberMinValue The integer min value.
+     * @param decimalMinValue The decimal min value.
      */
-    void setNumberMinValue(double numberMinValue);
+    void setDecimalMinValue(double decimalMinValue);
 
     /**
-     * Sets the {@link SlashCommandOptionType#NUMBER} max value for the slash command option.
+     * Sets the {@link SlashCommandOptionType#DECIMAL} max value for the slash command option.
      *
-     * @param numberMaxValue The integer max value.
+     * @param decimalMaxValue The decimal max value.
      */
-    void setNumberMaxValue(double numberMaxValue);
+    void setDecimalMaxValue(double decimalMaxValue);
 
     /**
      * Build the slash command option.

@@ -125,17 +125,14 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
     Optional<Mentionable> getMentionableValue();
 
     /**
-     * Gets the mentionable value of this option.
-     * Note: This method only respects cached users if the ID of the Mentionable belongs to a user. To fetch the user
-     *     from Discord if the user is not cached,
-     *     use {@link SlashCommandInteractionOption#requestMentionableValue()}.
+     * Gets the decimal value of this option.
      *
-     * <p>If this option does not have a mentionable value or the option itself is a subcommand or group,
+     * <p>If this option does not have a decimal value or the option itself is a subcommand or group,
      *     the optional will be empty.
      *
-     * @return The mentionable value of this option.
+     * @return The decimal value of this option.
      */
-    Optional<Double> getNumberValue();
+    Optional<Double> getDecimalValue();
 
     /**
      * Gets the mentionable value of this option.

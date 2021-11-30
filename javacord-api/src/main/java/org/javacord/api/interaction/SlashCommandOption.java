@@ -67,32 +67,32 @@ public interface SlashCommandOption {
     Set<ChannelType> getChannelTypes();
 
     /**
-     * If the option is an {@link SlashCommandOptionType#INTEGER} type, the minimum value permitted.
+     * If the option is an {@link SlashCommandOptionType#LONG} type, the minimum value permitted.
      *
      * @return The minimum value permitted.
      */
-    Optional<Long> getIntegerMinValue();
+    Optional<Long> getLongMinValue();
 
     /**
-     * If the option is an {@link SlashCommandOptionType#INTEGER} type, the maximum value permitted.
+     * If the option is an {@link SlashCommandOptionType#LONG} type, the maximum value permitted.
      *
      * @return The maximum value permitted.
      */
-    Optional<Long> getIntegerMaxValue();
+    Optional<Long> getLongMaxValue();
 
     /**
-     * If the option is an {@link SlashCommandOptionType#NUMBER} type, the minimum value permitted.
+     * If the option is an {@link SlashCommandOptionType#DECIMAL} type, the minimum value permitted.
      *
      * @return The minimum value permitted.
      */
-    Optional<Double> getNumberMinValue();
+    Optional<Double> getDecimalMinValue();
 
     /**
-     * If the option is an {@link SlashCommandOptionType#NUMBER} type, the maximum value permitted.
+     * If the option is an {@link SlashCommandOptionType#DECIMAL} type, the maximum value permitted.
      *
      * @return The maximum value permitted.
      */
-    Optional<Double> getNumberMaxValue();
+    Optional<Double> getDecimalMaxValue();
 
     /**
      * Create a new slash command option to be used with a slash command builder.
@@ -245,7 +245,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new {@link SlashCommandOptionType#NUMBER} slash command option to be used with a slash command builder.
+     * Create a new {@link SlashCommandOptionType#DECIMAL} slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param name The name of the option.
@@ -253,57 +253,11 @@ public interface SlashCommandOption {
      * @param required Whether this option is required
      * @return The new slash command option builder.
      */
-    static SlashCommandOption createNumberOption(String name,
-                                                 String description,
-                                                 boolean required) {
-        return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.NUMBER)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required)
-                .build();
-    }
-
-    /**
-     * Create a new {@link SlashCommandOptionType#NUMBER} slash command option to be used with a slash command builder.
-     * This is a convenience method.
-     *
-     * @param name The name of the option.
-     * @param description The description of the option.
-     * @param required Whether this option is required
-     * @param minValue The minimum value permitted.
-     * @param maxValue The maximum value permitted.
-     * @return The new slash command option builder.
-     */
-    static SlashCommandOption createNumberOption(String name,
-                                                 String description,
-                                                 boolean required,
-                                                 double minValue,
-                                                 double maxValue) {
-        return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.NUMBER)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required)
-                .setNumberMinValue(minValue)
-                .setNumberMaxValue(maxValue)
-                .build();
-    }
-
-    /**
-     * Create a new {@link SlashCommandOptionType#INTEGER} slash command option to be used with a slash command builder.
-     * This is a convenience method.
-     *
-     * @param name The name of the option.
-     * @param description The description of the option.
-     * @param required Whether this option is required
-     * @return The new slash command option builder.
-     */
-    static SlashCommandOption createIntegerOption(String name,
+    static SlashCommandOption createDecimalOption(String name,
                                                   String description,
                                                   boolean required) {
         return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.INTEGER)
+                .setType(SlashCommandOptionType.DECIMAL)
                 .setName(name)
                 .setDescription(description)
                 .setRequired(required)
@@ -311,7 +265,7 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new {@link SlashCommandOptionType#INTEGER} slash command option to be used with a slash command builder.
+     * Create a new {@link SlashCommandOptionType#DECIMAL} slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
      * @param name The name of the option.
@@ -321,18 +275,64 @@ public interface SlashCommandOption {
      * @param maxValue The maximum value permitted.
      * @return The new slash command option builder.
      */
-    static SlashCommandOption createIntegerOption(String name,
+    static SlashCommandOption createDecimalOption(String name,
                                                   String description,
                                                   boolean required,
-                                                  long minValue,
-                                                  long maxValue) {
+                                                  double minValue,
+                                                  double maxValue) {
         return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.INTEGER)
+                .setType(SlashCommandOptionType.DECIMAL)
                 .setName(name)
                 .setDescription(description)
                 .setRequired(required)
-                .setIntegerMinValue(minValue)
-                .setIntegerMaxValue(maxValue)
+                .setDecimalMinValue(minValue)
+                .setDecimalMaxValue(maxValue)
+                .build();
+    }
+
+    /**
+     * Create a new {@link SlashCommandOptionType#LONG} slash command option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name The name of the option.
+     * @param description The description of the option.
+     * @param required Whether this option is required
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createLongOption(String name,
+                                               String description,
+                                               boolean required) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.LONG)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
+                .build();
+    }
+
+    /**
+     * Create a new {@link SlashCommandOptionType#LONG} slash command option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name The name of the option.
+     * @param description The description of the option.
+     * @param required Whether this option is required
+     * @param minValue The minimum value permitted.
+     * @param maxValue The maximum value permitted.
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createLongOption(String name,
+                                               String description,
+                                               boolean required,
+                                               long minValue,
+                                               long maxValue) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.LONG)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
+                .setLongMinValue(minValue)
+                .setLongMaxValue(maxValue)
                 .build();
     }
 }

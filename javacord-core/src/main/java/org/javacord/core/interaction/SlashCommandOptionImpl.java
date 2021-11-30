@@ -25,10 +25,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     private final List<SlashCommandOptionChoice> choices;
     private final List<SlashCommandOption> options;
     private final Set<ChannelType> channelTypes;
-    private final Long integerMinValue;
-    private final Long integerMaxValue;
-    private final Double numberMinValue;
-    private final Double numberMaxValue;
+    private final Long longMinValue;
+    private final Long longMaxValue;
+    private final Double decimalMinValue;
+    private final Double decimalMaxValue;
 
     /**
      * Class constructor.
@@ -61,21 +61,21 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             }
         }
 
-        if (type == SlashCommandOptionType.INTEGER) {
-            integerMinValue = data.has("min_value") ? data.get("min_value").asLong() : null;
-            integerMaxValue = data.has("max_value") ? data.get("max_value").asLong() : null;
-            numberMinValue = null;
-            numberMaxValue = null;
-        } else if (type == SlashCommandOptionType.NUMBER) {
-            numberMinValue = data.has("min_value") ? data.get("min_value").asDouble() : null;
-            numberMaxValue = data.has("max_value") ? data.get("max_value").asDouble() : null;
-            integerMinValue = null;
-            integerMaxValue = null;
+        if (type == SlashCommandOptionType.LONG) {
+            longMinValue = data.has("min_value") ? data.get("min_value").asLong() : null;
+            longMaxValue = data.has("max_value") ? data.get("max_value").asLong() : null;
+            decimalMinValue = null;
+            decimalMaxValue = null;
+        } else if (type == SlashCommandOptionType.DECIMAL) {
+            decimalMinValue = data.has("min_value") ? data.get("min_value").asDouble() : null;
+            decimalMaxValue = data.has("max_value") ? data.get("max_value").asDouble() : null;
+            longMinValue = null;
+            longMaxValue = null;
         } else {
-            integerMinValue = null;
-            integerMaxValue = null;
-            numberMinValue = null;
-            numberMaxValue = null;
+            longMinValue = null;
+            longMaxValue = null;
+            decimalMinValue = null;
+            decimalMaxValue = null;
         }
     }
 
@@ -89,10 +89,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
      * @param choices The choices.
      * @param options The options.
      * @param channelTypes The channel types.
-     * @param integerMinValue The {@link SlashCommandOptionType#INTEGER} min value
-     * @param integerMaxValue The {@link SlashCommandOptionType#INTEGER} max value
-     * @param numberMinValue The {@link SlashCommandOptionType#NUMBER} min value
-     * @param numberMaxValue The {@link SlashCommandOptionType#NUMBER} max value
+     * @param longMinValue The {@link SlashCommandOptionType#LONG} min value
+     * @param longMaxValue The {@link SlashCommandOptionType#LONG} max value
+     * @param decimalMinValue The {@link SlashCommandOptionType#DECIMAL} min value
+     * @param decimalMaxValue The {@link SlashCommandOptionType#DECIMAL} max value
      */
     public SlashCommandOptionImpl(
             SlashCommandOptionType type,
@@ -102,10 +102,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             List<SlashCommandOptionChoice> choices,
             List<SlashCommandOption> options,
             Set<ChannelType> channelTypes,
-            Long integerMinValue,
-            Long integerMaxValue,
-            Double numberMinValue,
-            Double numberMaxValue
+            Long longMinValue,
+            Long longMaxValue,
+            Double decimalMinValue,
+            Double decimalMaxValue
     ) {
         this.type = type;
         this.name = name;
@@ -114,10 +114,10 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         this.choices = choices;
         this.options = options;
         this.channelTypes = channelTypes;
-        this.integerMinValue = integerMinValue;
-        this.integerMaxValue = integerMaxValue;
-        this.numberMinValue = numberMinValue;
-        this.numberMaxValue = numberMaxValue;
+        this.longMinValue = longMinValue;
+        this.longMaxValue = longMaxValue;
+        this.decimalMinValue = decimalMinValue;
+        this.decimalMaxValue = decimalMaxValue;
     }
 
     @Override
@@ -156,23 +156,23 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     }
 
     @Override
-    public Optional<Long> getIntegerMinValue() {
-        return Optional.ofNullable(integerMinValue);
+    public Optional<Long> getLongMinValue() {
+        return Optional.ofNullable(longMinValue);
     }
 
     @Override
-    public Optional<Long> getIntegerMaxValue() {
-        return Optional.ofNullable(integerMaxValue);
+    public Optional<Long> getLongMaxValue() {
+        return Optional.ofNullable(longMaxValue);
     }
 
     @Override
-    public Optional<Double> getNumberMinValue() {
-        return Optional.ofNullable(numberMinValue);
+    public Optional<Double> getDecimalMinValue() {
+        return Optional.ofNullable(decimalMinValue);
     }
 
     @Override
-    public Optional<Double> getNumberMaxValue() {
-        return Optional.ofNullable(numberMaxValue);
+    public Optional<Double> getDecimalMaxValue() {
+        return Optional.ofNullable(decimalMaxValue);
     }
 
     /**
@@ -198,19 +198,19 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             ArrayNode jsonChannelTypes = node.putArray("channel_types");
             channelTypes.forEach(channelType -> jsonChannelTypes.add(channelType.getId()));
         }
-        if (type == SlashCommandOptionType.INTEGER) {
-            if (integerMinValue != null) {
-                node.put("min_value", integerMinValue);
+        if (type == SlashCommandOptionType.LONG) {
+            if (longMinValue != null) {
+                node.put("min_value", longMinValue);
             }
-            if (integerMaxValue != null) {
-                node.put("max_value", integerMaxValue);
+            if (longMaxValue != null) {
+                node.put("max_value", longMaxValue);
             }
-        } else if (type == SlashCommandOptionType.NUMBER) {
-            if (numberMinValue != null) {
-                node.put("min_value", numberMinValue);
+        } else if (type == SlashCommandOptionType.DECIMAL) {
+            if (decimalMinValue != null) {
+                node.put("min_value", decimalMinValue);
             }
-            if (numberMaxValue != null) {
-                node.put("max_value", numberMaxValue);
+            if (decimalMaxValue != null) {
+                node.put("max_value", decimalMaxValue);
             }
         }
         return node;

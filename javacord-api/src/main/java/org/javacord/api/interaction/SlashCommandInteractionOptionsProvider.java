@@ -61,7 +61,7 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the long value of the first option (if present).
-     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
+     * This will be present if the option is of type {@link SlashCommandOptionType#LONG}.
      *
      * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
      * @deprecated Use {@link #getOptions() getOptions().get(0).getLongValue()}
@@ -167,12 +167,12 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the double value of the first option (if present).
      *
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
-     * @deprecated Use {@link #getOptions() getOptions().get(0).getNumberValue()}
-     *     or {@link #getOptionNumberValueByIndex(int) getOptionNumberValueByIndex(0)} instead.
+     * @deprecated Use {@link #getOptions() getOptions().get(0).getDecimalValue()}
+     *     or {@link #getOptionDecimalValueByIndex(int) getOptionDecimalValueByIndex(0)} instead.
      */
     @Deprecated
     default Optional<Double> getFirstOptionNumberValue() {
-        return getFirstOption().flatMap(SlashCommandInteractionOption::getNumberValue);
+        return getFirstOption().flatMap(SlashCommandInteractionOption::getDecimalValue);
     }
 
     /**
@@ -214,7 +214,7 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the long value of the second option (if present).
-     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
+     * This will be present if the option is of type {@link SlashCommandOptionType#LONG}.
      *
      * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
      * @deprecated Use {@link #getOptions() getOptions().get(1).getLongValue()}
@@ -320,12 +320,12 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the double value of the second option (if present).
      *
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
-     * @deprecated Use {@link #getOptions() getOptions().get(1).getNumberValue()}
-     *     or {@link #getOptionNumberValueByIndex(int) getOptionNumberValueByIndex(1)} instead.
+     * @deprecated Use {@link #getOptions() getOptions().get(1).getDecimalValue()}
+     *     or {@link #getOptionDecimalValueByIndex(int) getOptionDecimalValueByIndex(1)} instead.
      */
     @Deprecated
     default Optional<Double> getSecondOptionNumberValue() {
-        return getSecondOption().flatMap(SlashCommandInteractionOption::getNumberValue);
+        return getSecondOption().flatMap(SlashCommandInteractionOption::getDecimalValue);
     }
 
     /**
@@ -367,7 +367,7 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the long value of the third option (if present).
-     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
+     * This will be present if the option is of type {@link SlashCommandOptionType#LONG}.
      *
      * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
      * @deprecated Use {@link #getOptions() getOptions().get(2).getLongValue()}
@@ -474,12 +474,12 @@ public interface SlashCommandInteractionOptionsProvider {
      * Gets the double value of the third option (if present).
      *
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
-     * @deprecated Use {@link #getOptions() getOptions().get(2).getNumberValue()}
-     *     or {@link #getOptionNumberValueByIndex(int) getOptionNumberValueByIndex(2)} instead.
+     * @deprecated Use {@link #getOptions() getOptions().get(2).getDecimalValue()}
+     *     or {@link #getOptionDecimalValueByIndex(int) getOptionDecimalValueByIndex(2)} instead.
      */
     @Deprecated
     default Optional<Double> getThirdOptionNumberValue() {
-        return getThirdOption().flatMap(SlashCommandInteractionOption::getNumberValue);
+        return getThirdOption().flatMap(SlashCommandInteractionOption::getDecimalValue);
     }
 
     /**
@@ -517,7 +517,7 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the long value of an option having the specified name.
-     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
+     * This will be present if the option is of type {@link SlashCommandOptionType#LONG}.
      *
      * @param name The name of the option to search for.
      * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
@@ -607,8 +607,8 @@ public interface SlashCommandInteractionOptionsProvider {
      * @param name The name of the option to search for.
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
      */
-    default Optional<Double> getOptionNumberValueByName(String name) {
-        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getNumberValue);
+    default Optional<Double> getOptionDecimalValueByName(String name) {
+        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getDecimalValue);
     }
 
     /**
@@ -646,7 +646,7 @@ public interface SlashCommandInteractionOptionsProvider {
 
     /**
      * Gets the long value of an option at the specified index.
-     * This will be present if the option is of type {@link SlashCommandOptionType#INTEGER}.
+     * This will be present if the option is of type {@link SlashCommandOptionType#LONG}.
      *
      * @param index The index of the option to search for.
      * @return An Optional with the long value of such an option if it exists; an empty Optional otherwise
@@ -736,7 +736,7 @@ public interface SlashCommandInteractionOptionsProvider {
      * @param index The index of the option to search for.
      * @return An Optional with the double value of such an option if it exists; an empty Optional otherwise
      */
-    default Optional<Double> getOptionNumberValueByIndex(int index) {
-        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getNumberValue);
+    default Optional<Double> getOptionDecimalValueByIndex(int index) {
+        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getDecimalValue);
     }
 }

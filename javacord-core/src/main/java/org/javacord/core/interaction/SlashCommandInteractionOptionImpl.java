@@ -26,8 +26,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     private final String stringRepresentation;
     private final String stringValue;
     /**
-     * This is {@link SlashCommandOptionType#INTEGER} but it can be any integer between -2^53 and 2^53 and
-     * therefore exceeds Javas Integer range.
+     * This is {@link SlashCommandOptionType#LONG} but it can be any integer between -2^53 and 2^53 and
+     * therefore exceeds Javas Integer range. This is the INTEGER option according to the Discord docs.
      */
     private final Long longValue;
     private final Boolean booleanValue;
@@ -35,7 +35,10 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     private final Long channelValue;
     private final Long roleValue;
     private final Long mentionableValue;
-    private final Double numberValue;
+    /**
+     * This is the NUMBER option according to the Discord docs.
+     */
+    private final Double decimalValue;
 
     private final List<SlashCommandInteractionOption> options;
 
@@ -64,7 +67,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         Long localChannelValue = null;
         Long localRoleValue = null;
         Long localMentionableValue = null;
-        Double localNumberValue = null;
+        Double localDecimalValue = null;
 
         final int typeInt = jsonData.get("type").asInt();
         final SlashCommandOptionType slashCommandOptionType = SlashCommandOptionType.fromValue(typeInt);
@@ -81,7 +84,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
                 localStringValue = valueNode.asText();
                 localStringRepresentation = localStringValue;
                 break;
-            case INTEGER:
+            case LONG:
                 localLongValue = valueNode.asLong();
                 localStringRepresentation = String.valueOf(localLongValue);
                 break;
@@ -105,9 +108,9 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
                 localMentionableValue = Long.parseLong(valueNode.asText());
                 localStringRepresentation = String.valueOf(localMentionableValue);
                 break;
-            case NUMBER:
-                localNumberValue = valueNode.asDouble();
-                localStringRepresentation = String.valueOf(localNumberValue);
+            case DECIMAL:
+                localDecimalValue = valueNode.asDouble();
+                localStringRepresentation = String.valueOf(localDecimalValue);
                 break;
             default:
                 LOGGER.warn("Received slash command option of unknown type <{}>. "
@@ -122,7 +125,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         channelValue = localChannelValue;
         roleValue = localRoleValue;
         mentionableValue = localMentionableValue;
-        numberValue = localNumberValue;
+        decimalValue = localDecimalValue;
     }
 
     @Override
@@ -198,8 +201,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     }
 
     @Override
-    public Optional<Double> getNumberValue() {
-        return Optional.ofNullable(numberValue);
+    public Optional<Double> getDecimalValue() {
+        return Optional.ofNullable(decimalValue);
     }
 
     @Override
