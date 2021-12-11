@@ -155,8 +155,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     @Override
     public Optional<User> getUserValue() {
-        return Optional.ofNullable(api.getCachedUserById(userValue)
-                .orElseGet(() -> resolvedUsers.get(userValue)));
+        return Optional.ofNullable(userValue)
+                .map(id -> api.getCachedUserById(id).orElseGet(() -> resolvedUsers.get(id)));
     }
 
     @Override
