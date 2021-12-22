@@ -235,8 +235,10 @@ abstract class MessageBuilderBase<T> {
      * @param image The image to add as an attachment.
      * @param fileName The file name of the image.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(BufferedImage, String)} instead.
      * @see #addAttachment(BufferedImage, String)
      */
+    @Deprecated
     public T addFile(BufferedImage image, String fileName) {
         delegate.addFile(image, fileName);
         return myClass.cast(this);
@@ -247,8 +249,10 @@ abstract class MessageBuilderBase<T> {
      *
      * @param file The file to add as an attachment.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(File)} instead.
      * @see #addAttachment(File)
      */
+    @Deprecated
     public T addFile(File file) {
         delegate.addFile(file);
         return myClass.cast(this);
@@ -259,8 +263,10 @@ abstract class MessageBuilderBase<T> {
      *
      * @param icon The icon to add as an attachment.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(Icon)} instead.
      * @see #addAttachment(Icon)
      */
+    @Deprecated
     public T addFile(Icon icon) {
         delegate.addFile(icon);
         return myClass.cast(this);
@@ -271,8 +277,10 @@ abstract class MessageBuilderBase<T> {
      *
      * @param url The url of the attachment.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(URL)} instead.
      * @see #addAttachment(URL)
      */
+    @Deprecated
     public T addFile(URL url) {
         delegate.addFile(url);
         return myClass.cast(this);
@@ -284,8 +292,10 @@ abstract class MessageBuilderBase<T> {
      * @param bytes The bytes of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(byte[], String)} instead.
      * @see #addAttachment(byte[], String)
      */
+    @Deprecated
     public T addFile(byte[] bytes, String fileName) {
         delegate.addFile(bytes, fileName);
         return myClass.cast(this);
@@ -297,8 +307,10 @@ abstract class MessageBuilderBase<T> {
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(InputStream, String)} instead.
      * @see #addAttachment(InputStream, String)
      */
+    @Deprecated
     public T addFile(InputStream stream, String fileName) {
         delegate.addFile(stream, fileName);
         return myClass.cast(this);
@@ -310,8 +322,10 @@ abstract class MessageBuilderBase<T> {
      * @param image The image to add as an attachment.
      * @param fileName The file name of the image.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(BufferedImage, String)} instead.
      * @see #addAttachmentAsSpoiler(BufferedImage, String)
      */
+    @Deprecated
     public T addFileAsSpoiler(BufferedImage image, String fileName) {
         delegate.addFile(image, "SPOILER_" + fileName);
         return myClass.cast(this);
@@ -322,8 +336,10 @@ abstract class MessageBuilderBase<T> {
      *
      * @param file The file to add as an attachment.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(File)} instead.
      * @see #addAttachmentAsSpoiler(File)
      */
+    @Deprecated
     public T addFileAsSpoiler(File file) {
         delegate.addFileAsSpoiler(file);
         return myClass.cast(this);
@@ -334,8 +350,10 @@ abstract class MessageBuilderBase<T> {
      *
      * @param icon The icon to add as an attachment.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(Icon)} instead.
      * @see #addAttachmentAsSpoiler(Icon)
      */
+    @Deprecated
     public T addFileAsSpoiler(Icon icon) {
         delegate.addFileAsSpoiler(icon);
         return myClass.cast(this);
@@ -346,8 +364,10 @@ abstract class MessageBuilderBase<T> {
      *
      * @param url The url of the attachment.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(URL)} instead.
      * @see #addAttachment(URL)
      */
+    @Deprecated
     public T addFileAsSpoiler(URL url) {
         delegate.addFileAsSpoiler(url);
         return myClass.cast(this);
@@ -359,8 +379,10 @@ abstract class MessageBuilderBase<T> {
      * @param bytes The bytes of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(byte[], String)} instead.
      * @see #addAttachmentAsSpoiler(byte[], String)
      */
+    @Deprecated
     public T addFileAsSpoiler(byte[] bytes, String fileName) {
         delegate.addFile(bytes, "SPOILER_" + fileName);
         return myClass.cast(this);
@@ -372,8 +394,10 @@ abstract class MessageBuilderBase<T> {
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
+     * @deprecated Use {@link #addAttachment(InputStream, String)} instead.
      * @see #addAttachment(InputStream, String)
      */
+    @Deprecated
     public T addFileAsSpoiler(InputStream stream, String fileName) {
         delegate.addFile(stream, "SPOILER_" + fileName);
         return myClass.cast(this);
