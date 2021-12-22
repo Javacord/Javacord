@@ -284,51 +284,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void addFile(BufferedImage image, String fileName) {
-        addAttachment(image, fileName);
-    }
-
-    @Override
-    public void addFile(File file) {
-        addAttachment(file);
-    }
-
-    @Override
-    public void addFile(Icon icon) {
-        addAttachment(icon);
-    }
-
-    @Override
-    public void addFile(URL url) {
-        addAttachment(url);
-    }
-
-    @Override
-    public void addFile(byte[] bytes, String fileName) {
-        addAttachment(bytes, fileName);
-    }
-
-    @Override
-    public void addFile(InputStream stream, String fileName) {
-        addAttachment(stream, fileName);
-    }
-
-    @Override
-    public void addFileAsSpoiler(File file) {
-        addAttachmentAsSpoiler(file);
-    }
-
-    @Override
-    public void addFileAsSpoiler(Icon icon) {
-        addAttachmentAsSpoiler(icon);
-    }
-
-    @Override
-    public void addFileAsSpoiler(URL url) {
-        addAttachmentAsSpoiler(url);
-    }
-
-    @Override
     public void addAttachment(BufferedImage image, String fileName) {
         if (image == null || fileName == null) {
             throw new IllegalArgumentException("image and fileName cannot be null!");
