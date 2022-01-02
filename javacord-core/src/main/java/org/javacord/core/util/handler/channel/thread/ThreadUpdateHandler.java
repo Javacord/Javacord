@@ -30,8 +30,9 @@ public class ThreadUpdateHandler extends PacketHandler {
     public void handle(final JsonNode packet) {
         final ChannelType type = ChannelType.fromId(packet.get("type").asInt());
         switch (type) {
-            case SERVER_PRIVATE_THREAD:
             case SERVER_PUBLIC_THREAD:
+            case SERVER_PRIVATE_THREAD:
+            case SERVER_NEWS_THREAD:
                 handleThread(packet);
                 break;
             default:
