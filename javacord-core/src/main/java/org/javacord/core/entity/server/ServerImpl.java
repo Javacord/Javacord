@@ -395,6 +395,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 switch (ChannelType.fromId(channel.get("type").asInt())) {
                     case SERVER_PUBLIC_THREAD:
                     case SERVER_PRIVATE_THREAD:
+                    case SERVER_NEWS_THREAD:
                         getOrCreateServerThreadChannel(channel);
                         break;
                     default:
@@ -762,8 +763,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         final ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
             switch (type) {
-                case SERVER_PRIVATE_THREAD:
                 case SERVER_PUBLIC_THREAD:
+                case SERVER_PRIVATE_THREAD:
                 case SERVER_NEWS_THREAD:
                     return getThreadChannelById(id).orElseGet(() -> new ServerThreadChannelImpl(api, this, data));
                 default:

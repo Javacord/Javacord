@@ -34,6 +34,7 @@ public class ThreadCreateHandler extends PacketHandler {
         switch (type) {
             case SERVER_PUBLIC_THREAD:
             case SERVER_PRIVATE_THREAD:
+            case SERVER_NEWS_THREAD:
                 handleThread(packet);
                 break;
             default:

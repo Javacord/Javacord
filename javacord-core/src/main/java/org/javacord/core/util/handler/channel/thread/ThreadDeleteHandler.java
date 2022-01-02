@@ -38,6 +38,7 @@ public class ThreadDeleteHandler extends PacketHandler {
         switch (type) {
             case SERVER_PUBLIC_THREAD:
             case SERVER_PRIVATE_THREAD:
+            case SERVER_NEWS_THREAD:
                 handleServerThread(packet);
                 break;
             default:
