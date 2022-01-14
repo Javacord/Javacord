@@ -1,5 +1,6 @@
 package org.javacord.api.event.interaction;
 
+import org.javacord.api.event.Event;
 import org.javacord.api.interaction.Interaction;
 import org.javacord.api.interaction.MessageComponentInteraction;
 import org.javacord.api.interaction.SelectMenuInteraction;
@@ -9,7 +10,7 @@ import java.util.Optional;
 /**
  * A select menu choose event.
  */
-public interface SelectMenuChooseEvent {
+public interface SelectMenuChooseEvent extends Event {
 
     /**
      * Gets the created interaction.
