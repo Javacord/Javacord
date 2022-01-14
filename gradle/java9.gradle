@@ -24,7 +24,7 @@ if (JavaVersion.current().java9Compatible) {
         task compileJava9(type: JavaCompile, dependsOn: [sourceSets.main.compileClasspath,
                                                          sourceSets.main.runtimeClasspath]) {
             description 'Compiles main Java 9 source'
-            source sourceSets.main.java
+            source sourceSets.main.java.matching { exclude 'org/javacord/core/entity/message/MessageSetImpl.java' }
             source 'src/main/java9/'
             classpath = files()
             destinationDir = file("$buildDir/classes/java9/main")
@@ -46,6 +46,7 @@ if (JavaVersion.current().java9Compatible) {
             }
             from(compileJava9) {
                 include 'module-info.class'
+                include 'org/javacord/core/entity/message/MessageSetImpl.class'
                 into 'META-INF/versions/9/'
             }
         }
