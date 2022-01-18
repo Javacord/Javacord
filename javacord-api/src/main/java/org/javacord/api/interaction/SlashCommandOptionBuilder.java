@@ -3,7 +3,6 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -62,6 +61,17 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
+     * Sets if this option can be autocompleted.
+     *
+     * @param autocompletable Whether the option can be autocompleted.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder setAutocompletable(boolean autocompletable) {
+        delegate.setAutocompletable(autocompletable);
+        return this;
+    }
+
+    /**
      * Adds a choice for the slash command option.
      *
      * @param choice The choice.
@@ -75,7 +85,7 @@ public class SlashCommandOptionBuilder {
     /**
      * Adds a string choice for the slash command option.
      *
-     * @param name The name of the choice.
+     * @param name  The name of the choice.
      * @param value The value of the choice.
      * @return The current instance in order to chain call methods.
      */
@@ -87,7 +97,7 @@ public class SlashCommandOptionBuilder {
     /**
      * Adds an int choice for the slash command option.
      *
-     * @param name The name of the choice.
+     * @param name  The name of the choice.
      * @param value The value of the choice.
      * @return The current instance in order to chain call methods.
      */

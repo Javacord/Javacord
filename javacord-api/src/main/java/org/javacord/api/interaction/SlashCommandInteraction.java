@@ -1,6 +1,5 @@
 package org.javacord.api.interaction;
 
-public interface SlashCommandInteraction
-        extends ApplicationCommandInteraction, SlashCommandInteractionOptionsProvider {
+public interface SlashCommandInteraction extends ApplicationCommandInteraction, SlashCommandInteractionOptionsProvider {
 
 }

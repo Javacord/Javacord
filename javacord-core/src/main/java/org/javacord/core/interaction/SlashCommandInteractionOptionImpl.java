@@ -10,7 +10,6 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.interaction.SlashCommandOptionType;
 import org.javacord.core.util.logging.LoggerUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +41,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     private final List<SlashCommandInteractionOption> options;
 
+    private final Boolean focused;
+
     private static final Logger LOGGER = LoggerUtil.getLogger(SlashCommandInteractionOptionImpl.class);
 
     /**
@@ -56,6 +57,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         this.api = api;
         this.resolvedUsers = resolvedUsers;
         name = jsonData.get("name").asText();
+        focused = jsonData.has("focused") ? jsonData.get("focused").asBoolean() : null;
         options = new ArrayList<>();
         final JsonNode valueNode = jsonData.get("value");
 
@@ -131,6 +133,11 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Optional<Boolean> isFocused() {
+        return Optional.ofNullable(focused);
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.ComponentType;
+import org.javacord.api.event.interaction.AutocompleteCreateEvent;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
 import org.javacord.api.event.interaction.MessageComponentCreateEvent;
@@ -18,6 +19,7 @@ import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
+import org.javacord.core.event.interaction.AutocompleteCreateEventImpl;
 import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
 import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
@@ -25,6 +27,7 @@ import org.javacord.core.event.interaction.MessageContextMenuCommandEventImpl;
 import org.javacord.core.event.interaction.SelectMenuChooseEventImpl;
 import org.javacord.core.event.interaction.SlashCommandCreateEventImpl;
 import org.javacord.core.event.interaction.UserContextMenuCommandEventImpl;
+import org.javacord.core.interaction.AutocompleteInteractionImpl;
 import org.javacord.core.interaction.ButtonInteractionImpl;
 import org.javacord.core.interaction.InteractionImpl;
 import org.javacord.core.interaction.MessageContextMenuInteractionImpl;
@@ -111,6 +114,9 @@ public class InteractionCreateHandler extends PacketHandler {
                         return;
                 }
                 break;
+            case APPLICATION_COMMAND_AUTOCOMPLETE:
+                interaction = new AutocompleteInteractionImpl(api, channel, packet);
+                break;
             default:
                 logger.warn("Received interaction of unknown type <{}>. "
                         + "Please contact the developer!", typeId);
@@ -125,8 +131,7 @@ public class InteractionCreateHandler extends PacketHandler {
                 server,
                 interaction.getChannel().orElse(null),
                 interaction.getUser(),
-                event
-        );
+                event);
 
         switch (interactionType) {
             case APPLICATION_COMMAND:
@@ -142,8 +147,7 @@ public class InteractionCreateHandler extends PacketHandler {
                                 server,
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
-                                slashCommandCreateEvent
-                        );
+                                slashCommandCreateEvent);
                         break;
                     case USER:
                         UserContextMenuCommandEvent userContextMenuCommandEvent =
@@ -153,8 +157,7 @@ public class InteractionCreateHandler extends PacketHandler {
                                 server,
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
-                                userContextMenuCommandEvent
-                        );
+                                userContextMenuCommandEvent);
                         break;
                     case MESSAGE:
                         MessageContextMenuCommandEvent messageContextMenuCommandEvent =
@@ -166,8 +169,7 @@ public class InteractionCreateHandler extends PacketHandler {
                                 server,
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
-                                messageContextMenuCommandEvent
-                        );
+                                messageContextMenuCommandEvent);
                         break;
                     default:
                         logger.info("Got application command interaction of unknown type <{}>. "
@@ -206,12 +208,21 @@ public class InteractionCreateHandler extends PacketHandler {
                                 server,
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
-                                selectMenuChooseEvent
-                        );
+                                selectMenuChooseEvent);
                         break;
                     default:
                         break;
                 }
+                break;
+            case APPLICATION_COMMAND_AUTOCOMPLETE:
+                AutocompleteCreateEvent autocompleteCreateEvent =
+                        new AutocompleteCreateEventImpl(interaction);
+                api.getEventDispatcher().dispatchAutocompleteCreateEvent(
+                        server == null ? api : server,
+                        server,
+                        interaction.getChannel().orElse(null),
+                        interaction.getUser(),
+                        autocompleteCreateEvent);
                 break;
             default:
                 break;

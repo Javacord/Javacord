@@ -19,6 +19,15 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
     String getName();
 
     /**
+     * Checks if this option is the currently focused option for autocomplete.
+     *
+     * <p>Returns an empty optional if the invoked command is not autocompletable at all.
+     *
+     * @return Whether this option is the currently focused option for autocomplete.
+     */
+    Optional<Boolean> isFocused();
+
+    /**
      * Checks if the option is a subcommand or group.
      *
      * <p>If the option is a subcommand or group, it does have options but no value.
