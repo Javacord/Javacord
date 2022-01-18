@@ -271,7 +271,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A list containing all application commands.
      */
     CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<ApplicationCommandBuilder<? extends ApplicationCommand,
+            List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
                     ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
                     ? extends ApplicationCommandBuilder<?, ?, ?>>>
                     applicationCommandBuilderList);
@@ -289,7 +289,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
             Server server,
-            List<ApplicationCommandBuilder<? extends ApplicationCommand,
+            List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
                     ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
                     ? extends ApplicationCommandBuilder<?, ?, ?>>>
                     applicationCommandBuilderList);

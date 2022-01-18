@@ -1568,7 +1568,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<ApplicationCommandBuilder<? extends ApplicationCommand,
+            List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
                     ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
                     ? extends ApplicationCommandBuilder<?, ?, ?>>>
                     applicationCommandBuilderList) {
@@ -1581,7 +1581,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server, List<ApplicationCommandBuilder<? extends ApplicationCommand,
+            Server server, List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
             ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
             ? extends ApplicationCommandBuilder<?, ?, ?>>> applicationCommandBuilderList) {
 
@@ -1595,7 +1595,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     //Internal Application Command Utility methods
     //////////////////////////////////////////////
 
-    private ArrayNode applicationCommandBuildersToArrayNode(List<ApplicationCommandBuilder<
+    private ArrayNode applicationCommandBuildersToArrayNode(List<? extends ApplicationCommandBuilder<
             ? extends ApplicationCommand,
             ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
             ? extends ApplicationCommandBuilder<?, ?, ?>>> applicationCommandBuilderList) {
