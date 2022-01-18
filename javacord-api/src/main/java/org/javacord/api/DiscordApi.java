@@ -41,7 +41,6 @@ import org.javacord.api.interaction.ServerApplicationCommandPermissions;
 import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
-import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.concurrent.ThreadPool;
@@ -271,10 +270,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A list containing all application commands.
      */
     CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
-                    ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
-                    ? extends ApplicationCommandBuilder<?, ?, ?>>>
-                    applicationCommandBuilderList);
+            List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList);
 
     /**
      * Bulk overwrites the servers application commands.
@@ -289,10 +285,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
             Server server,
-            List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
-                    ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
-                    ? extends ApplicationCommandBuilder<?, ?, ?>>>
-                    applicationCommandBuilderList);
+            List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList);
 
     /**
      * Gets a utility class to interact with uncached messages.
@@ -1521,7 +1514,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return A set with all server thread channels of the bot.
      */
     Set<ServerThreadChannel> getServerThreadChannels();
-    
+
     /**
      * Gets a set with all the private threads of the bot.
      *
@@ -1925,7 +1918,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
-    
+
     /**
      * Gets a server thread channel by its id.
      *
@@ -1935,7 +1928,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     default Optional<ServerThreadChannel> getServerThreadChannelById(long id) {
         return getChannelById(id).flatMap(Channel::asServerThreadChannel);
     }
-    
+
     /**
      * Gets a server thread channel by its id.
      *
@@ -1949,7 +1942,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
             return Optional.empty();
         }
     }
-    
+
     /**
      * Gets a set with all server thread channels with the given name.
      * This method is case-sensitive!
@@ -1963,7 +1956,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
                         .filter(channel -> channel.getName().equals(name))
                         .collect(Collectors.toSet()));
     }
-    
+
     /**
      * Gets a set with all server thread channels with the given name.
      * This method is case-insensitive!

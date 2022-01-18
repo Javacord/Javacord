@@ -52,7 +52,6 @@ import org.javacord.api.interaction.ServerApplicationCommandPermissions;
 import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
-import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -1568,11 +1567,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
-            List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
-                    ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
-                    ? extends ApplicationCommandBuilder<?, ?, ?>>>
-                    applicationCommandBuilderList) {
-
+            List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId))
                 .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
@@ -1581,10 +1576,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server, List<? extends ApplicationCommandBuilder<? extends ApplicationCommand,
-            ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
-            ? extends ApplicationCommandBuilder<?, ?, ?>>> applicationCommandBuilderList) {
-
+            Server server, List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.SERVER_APPLICATION_COMMANDS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
                 .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
@@ -1595,16 +1587,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     //Internal Application Command Utility methods
     //////////////////////////////////////////////
 
-    private ArrayNode applicationCommandBuildersToArrayNode(List<? extends ApplicationCommandBuilder<
-            ? extends ApplicationCommand,
-            ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
-            ? extends ApplicationCommandBuilder<?, ?, ?>>> applicationCommandBuilderList) {
+    private ArrayNode applicationCommandBuildersToArrayNode(
+            List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (ApplicationCommandBuilder<? extends ApplicationCommand,
-                ? extends ApplicationCommandBuilderDelegate<? extends ApplicationCommand>,
-                ? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilder
-                : applicationCommandBuilderList) {
-            body.add(((ApplicationCommandBuilderDelegateImpl<? extends ApplicationCommand>)
+        for (ApplicationCommandBuilder<?, ?, ?> applicationCommandBuilder : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl<?>)
                     applicationCommandBuilder.getDelegate())
                     .getJsonBodyForApplicationCommand());
         }
