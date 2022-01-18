@@ -29,6 +29,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     private final Long longMaxValue;
     private final Double decimalMinValue;
     private final Double decimalMaxValue;
+    private final boolean autocomplete;
 
     /**
      * Class constructor.
@@ -40,6 +41,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         name = data.get("name").asText();
         description = data.get("description").asText();
         required = data.has("required") && data.get("required").asBoolean(false);
+        autocomplete = data.has("autocomplete") && data.get("autocomplete").asBoolean();
         choices = new ArrayList<>();
         if (data.has("choices")) {
             for (JsonNode choiceJson : data.get("choices")) {
@@ -86,6 +88,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
      * @param name The name.
      * @param description The description.
      * @param required If the option is required.
+     * @param autocomplete If the option is autocompletable.
      * @param choices The choices.
      * @param options The options.
      * @param channelTypes The channel types.
@@ -99,6 +102,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             String name,
             String description,
             boolean required,
+            boolean autocomplete,
             List<SlashCommandOptionChoice> choices,
             List<SlashCommandOption> options,
             Set<ChannelType> channelTypes,
@@ -111,6 +115,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         this.name = name;
         this.description = description;
         this.required = required;
+        this.autocomplete = autocomplete;
         this.choices = choices;
         this.options = options;
         this.channelTypes = channelTypes;
@@ -138,6 +143,11 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     @Override
     public boolean isRequired() {
         return required;
+    }
+
+    @Override
+    public boolean isAutocompletable() {
+        return autocomplete;
     }
 
     @Override
@@ -186,6 +196,7 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         node.put("name", name);
         node.put("description", description);
         node.put("required", required);
+        node.put("autocomplete", autocomplete);
         if (!choices.isEmpty()) {
             ArrayNode jsonChoices = node.putArray("choices");
             choices.forEach(choice -> jsonChoices.add(((SlashCommandOptionChoiceImpl) choice).toJsonNode()));

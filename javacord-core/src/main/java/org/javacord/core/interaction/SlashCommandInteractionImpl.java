@@ -16,10 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SlashCommandInteractionImpl extends InteractionImpl implements SlashCommandInteraction {
+public class SlashCommandInteractionImpl extends ApplicationCommandInteractionImpl implements SlashCommandInteraction {
 
-    private final long commandId;
-    private final String commandName;
     private final List<SlashCommandInteractionOption> options;
 
     /**
@@ -57,8 +55,6 @@ public class SlashCommandInteractionImpl extends InteractionImpl implements Slas
                 });
             }
         }
-        commandId = data.get("id").asLong();
-        commandName = data.get("name").asText();
         options = new ArrayList<>();
         if (data.has("options") && data.get("options").isArray()) {
             for (JsonNode optionJson : data.get("options")) {

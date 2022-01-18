@@ -1,7 +1,6 @@
 package org.javacord.api.interaction;
 
 import org.javacord.api.util.SafeSpecializable;
-
 import java.util.Optional;
 
 public interface Interaction extends InteractionBase, SafeSpecializable<InteractionBase> {
@@ -22,6 +21,26 @@ public interface Interaction extends InteractionBase, SafeSpecializable<Interact
      */
     default Optional<SlashCommandInteraction> asSlashCommandInteractionWithCommandId(long commandId) {
         return asSlashCommandInteraction().filter(interaction -> interaction.getCommandId() == commandId);
+    }
+
+    /**
+     * Get this interaction as autocomplete interaction if the type matches.
+     *
+     * @return the interaction as autocomplete interaction if the type matches; an empty optional otherwise
+     */
+    default Optional<AutocompleteInteraction> asAutocompleteInteraction() {
+        return as(AutocompleteInteraction.class);
+    }
+
+    /**
+     * Get this interaction as autocomplete interaction if the type and the command id match.
+     *
+     * @param commandId The command id to match.
+     * @return the interaction as autocomplete interaction if the properties match; an empty optional otherwise
+     */
+    default Optional<AutocompleteInteraction> asAutocompleteInteraction(long commandId) {
+        return asAutocompleteInteraction()
+                .filter(autocompleteInteraction -> autocompleteInteraction.getCommandId() == commandId);
     }
 
     /**

@@ -44,6 +44,13 @@ public interface SlashCommandOptionBuilderDelegate {
     void setRequired(boolean required);
 
     /**
+     * Sets if this option can be autocompleted.
+     *
+     * @param autocompletable Whether the option can be autocompleted.
+     */
+    void setAutocompletable(boolean autocompletable);
+
+    /**
      * Adds a choice for the slash command option.
      *
      * @param choice The choice.

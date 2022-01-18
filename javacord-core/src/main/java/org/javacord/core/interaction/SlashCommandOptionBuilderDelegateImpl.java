@@ -5,7 +5,6 @@ import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionType;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -17,7 +16,8 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     private SlashCommandOptionType type;
     private String name;
     private String description;
-    private boolean required;
+    private boolean required = false;
+    private boolean autocompletable = false;
     private List<SlashCommandOptionChoice> choices = new ArrayList<>();
     private List<SlashCommandOption> options = new ArrayList<>();
     private Set<ChannelType> channelTypes = new HashSet<>();
@@ -44,6 +44,11 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     @Override
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    @Override
+    public void setAutocompletable(boolean autocompletable) {
+        this.autocompletable = autocompletable;
     }
 
     @Override
@@ -110,7 +115,7 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
 
     @Override
     public SlashCommandOption build() {
-        return new SlashCommandOptionImpl(type, name, description, required, choices, options, channelTypes,
-                longMinValue, longMaxValue, decimalMinValue, decimalMaxValue);
+        return new SlashCommandOptionImpl(type, name, description, required, autocompletable, choices, options,
+                channelTypes, longMinValue, longMaxValue, decimalMinValue, decimalMaxValue);
     }
 }
