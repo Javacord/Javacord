@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.interaction.AutocompleteInteraction;
 import org.javacord.api.interaction.InteractionType;
+import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
@@ -55,6 +56,15 @@ public class AutocompleteInteractionImpl extends SlashCommandInteractionImpl imp
                 .setUrlParameters(getIdAsString(), getToken())
                 .setBody(topBody)
                 .execute(result -> null);
+    }
+
+    @Override
+    public SlashCommandInteractionOption getFocusedOption() {
+        return getArguments().stream()
+                .filter(slashCommandInteractionOption -> slashCommandInteractionOption.isFocused().orElse(false))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException("Autocomplete interaction does not have a focused option"));
     }
 
     /**

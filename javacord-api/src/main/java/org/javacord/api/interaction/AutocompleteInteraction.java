@@ -13,4 +13,11 @@ public interface AutocompleteInteraction extends SlashCommandInteraction {
      */
     CompletableFuture<Void> respondWithChoices(List<SlashCommandOptionChoice> choices);
 
+    /**
+     * Gets the focused option that triggered this AutocompleteInteraction.
+     *
+     * @return The focused option.
+     */
+    SlashCommandInteractionOption getFocusedOption();
+
 }
