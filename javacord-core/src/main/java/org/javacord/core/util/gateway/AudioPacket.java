@@ -1,7 +1,6 @@
 package org.javacord.core.util.gateway;
 
 import com.codahale.xsalsa20poly1305.SecretBox;
-import okio.ByteString;
 import org.javacord.api.audio.SilentAudioSource;
 
 import java.net.DatagramPacket;
@@ -61,8 +60,7 @@ public class AudioPacket {
     public void encrypt(byte[] key) {
         byte[] nonce = new byte[NONCE_LENGTH];
         System.arraycopy(header, 0, nonce, 0, RTP_HEADER_LENGTH);
-        audioFrame = new SecretBox(ByteString.of(key)).seal(ByteString.of(nonce), ByteString.of(audioFrame))
-                .toByteArray();
+        audioFrame = new SecretBox(key).seal(nonce, audioFrame);
         encrypted = true;
     }
 
