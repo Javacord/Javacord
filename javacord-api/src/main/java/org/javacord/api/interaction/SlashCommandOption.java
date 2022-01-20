@@ -452,29 +452,6 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new {@link SlashCommandOptionType#ROLE} slash command option to be used with a slash command builder.
-     * This is a convenience method.
-     *
-     * @param name         The name of the option.
-     * @param description  The description of the option.
-     * @param required     Whether this option is required
-     * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
-     */
-    static SlashCommandOption createRoleOption(String name,
-                                               String description,
-                                               boolean required,
-                                               boolean autocomplete) {
-        return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.ROLE)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required)
-                .setAutocompletable(autocomplete)
-                .build();
-    }
-
-    /**
      * Create a new {@link SlashCommandOptionType#MENTIONABLE} slash command option
      * to be used with a slash command builder.
      * This is a convenience method.
@@ -492,30 +469,6 @@ public interface SlashCommandOption {
                 .setName(name)
                 .setDescription(description)
                 .setRequired(required)
-                .build();
-    }
-
-    /**
-     * Create a new {@link SlashCommandOptionType#MENTIONABLE} slash command option
-     * to be used with a slash command builder.
-     * This is a convenience method.
-     *
-     * @param name         The name of the option.
-     * @param description  The description of the option.
-     * @param required     Whether this option is required
-     * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
-     */
-    static SlashCommandOption createMentionableOption(String name,
-                                                      String description,
-                                                      boolean required,
-                                                      boolean autocomplete) {
-        return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.MENTIONABLE)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required)
-                .setAutocompletable(autocomplete)
                 .build();
     }
 
@@ -540,29 +493,6 @@ public interface SlashCommandOption {
     }
 
     /**
-     * Create a new {@link SlashCommandOptionType#USER} slash command option to be used with a slash command builder.
-     * This is a convenience method.
-     *
-     * @param name         The name of the option.
-     * @param description  The description of the option.
-     * @param required     Whether this option is required
-     * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
-     */
-    static SlashCommandOption createUserOption(String name,
-                                               String description,
-                                               boolean required,
-                                               boolean autocomplete) {
-        return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.USER)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required)
-                .setAutocompletable(autocomplete)
-                .build();
-    }
-
-    /**
      * Create a new {@link SlashCommandOptionType#BOOLEAN} slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
@@ -579,29 +509,6 @@ public interface SlashCommandOption {
                 .setName(name)
                 .setDescription(description)
                 .setRequired(required)
-                .build();
-    }
-
-    /**
-     * Create a new {@link SlashCommandOptionType#BOOLEAN} slash command option to be used with a slash command builder.
-     * This is a convenience method.
-     *
-     * @param name         The name of the option.
-     * @param description  The description of the option.
-     * @param required     Whether this option is required
-     * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
-     */
-    static SlashCommandOption createBooleanOption(String name,
-                                                  String description,
-                                                  boolean required,
-                                                  boolean autocomplete) {
-        return new SlashCommandOptionBuilder()
-                .setType(SlashCommandOptionType.BOOLEAN)
-                .setName(name)
-                .setDescription(description)
-                .setRequired(required)
-                .setAutocompletable(autocomplete)
                 .build();
     }
 
