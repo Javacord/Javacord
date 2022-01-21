@@ -16,8 +16,8 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.listener.user.UserAttachableListenerManager;
-
 import java.awt.Color;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -235,7 +235,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * Gets the user's server-specific avatar in the given server at the given image size.
      *
      * @param server The server.
-     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @param size   The size of the image, must be any power of 2 between 16 and 4096.
      * @return The user's avatar in the server.
      */
     Optional<Icon> getServerAvatar(Server server, int size);
@@ -256,7 +256,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * avatar.
      *
      * @param server The server.
-     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @param size   The size of the image, must be any power of 2 between 16 and 4096.
      * @return The user's effective avatar.
      */
     Icon getEffectiveAvatar(Server server, int size);
@@ -299,7 +299,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param server The server.
+     * @param server   The server.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
      */
@@ -313,9 +313,9 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param server The server.
+     * @param server   The server.
      * @param nickname The new nickname of the user.
-     * @param reason The audit log reason for this update.
+     * @param reason   The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNickname(Server server, String nickname, String reason) {
@@ -356,6 +356,115 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return The nickname of the user.
      */
     Optional<String> getNickname(Server server);
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param timeout The new timeout of the user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Instant timeout) {
+        return server.timeoutUser(this, timeout);
+    }
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param timeout The new timeout of the user.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Instant timeout, String reason) {
+        return server.timeoutUser(this, timeout, reason);
+    }
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param duration The duration of the timeout.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Duration duration) {
+        return server.timeoutUser(this, Instant.now().plus(duration));
+    }
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param duration The duration of the timeout.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Duration duration, String reason) {
+        return server.timeoutUser(this, Instant.now().plus(duration), reason);
+    }
+
+    /**
+     * Removes a timeout of the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server The server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeTimeout(Server server) {
+        return server.timeoutUser(this, Instant.MIN);
+    }
+
+    /**
+     * Removes a timeout of the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server The server.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeTimeout(Server server, String reason) {
+        return server.timeoutUser(this, Instant.MIN, reason);
+    }
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant may be in the past which indicates that the user is not timed out.
+     *
+     * @param server The server to get the timeout for the user from.
+     * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
+     *         if user is currently not timed out.
+     */
+    Optional<Instant> getTimeout(Server server);
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant will be checked against {@link Instant#now()} and will only return an Instant,
+     * if the timeout is active at the moment when this method is called.
+     *
+     * @param server The server to get the timeout for the user from.
+     * @return The timestamp of when this user will no longer be timed out.
+     */
+    default Optional<Instant> getActiveTimeout(Server server) {
+        return getTimeout(server).filter(Instant.now()::isBefore);
+    }
 
     /**
      * Gets the pending state of the user in the given server.
@@ -572,7 +681,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role which should be added to the user.
+     * @param role   The role which should be added to the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#addRoleToUser(User, Role, String)
@@ -601,7 +710,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role which should be removed from the user.
+     * @param role   The role which should be removed from the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#removeRoleFromUser(User, Role, String)

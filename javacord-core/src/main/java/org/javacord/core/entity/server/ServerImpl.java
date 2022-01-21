@@ -1190,6 +1190,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Optional<Instant> getTimeout(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getTimeout);
+    }
+
+    @Override
     public Optional<Icon> getUserServerAvatar(User user) {
         return getRealMemberById(user.getId())
                 .flatMap(Member::getServerAvatar);

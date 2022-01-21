@@ -52,7 +52,8 @@ public enum PermissionType {
     MANAGE_ROLES(0x0010000000L),
     MANAGE_WEBHOOKS(0x0020000000L),
     MANAGE_EMOJIS(0x0040000000L), //MANAGE_EMOJIS_AND_STICKERS
-    USE_APPLICATION_COMMANDS(0x0080000000L);
+    USE_APPLICATION_COMMANDS(0x0080000000L),
+    MODERATE_MEMBERS(0x0000010000000000L);
 
     /**
      * The value of the permission. A long where only one bit is set (e.g. <code>0b1000</code>).

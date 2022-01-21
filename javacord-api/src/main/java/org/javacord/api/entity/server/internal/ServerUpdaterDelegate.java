@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -367,6 +368,14 @@ public interface ServerUpdaterDelegate {
      * @param nickname The new nickname of the user.
      */
     void setNickname(User user, String nickname);
+
+    /**
+     * Queues a user's timeout to be updated.
+     *
+     * @param user The user whose nickname should be updated.
+     * @param timeout The new timeout of the user.
+     */
+    void setUserTimeout(User user, Instant timeout);
 
     /**
      * Queues a user's muted state to be updated.
