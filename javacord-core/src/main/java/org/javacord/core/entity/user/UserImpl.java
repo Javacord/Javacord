@@ -307,6 +307,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
+    public Optional<Instant> getTimeout(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getTimeout(this);
+        } else {
+            return member.getTimeout();
+        }
+    }
+
+    @Override
     public boolean isPending(Server server) {
         if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.isPending(getId());

@@ -8,7 +8,6 @@ import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
-
 import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
@@ -132,5 +131,14 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
      * @return Whether this user has passed the membership screening.
      */
     boolean isPending();
+
+    /**
+     * Gets the timestamp of the timeout when the timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant may be in the past which indicates that the user is not timed out.
+     *
+     * @return The timestamp of when this member will no longer be timed out.
+     */
+    Optional<Instant> getTimeout();
 
 }

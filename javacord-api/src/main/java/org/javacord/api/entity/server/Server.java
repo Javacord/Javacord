@@ -40,6 +40,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -180,6 +181,30 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return The nickname of the user.
      */
     Optional<String> getNickname(User user);
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant may be in the past which indicates that the user is not timed out.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
+     *         if user is currently not timed out.
+     */
+    Optional<Instant> getTimeout(User user);
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant will be checked against {@link Instant#now()} and will only return an Instant,
+     * if the timeout is active at the moment when this method is called.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this user will no longer be timed out.
+     */
+    default Optional<Instant> getActiveTimeout(User user) {
+        return getTimeout(user).filter(Instant.now()::isBefore);
+    }
 
     /**
      * Gets the user's server specific avatar.
@@ -1517,6 +1542,93 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default CompletableFuture<Void> resetNickname(User user, String reason) {
         return createUpdater().setNickname(user, null).setAuditLogReason(reason).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user    The user.
+     * @param timeout The timestamp until the user should be timed out.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Instant timeout) {
+        return createUpdater().setUserTimeout(user, timeout).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user    The user.
+     * @param timeout The timestamp until the user should be timed out.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Instant timeout, String reason) {
+        return createUpdater().setUserTimeout(user, timeout).setAuditLogReason(reason).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user    The user.
+     * @param duration The duration of the timeout.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Duration duration) {
+        return createUpdater().setUserTimeout(user, Instant.now().plus(duration)).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user    The user.
+     * @param duration The duration of the timeout.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Duration duration, String reason) {
+        return createUpdater().setUserTimeout(user, Instant.now().plus(duration))
+                .setAuditLogReason(reason)
+                .update();
+    }
+
+    /**
+     * Remove a timeout for the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user The user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeUserTimeout(User user) {
+        return createUpdater().setUserTimeout(user, Instant.MIN).update();
+    }
+
+    /**
+     * Remove a timeout for the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user   The user.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeUserTimeout(User user, String reason) {
+        return createUpdater().setUserTimeout(user, Instant.MIN).setAuditLogReason(reason).update();
     }
 
     /**
