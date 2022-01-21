@@ -2,6 +2,9 @@ package org.javacord.api.interaction;
 
 public enum InteractionType {
 
+    /**
+     * Only relevant for webhook based interactions.
+     */
     PING(1),
     APPLICATION_COMMAND(2),
     MESSAGE_COMPONENT(3),

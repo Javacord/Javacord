@@ -101,4 +101,19 @@ public interface InteractionBase extends DiscordEntity {
      * @return The version.
      */
     int getVersion();
+
+    /**
+     * Gets the selected language of the invoking user.
+     *
+     * @return The user selected language.
+     */
+    String getLocale();
+
+    /**
+     * Gets the server's preferred locale, if invoked in a server.
+     *
+     * @return The server's preferred locale.
+     */
+    Optional<String> getServerLocale();
+
 }

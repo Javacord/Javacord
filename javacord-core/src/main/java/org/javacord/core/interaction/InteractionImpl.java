@@ -23,7 +23,6 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,6 +45,8 @@ public abstract class InteractionImpl implements Interaction {
     private final UserImpl user;
     private final String token;
     private final int version;
+    private final String locale;
+    private final String serverLocale;
 
     /**
      * Class constructor.
@@ -76,6 +77,8 @@ public abstract class InteractionImpl implements Interaction {
         }
         token = jsonData.get("token").asText();
         version = jsonData.get("version").asInt();
+        locale = jsonData.get("locale").asText();
+        serverLocale = jsonData.hasNonNull("guild_locale") ? jsonData.get("guild_locale").asText() : null;
     }
 
     @Override
@@ -143,5 +146,15 @@ public abstract class InteractionImpl implements Interaction {
     @Override
     public int getVersion() {
         return version;
+    }
+
+    @Override
+    public String getLocale() {
+        return locale;
+    }
+
+    @Override
+    public Optional<String> getServerLocale() {
+        return Optional.ofNullable(serverLocale);
     }
 }
