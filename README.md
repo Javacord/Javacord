@@ -93,7 +93,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 ```groovy
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.3.2' }
+dependencies { implementation 'org.javacord:javacord:3.4.0' }
 ```
 
 #### Maven
@@ -102,7 +102,7 @@ dependencies { implementation 'org.javacord:javacord:3.3.2' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.3.2</version>
+    <version>3.4.0</version>
     <type>pom</type>
 </dependency>
 ```
@@ -110,7 +110,7 @@ dependencies { implementation 'org.javacord:javacord:3.3.2' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.3.2")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.4.0")
 ```
 
 ### Optional Logger Dependency
@@ -121,7 +121,7 @@ log levels per class, and much more.
 
 For example, Log4j Core in Gradle
 ```groovy
-dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
+dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.17.1' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-config.html) wiki article for further information.
 
@@ -165,7 +165,7 @@ class to stay for at least 6 months before it finally gets removed, but this is 
 ## 🥇 Large Bots Using Javacord
 
 Javacord is used by many large bots. Here are just a few of them:
-* [**Yunite**](https://yunite.xyz/): A bot for Fortnite which runs on over 60,000 servers with over eight million users.
+* [**Yunite**](https://yunite.xyz/): A bot for Fortnite which runs on over 100,000 servers with over ten million users.
 * [**Beemo**](https://beemo.gg/): A bot that prevents raids of many large servers such as [discord.gg/LeagueOfLegends](https://discord.gg/LeagueOfLegends), [discord.gg/VALORANT](https://discord.gg/VALORANT), and many more.
 
 If you own a large bot that uses Javacord, feel free to add it to the list in a pull request!
