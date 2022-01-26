@@ -878,7 +878,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
         return !severTextChannel.isPresent()
                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                || severTextChannel.get()
-                       .hasPermissions(user, PermissionType.READ_MESSAGES, PermissionType.SEND_MESSAGES);
+                       .hasPermissions(user, PermissionType.VIEW_CHANNEL, PermissionType.SEND_MESSAGES);
     }
 
     /**
@@ -1073,7 +1073,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
         return !severTextChannel.isPresent()
                || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                || severTextChannel.get().hasPermissions(user,
-                                                        PermissionType.READ_MESSAGES,
+                                                        PermissionType.VIEW_CHANNEL,
                                                         PermissionType.READ_MESSAGE_HISTORY,
                                                         PermissionType.ADD_REACTIONS);
     }
