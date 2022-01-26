@@ -1500,7 +1500,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return !channel.isPresent()
                 || channel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
                 || channel.get().hasPermissions(user,
-                PermissionType.READ_MESSAGES,
+                PermissionType.VIEW_CHANNEL,
                 PermissionType.READ_MESSAGE_HISTORY,
                 PermissionType.ADD_REACTIONS);
     }

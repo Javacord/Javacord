@@ -136,7 +136,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * {@link PermissionState#DENIED} states!
      * It takes into account global permissions and the effective overwritten permissions of a user.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
      * @param user The user.
@@ -161,7 +161,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * Gets the effective allowed permissions of a user in this channel.
      * It takes into account global permissions and the effective overwritten permissions of a user.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
      * @param user The user.
@@ -175,7 +175,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * Gets the effective denied permissions of a user in this channel.
      * It takes into account global permissions and the effective overwritten permissions of a user.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
      * @param user The user.
@@ -214,7 +214,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
     /**
      * Checks if a user has a given permission.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
      * @param user       The user.

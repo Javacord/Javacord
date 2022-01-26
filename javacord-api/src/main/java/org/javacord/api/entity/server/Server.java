@@ -776,7 +776,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Get the allowed permissions of a given user.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
      * @param user The user.
@@ -2112,7 +2112,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if a user has a given permission.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      * This method also do not take into account overwritten permissions in some channels!
      *

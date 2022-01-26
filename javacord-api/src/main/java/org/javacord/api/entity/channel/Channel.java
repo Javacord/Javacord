@@ -154,7 +154,7 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
         return !severChannel.isPresent()
                 || severChannel.get().hasAnyPermission(user,
                                                        PermissionType.ADMINISTRATOR,
-                                                       PermissionType.READ_MESSAGES);
+                                                       PermissionType.VIEW_CHANNEL);
     }
 
     /**
