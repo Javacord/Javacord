@@ -13,6 +13,6 @@ jobs:
         with:
           java-version: 11
       - name: Build project
-        run: ./gradlew build
+        run: ./gradlew build -x test
       - name: Run tests
         run: ./gradlew test
