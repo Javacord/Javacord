@@ -32,7 +32,7 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
 
         JsonNode data = jsonData.get("data");
         Map<Long, User> resolvedUsers = new HashMap<>();
-        if (jsonData.has("resolved")) {
+        if (data.has("resolved")) {
             JsonNode resolved = data.get("resolved");
             if (jsonData.has("guild_id")) {
                 ServerImpl server = (ServerImpl) api.getServerById(jsonData.get("guild_id").asLong())
