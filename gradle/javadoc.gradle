@@ -31,6 +31,9 @@ subprojects {
             if (java9ToolChain) {
                 addBooleanOption 'html5', true
                 addStringOption '-release', targetCompatibility.majorVersion
+                if (JavaVersion.toVersion(toolChain.version).java11Compatible) {
+                    addBooleanOption '-no-module-directories', true
+                }
             } else {
                 options.source sourceCompatibility.toString()
             }
