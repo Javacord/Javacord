@@ -417,10 +417,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
         if (data.hasNonNull("voice_states")) {
             for (JsonNode voiceStateJson : data.get("voice_states")) {
-                ServerVoiceChannelImpl channel =
-                        (ServerVoiceChannelImpl) getVoiceChannelById(voiceStateJson.get("channel_id").asLong())
-                                .orElseThrow(AssertionError::new);
-                channel.addConnectedUser(voiceStateJson.get("user_id").asLong());
+                Optional<ServerVoiceChannelImpl> channel =
+                        getVoiceChannelById(voiceStateJson.get("channel_id").asLong())
+                                .map(ch -> (ServerVoiceChannelImpl) ch);
+                // This gracefully disregards any channels in voice_states that are not present in the channels field.
+                // Bug occurred on a particular guild and prevented the guild from using the bot entirely.
+                // This log should happen almost never but should protect any guilds from failing creation due to
+                // mismatching guild data from Discord. https://github.com/discord/discord-api-docs/issues/4455
+                if (channel.isPresent()) {
+                    channel.get().addConnectedUser(voiceStateJson.get("user_id").asLong());
+                } else {
+                    logger.warn("Channel " + voiceStateJson.get("channel_id").asLong()
+                            + " was found in the voice_states property for server " + this.id
+                            + " but was not found in the channels property. It will not be"
+                            + " loaded.");
+                }
             }
         }
 
