@@ -41,4 +41,21 @@ public interface LowLevelComponent extends Component, Specializable<LowLevelComp
         return isSelectMenu() ? Optional.of((SelectMenu) this) : Optional.empty();
     }
 
+    /**
+     * Whether this component is of this type.
+     *
+     * @return True if it's of that type.
+     */
+    default boolean isTextInput() {
+        return getType() == ComponentType.TEXT_INPUT;
+    }
+
+    /**
+     * Gets the component as a TextInput if it's of that type.
+     *
+     * @return The SelectMenu.
+     */
+    default Optional<TextInput> asTextInput() {
+        return isTextInput() ? Optional.of((TextInput) this) : Optional.empty();
+    }
 }

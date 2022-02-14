@@ -1,12 +1,16 @@
 package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageFlag;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.Interaction;
@@ -16,6 +20,7 @@ import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.InteractionCallbackType;
+import org.javacord.core.entity.message.component.ComponentImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -23,6 +28,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -116,6 +122,31 @@ public abstract class InteractionImpl implements Interaction {
                 .setUrlParameters(getIdAsString(), token)
                 .setBody(ephemeral ? RESPOND_LATER_EPHEMERAL_BODY : RESPOND_LATER_BODY)
                 .execute(result -> new InteractionOriginalResponseUpdaterImpl(this));
+    }
+
+    @Override
+    public CompletableFuture<Void> respondWithModal(String customId, String title,
+                                                    List<HighLevelComponent> components) {
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        body.put("type", InteractionCallbackType.MODAL.getId());
+
+        ObjectNode modal = JsonNodeFactory.instance.objectNode();
+        modal.put("custom_id", customId);
+        modal.put("title", title);
+
+        ArrayNode comps = JsonNodeFactory.instance.arrayNode();
+        components.forEach(highLevelComponent -> comps.add(((ComponentImpl) highLevelComponent).toJsonNode()));
+
+        modal.set("components", comps);
+        body.set("data", modal);
+
+        return new RestRequest<Void>(this.api, RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
+                .setUrlParameters(getIdAsString(), token)
+                .setBody(body)
+                .execute(result -> {
+                    System.out.println(result.getJsonBody());
+                    return null;
+                });
     }
 
     @Override

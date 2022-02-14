@@ -36,6 +36,11 @@ public enum InteractionCallbackType {
     APPLICATION_COMMAND_AUTOCOMPLETE_RESULT(8),
 
     /**
+     * Respond to a non MODAL_SUBMIT interaction with a popup modal.
+     */
+    MODAL(9),
+
+    /**
      * An unknown interaction callback type.
      */
     UNKNOWN(-1);

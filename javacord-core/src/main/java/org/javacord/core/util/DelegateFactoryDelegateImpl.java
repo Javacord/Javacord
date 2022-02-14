@@ -24,6 +24,7 @@ import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelega
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.TextInputBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderBaseDelegate;
@@ -80,6 +81,7 @@ import org.javacord.core.entity.message.component.internal.ActionRowBuilderDeleg
 import org.javacord.core.entity.message.component.internal.ButtonBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.SelectMenuBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.SelectMenuOptionBuilderDelegateImpl;
+import org.javacord.core.entity.message.component.internal.TextInputBuilderDelegateImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsBuilderDelegateImpl;
 import org.javacord.core.entity.permission.PermissionsBuilderDelegateImpl;
@@ -317,6 +319,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ButtonBuilderDelegate createButtonBuilderDelegate() {
         return new ButtonBuilderDelegateImpl();
+    }
+
+    @Override
+    public TextInputBuilderDelegate createTextInputBuilderDelegate() {
+        return new TextInputBuilderDelegateImpl();
     }
 
     @Override
