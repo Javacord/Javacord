@@ -9,6 +9,7 @@ import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.TextInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +40,14 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
                         SelectMenu selectMenu = new SelectMenuImpl(componentJson);
                         components.add(selectMenu);
                         break;
+                    case TEXT_INPUT:
+                        TextInput textInput = new TextInputImpl(componentJson);
+                        components.add(textInput);
+                        break;
                     default:
                         throw new IllegalStateException(
                             String.format(
-                                "Couldn't parse the component of type '%d'. Please contact the developer!",
-                                typeInt
+                                "Couldn't parse the component of type '%d'. Please contact the developer!", typeInt
                             )
                         );
                 }
@@ -84,6 +88,10 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
                 case SELECT_MENU:
                     SelectMenuImpl selectMenu = (SelectMenuImpl) component;
                     componentsJson.add(selectMenu.toJsonNode());
+                    break;
+                case TEXT_INPUT:
+                    TextInputImpl textInput = (TextInputImpl) component;
+                    componentsJson.add(textInput.toJsonNode());
                     break;
                 default:
                     throw new IllegalStateException("An unknown component type was added.");

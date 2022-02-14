@@ -2,12 +2,14 @@ package org.javacord.api.interaction;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
-
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -43,7 +45,7 @@ public interface InteractionBase extends DiscordEntity {
      * interaction.
      *
      * @return A CompletableFuture that completes as soon as the acknowledgement has been sent; it yields an updater
-     *     that should be used to update the message later on.
+     *         that should be used to update the message later on.
      */
     CompletableFuture<InteractionOriginalResponseUpdater> respondLater();
 
@@ -55,9 +57,33 @@ public interface InteractionBase extends DiscordEntity {
      *
      * @param ephemeral Whether the response should be ephemeral
      * @return A CompletableFuture that completes as soon as the acknowledgement has been sent; it yields an updater
-     *     that should be used to update the message later on.
+     *         that should be used to update the message later on.
      */
     CompletableFuture<InteractionOriginalResponseUpdater> respondLater(boolean ephemeral);
+
+    /**
+     * Respond with a popup modal the user can interact with.
+     * You can respond to every interaction with a modal except to a {@link ModalInteraction}.
+     *
+     * @param customId   The custom ID of the modal.
+     * @param title      The title of the modal.
+     * @param components The components that should be displayed in the modal.
+     * @return A CompletableFuture that completes as soon as the modal has been sent.
+     */
+    default CompletableFuture<Void> respondWithModal(String customId, String title, HighLevelComponent... components) {
+        return respondWithModal(customId, title, Arrays.asList(components));
+    }
+
+    /**
+     * Respond with a popup modal the user can interact with.
+     * You can respond to every interaction with a modal except to a {@link ModalInteraction}.
+     *
+     * @param customId   The custom ID of the modal.
+     * @param title      The title of the modal.
+     * @param components The components that should be displayed in the modal.
+     * @return A CompletableFuture that completes as soon as the modal has been sent.
+     */
+    CompletableFuture<Void> respondWithModal(String customId, String title, List<HighLevelComponent> components);
 
     /**
      * Create a message builder to send follow-up messages for this interaction.

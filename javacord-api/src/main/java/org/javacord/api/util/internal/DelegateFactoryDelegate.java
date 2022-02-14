@@ -24,6 +24,7 @@ import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelega
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.TextInputBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.internal.MessageBuilderBaseDelegate;
@@ -393,6 +394,13 @@ public interface DelegateFactoryDelegate {
      * @return A new Button builder delegate.
      */
     ButtonBuilderDelegate createButtonBuilderDelegate();
+
+    /**
+     * Creates a new TextInput builder delegate.
+     *
+     * @return A new TextInput builder delegate.
+     */
+    TextInputBuilderDelegate createTextInputBuilderDelegate();
 
     /**
      * Creates a new select menu builder delegate.

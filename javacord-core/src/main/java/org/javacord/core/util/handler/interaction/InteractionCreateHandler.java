@@ -10,6 +10,7 @@ import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.InteractionCreateEvent;
 import org.javacord.api.event.interaction.MessageComponentCreateEvent;
 import org.javacord.api.event.interaction.MessageContextMenuCommandEvent;
+import org.javacord.api.event.interaction.ModalSubmitEvent;
 import org.javacord.api.event.interaction.SelectMenuChooseEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.event.interaction.UserContextMenuCommandEvent;
@@ -24,6 +25,7 @@ import org.javacord.core.event.interaction.ButtonClickEventImpl;
 import org.javacord.core.event.interaction.InteractionCreateEventImpl;
 import org.javacord.core.event.interaction.MessageComponentCreateEventImpl;
 import org.javacord.core.event.interaction.MessageContextMenuCommandEventImpl;
+import org.javacord.core.event.interaction.ModalSubmitEventImpl;
 import org.javacord.core.event.interaction.SelectMenuChooseEventImpl;
 import org.javacord.core.event.interaction.SlashCommandCreateEventImpl;
 import org.javacord.core.event.interaction.UserContextMenuCommandEventImpl;
@@ -31,6 +33,7 @@ import org.javacord.core.interaction.AutocompleteInteractionImpl;
 import org.javacord.core.interaction.ButtonInteractionImpl;
 import org.javacord.core.interaction.InteractionImpl;
 import org.javacord.core.interaction.MessageContextMenuInteractionImpl;
+import org.javacord.core.interaction.ModalInteractionImpl;
 import org.javacord.core.interaction.SelectMenuInteractionImpl;
 import org.javacord.core.interaction.SlashCommandInteractionImpl;
 import org.javacord.core.interaction.UserContextMenuInteractionImpl;
@@ -116,6 +119,9 @@ public class InteractionCreateHandler extends PacketHandler {
                 break;
             case APPLICATION_COMMAND_AUTOCOMPLETE:
                 interaction = new AutocompleteInteractionImpl(api, channel, packet);
+                break;
+            case MODAL_SUBMIT:
+                interaction = new ModalInteractionImpl(api, channel, packet);
                 break;
             default:
                 logger.warn("Received interaction of unknown type <{}>. "
@@ -215,14 +221,22 @@ public class InteractionCreateHandler extends PacketHandler {
                 }
                 break;
             case APPLICATION_COMMAND_AUTOCOMPLETE:
-                AutocompleteCreateEvent autocompleteCreateEvent =
-                        new AutocompleteCreateEventImpl(interaction);
+                AutocompleteCreateEvent autocompleteCreateEvent = new AutocompleteCreateEventImpl(interaction);
                 api.getEventDispatcher().dispatchAutocompleteCreateEvent(
                         server == null ? api : server,
                         server,
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
                         autocompleteCreateEvent);
+                break;
+            case MODAL_SUBMIT:
+                ModalSubmitEvent modalSubmitEvent = new ModalSubmitEventImpl(interaction);
+                api.getEventDispatcher().dispatchModalSubmitEvent(
+                        server == null ? api : server,
+                        server,
+                        interaction.getChannel().orElse(null),
+                        interaction.getUser(),
+                        modalSubmitEvent);
                 break;
             default:
                 break;

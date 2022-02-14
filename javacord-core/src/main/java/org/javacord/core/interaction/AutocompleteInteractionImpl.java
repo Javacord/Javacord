@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.interaction.AutocompleteInteraction;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
@@ -94,6 +95,17 @@ public class AutocompleteInteractionImpl extends SlashCommandInteractionImpl imp
      */
     @Override
     public CompletableFuture<InteractionOriginalResponseUpdater> respondLater(boolean ephemeral) {
+        throw new UnsupportedOperationException("This method is not supported by this interaction");
+    }
+
+    /**
+     * This method cannot be used by autocomplete interactions.
+     *
+     * @return Throws an {@link UnsupportedOperationException}.
+     */
+    @Override
+    public CompletableFuture<Void> respondWithModal(String customId, String title,
+                                                    List<HighLevelComponent> components) {
         throw new UnsupportedOperationException("This method is not supported by this interaction");
     }
 

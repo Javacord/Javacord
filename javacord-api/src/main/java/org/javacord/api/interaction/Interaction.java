@@ -100,4 +100,23 @@ public interface Interaction extends InteractionBase, Specializable<InteractionB
     default Optional<MessageComponentInteraction> asMessageComponentInteractionWithCustomId(String customId) {
         return asMessageComponentInteraction().filter(interaction -> interaction.getCustomId().equals(customId));
     }
+
+    /**
+     * Get this interaction as modal interaction if the type matches.
+     *
+     * @return the interaction as modal interaction if the type matches; an empty optional otherwise
+     */
+    default Optional<ModalInteraction> asModalInteraction() {
+        return as(ModalInteraction.class);
+    }
+
+    /**
+     * Get this interaction as modal interaction if the type and the given custom id match.
+     *
+     * @param customId The custom id to match.
+     * @return the interaction as modal interaction if the properties match; an empty optional otherwise
+     */
+    default Optional<ModalInteraction> asModalInteractionWithCustomId(String customId) {
+        return asModalInteraction().filter(interaction -> interaction.getCustomId().equals(customId));
+    }
 }
