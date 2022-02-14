@@ -4,6 +4,7 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
@@ -243,14 +244,14 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     }
 
     @Override
-    public InteractionMessageBuilder setFlags(InteractionCallbackDataFlag... interactionCallbackDataFlags) {
-        setFlags(EnumSet.copyOf(Arrays.asList(interactionCallbackDataFlags)));
+    public InteractionMessageBuilder setFlags(MessageFlag... messageFlags) {
+        setFlags(EnumSet.copyOf(Arrays.asList(messageFlags)));
         return this;
     }
 
     @Override
-    public InteractionMessageBuilder setFlags(EnumSet<InteractionCallbackDataFlag> interactionCallbackDataFlags) {
-        delegate.setFlags(interactionCallbackDataFlags);
+    public InteractionMessageBuilder setFlags(EnumSet<MessageFlag> messageFlags) {
+        delegate.setFlags(messageFlags);
         return this;
     }
 

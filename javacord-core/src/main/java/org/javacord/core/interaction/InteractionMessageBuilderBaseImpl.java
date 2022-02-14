@@ -2,11 +2,11 @@ package org.javacord.core.interaction;
 
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
-import org.javacord.api.interaction.callback.InteractionCallbackDataFlag;
 import org.javacord.api.interaction.callback.InteractionMessageBuilderBase;
 import org.javacord.api.util.internal.DelegateFactory;
 import java.util.Arrays;
@@ -151,14 +151,14 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     }
 
     @Override
-    public T setFlags(InteractionCallbackDataFlag... interactionCallbackDataFlags) {
-        setFlags(EnumSet.copyOf(Arrays.asList(interactionCallbackDataFlags)));
+    public T setFlags(MessageFlag... messageFlags) {
+        setFlags(EnumSet.copyOf(Arrays.asList(messageFlags)));
         return myClass.cast(this);
     }
 
     @Override
-    public T setFlags(EnumSet<InteractionCallbackDataFlag> interactionCallbackDataFlags) {
-        delegate.setFlags(interactionCallbackDataFlags);
+    public T setFlags(EnumSet<MessageFlag> messageFlags) {
+        delegate.setFlags(messageFlags);
         return myClass.cast(this);
     }
 
