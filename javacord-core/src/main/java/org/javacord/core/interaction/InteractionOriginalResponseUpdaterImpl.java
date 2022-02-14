@@ -4,12 +4,12 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageDecoration;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.interaction.InteractionBase;
-import org.javacord.api.interaction.callback.InteractionCallbackDataFlag;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -316,15 +316,14 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
-    public InteractionOriginalResponseUpdater setFlags(InteractionCallbackDataFlag... interactionCallbackDataFlags) {
-        setFlags(EnumSet.copyOf(Arrays.asList(interactionCallbackDataFlags)));
+    public InteractionOriginalResponseUpdater setFlags(MessageFlag... messageFlags) {
+        setFlags(EnumSet.copyOf(Arrays.asList(messageFlags)));
         return this;
     }
 
     @Override
-    public InteractionOriginalResponseUpdater setFlags(
-            EnumSet<InteractionCallbackDataFlag> interactionCallbackDataFlags) {
-        delegate.setFlags(interactionCallbackDataFlags);
+    public InteractionOriginalResponseUpdater setFlags(EnumSet<MessageFlag> messageFlags) {
+        delegate.setFlags(messageFlags);
         return this;
     }
 }
