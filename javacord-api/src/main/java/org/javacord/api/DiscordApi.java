@@ -1134,7 +1134,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a message by its id.
+     * Gets a message by its id, if it exists and belongs to the given channel.
      *
      * @param id The id of the message.
      * @param channel The channel of the message.
@@ -1146,7 +1146,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a message by its id.
+     * Gets a message by its id, if it exists and belongs to the given channel.
      *
      * @param id The id of the message.
      * @param channel The channel of the message.
