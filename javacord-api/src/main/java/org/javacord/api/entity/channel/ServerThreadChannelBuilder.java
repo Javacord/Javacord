@@ -49,7 +49,7 @@ public class ServerThreadChannelBuilder extends ServerChannelBuilder<ServerThrea
      *                   only available when creating a private thread.
      * @return The current instance in order to chain call methods.
      */
-    public ServerThreadChannelBuilder setInvitableFlag(boolean inviteable) {
+    public ServerThreadChannelBuilder setInvitableFlag(Boolean inviteable) {
         delegate.setInvitableFlag(inviteable);
         return this;
     }
