@@ -43,6 +43,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .setBody(topBody)
                 .execute(result -> null);
     }
@@ -52,6 +54,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.DELETE, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .execute(result -> null);
     }
 
@@ -59,7 +63,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     public CompletableFuture<Message> editOriginalResponse(InteractionBase interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.PATCH, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
-                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
+                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false);
 
         return executeResponse(request);
     }
@@ -68,7 +74,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     public CompletableFuture<Message> sendFollowupMessage(InteractionBase interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
-                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
+                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false);
 
         return executeResponse(request);
     }
@@ -85,6 +93,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .setBody(topBody)
                 .execute(result -> null);
     }
@@ -95,6 +105,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                 RestEndpoint.WEBHOOK_MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
                         interaction.getToken(), messageId)
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .execute(result -> null);
     }
 
@@ -103,7 +115,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(), RestMethod.PATCH,
                 RestEndpoint.WEBHOOK_MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
-                        interaction.getToken(), messageId);
+                        interaction.getToken(), messageId)
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false);
 
         return executeResponse(request);
     }

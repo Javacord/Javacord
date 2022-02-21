@@ -540,7 +540,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         RestRequest<Message> request =
                 new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
                         .addQueryParameter("wait", Boolean.toString(wait))
-                        .setUrlParameters(webhookId, webhookToken);
+                        .setUrlParameters(webhookId, webhookToken)
+                        .consumeGlobalRatelimit(false)
+                        .includeAuthorizationHeader(false);
         CompletableFuture<Message> future = new CompletableFuture<>();
         if (!attachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             // We access files etc. so this should be async
