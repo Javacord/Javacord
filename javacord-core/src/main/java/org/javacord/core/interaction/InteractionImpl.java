@@ -120,6 +120,8 @@ public abstract class InteractionImpl implements Interaction {
         return new RestRequest<InteractionOriginalResponseUpdater>(this.api,
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(getIdAsString(), token)
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .setBody(ephemeral ? RESPOND_LATER_EPHEMERAL_BODY : RESPOND_LATER_BODY)
                 .execute(result -> new InteractionOriginalResponseUpdaterImpl(this));
     }

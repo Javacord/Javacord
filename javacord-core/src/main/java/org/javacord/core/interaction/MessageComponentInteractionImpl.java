@@ -49,6 +49,8 @@ public abstract class MessageComponentInteractionImpl extends InteractionImpl im
         return new RestRequest<Void>(getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(getIdAsString(), getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .setBody(UPDATE_LATER_BODY)
                 .execute(result -> null);
     }
