@@ -15,8 +15,11 @@ import org.javacord.api.util.rest.RestRequestResponseInformation;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -181,7 +184,12 @@ public class RestRequest<T> {
      */
     public RestRequest<T> setAuditLogReason(String reason) {
         if (reason != null) {
-            addHeader("X-Audit-Log-Reason", reason);
+            try {
+                addHeader("X-Audit-Log-Reason",
+                        URLEncoder.encode(reason, StandardCharsets.UTF_8.name()).replace("+", " "));
+            } catch (UnsupportedEncodingException e) {
+                throw new AssertionError(e); // UTF-8 is always available
+            }
         }
         return this;
     }
