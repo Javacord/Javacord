@@ -1,0 +1,26 @@
+version: 2
+updates:
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "nothub"
+    reviewers:
+      - "nothub"
+    commit-message:
+      prefix: "gradle"
+      include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "nothub"
+    reviewers:
+      - "nothub"
+    commit-message:
+      prefix: "github-actions"
+      include: "scope"
