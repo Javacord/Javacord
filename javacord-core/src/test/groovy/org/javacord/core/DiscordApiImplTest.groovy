@@ -99,7 +99,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, null, false)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -116,7 +116,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -149,7 +149,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -170,7 +170,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -192,7 +192,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, MockProxyManager.httpProxy, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -220,7 +220,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.proxySelector, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -252,7 +252,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, MockProxyManager.httpProxy, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -287,7 +287,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, MockProxyManager.httpProxy, authenticator, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -320,7 +320,7 @@ class DiscordApiImplTest extends Specification {
                     null, true, null, { [InetAddress.getLoopbackAddress()] })
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -349,7 +349,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -389,7 +389,7 @@ class DiscordApiImplTest extends Specification {
             }
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -427,7 +427,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, MockProxyManager.httpProxy, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -465,7 +465,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, MockProxyManager.proxySelector, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -492,7 +492,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, null, null, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()
@@ -531,7 +531,7 @@ class DiscordApiImplTest extends Specification {
             def api = new DiscordApiImpl('fakeBotToken', null, null, null, MockProxyManager.httpProxy, authenticator, true)
 
         when:
-            api.applicationInfo.join()
+            api.requestApplicationInfo().join()
 
         then:
             CompletionException ce = thrown()

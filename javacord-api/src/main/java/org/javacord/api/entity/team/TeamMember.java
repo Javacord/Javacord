@@ -15,9 +15,21 @@ public interface TeamMember extends DiscordEntity {
     TeamMembershipState getMembershipState();
 
     /**
-     * Gets the member as user.
+     * Gets the user id of this member.
+     *
+     * @return The user id.
+     */
+    @Override
+    long getId();
+
+    /**
+     * Requests the member as user.
+     *
+     * <p>If the user is not cached, it will be requested.</p>
      *
      * @return The member as user.
      */
-    CompletableFuture<User> getUser();
+    default CompletableFuture<User> requestUser() {
+        return getApi().getUserById(getId());
+    }
 }
