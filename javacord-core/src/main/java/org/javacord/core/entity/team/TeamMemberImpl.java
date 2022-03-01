@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.team.TeamMember;
 import org.javacord.api.entity.team.TeamMembershipState;
-import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
-
-import java.util.concurrent.CompletableFuture;
 
 public class TeamMemberImpl implements TeamMember  {
 
@@ -43,11 +40,6 @@ public class TeamMemberImpl implements TeamMember  {
     @Override
     public TeamMembershipState getMembershipState() {
         return membershipState;
-    }
-
-    @Override
-    public CompletableFuture<User> getUser() {
-        return api.getUserById(id);
     }
 
     @Override

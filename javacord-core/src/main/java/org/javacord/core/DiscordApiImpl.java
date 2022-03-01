@@ -38,7 +38,6 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.sticker.StickerPack;
-import org.javacord.api.entity.team.Team;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -312,19 +311,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private volatile User you;
 
     /**
-     * The client id of the application.
+     * The cached application info.
      */
-    private volatile long clientId = -1;
-
-    /**
-     * The id of the application's owner.
-     */
-    private volatile long ownerId = -1;
-
-    /**
-     * The team of the application.
-     */
-    private volatile Team team = null;
+    private volatile ApplicationInfo applicationInfo;
 
     /**
      * The time offset between the Discord time and our local time.
@@ -656,15 +645,15 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                                     .map(source -> source.apply(this))
                                     .forEach(this::addListener);
                             // Application information
-                            getApplicationInfo().whenComplete((applicationInfo, exception) -> {
+                            requestApplicationInfo().whenComplete((applicationInfo, exception) -> {
                                 if (exception != null) {
                                     logger.error("Could not access self application info on startup!", exception);
+                                    threadPool.shutdown();
+                                    ready.completeExceptionally(exception);
                                 } else {
-                                    clientId = applicationInfo.getClientId();
-                                    ownerId = applicationInfo.getOwnerId();
-                                    team = applicationInfo.getTeam().orElse(null);
+                                    this.applicationInfo = applicationInfo;
+                                    ready.complete(this);
                                 }
-                                ready.complete(this);
                             });
                         } else {
                             threadPool.shutdown();
@@ -1440,112 +1429,112 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public CompletableFuture<Set<ApplicationCommand>> getGlobalApplicationCommands() {
         return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
+                .setUrlParameters(String.valueOf(getClientId()))
                 .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId) {
         return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
                 .execute(result -> jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<ApplicationCommand>> getServerApplicationCommands(Server server) {
         return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
                 .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId) {
         return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<SlashCommand>> getGlobalSlashCommands() {
         return new RestRequest<Set<SlashCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
+                .setUrlParameters(String.valueOf(getClientId()))
                 .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> getGlobalSlashCommandById(long commandId) {
         return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
                 .execute(result -> (SlashCommand) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<SlashCommand>> getServerSlashCommands(Server server) {
         return new RestRequest<Set<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
                 .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId) {
         return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> (SlashCommand) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<UserContextMenu>> getGlobalUserContextMenus() {
         return new RestRequest<Set<UserContextMenu>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
+                .setUrlParameters(String.valueOf(getClientId()))
                 .execute(result -> jsonToUserContextMenuList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<UserContextMenu> getGlobalUserContextMenuById(long commandId) {
         return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
                 .execute(result -> (UserContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<UserContextMenu>> getServerUserContextMenus(Server server) {
         return new RestRequest<Set<UserContextMenu>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
                 .execute(result -> jsonToUserContextMenuList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<UserContextMenu> getServerUserContextMenuById(Server server, long commandId) {
         return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> (UserContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<MessageContextMenu>> getGlobalMessageContextMenus() {
         return new RestRequest<Set<MessageContextMenu>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
+                .setUrlParameters(String.valueOf(getClientId()))
                 .execute(result -> jsonToMessageContextMenuList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<MessageContextMenu> getGlobalMessageContextMenuById(long commandId) {
         return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
                 .execute(result -> (MessageContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Set<MessageContextMenu>> getServerMessageContextMenus(Server server) {
         return new RestRequest<Set<MessageContextMenu>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
                 .execute(result -> jsonToMessageContextMenuList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<MessageContextMenu> getServerMessageContextMenuById(Server server, long commandId) {
         return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> (MessageContextMenu) jsonToApplicationCommand(result.getJsonBody()));
     }
 
@@ -1554,7 +1543,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Server server) {
         return new RestRequest<Set<ServerApplicationCommandPermissions>>(this, RestMethod.GET,
                 RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
                 .execute(result -> jsonToServerApplicationCommandPermissionsSet(result.getJsonBody()));
     }
 
@@ -1563,7 +1552,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Server server, long commandId) {
         return new RestRequest<ServerApplicationCommandPermissions>(this, RestMethod.GET,
                 RestEndpoint.APPLICATION_COMMAND_PERMISSIONS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> new ServerApplicationCommandPermissionsImpl(this, result.getJsonBody()));
     }
 
@@ -1571,7 +1560,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<Set<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
             Set<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
+                .setUrlParameters(String.valueOf(getClientId()))
                 .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
                 .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
@@ -1580,7 +1569,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     public CompletableFuture<Set<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
             long server, Set<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), String.valueOf(server))
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(server))
                 .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
                 .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
@@ -1878,21 +1867,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public long getOwnerId() {
-        return ownerId;
-    }
-
-    @Override
-    public Optional<Team> getCachedTeam() {
-        return Optional.ofNullable(team);
-    }
-
-    @Override
-    public long getClientId() {
-        return clientId;
-    }
-
-    @Override
     public CompletableFuture<Void> disconnect() {
         boolean doDisconnect = false;
         synchronized (disconnectFuture) {
@@ -1941,11 +1915,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public CompletableFuture<ApplicationInfo> getApplicationInfo() {
+    public ApplicationInfo getCachedApplicationInfo() {
+        return this.applicationInfo;
+    }
+
+    @Override
+    public CompletableFuture<ApplicationInfo> requestApplicationInfo() {
         return new RestRequest<ApplicationInfo>(this, RestMethod.GET, RestEndpoint.SELF_INFO)
                 .execute(result -> {
                     ApplicationInfo applicationInfo = new ApplicationInfoImpl(this, result.getJsonBody());
-                    this.team = applicationInfo.getTeam().orElse(null);
+                    this.applicationInfo = applicationInfo;
                     return applicationInfo;
                 });
     }

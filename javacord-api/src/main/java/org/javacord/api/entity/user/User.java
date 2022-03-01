@@ -16,6 +16,7 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.listener.user.UserAttachableListenerManager;
+
 import java.awt.Color;
 import java.time.Duration;
 import java.time.Instant;
@@ -63,25 +64,31 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     boolean isBot();
 
     /**
-     * Checks if this user is the owner of the current account.
-     * Always returns <code>false</code> if logged in to a user account.
+     * Checks if this user is the owner of the current account or the current account's team.
      *
      * @return Whether this user is the owner of the current account.
      */
     default boolean isBotOwner() {
-        return getApi().getOwnerId() == getId();
+        return getApi().getOwnerId().isPresent() && getApi().getOwnerId().get() == getId();
     }
 
     /**
      * Checks if this user is a member of the team of the current account.
-     * Always returns <code>false</code> if logged in to a user account.
      *
      * @return Whether this user is a member of the team of the current account.
      */
     default boolean isTeamMember() {
-        return getApi().getAccountType() == AccountType.BOT
-                && getApi().getCachedTeam().map(team -> team.getOwnerId() == getId()
+        return getApi().getCachedTeam().map(team -> team.getOwnerId() == getId()
                 || team.getTeamMembers().stream().anyMatch(teamMember -> teamMember.getId() == getId())).orElse(false);
+    }
+
+    /**
+     * Checks if this user is the owner or a member of the team of the current account.
+     *
+     * @return Whether this user is the owner or a member of the team of the current account.
+     */
+    default boolean isBotOwnerOrTeamMember() {
+        return isBotOwner() || isTeamMember();
     }
 
     /**

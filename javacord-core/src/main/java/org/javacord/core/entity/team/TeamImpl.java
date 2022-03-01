@@ -13,11 +13,10 @@ import org.javacord.core.util.logging.LoggerUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class TeamImpl implements Team {
 
@@ -47,27 +46,28 @@ public class TeamImpl implements Team {
     private final String iconHash;
 
     /**
-     * The members of the team.
+     * The name of the team.
      */
-    private final List<TeamMember> members = new LinkedList<TeamMember>();
+    private final String name;
 
     /**
-     * Creates a new user.
+     * The members of the team.
+     */
+    private final Set<TeamMember> members = new HashSet<>();
+
+    /**
+     * Creates a new team.
      *
      * @param api The discord api instance.
-     * @param data The json data of the user.
+     * @param data The json data of the team.
      */
     public TeamImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
 
-        id = Long.parseLong(data.get("id").asText());
-
-
-        iconHash = data.has("icon") ? data.get("icon").asText() : null;
-
-
+        id = data.get("id").asLong();
+        iconHash = data.path("icon").asText(null);
+        name = data.get("name").asText();
         ownerId = data.get("owner_user_id").asLong();
-
         for (JsonNode member : data.get("members")) {
             members.add(new TeamMemberImpl(api, member));
         }
@@ -90,13 +90,18 @@ public class TeamImpl implements Team {
     }
 
     @Override
-    public Collection<TeamMember> getTeamMembers() {
-        return new ArrayList<>(members);
+    public Set<TeamMember> getTeamMembers() {
+        return Collections.unmodifiableSet(members);
     }
 
     @Override
     public long getOwnerId() {
         return ownerId;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 
     @Override

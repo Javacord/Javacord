@@ -98,12 +98,22 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
      * Checks if the author is the owner of the current account.
-     * Always returns <code>false</code> if logged in to a user account.
+     *
+     * <p>Will return false if the account is owned by a team.</p>
      *
      * @return Whether the author is the owner of the current account.
      */
     default boolean isBotOwner() {
-        return isUser() && getApi().getOwnerId() == getId();
+        return asUser().map(User::isBotOwner).orElse(false);
+    }
+
+    /**
+     * Checks if the author is a member of the team owning the bot account.
+     *
+     * @return Whether the author is a member of the team owning the bot account.
+     */
+    default boolean isTeamMember() {
+        return asUser().map(User::isTeamMember).orElse(false);
     }
 
     /**
