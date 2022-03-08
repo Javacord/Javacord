@@ -2157,6 +2157,24 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Requests a ban object for the specified user.
+     *
+     * @param user The user to request the ban object for.
+     * @return A future to get a server ban object if the user is currently banned.
+     */
+    default CompletableFuture<Ban> requestBan(User user) {
+        return requestBan(user.getId());
+    }
+
+    /**
+     * Requests a ban object for the specified user.
+     *
+     * @param userId The user id to request the ban object for.
+     * @return A future to get a server ban object if the user is currently banned.
+     */
+    CompletableFuture<Ban> requestBan(long userId);
+
+    /**
      * Gets a collection with all server bans.
      *
      * @return A collection with all server bans.
