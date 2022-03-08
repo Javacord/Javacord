@@ -15,7 +15,7 @@ public interface ServerMemberBanEvent extends ServerMemberEvent {
      *
      * @return The ban object.
      */
-    CompletableFuture<Optional<Ban>> requestBan();
+    CompletableFuture<Ban> requestBan();
 
     /**
      * Requests the reason of the ban.
@@ -23,7 +23,7 @@ public interface ServerMemberBanEvent extends ServerMemberEvent {
      * @return The reason of the ban.
      */
     default CompletableFuture<Optional<String>> requestReason() {
-        return requestBan().thenApply(ban -> ban.flatMap(Ban::getReason));
+        return requestBan().thenApply(Ban::getReason);
     }
 
 }
