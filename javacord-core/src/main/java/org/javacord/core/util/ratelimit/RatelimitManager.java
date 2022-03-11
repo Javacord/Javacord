@@ -174,11 +174,7 @@ public class RatelimitManager {
         Response response = result.getResponse();
         boolean global = response.header("X-RateLimit-Global", "false").equalsIgnoreCase("true");
         int remaining = Integer.parseInt(response.header("X-RateLimit-Remaining", "1"));
-        long reset = request
-                .getEndpoint()
-                .getHardcodedRatelimit()
-                .map(ratelimit -> responseTimestamp + api.getTimeOffset() + ratelimit)
-                .orElseGet(() -> (long) (Double.parseDouble(response.header("X-RateLimit-Reset", "0")) * 1000));
+        long reset =  (long) (Double.parseDouble(response.header("X-RateLimit-Reset", "0")) * 1000);
 
         // Check if we received a 429 response
         if (result.getResponse().code() == 429) {

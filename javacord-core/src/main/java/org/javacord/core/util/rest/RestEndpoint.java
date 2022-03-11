@@ -29,7 +29,7 @@ public enum RestEndpoint {
     SERVER_SELF("/users/@me/guilds/%s", 0),
     SERVER_CHANNEL("/guilds/%s/channels", 0),
     // hardcoded reactions ratelimit due to https://github.com/discordapp/discord-api-docs/issues/182
-    REACTION("/channels/%s/messages/%s/reactions", 0, 250),
+    REACTION("/channels/%s/messages/%s/reactions", 0),
     PINS("/channels/%s/pins", 0),
     SERVER_MEMBER("/guilds/%s/members/%s", 0),
     SERVER_MEMBER_ROLE("/guilds/%s/members/%s/roles/%s", 0),
@@ -78,24 +78,13 @@ public enum RestEndpoint {
      */
     private final int majorParameterPosition;
 
-    /**
-     * The position of the major parameter starting with <code>0</code> or <code>-1</code> if no major parameter exists.
-     */
-    private final int hardcodedRatelimit;
-
-
     RestEndpoint(String endpointUrl) {
-        this(endpointUrl, -1, -1);
+        this(endpointUrl, -1);
     }
 
     RestEndpoint(String endpointUrl, int majorParameterPosition) {
-        this(endpointUrl, majorParameterPosition, -1);
-    }
-
-    RestEndpoint(String endpointUrl, int majorParameterPosition, int hardcodedRatelimit) {
         this.endpointUrl = endpointUrl;
         this.majorParameterPosition = majorParameterPosition;
-        this.hardcodedRatelimit = hardcodedRatelimit;
     }
 
     /**
@@ -119,18 +108,6 @@ public enum RestEndpoint {
      */
     public String getEndpointUrl() {
         return endpointUrl;
-    }
-
-    /**
-     * Gets the hardcoded ratelimit if one is set.
-     *
-     * @return An optional which is present, if the endpoint has a hardcoded ratelimit.
-     */
-    public Optional<Integer> getHardcodedRatelimit() {
-        if (hardcodedRatelimit >= 0) {
-            return Optional.of(hardcodedRatelimit);
-        }
-        return Optional.empty();
     }
 
     /**
