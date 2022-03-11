@@ -43,9 +43,6 @@ public class RatelimitBucket {
      */
     public RatelimitBucket(DiscordApi api, RestEndpoint endpoint, String majorUrlParameter) {
         this.api = (DiscordApiImpl) api;
-        if (endpoint.isGlobal()) {
-            endpoint = null;
-        }
         this.endpoint = endpoint;
         this.majorUrlParameter = majorUrlParameter;
     }
@@ -128,9 +125,6 @@ public class RatelimitBucket {
      * @return Whether a bucket created with the given parameters would equal this bucket or not.
      */
     public boolean equals(RestEndpoint endpoint, String majorUrlParameter) {
-        if (endpoint.isGlobal()) {
-            endpoint = null;
-        }
         boolean endpointSame = this.endpoint == endpoint;
         boolean majorUrlParameterBothNull = this.majorUrlParameter == null && majorUrlParameter == null;
         boolean majorUrlParameterEqual =
