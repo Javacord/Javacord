@@ -144,6 +144,8 @@ public abstract class InteractionImpl implements Interaction {
 
         return new RestRequest<Void>(this.api, RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(getIdAsString(), token)
+                .includeAuthorizationHeader(false)
+                .consumeGlobalRatelimit(false)
                 .setBody(body)
                 .execute(result -> {
                     System.out.println(result.getJsonBody());
