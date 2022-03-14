@@ -13,3 +13,7 @@
 *.iml
 *.ipr
 *.iws
+
+# System files
+.DS_Store
+
