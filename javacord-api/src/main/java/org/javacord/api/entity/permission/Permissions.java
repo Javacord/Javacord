@@ -1,8 +1,8 @@
 package org.javacord.api.entity.permission;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -43,34 +43,34 @@ public interface Permissions {
     }
 
     /**
-     * Gets a collection with permission types which are set to ({@link PermissionState#ALLOWED}).
+     * Gets a set with permission types which are set to ({@link PermissionState#ALLOWED}).
      *
-     * @return A collection with all allowed permissions.
+     * @return A set with all allowed permissions.
      */
-    default Collection<PermissionType> getAllowedPermission() {
-        return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
+    default Set<PermissionType> getAllowedPermission() {
+        return Collections.unmodifiableSet(Arrays.stream(PermissionType.values())
                 .filter(type -> getState(type) == PermissionState.ALLOWED)
                 .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with permission types which are set to ({@link PermissionState#DENIED}).
+     * Gets a set with permission types which are set to ({@link PermissionState#DENIED}).
      *
-     * @return A collection with all denied permissions.
+     * @return A set with all denied permissions.
      */
-    default Collection<PermissionType> getDeniedPermissions() {
-        return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
+    default Set<PermissionType> getDeniedPermissions() {
+        return Collections.unmodifiableSet(Arrays.stream(PermissionType.values())
                 .filter(type -> getState(type) == PermissionState.DENIED)
                 .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with permission types which are set to ({@link PermissionState#UNSET}).
+     * Gets a set with permission types which are set to ({@link PermissionState#UNSET}).
      *
-     * @return A collection with all unset permissions.
+     * @return A set with all unset permissions.
      */
-    default Collection<PermissionType> getUnsetPermissions() {
-        return Collections.unmodifiableCollection(Arrays.stream(PermissionType.values())
+    default Set<PermissionType> getUnsetPermissions() {
+        return Collections.unmodifiableSet(Arrays.stream(PermissionType.values())
                 .filter(type -> getState(type) == PermissionState.UNSET)
                 .collect(Collectors.toSet()));
     }

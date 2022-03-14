@@ -8,12 +8,12 @@ import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.user.User;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface RegularServerChannel extends ServerChannel, Comparable<RegularServerChannel> {
@@ -167,7 +167,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * @param user The user.
      * @return The effective allowed permissions of a user in this channel.
      */
-    default Collection<PermissionType> getEffectiveAllowedPermissions(User user) {
+    default Set<PermissionType> getEffectiveAllowedPermissions(User user) {
         return getEffectivePermissions(user).getAllowedPermission();
     }
 
@@ -181,7 +181,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * @param user The user.
      * @return The effective denied permissions of a user in this channel.
      */
-    default Collection<PermissionType> getEffectiveDeniedPermissions(User user) {
+    default Set<PermissionType> getEffectiveDeniedPermissions(User user) {
         return getEffectivePermissions(user).getDeniedPermissions();
     }
 

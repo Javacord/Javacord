@@ -14,10 +14,10 @@ import org.javacord.core.listener.channel.server.InternalServerChannelAttachable
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -99,15 +99,15 @@ public class ServerChannelImpl implements ServerChannel, InternalServerChannelAt
     }
 
     @Override
-    public CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_INVITE)
+    public CompletableFuture<Set<RichInvite>> getInvites() {
+        return new RestRequest<Set<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.CHANNEL_INVITE)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
-                    Collection<RichInvite> invites = new HashSet<>();
+                    Set<RichInvite> invites = new HashSet<>();
                     for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new InviteImpl(getApi(), inviteJson));
                     }
-                    return Collections.unmodifiableCollection(invites);
+                    return Collections.unmodifiableSet(invites);
                 });
     }
 

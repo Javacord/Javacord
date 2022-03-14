@@ -6,7 +6,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.thread.ThreadMembersUpdateEvent;
 import org.javacord.core.event.server.ServerEventImpl;
 
-import java.util.List;
+import java.util.Set;
 
 public class ThreadMembersUpdateEventImpl extends ServerEventImpl implements ThreadMembersUpdateEvent {
 
@@ -23,12 +23,12 @@ public class ThreadMembersUpdateEventImpl extends ServerEventImpl implements Thr
     /**
      * The users who were added to the thread.
      */
-    private final List<ThreadMember> addedMembers;
+    private final Set<ThreadMember> addedMembers;
 
     /**
      * The ids of the users who were removed from the thread.
      */
-    private final List<Long> removedMemberIds;
+    private final Set<Long> removedMemberIds;
 
     /**
      * Creates a Thread Members Update Event.
@@ -40,8 +40,8 @@ public class ThreadMembersUpdateEventImpl extends ServerEventImpl implements Thr
      * @param removedMemberIds    The ids of users who were removed from the thread.
      */
     public ThreadMembersUpdateEventImpl(final ServerThreadChannel serverThreadChannel, final Server server,
-                                        final int memberCount, final List<ThreadMember> addedMembers,
-                                        final List<Long> removedMemberIds) {
+                                        final int memberCount, final Set<ThreadMember> addedMembers,
+                                        final Set<Long> removedMemberIds) {
         super(server);
         this.serverThreadChannel = serverThreadChannel;
         this.memberCount = memberCount;
@@ -60,12 +60,12 @@ public class ThreadMembersUpdateEventImpl extends ServerEventImpl implements Thr
     }
 
     @Override
-    public List<ThreadMember> getAddedMembers() {
+    public Set<ThreadMember> getAddedMembers() {
         return addedMembers;
     }
 
     @Override
-    public List<Long> getRemovedMemberIds() {
+    public Set<Long> getRemovedMemberIds() {
         return removedMemberIds;
     }
 

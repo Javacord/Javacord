@@ -17,6 +17,9 @@ public class RegularServerChannelBuilder<T> extends ServerChannelBuilder<T> {
 
     /**
      * Creates a new regular server channel builder.
+     *
+     * @param myClass The class this builder is for.
+     * @param delegate A subtype of a RegularServerChannelBuilderDelegate.
      */
     protected RegularServerChannelBuilder(Class<T> myClass, RegularServerChannelBuilderDelegate delegate) {
         super(myClass, delegate);

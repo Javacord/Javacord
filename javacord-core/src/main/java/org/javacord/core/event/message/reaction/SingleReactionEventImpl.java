@@ -8,8 +8,8 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.reaction.SingleReactionEvent;
 import org.javacord.core.event.message.RequestableMessageEventImpl;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -73,7 +73,7 @@ public abstract class SingleReactionEventImpl extends RequestableMessageEventImp
     }
 
     @Override
-    public CompletableFuture<List<User>> getUsers() {
+    public CompletableFuture<Set<User>> getUsers() {
         return Reaction.getUsers(getApi(), getChannel().getId(), getMessageId(), getEmoji());
     }
 

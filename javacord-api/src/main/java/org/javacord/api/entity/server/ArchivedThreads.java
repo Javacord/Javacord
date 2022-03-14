@@ -3,22 +3,23 @@ package org.javacord.api.entity.server;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import java.util.List;
+import java.util.Set;
 
 public interface ArchivedThreads {
 
     /**
-     * Gets the active threads.
+     * Gets a list with the active threads.
      *
-     * @return The active Server Thread Channels.
+     * @return A list containing the active Server Thread Channels.
      */
     List<ServerThreadChannel> getServerThreadChannels();
 
     /**
-     * A thread member object for each returned thread the current user has joined.
+     * A set with the thread member objects for each returned thread the current user has joined.
      *
-     * @return The thread members.
+     * @return A list containing the thread members.
      */
-    List<ThreadMember> getThreadMembers();
+    Set<ThreadMember> getThreadMembers();
 
     /**
      * Whether there are more threads.

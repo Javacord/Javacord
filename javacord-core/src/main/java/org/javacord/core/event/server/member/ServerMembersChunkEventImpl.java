@@ -6,14 +6,14 @@ import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.core.event.server.ServerEventImpl;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 /**
  * The implementation of {@link ServerMembersChunkEvent}.
  */
 public class ServerMembersChunkEventImpl extends ServerEventImpl implements ServerMembersChunkEvent {
 
-    private final List<User> membersChunk;
+    private final Set<User> membersChunk;
 
     /**
      * Creates a new server members chunk event.
@@ -21,13 +21,13 @@ public class ServerMembersChunkEventImpl extends ServerEventImpl implements Serv
      * @param server The server of the event.
      * @param membersChunk The chunk of members.
      */
-    public ServerMembersChunkEventImpl(Server server, List<User> membersChunk) {
+    public ServerMembersChunkEventImpl(Server server, Set<User> membersChunk) {
         super(server);
         this.membersChunk = membersChunk;
     }
 
     @Override
-    public List<User> getMembers() {
-        return Collections.unmodifiableList(membersChunk);
+    public Set<User> getMembers() {
+        return Collections.unmodifiableSet(membersChunk);
     }
 }

@@ -4,9 +4,9 @@ import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelAttachableListenerManager;
 
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -65,14 +65,14 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
      *
      * @return The ids of the users that are connected to this server voice channel.
      */
-    Collection<Long> getConnectedUserIds();
+    Set<Long> getConnectedUserIds();
 
     /**
      * Gets the users that are connected to this server voice channel.
      *
      * @return The users that are connected to this server voice channel.
      */
-    Collection<User> getConnectedUsers();
+    Set<User> getConnectedUsers();
 
     /**
      * Checks whether the user with the given id is connected to this channel.

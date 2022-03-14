@@ -16,10 +16,9 @@ import org.javacord.core.event.server.emoji.KnownCustomEmojiCreateEventImpl;
 import org.javacord.core.event.server.emoji.KnownCustomEmojiDeleteEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -61,9 +60,9 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                         api.getEventDispatcher().dispatchKnownCustomEmojiChangeNameEvent(server, emoji, server, event);
                     }
 
-                    Collection<Role> oldWhitelist = emoji.getWhitelistedRoles().orElse(Collections.emptySet());
+                    Set<Role> oldWhitelist = emoji.getWhitelistedRoles().orElse(Collections.emptySet());
                     JsonNode newWhitelistJson = value.get("roles");
-                    Collection<Role> newWhitelist = new ArrayList<>();
+                    Set<Role> newWhitelist = new HashSet<>();
                     if (newWhitelistJson != null && !newWhitelistJson.isNull()) {
                         for (JsonNode role : newWhitelistJson) {
                             server.getRoleById(role.asLong()).ifPresent(newWhitelist::add);
