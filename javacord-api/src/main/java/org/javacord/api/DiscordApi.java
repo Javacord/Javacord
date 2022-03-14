@@ -830,7 +830,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return Whether all users of available servers are in the cache.
      */
     default boolean hasAllUsersInCache() {
-        return !getServers().stream().anyMatch(Server::hasAllMembersInCache);
+        return getServers().stream().allMatch(Server::hasAllMembersInCache);
     }
 
     /**
