@@ -6,15 +6,15 @@ import org.javacord.api.interaction.ApplicationCommandPermissions;
 import org.javacord.api.interaction.ServerApplicationCommandPermissions;
 import org.javacord.core.DiscordApiImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ServerApplicationCommandPermissionsImpl implements ServerApplicationCommandPermissions {
 
     private final long id;
     private final long applicationId;
     private final Server server;
-    private final List<ApplicationCommandPermissions> permissions;
+    private final Set<ApplicationCommandPermissions> permissions;
 
     /**
      * Class constructor.
@@ -27,7 +27,7 @@ public class ServerApplicationCommandPermissionsImpl implements ServerApplicatio
         applicationId = data.get("application_id").asLong();
         server = api.getPossiblyUnreadyServerById(data.get("guild_id").asLong()).orElseThrow(AssertionError::new);
 
-        permissions = new ArrayList<>();
+        permissions = new HashSet<>();
         for (JsonNode jsonNode : data.get("permissions")) {
             permissions.add(new ApplicationCommandPermissionsImpl(server, jsonNode));
         }
@@ -54,7 +54,7 @@ public class ServerApplicationCommandPermissionsImpl implements ServerApplicatio
     }
 
     @Override
-    public List<ApplicationCommandPermissions> getPermissions() {
+    public Set<ApplicationCommandPermissions> getPermissions() {
         return permissions;
     }
 }

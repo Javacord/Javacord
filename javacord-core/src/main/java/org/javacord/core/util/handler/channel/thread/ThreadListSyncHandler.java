@@ -14,7 +14,9 @@ import org.javacord.core.event.channel.thread.ThreadListSyncEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ThreadListSyncHandler extends PacketHandler {
 
@@ -40,7 +42,7 @@ public class ThreadListSyncHandler extends PacketHandler {
             return;
         }
 
-        final List<Long> channelIds = new ArrayList<>();
+        final Set<Long> channelIds = new HashSet<>();
         if (packet.has("channel_ids")) {
             for (final JsonNode channelId : packet.get("channel_ids")) {
                 channelIds.add(channelId.asLong());
@@ -57,7 +59,7 @@ public class ThreadListSyncHandler extends PacketHandler {
             threadIds.add(thread.getId());
         }
 
-        final List<ThreadMember> members = new ArrayList<>();
+        final Set<ThreadMember> members = new HashSet<>();
         for (final JsonNode member : packet.get("members")) {
             members.add(new ThreadMemberImpl(api, server, member));
         }

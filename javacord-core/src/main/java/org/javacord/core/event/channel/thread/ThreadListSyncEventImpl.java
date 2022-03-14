@@ -7,6 +7,7 @@ import org.javacord.api.event.channel.thread.ThreadListSyncEvent;
 import org.javacord.core.event.server.ServerEventImpl;
 
 import java.util.List;
+import java.util.Set;
 
 public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadListSyncEvent {
 
@@ -16,7 +17,7 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
      * This array may contain channel_ids that have no active threads as well,
      * so you know to clear that data.
      */
-    private final List<Long> channelIds;
+    private final Set<Long> channelIds;
 
     /**
      * All active threads in the given channels that the current user can access.
@@ -27,7 +28,7 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
      * All thread member objects from the synced threads for the current user,
      * indicating which threads the current user has been added to.
      */
-    private final List<ThreadMember> members;
+    private final Set<ThreadMember> members;
 
     /**
      * Creates a Thread List Sync Event.
@@ -37,9 +38,9 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
      * @param serverThreadChannels The active threads in the given channels that the current user can access.
      * @param members              All thread member objects from the synced threads for the current user.
      */
-    public ThreadListSyncEventImpl(final Server server, final List<Long> channelIds,
+    public ThreadListSyncEventImpl(final Server server, final Set<Long> channelIds,
                                    final List<ServerThreadChannel> serverThreadChannels,
-                                   final List<ThreadMember> members) {
+                                   final Set<ThreadMember> members) {
         super(server);
 
         this.channelIds = channelIds;
@@ -48,7 +49,7 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
     }
 
     @Override
-    public List<Long> getChannelIds() {
+    public Set<Long> getChannelIds() {
         return channelIds;
     }
 
@@ -58,7 +59,7 @@ public class ThreadListSyncEventImpl extends ServerEventImpl implements ThreadLi
     }
 
     @Override
-    public List<ThreadMember> getMembers() {
+    public Set<ThreadMember> getMembers() {
         return members;
     }
 }

@@ -13,6 +13,7 @@ import org.javacord.core.util.rest.RestRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -38,7 +39,7 @@ public class CustomEmojiUpdaterDelegateImpl implements CustomEmojiUpdaterDelegat
     /**
      * The whitelist to update.
      */
-    private Collection<Role> whitelist = null;
+    private Set<Role> whitelist = null;
 
     /**
      * Whether the whitelist should be updated or not.

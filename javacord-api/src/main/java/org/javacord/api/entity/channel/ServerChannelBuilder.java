@@ -14,8 +14,12 @@ public class ServerChannelBuilder<T> {
      */
     protected final ServerChannelBuilderDelegate delegate;
 
+
     /**
      * Creates a new server channel builder.
+     *
+     * @param myClass The class this builder is for.
+     * @param delegate A subtype of a ServerChannelBuilderDelegate.
      */
     protected ServerChannelBuilder(Class<T> myClass, ServerChannelBuilderDelegate delegate) {
         this.myClass = myClass;

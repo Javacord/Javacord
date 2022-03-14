@@ -5,7 +5,7 @@ import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.server.ServerEvent;
 
-import java.util.List;
+import java.util.Set;
 
 public interface ThreadMembersUpdateEvent extends ServerEvent {
 
@@ -35,12 +35,12 @@ public interface ThreadMembersUpdateEvent extends ServerEvent {
      *
      * @return The users as ThreadMembers.
      */
-    List<ThreadMember> getAddedMembers();
+    Set<ThreadMember> getAddedMembers();
 
     /**
      * The ids of the users who were removed from the thread.
      *
      * @return The ids.
      */
-    List<Long> getRemovedMemberIds();
+    Set<Long> getRemovedMemberIds();
 }

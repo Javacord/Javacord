@@ -4,9 +4,10 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.ServerThreadChannelAttachableListenerManager;
 import java.time.Instant;
-import java.util.List;
+
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -106,11 +107,11 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     Instant getArchiveTimestamp();
 
     /**
-     * List of the members of the thread.
+     * A set of the members of the thread.
      *
      * @return The members of the current thread.
      */
-    List<ThreadMember> getMembers();
+    Set<ThreadMember> getMembers();
 
     @Override
     default Optional<ServerThreadChannel> getCurrentCachedInstance() {
@@ -184,12 +185,12 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     }
 
     /**
-     * Gets a list of all members in this thread.
+     * Gets a set of all members in this thread.
      * Requires the {@link org.javacord.api.entity.intent.Intent#GUILD_MEMBERS} intent.
      *
-     * @return a list of all members in this thread.
+     * @return a set of all members in this thread.
      */
-    CompletableFuture<List<ThreadMember>> getThreadMembers();
+    CompletableFuture<Set<ThreadMember>> getThreadMembers();
 
     /**
      * Creates an updater for this thread.

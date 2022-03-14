@@ -11,11 +11,11 @@ import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.voice.InternalServerVoiceChannelAttachableListenerManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -43,7 +43,7 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     /**
      * The ids of the connected users of this server voice channel.
      */
-    private final Collection<Long> connectedUsers = new ArrayList<>();
+    private final Set<Long> connectedUsers = new HashSet<>();
 
     /**
      * Creates a new server voice channel object.
@@ -138,17 +138,17 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     }
 
     @Override
-    public Collection<Long> getConnectedUserIds() {
-        return Collections.unmodifiableCollection(connectedUsers);
+    public Set<Long> getConnectedUserIds() {
+        return Collections.unmodifiableSet(connectedUsers);
     }
 
     @Override
-    public Collection<User> getConnectedUsers() {
-        return Collections.unmodifiableCollection(
+    public Set<User> getConnectedUsers() {
+        return Collections.unmodifiableSet(
                 connectedUsers.stream()
                         .map(getApi()::getCachedUserById)
                         .map(optionalUser -> optionalUser.orElseThrow(AssertionError::new))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     @Override

@@ -220,7 +220,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * A list with all custom emojis from this server.
      */
-    private final Collection<KnownCustomEmoji> customEmojis = new ArrayList<>();
+    private final Set<KnownCustomEmoji> customEmojis = new HashSet<>();
 
     /**
      * A list with all features from this server.
@@ -1152,8 +1152,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public Collection<ServerFeature> getFeatures() {
-        return Collections.unmodifiableCollection(new HashSet<>(serverFeatures));
+    public Set<ServerFeature> getFeatures() {
+        return Collections.unmodifiableSet(new HashSet<>(serverFeatures));
     }
 
     @Override
@@ -1391,15 +1391,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
+    public CompletableFuture<Set<RichInvite>> getInvites() {
+        return new RestRequest<Set<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
-                    Collection<RichInvite> invites = new HashSet<>();
+                    Set<RichInvite> invites = new HashSet<>();
                     for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new InviteImpl(getApi(), inviteJson));
                     }
-                    return Collections.unmodifiableCollection(invites);
+                    return Collections.unmodifiableSet(invites);
                 });
     }
 
@@ -1592,8 +1592,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after) {
-        RestRequest<Collection<Ban>> request = new RestRequest<Collection<Ban>>(
+    public CompletableFuture<Set<Ban>> getBans(Integer limit, Long after) {
+        RestRequest<Set<Ban>> request = new RestRequest<Set<Ban>>(
                 getApi(),
                 RestMethod.GET,
                 RestEndpoint.BAN
@@ -1608,17 +1608,17 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         return request.execute(result -> {
-            ArrayList<Ban> bans = new ArrayList<>();
+            Set<Ban> bans = new HashSet<>();
             for (JsonNode ban : result.getJsonBody()) {
                 bans.add(new BanImpl(this, ban));
             }
-            return Collections.unmodifiableCollection(bans);
+            return Collections.unmodifiableSet(bans);
         });
     }
 
     @Override
-    public CompletableFuture<Collection<Ban>> getBans() {
-        CompletableFuture<Collection<Ban>> future = new CompletableFuture<>();
+    public CompletableFuture<Set<Ban>> getBans() {
+        CompletableFuture<Set<Ban>> future = new CompletableFuture<>();
         ArrayList<Ban> bans = new ArrayList<>();
 
         fetchBansPageAndAddAllToCollection(null, bans, future);
@@ -1628,14 +1628,14 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     private void fetchBansPageAndAddAllToCollection(Long after,
                                                     ArrayList<Ban> banList,
-                                                    CompletableFuture<Collection<Ban>> futureToComplete) {
+                                                    CompletableFuture<Set<Ban>> futureToComplete) {
         this.getBans(1000, after).thenAccept((page) -> {
             banList.addAll(page);
 
             // If the response was smaller than 1000 entries, this was the last page.
             // Let's pass the full list to the future!
             if (page.size() < 1000) {
-                futureToComplete.complete(Collections.unmodifiableCollection(banList));
+                futureToComplete.complete(Collections.unmodifiableSet(new HashSet<>(banList)));
                 return;
             }
 
@@ -1739,12 +1739,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public Collection<KnownCustomEmoji> getCustomEmojis() {
-        return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
+    public Set<KnownCustomEmoji> getCustomEmojis() {
+        return Collections.unmodifiableSet(customEmojis);
     }
 
     @Override
-    public CompletableFuture<List<SlashCommand>> getSlashCommands() {
+    public CompletableFuture<Set<SlashCommand>> getSlashCommands() {
         return api.getServerSlashCommands(this);
     }
 

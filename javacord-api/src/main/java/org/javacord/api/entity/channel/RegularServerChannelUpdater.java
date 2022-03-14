@@ -15,6 +15,8 @@ public class RegularServerChannelUpdater<T extends RegularServerChannelUpdater<T
 
     /**
      * Creates a new regular server channel updater.
+     *
+     * @param regularServerChannelUpdaterDelegate A subtype of a RegularServerChannelUpdaterDelegate.
      */
     protected RegularServerChannelUpdater(RegularServerChannelUpdaterDelegate regularServerChannelUpdaterDelegate) {
         super(regularServerChannelUpdaterDelegate);
@@ -23,6 +25,7 @@ public class RegularServerChannelUpdater<T extends RegularServerChannelUpdater<T
 
     /**
      * Creates a new regular server channel updater.
+     *
      * @param channel The channel to update.
      */
     public RegularServerChannelUpdater(RegularServerChannel channel) {

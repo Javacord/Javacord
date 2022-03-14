@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -95,10 +94,10 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @return The server voice channels the user is connected to.
      */
-    default Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
-        return Collections.unmodifiableCollection(getApi().getServerVoiceChannels().stream()
+    default Set<ServerVoiceChannel> getConnectedVoiceChannels() {
+        return Collections.unmodifiableSet(getApi().getServerVoiceChannels().stream()
                 .filter(this::isConnected)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toSet()));
     }
 
     /**

@@ -11,8 +11,8 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.thread.ThreadMembersUpdateEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ThreadMembersUpdateHandler extends PacketHandler {
 
@@ -51,14 +51,14 @@ public class ThreadMembersUpdateHandler extends PacketHandler {
 
         final int memberCount = packet.get("member_count").asInt();
 
-        final List<Long> removedMemberIds = new ArrayList<>();
+        final Set<Long> removedMemberIds = new HashSet<>();
         if (packet.has("removed_member_ids")) {
             for (final JsonNode removedMemberId : packet.get("removed_member_ids")) {
                 removedMemberIds.add(removedMemberId.asLong());
             }
         }
 
-        final List<ThreadMember> addedMembers = new ArrayList<>();
+        final Set<ThreadMember> addedMembers = new HashSet<>();
         if (packet.has("added_members")) {
             for (final JsonNode addedMember : packet.get("added_members")) {
                 addedMembers.add(new ThreadMemberImpl(api, server, addedMember));

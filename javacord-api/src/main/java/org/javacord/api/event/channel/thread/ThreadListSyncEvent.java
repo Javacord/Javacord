@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.server.ServerEvent;
 import java.util.List;
+import java.util.Set;
 
 public interface ThreadListSyncEvent extends ServerEvent {
 
@@ -15,7 +16,7 @@ public interface ThreadListSyncEvent extends ServerEvent {
      *      This array may contain channel_ids that have no active threads as well,
      *      so you know to clear that data.
      */
-    List<Long> getChannelIds();
+    Set<Long> getChannelIds();
 
     /**
      * All active threads in the given channels that the current user can access.
@@ -30,5 +31,5 @@ public interface ThreadListSyncEvent extends ServerEvent {
      *
      * @return All thread member objects from the synced threads for the current user.
      */
-    List<ThreadMember> getMembers();
+    Set<ThreadMember> getMembers();
 }

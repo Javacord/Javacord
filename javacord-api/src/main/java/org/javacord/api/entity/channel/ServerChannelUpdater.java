@@ -16,6 +16,8 @@ public class ServerChannelUpdater<T extends ServerChannelUpdater<T>> {
 
     /**
      * Creates a new server channel updater.
+     *
+     * @param serverChannelUpdaterDelegate A subtype of a ServerChannelUpdaterDelegate.
      */
     protected ServerChannelUpdater(ServerChannelUpdaterDelegate serverChannelUpdaterDelegate) {
         this.serverChannelUpdaterDelegate = serverChannelUpdaterDelegate;
@@ -23,6 +25,7 @@ public class ServerChannelUpdater<T extends ServerChannelUpdater<T>> {
 
     /**
      * Creates a new server channel updater.
+     *
      * @param serverChannel The server channel to update.
      */
     public ServerChannelUpdater(ServerChannel serverChannel) {

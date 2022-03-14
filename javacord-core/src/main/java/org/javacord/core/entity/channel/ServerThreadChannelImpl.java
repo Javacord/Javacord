@@ -15,9 +15,9 @@ import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -74,7 +74,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     /**
      * A collection of the thread's users.
      */
-    private final List<ThreadMember> members;
+    private final Set<ThreadMember> members;
 
     /**
      * Creates a new server text channel object.
@@ -91,7 +91,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         messageCount = data.get("message_count").asInt(0);
         memberCount = data.get("member_count").asInt(0);
 
-        members = new ArrayList<>();
+        members = new HashSet<>();
         if (data.hasNonNull("member")) {
             // If userId is not included, that means this came from a GUILD_CREATE event
             // This means the userId is the bot's and the thread id is from this thread
@@ -157,7 +157,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
-    public List<ThreadMember> getMembers() {
+    public Set<ThreadMember> getMembers() {
         return members;
     }
 
@@ -183,16 +183,16 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
-    public CompletableFuture<List<ThreadMember>> getThreadMembers() {
-        return new RestRequest<List<ThreadMember>>(getApi(), RestMethod.GET, RestEndpoint.LIST_THREAD_MEMBERS)
+    public CompletableFuture<Set<ThreadMember>> getThreadMembers() {
+        return new RestRequest<Set<ThreadMember>>(getApi(), RestMethod.GET, RestEndpoint.LIST_THREAD_MEMBERS)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
-                    final List<ThreadMember> threadMembers = new ArrayList<>();
+                    final Set<ThreadMember> threadMembers = new HashSet<>();
                     final JsonNode jsonNode = result.getJsonBody();
                     for (final JsonNode node : jsonNode) {
                         threadMembers.add(new ThreadMemberImpl(getApi(), getServer(), node));
                     }
-                    return Collections.unmodifiableList(threadMembers);
+                    return Collections.unmodifiableSet(threadMembers);
                 });
     }
 
@@ -201,7 +201,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
      *
      * @param members The new members.
      */
-    public void setMembers(final List<ThreadMember> members) {
+    public void setMembers(final Set<ThreadMember> members) {
         this.members.clear();
         this.members.addAll(members);
     }
