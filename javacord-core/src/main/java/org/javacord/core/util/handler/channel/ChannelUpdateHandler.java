@@ -302,7 +302,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         long channelCategoryId = jsonChannel.get("id").asLong();
         api.getChannelCategoryById(channelCategoryId).map(ChannelCategoryImpl.class::cast).ifPresent(channel -> {
             boolean oldNsfwFlag = channel.isNsfw();
-            boolean newNsfwFlag = jsonChannel.get("nsfw").asBoolean();
+            boolean newNsfwFlag = jsonChannel.path("nsfw").asBoolean(false);
             if (oldNsfwFlag != newNsfwFlag) {
                 channel.setNsfwFlag(newNsfwFlag);
                 ServerChannelChangeNsfwFlagEvent event =
