@@ -204,6 +204,22 @@ public interface DiscordApiBuilderDelegate {
     Collection<CompletableFuture<DiscordApi>> loginShards(int... shards);
 
     /**
+     * Sets whether adding all new messages to the cache is enabled.
+     *
+     * <p>By default, this is enabled
+     *
+     * @param enabled Whether adding all new messages to the cache is enabled.
+     */
+    void setAddAllMessageToCacheEnabled(boolean enabled);
+
+    /**
+     * Gets whether adding all new messages to the cache is enabled.
+     *
+     * @return Whether adding all new messages to the cache is enabled.
+     */
+    boolean isAddAllMessageToCacheEnabled();
+
+    /**
      * Sets the recommended total shards.
      *
      * @return A future to check if the action was successful.

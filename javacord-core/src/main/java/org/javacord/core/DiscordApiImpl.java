@@ -371,6 +371,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private static final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
     /**
+     * If all new messages should be added to the cache
+     */
+    private final boolean addAllMessageToCacheEnabled;
+
+    /**
      * A map with all cached messages.
      */
     private final Map<Long, WeakReference<Message>> messages = new ConcurrentHashMap<>();
@@ -476,7 +481,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     ) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false);
+                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false, true);
     }
 
     /**
@@ -521,37 +526,38 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Dns dns) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false);
+                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false, true);
     }
 
     /**
      * Creates a new discord api instance.
      *
-     * @param token                      The token used to connect without any account type specific prefix.
-     * @param currentShard               The current shard the bot should connect to.
-     * @param totalShards                The total amount of shards.
-     * @param intents                    The intents for the events which should be received.
-     * @param waitForServersOnStartup    Whether Javacord should wait for all servers
-     *                                   to become available on startup or not.
-     * @param waitForUsersOnStartup      Whether Javacord should wait for all users
-     *                                   to become available on startup or not.
-     * @param registerShutdownHook       Whether the shutdown hook should be registered or not.
-     * @param globalRatelimiter          The ratelimiter used for global ratelimits.
-     * @param gatewayIdentifyRatelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
-     * @param proxySelector              The proxy selector which should be used to determine the proxies that
-     *                                   should be used to connect to the Discord REST API and websocket.
-     * @param proxy                      The proxy which should be used to connect to the Discord REST API and
-     *                                   websocket.
-     * @param proxyAuthenticator         The authenticator that should be used to authenticate against proxies that
-     *                                   require it.
-     * @param trustAllCertificates       Whether to trust all SSL certificates.
-     * @param ready                      The future which will be completed when the connection to Discord was
-     *                                   successful.
-     * @param dns                        The DNS instance to use in the OkHttp client. This should only be used in
-     *                                   testing.
-     * @param listenerSourceMap          The functions to create listeners for pre-registration.
-     * @param unspecifiedListeners       The listeners of unspecified types to pre-register.
-     * @param userCacheEnabled           Whether the user cache should be enabled.
+     * @param token                         The token used to connect without any account type specific prefix.
+     * @param currentShard                  The current shard the bot should connect to.
+     * @param totalShards                   The total amount of shards.
+     * @param intents                       The intents for the events which should be received.
+     * @param waitForServersOnStartup       Whether Javacord should wait for all servers
+     *                                      to become available on startup or not.
+     * @param waitForUsersOnStartup         Whether Javacord should wait for all users
+     *                                      to become available on startup or not.
+     * @param registerShutdownHook          Whether the shutdown hook should be registered or not.
+     * @param globalRatelimiter             The ratelimiter used for global ratelimits.
+     * @param gatewayIdentifyRatelimiter    The ratelimiter used to respect the 5-second gateway identify ratelimit.
+     * @param proxySelector                 The proxy selector which should be used to determine the proxies that
+     *                                      should be used to connect to the Discord REST API and websocket.
+     * @param proxy                         The proxy which should be used to connect to the Discord REST API and
+     *                                      websocket.
+     * @param proxyAuthenticator            The authenticator that should be used to authenticate against proxies that
+     *                                      require it.
+     * @param trustAllCertificates          Whether to trust all SSL certificates.
+     * @param ready                         The future which will be completed when the connection to Discord was
+     *                                      successful.
+     * @param dns                           The DNS instance to use in the OkHttp client. This should only be used in
+     *                                      testing.
+     * @param listenerSourceMap             The functions to create listeners for pre-registration.
+     * @param unspecifiedListeners          The listeners of unspecified types to pre-register.
+     * @param userCacheEnabled              Whether the user cache should be enabled.
+     * @param addAllMessageToCacheEnabled   Whether adding all new messages to the cache is enabled.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
@@ -574,7 +580,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     List<Function<DiscordApi, GloballyAttachableListener>>
                     > listenerSourceMap,
             List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners,
-            boolean userCacheEnabled
+            boolean userCacheEnabled,
+            boolean addAllMessageToCacheEnabled
     ) {
         this.token = token;
         this.currentShard = currentShard;
@@ -588,6 +595,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
         this.userCacheEnabled = userCacheEnabled;
+        this.addAllMessageToCacheEnabled = addAllMessageToCacheEnabled;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
         //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
@@ -667,24 +675,26 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 }
             });
 
-            // After minimum JDK 9 is required this can be switched to use a Cleaner
-            getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-                messageCacheLock.lock();
-                try {
-                    for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                            messageRef != null;
-                            messageRef = messagesCleanupQueue.poll()) {
-                        Long messageId = messageIdByRef.remove(messageRef);
-                        if (messageId != null) {
-                            messages.remove(messageId, messageRef);
+            if (addAllMessageToCacheEnabled) {
+                // After minimum JDK 9 is required this can be switched to use a Cleaner
+                getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+                    messageCacheLock.lock();
+                    try {
+                        for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
+                             messageRef != null;
+                             messageRef = messagesCleanupQueue.poll()) {
+                            Long messageId = messageIdByRef.remove(messageRef);
+                            if (messageId != null) {
+                                messages.remove(messageId, messageRef);
+                            }
                         }
+                    } catch (Throwable t) {
+                        logger.error("Failed to process messages cleanup queue!", t);
+                    } finally {
+                        messageCacheLock.unlock();
                     }
-                } catch (Throwable t) {
-                    logger.error("Failed to process messages cleanup queue!", t);
-                } finally {
-                    messageCacheLock.unlock();
-                }
-            }, 30, 30, TimeUnit.SECONDS);
+                }, 30, 30, TimeUnit.SECONDS);
+            }
 
             if (registerShutdownHook) {
                 // Add shutdown hook
@@ -1168,18 +1178,20 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param message The message to add.
      */
     public void addMessageToCache(Message message) {
-        messageCacheLock.lock();
-        try {
-            messages.compute(message.getId(), (key, value) -> {
-                if ((value == null) || (value.get() == null)) {
-                    WeakReference<Message> result = new WeakReference<>(message, messagesCleanupQueue);
-                    messageIdByRef.put(result, key);
-                    return result;
-                }
-                return value;
-            });
-        } finally {
-            messageCacheLock.unlock();
+        if (addAllMessageToCacheEnabled || message.isCachedForever()) {
+            messageCacheLock.lock();
+            try {
+                messages.compute(message.getId(), (key, value) -> {
+                    if ((value == null) || (value.get() == null)) {
+                        WeakReference<Message> result = new WeakReference<>(message, messagesCleanupQueue);
+                        messageIdByRef.put(result, key);
+                        return result;
+                    }
+                    return value;
+                });
+            } finally {
+                messageCacheLock.unlock();
+            }
         }
     }
 
@@ -1964,6 +1976,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public boolean isUserCacheEnabled() {
         return userCacheEnabled;
+    }
+
+    @Override
+    public boolean isAddAllMessageToCacheEnabled() {
+        return addAllMessageToCacheEnabled;
     }
 
     @Override
