@@ -371,7 +371,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private static final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
     /**
-     * If all new messages should be added to the cache
+     * If all new messages should be added to the cache.
      */
     private final boolean addAllMessageToCacheEnabled;
 
@@ -681,8 +681,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     messageCacheLock.lock();
                     try {
                         for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                             messageRef != null;
-                             messageRef = messagesCleanupQueue.poll()) {
+                                messageRef != null;
+                                messageRef = messagesCleanupQueue.poll()) {
                             Long messageId = messageIdByRef.remove(messageRef);
                             if (messageId != null) {
                                 messages.remove(messageId, messageRef);

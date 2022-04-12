@@ -469,10 +469,10 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * @param enabled Whether adding all new messages to the cache is enabled.
      * @return The current instance in order to chain call methods.
      */
-   public DiscordApiBuilder setAddAllMessageToCacheEnabled(boolean enabled) {
-       delegate.setAddAllMessageToCacheEnabled(enabled);
-       return this;
-   }
+    public DiscordApiBuilder setAddAllMessageToCacheEnabled(boolean enabled) {
+        delegate.setAddAllMessageToCacheEnabled(enabled);
+        return this;
+    }
 
     /**
      * Gets whether adding all new messages to the cache is enabled.

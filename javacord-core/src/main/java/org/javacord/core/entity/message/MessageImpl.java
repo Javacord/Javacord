@@ -184,7 +184,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         Long webhookId = data.has("webhook_id") ? data.get("webhook_id").asLong() : null;
         author = new MessageAuthorImpl(this, webhookId, data);
 
-        if (api.isAddAllMessageToCacheEnabled() || cacheForever){
+        if (api.isAddAllMessageToCacheEnabled() || cacheForever) {
             MessageCacheImpl cache = (MessageCacheImpl) channel.getMessageCache();
             cache.addMessage(this);
         }

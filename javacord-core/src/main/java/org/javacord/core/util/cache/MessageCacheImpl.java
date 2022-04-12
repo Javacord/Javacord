@@ -97,8 +97,8 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
                 try {
                     int removedMessages = 0;
                     for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                         messageRef != null;
-                         messageRef = messagesCleanupQueue.poll()) {
+                            messageRef != null;
+                            messageRef = messagesCleanupQueue.poll()) {
                         messages.remove(messageRef);
                         removedMessages++;
                     }
