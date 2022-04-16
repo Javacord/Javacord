@@ -208,9 +208,13 @@ public abstract class EventDispatcherBase {
                     } catch (InterruptedException ignored) { }
                 }
             }
-            Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(
-                    queueSelector, o -> new ConcurrentLinkedQueue<>());
-            listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
+            if (!listeners.isEmpty()) {
+                synchronized (queuedListenerTasks) {
+                    Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(
+                            queueSelector, o -> new ConcurrentLinkedQueue<>());
+                    listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
+                }
+            }
             checkRunningListenersAndStartIfPossible(queueSelector);
         });
     }
@@ -233,6 +237,10 @@ public abstract class EventDispatcherBase {
             // - running for object-dependent tasks, but queue is empty or not present
             Queue<Runnable> queue = queueSelector == null ? null : queuedListenerTasks.get(queueSelector);
             if (queue == null || queue.isEmpty()) {
+                if (queueSelector != null) {
+                    // Remove the entry for the queue selector, so that it eventually can be garbage collected
+                    queuedListenerTasks.remove(queueSelector);
+                }
                 // if no object-independent tasks to be processed everything is fine, return
                 if (queuedListenerTasks.get(null).isEmpty()) {
                     return;
@@ -285,8 +293,15 @@ public abstract class EventDispatcherBase {
                     activeListeners.remove(activeListener);
                     alreadyCanceledListeners.remove(activeListener);
                     runningListeners.remove(finalQueueSelector);
-                    // Inform the dispatchEvent method that it maybe can queue new listeners now
                     synchronized (queuedListenerTasks) {
+                        // Remove the entry for the queue selector, so that it eventually can be garbage collected
+                        if (finalQueueSelector != null) {
+                            Queue<Runnable> remainingQueue = queuedListenerTasks.get(finalQueueSelector);
+                            if (remainingQueue != null && remainingQueue.isEmpty()) {
+                                queuedListenerTasks.remove(finalQueueSelector);
+                            }
+                        }
+                        // Inform the dispatchEvent method that it maybe can queue new listeners now
                         queuedListenerTasks.notifyAll();
                     }
                     checkRunningListenersAndStartIfPossible(finalQueueSelector);
