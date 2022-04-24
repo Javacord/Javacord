@@ -30,6 +30,13 @@ public interface DiscordApiBuilderDelegate {
     void setGlobalRatelimiter(Ratelimiter ratelimiter);
 
     /**
+     * Sets whether this API instance can dispatch events.
+     *
+     * @param dispatchEvents Whether events can be dispatched.
+     */
+    void setEventsDispatchable(boolean dispatchEvents);
+
+    /**
      * Sets a ratelimiter that can be used to respect the 5-second gateway identify ratelimit.
      *
      * @param ratelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.

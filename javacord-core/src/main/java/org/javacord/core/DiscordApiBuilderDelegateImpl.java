@@ -56,6 +56,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private volatile Ratelimiter globalRatelimiter;
 
     /**
+     * Whether events can be dispatched.
+     */
+    private volatile boolean dispatchEvents = true;
+
+    /**
      * A ratelimiter used to respect the 5 seconds gateway identify ratelimit.
      */
     private volatile Ratelimiter gatewayIdentifyRatelimiter;
@@ -193,7 +198,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             new DiscordApiImpl(token, currentShard.get(), totalShards.get(), intents,
                     waitForServersOnStartup, waitForUsersOnStartup, registerShutdownHook, globalRatelimiter,
                     gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates,
-                    future, null, preparedListeners, preparedUnspecifiedListeners, userCacheEnabled);
+                    future, null, preparedListeners, preparedUnspecifiedListeners, userCacheEnabled, dispatchEvents);
         }
         return future;
     }
@@ -274,6 +279,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public void setGlobalRatelimiter(Ratelimiter ratelimiter) {
         globalRatelimiter = ratelimiter;
+    }
+
+    @Override
+    public void setEventsDispatchable(boolean dispatchEvents) {
+        this.dispatchEvents = dispatchEvents;
     }
 
     @Override

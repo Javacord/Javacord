@@ -101,6 +101,20 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     ThreadPool getThreadPool();
 
     /**
+     * Sets whether this API instance can dispatch events.
+     *
+     * @param dispatchEvents Whether events can be dispatched.
+     */
+    void setEventsDispatchable(boolean dispatchEvents);
+
+    /**
+     * Gets whether this API instance can dispatch events.
+     *
+     * @return Whether events can be dispatched.
+     */
+    boolean canDispatchEvents();
+
+    /**
      * Gets a list with all global commands for the application.
      *
      * @return A list with all global commands.

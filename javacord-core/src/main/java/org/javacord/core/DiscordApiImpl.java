@@ -251,6 +251,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final Set<Intent> intents;
 
     /**
+     * Whether events can be dispatched.
+     */
+    private boolean dispatchEvents = true;
+
+    /**
      * Whether Javacord should wait for all servers to become available on startup or not.
      */
     private final boolean waitForServersOnStartup;
@@ -476,7 +481,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     ) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false);
+                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false, true);
     }
 
     /**
@@ -521,7 +526,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Dns dns) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false);
+                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false, true);
     }
 
     /**
@@ -552,6 +557,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param listenerSourceMap          The functions to create listeners for pre-registration.
      * @param unspecifiedListeners       The listeners of unspecified types to pre-register.
      * @param userCacheEnabled           Whether the user cache should be enabled.
+     * @param dispatchEvents             Whether events can be dispatched.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
@@ -574,7 +580,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     List<Function<DiscordApi, GloballyAttachableListener>>
                     > listenerSourceMap,
             List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners,
-            boolean userCacheEnabled
+            boolean userCacheEnabled,
+            boolean dispatchEvents
     ) {
         this.token = token;
         this.currentShard = currentShard;
@@ -588,6 +595,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
         this.userCacheEnabled = userCacheEnabled;
+        this.dispatchEvents = dispatchEvents;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
         //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
@@ -721,6 +729,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public boolean hasUserCacheEnabled() {
         return userCacheEnabled;
+    }
+
+    @Override
+    public void setEventsDispatchable(boolean dispatchEvents) {
+        this.dispatchEvents = dispatchEvents;
+    }
+
+    @Override
+    public boolean canDispatchEvents() {
+        return dispatchEvents;
     }
 
     /**

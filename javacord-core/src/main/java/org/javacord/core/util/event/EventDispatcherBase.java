@@ -191,6 +191,10 @@ public abstract class EventDispatcherBase {
      * @param <T>           The type of the listener.
      */
     protected <T> void dispatchEvent(DispatchQueueSelector queueSelector, List<T> listeners, Consumer<T> consumer) {
+        if (!api.canDispatchEvents()) {
+            return;
+        }
+
         api.getThreadPool().getSingleThreadExecutorService("Event Dispatch Queues Manager").submit(() -> {
             if (queueSelector != null) { // Object dependent listeners
                 // Don't allow adding of more events while there are unfinished object independent tasks
