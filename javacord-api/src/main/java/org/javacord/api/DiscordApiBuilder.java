@@ -117,6 +117,17 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets whether this API instance can dispatch events.
+     *
+     * @param dispatchEvents Whether events can be dispatched.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setEventsDispatchable(boolean dispatchEvents) {
+        delegate.setEventsDispatchable(dispatchEvents);
+        return this;
+    }
+
+    /**
      * Sets the proxy selector which should be used to determine the proxies that should be used to connect to the
      * Discord REST API and web socket.
      * If no explicit proxy is configured using {@link #setProxy(Proxy)} and no proxy selector is configured using this
