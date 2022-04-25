@@ -28,9 +28,4 @@ project(':javacord-core') {
 
         testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
     }
-
-    // Log4J Core has some annotation processor
-    // This suppresses a build warning regarding the processor
-    // With Gradle 5.0 the processor is ignored anyway so then the line can be removed
-    compileTestGroovy.options.compilerArgs << '-proc:none'
 }
