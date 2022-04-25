@@ -1,0 +1,25 @@
+# Publishes the project to a Maven repository on every push by calling the gradle publish command.
+# If the current version is a not a snapshot version ("-SNAPSHOT" suffix), it will publish to
+# Maven Central.
+name: Publish
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  publish:
+    name: Publish Repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Publish
+        run: ./gradlew test publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
