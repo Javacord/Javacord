@@ -38,7 +38,6 @@ apply(from = "gradle/readme.gradle.kts")
 apply(from = "gradle/jars.gradle")
 apply(from = "gradle/java9.gradle")
 apply(from = "gradle/tests.gradle")
-apply(from = "gradle/javadoc.gradle")
 apply(from = "gradle/listener-manager-generation.gradle")
 apply(from = "gradle/event-dispatcher-generation.gradle")
 apply(from = "gradle/checkstyle.gradle.kts")
@@ -146,5 +145,20 @@ publishing {
             // but do not try to publish the JAR
             artifacts.removeAll { it.classifier == null && it.extension == "jar" }
         }
+    }
+}
+
+subprojects {
+    tasks.register("configureJavadoc") {
+        doLast {
+            tasks.javadoc {
+                options.windowTitle = "Javacord $version (${project.name.replace("javacord-", "")})"
+                title = options.windowTitle
+            }
+        }
+    }
+
+    tasks.javadoc {
+        dependsOn("configureJavadoc")
     }
 }
