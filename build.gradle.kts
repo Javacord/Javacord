@@ -4,7 +4,6 @@ plugins {
     signing
     id("com.github.johnrengelman.shadow") version "2.0.4" apply false
     id("net.researchgate.release") version "2.7.0" apply false
-    id("biz.aQute.bnd.builder") version "5.3.0"
 }
 
 repositories {
