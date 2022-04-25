@@ -152,7 +152,7 @@ subprojects {
     tasks.register("configureJavadoc") {
         doLast {
             tasks.javadoc {
-                options.windowTitle = "Javacord $version (${project.name.replace("javacord-", "")})"
+                options.windowTitle = "Javacord $version (${project.ext.get("shortName")})"
                 title = options.windowTitle
             }
         }
