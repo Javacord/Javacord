@@ -1,6 +1,7 @@
 # volatile Gradle files
 /.gradle/
 /build/
+*/build/
 
 # Eclipse project files
 /.classpath
