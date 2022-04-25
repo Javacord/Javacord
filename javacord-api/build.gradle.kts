@@ -2,7 +2,7 @@ import java.time.Instant
 
 plugins {
     `java-library`
-    id("com.gorylenko.gradle-git-properties") version "2.3.1"
+    id("com.gorylenko.gradle-git-properties") version "2.4.0"
 }
 
 repositories {
