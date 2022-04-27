@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -89,29 +90,34 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
 
         setAutomaticCleanupEnabled(automaticCleanupEnabled);
 
-        // After minimum JDK 9 is required this can be switched to use a Cleaner
-        messagesCleanupFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
-            api.getMessageCacheLock().lock();
-            try {
-                int removedMessages = 0;
-                for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                        messageRef != null;
-                        messageRef = messagesCleanupQueue.poll()) {
-                    messages.remove(messageRef);
-                    removedMessages++;
+        if (api.isAddAllMessageToCacheEnabled()) {
+            // After minimum JDK 9 is required this can be switched to use a Cleaner
+            messagesCleanupFuture = api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+                api.getMessageCacheLock().lock();
+                try {
+                    int removedMessages = 0;
+                    for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
+                            messageRef != null;
+                            messageRef = messagesCleanupQueue.poll()) {
+                        messages.remove(messageRef);
+                        removedMessages++;
+                    }
+                    if (removedMessages > 0) {
+                        logger.warn("Heap memory was too low to hold all configured messages in the cache. "
+                                        + "Removed {} messages from the cache due to memory shortage. "
+                                        + "Either increase your heap settings or decrease your message cache settings!",
+                                removedMessages);
+                    }
+                } catch (Throwable t) {
+                    logger.error("Failed to clean softly referenced messages!", t);
+                } finally {
+                    api.getMessageCacheLock().unlock();
                 }
-                if (removedMessages > 0) {
-                    logger.warn("Heap memory was too low to hold all configured messages in the cache. "
-                                    + "Removed {} messages from the cache due to memory shortage. "
-                                    + "Either increase your heap settings or decrease your message cache settings!",
-                            removedMessages);
-                }
-            } catch (Throwable t) {
-                logger.error("Failed to clean softly referenced messages!", t);
-            } finally {
-                api.getMessageCacheLock().unlock();
-            }
-        }, 30, 30, TimeUnit.SECONDS);
+            }, 30, 30, TimeUnit.SECONDS);
+        } else {
+            messagesCleanupFuture = CompletableFuture.completedFuture(null);
+        }
+
     }
 
     /**

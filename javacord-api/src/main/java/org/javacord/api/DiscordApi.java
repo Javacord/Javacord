@@ -834,6 +834,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
+     * Checks if the add all messages to cache is enabled.
+     *
+     * @return Whether the add all messages to cache is enabled;
+     */
+    boolean isAddAllMessageToCacheEnabled();
+
+    /**
      * Gets a collection with all currently cached users.
      *
      * @return A collection with all currently cached users.

@@ -462,6 +462,28 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets whether adding all new messages to the cache is enabled.
+     *
+     * <p>By default, this is enabled
+     *
+     * @param enabled Whether adding all new messages to the cache is enabled.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAddAllMessageToCacheEnabled(boolean enabled) {
+        delegate.setAddAllMessageToCacheEnabled(enabled);
+        return this;
+    }
+
+    /**
+     * Gets whether adding all new messages to the cache is enabled.
+     *
+     * @return Whether adding all new messages to the cache is enabled.
+     */
+    boolean isAddAllMessageToCacheEnabled() {
+        return delegate.isAddAllMessageToCacheEnabled();
+    }
+
+    /**
      * Retrieves the recommended shards count from the Discord API and sets it in this builder.
      * Sharding allows you to split your bot into several independent instances.
      * A shard only handles a subset of a bot's servers.
