@@ -2190,9 +2190,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * This can be used to get a specific page of bans.
      * To get all pages / all bans at once, use {@link Server#getBans()}.
      *
+     * @param limit how many bans should be returned at most. Must be within [0, 1000]. If null, it will default to 1000
      * @param after should be a snowflake to only take bans of users with IDs higher
      *              than this parameter into account; can be null
-     * @param limit how many bans should be returned at most. Must be within [0, 1000]. If null, it will default to 1000
      * @return A collection with server bans on the given page with at most <code>limit</code> entries.
      */
     CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after);
