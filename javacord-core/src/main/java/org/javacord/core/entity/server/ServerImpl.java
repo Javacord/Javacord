@@ -1557,8 +1557,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after) {
-        RestRequest<Collection<Ban>> request = new RestRequest<Collection<Ban>>(getApi(), RestMethod.GET, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString());
+        RestRequest<Collection<Ban>> request = new RestRequest<Collection<Ban>>(
+                getApi(),
+                RestMethod.GET,
+                RestEndpoint.BAN
+        ).setUrlParameters(getIdAsString());
 
         if (limit != null) {
             request.addQueryParameter("limit", String.valueOf(limit));
