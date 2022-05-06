@@ -1556,6 +1556,28 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after) {
+        RestRequest<Collection<Ban>> request = new RestRequest<Collection<Ban>>(getApi(), RestMethod.GET, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString());
+
+        if (limit != null) {
+            request.addQueryParameter("limit", String.valueOf(limit));
+        }
+
+        if (after != null) {
+            request.addQueryParameter("after", String.valueOf(after));
+        }
+
+        return request.execute(result -> {
+            ArrayList<Ban> bans = new ArrayList<>();
+            for (JsonNode ban : result.getJsonBody()) {
+                bans.add(new BanImpl(this, ban));
+            }
+            return Collections.unmodifiableCollection(bans);
+        });
+    }
+
+    @Override
     public CompletableFuture<Collection<Ban>> getBans() {
         CompletableFuture<Collection<Ban>> future = new CompletableFuture<>();
         ArrayList<Ban> bans = new ArrayList<>();
@@ -1568,24 +1590,14 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private void fetchBansPageAndAddAllToCollection(Long after,
                                                     ArrayList<Ban> banList,
                                                     CompletableFuture<Collection<Ban>> futureToComplete) {
-        RestRequest<Object> request = new RestRequest<>(getApi(), RestMethod.GET, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString());
-
-        if (after != null) {
-            request.addQueryParameter("after", String.valueOf(after));
-        }
-
-        request.execute(result -> {
-            JsonNode body = result.getJsonBody();
-            for (JsonNode ban : body) {
-                banList.add(new BanImpl(this, ban));
-            }
+        this.getBans(1000, after).thenAccept((page) -> {
+            banList.addAll(page);
 
             // If the response was smaller than 1000 entries, this was the last page.
             // Let's pass the full list to the future!
-            if (body.size() < 1000) {
+            if (page.size() < 1000) {
                 futureToComplete.complete(Collections.unmodifiableCollection(banList));
-                return null;
+                return;
             }
 
             // The response contained 1000 bans. There could be more, so let's request the next page
@@ -1594,8 +1606,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     banList,
                     futureToComplete
             );
-
-            return null;
         }).exceptionally(t -> {
             futureToComplete.completeExceptionally(t);
             return null;
