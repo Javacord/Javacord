@@ -2176,10 +2176,26 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a collection with all server bans.
+     * Note: This method fires <code>ceil((number of bans + 1) / 1000)</code> requests to Discord
+     * as the API returns the results in pages and Javacord collects all pages into one collection.
+     * If you want to control pagination yourself, use {@link Server#getBans(Integer, Long)}.
      *
      * @return A collection with all server bans.
      */
     CompletableFuture<Collection<Ban>> getBans();
+
+    /**
+     * Gets a collection with up to <code>limit</code> server bans, only taking users with an ID higher than
+     * <code>after</code> into account.
+     * This can be used to get a specific page of bans.
+     * To get all pages / all bans at once, use {@link Server#getBans()}.
+     *
+     * @param limit how many bans should be returned at most. Must be within [0, 1000]. If null, it will default to 1000
+     * @param after should be a snowflake to only take bans of users with IDs higher
+     *              than this parameter into account; can be null
+     * @return A collection with server bans on the given page with at most <code>limit</code> entries.
+     */
+    CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after);
 
     /**
      * Gets a list of all webhooks in this server.

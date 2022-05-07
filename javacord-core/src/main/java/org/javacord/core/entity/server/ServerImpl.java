@@ -73,6 +73,7 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 import org.javacord.core.util.rest.RestRequestResult;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -1555,16 +1556,63 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after) {
+        RestRequest<Collection<Ban>> request = new RestRequest<Collection<Ban>>(
+                getApi(),
+                RestMethod.GET,
+                RestEndpoint.BAN
+        ).setUrlParameters(getIdAsString());
+
+        if (limit != null) {
+            request.addQueryParameter("limit", String.valueOf(limit));
+        }
+
+        if (after != null) {
+            request.addQueryParameter("after", String.valueOf(after));
+        }
+
+        return request.execute(result -> {
+            ArrayList<Ban> bans = new ArrayList<>();
+            for (JsonNode ban : result.getJsonBody()) {
+                bans.add(new BanImpl(this, ban));
+            }
+            return Collections.unmodifiableCollection(bans);
+        });
+    }
+
+    @Override
     public CompletableFuture<Collection<Ban>> getBans() {
-        return new RestRequest<Collection<Ban>>(getApi(), RestMethod.GET, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    Collection<Ban> bans = new ArrayList<>();
-                    for (JsonNode ban : result.getJsonBody()) {
-                        bans.add(new BanImpl(this, ban));
-                    }
-                    return Collections.unmodifiableCollection(bans);
-                });
+        CompletableFuture<Collection<Ban>> future = new CompletableFuture<>();
+        ArrayList<Ban> bans = new ArrayList<>();
+
+        fetchBansPageAndAddAllToCollection(null, bans, future);
+
+        return future;
+    }
+
+    private void fetchBansPageAndAddAllToCollection(Long after,
+                                                    ArrayList<Ban> banList,
+                                                    CompletableFuture<Collection<Ban>> futureToComplete) {
+        this.getBans(1000, after).thenAccept((page) -> {
+            banList.addAll(page);
+
+            // If the response was smaller than 1000 entries, this was the last page.
+            // Let's pass the full list to the future!
+            if (page.size() < 1000) {
+                futureToComplete.complete(Collections.unmodifiableCollection(banList));
+                return;
+            }
+
+            // The response contained 1000 bans. There could be more, so let's request the next page
+            fetchBansPageAndAddAllToCollection(
+                    banList.get(banList.size() - 1).getUser().getId(),
+                    banList,
+                    futureToComplete
+            );
+        }).exceptionally(t -> {
+            futureToComplete.completeExceptionally(t);
+            return null;
+        });
     }
 
     @Override
