@@ -3,6 +3,7 @@ package org.javacord.api.interaction.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.DiscordLocale;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -13,6 +14,29 @@ public interface ApplicationCommandUpdaterDelegate<T extends ApplicationCommand>
      * @param name The name to set.
      */
     void setName(String name);
+
+    /**
+     * Adds a name localization for the given locale.
+     *
+     * @param locale The locale to add a localization for.
+     * @param localization The command name localization.
+     */
+    void addNameLocalization(DiscordLocale locale, String localization);
+
+    /**
+     * Sets the new description of the slash command.
+     *
+     * @param description The description to set.
+     */
+    void setDescription(String description);
+
+    /**
+     * Adds a description localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The command description localization.
+     */
+    void addDescriptionLocalization(DiscordLocale locale, String localization);
 
     /**
      * Sets the new application command default permission.

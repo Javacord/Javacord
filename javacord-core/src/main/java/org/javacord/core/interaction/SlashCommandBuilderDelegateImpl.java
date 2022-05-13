@@ -14,13 +14,7 @@ import java.util.List;
 public class SlashCommandBuilderDelegateImpl extends ApplicationCommandBuilderDelegateImpl<SlashCommand>
         implements SlashCommandBuilderDelegate {
 
-    private String description;
     private List<SlashCommandOption> options = new ArrayList<>();
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     @Override
     public void addOption(SlashCommandOption option) {
@@ -43,7 +37,6 @@ public class SlashCommandBuilderDelegateImpl extends ApplicationCommandBuilderDe
      */
     public ObjectNode getJsonBodyForApplicationCommand() {
         ObjectNode jsonBody = super.getJsonBodyForApplicationCommand();
-        jsonBody.put("description", description);
 
         if (!options.isEmpty()) {
             ArrayNode jsonOptions = jsonBody.putArray("options");

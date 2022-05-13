@@ -25,6 +25,18 @@ public class SlashCommandOptionChoiceBuilder {
     }
 
     /**
+     * Adds a name localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The choice name localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionChoiceBuilder addNameLocalization(DiscordLocale locale, String localization) {
+        delegate.addNameLocalization(locale, localization);
+        return this;
+    }
+
+    /**
      * Sets the string value of the slash command option choice.
      *
      * @param value The value.

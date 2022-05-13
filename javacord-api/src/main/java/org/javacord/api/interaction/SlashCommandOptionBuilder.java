@@ -39,6 +39,18 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
+     * Adds a name localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The option name localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder addNameLocalization(DiscordLocale locale, String localization) {
+        delegate.addNameLocalization(locale, localization);
+        return this;
+    }
+
+    /**
      * Sets the description of the slash command option.
      *
      * @param description The description.
@@ -46,6 +58,18 @@ public class SlashCommandOptionBuilder {
      */
     public SlashCommandOptionBuilder setDescription(String description) {
         delegate.setDescription(description);
+        return this;
+    }
+
+    /**
+     * Adds a description localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The option description localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder addDescriptionLocalization(DiscordLocale locale, String localization) {
+        delegate.addDescriptionLocalization(locale, localization);
         return this;
     }
 

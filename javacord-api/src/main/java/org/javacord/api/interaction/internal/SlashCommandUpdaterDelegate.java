@@ -8,13 +8,6 @@ import java.util.List;
 public interface SlashCommandUpdaterDelegate extends ApplicationCommandUpdaterDelegate<SlashCommand> {
 
     /**
-     * Sets the new description of the slash command.
-     *
-     * @param description The description to set.
-     */
-    void setDescription(String description);
-
-    /**
      * Sets the new slash command options.
      *
      * @param slashCommandOptions The slash command options to set.

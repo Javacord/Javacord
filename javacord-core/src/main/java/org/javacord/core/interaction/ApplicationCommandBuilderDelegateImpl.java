@@ -6,23 +6,45 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class ApplicationCommandBuilderDelegateImpl<T extends ApplicationCommand>
         implements ApplicationCommandBuilderDelegate<T> {
 
     protected String name;
+    protected Map<DiscordLocale, String> nameLocalizations = new HashMap<>();
+    protected String description;
+    protected Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
 
     protected Boolean defaultPermission;
 
     @Override
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public void addNameLocalization(DiscordLocale locale, String localization) {
+        nameLocalizations.put(locale, localization);
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public void addDescriptionLocalization(DiscordLocale locale, String localization) {
+        descriptionLocalizations.put(locale, localization);
     }
 
     @Override
@@ -55,6 +77,21 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
     public ObjectNode getJsonBodyForApplicationCommand() {
         ObjectNode jsonBody = JsonNodeFactory.instance.objectNode()
                 .put("name", name);
+
+        if (!nameLocalizations.isEmpty()) {
+            ObjectNode nameLocalizationsJsonObject = jsonBody.putObject("name_localizations");
+            nameLocalizations.forEach(
+                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
+        }
+
+        jsonBody.put("description", description);
+
+        if (!descriptionLocalizations.isEmpty()) {
+            ObjectNode descriptionLocalizationsJsonObject = jsonBody.putObject("description_localizations");
+            descriptionLocalizations.forEach(
+                    (locale, localization) ->
+                            descriptionLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
+        }
 
         if (defaultPermission != null) {
             jsonBody.put("default_permission", defaultPermission.booleanValue());
