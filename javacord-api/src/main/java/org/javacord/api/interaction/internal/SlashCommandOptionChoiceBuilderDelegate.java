@@ -1,5 +1,6 @@
 package org.javacord.api.interaction.internal;
 
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionChoiceBuilder;
 
@@ -15,6 +16,14 @@ public interface SlashCommandOptionChoiceBuilderDelegate {
      * @param name The name.
      */
     void setName(String name);
+
+    /**
+     * Adds a name localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The choice name localization.
+     */
+    void addNameLocalization(DiscordLocale locale, String localization);
 
     /**
      * Sets the string value of the slash command option choice.

@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,8 +22,10 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     private final long id;
     private final long applicationId;
     private final String name;
+    private final Map<DiscordLocale, String> nameLocalizations = new HashMap<>();
     private final boolean defaultPermission;
     private final String description;
+    private final Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
 
     private final Server server;
 
@@ -33,7 +40,11 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
         id = data.get("id").asLong();
         applicationId = data.get("application_id").asLong();
         name = data.get("name").asText();
+        data.path("name_localizations").fields().forEachRemaining(e ->
+                nameLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         description = data.get("description").asText();
+        data.path("description_localizations").fields().forEachRemaining(e ->
+                descriptionLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         defaultPermission = !data.hasNonNull("default_permission") || data.get("default_permission").asBoolean();
         server = data.has("guild_id")
                 ? api.getPossiblyUnreadyServerById(data.get("guild_id").asLong()).orElseThrow(AssertionError::new)
@@ -61,8 +72,18 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
+    public Map<DiscordLocale, String> getNameLocalizations() {
+        return Collections.unmodifiableMap(nameLocalizations);
+    }
+
+    @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public Map<DiscordLocale, String> getDescriptionLocalizations() {
+        return Collections.unmodifiableMap(descriptionLocalizations);
     }
 
     @Override

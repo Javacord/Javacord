@@ -4,6 +4,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.Specializable;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,11 +39,25 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     String getName();
 
     /**
+     * Gets the name localizations of this command.
+     *
+     * @return The name localizations of this command.
+     */
+    Map<DiscordLocale, String> getNameLocalizations();
+
+    /**
      * Gets the description of this command.
      *
      * @return The description of this command.
      */
     String getDescription();
+
+    /**
+     * Gets the description localizations of this command.
+     *
+     * @return The description localizations of this command.
+     */
+    Map<DiscordLocale, String> getDescriptionLocalizations();
 
     /**
      * Gets the default permission of this command.

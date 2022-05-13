@@ -40,6 +40,12 @@ public class MessageContextMenuUpdaterDelegateImpl extends ApplicationCommandUpd
             body.put("name", name);
         }
 
+        if (!nameLocalizations.isEmpty()) {
+            ObjectNode nameLocalizationsJsonObject = body.putObject("name_localizations");
+            nameLocalizations.forEach(
+                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
+        }
+
         body.put("default_permission", defaultPermission);
     }
 

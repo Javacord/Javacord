@@ -24,11 +24,6 @@ public class SlashCommandUpdaterDelegateImpl extends ApplicationCommandUpdaterDe
         implements SlashCommandUpdaterDelegate {
 
     /**
-     * The slash command description.
-     */
-    private String description = null;
-
-    /**
      * The slash command options.
      */
     private List<SlashCommandOption> slashCommandOptions = new ArrayList<>();
@@ -43,11 +38,6 @@ public class SlashCommandUpdaterDelegateImpl extends ApplicationCommandUpdaterDe
     }
 
     @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
     public void setOptions(List<SlashCommandOption> slashCommandOptions) {
         this.slashCommandOptions = slashCommandOptions;
     }
@@ -57,8 +47,21 @@ public class SlashCommandUpdaterDelegateImpl extends ApplicationCommandUpdaterDe
             body.put("name", name);
         }
 
+        if (!nameLocalizations.isEmpty()) {
+            ObjectNode nameLocalizationsJsonObject = body.putObject("name_localizations");
+            nameLocalizations.forEach(
+                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
+        }
+
         if (description != null && !description.isEmpty()) {
             body.put("description", description);
+        }
+
+        if (!descriptionLocalizations.isEmpty()) {
+            ObjectNode descriptionLocalizationsJsonObject = body.putObject("description_localizations");
+            descriptionLocalizations.forEach(
+                    (locale, localization) ->
+                            descriptionLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
         }
 
         if (!slashCommandOptions.isEmpty()) {
