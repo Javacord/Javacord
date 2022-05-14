@@ -49,6 +49,7 @@ public enum AuditLogActionType {
     THREAD_CREATE(110),
     THREAD_UPDATE(111),
     THREAD_DELETE(112),
+    APPLICATION_COMMAND_PERMISSION_UPDATE(121),
 
     /**
      * An unknown action type.

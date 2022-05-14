@@ -191,6 +191,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         break;
                     case PERMISSIONS:
                     case ALLOWED_PERMISSIONS:
+                    case APPLICATION_COMMAND_PERMISSION_UPDATE:
                         Permissions oldPermissions = oldValue != null ? new PermissionsImpl(oldValue.asInt()) : null;
                         Permissions newPermissions = newValue != null ? new PermissionsImpl(newValue.asInt()) : null;
                         change = new AuditLogChangeImpl<>(type, oldPermissions, newPermissions);

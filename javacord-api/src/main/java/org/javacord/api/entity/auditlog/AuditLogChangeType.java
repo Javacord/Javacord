@@ -92,6 +92,9 @@ public enum AuditLogChangeType implements Nameable {
     // stage instance
     PRIVACY_LEVEL("privacy_level"),
 
+    // This is sent when a user changes a permission for a certain command. like changing permissions for a ban slash command.
+    APPLICATION_COMMAND_PERMISSION_UPDATE("application_command_permission_update"),
+
     /**
      * An unknown change type.
      */
