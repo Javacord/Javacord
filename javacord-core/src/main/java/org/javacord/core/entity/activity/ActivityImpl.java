@@ -3,6 +3,7 @@ package org.javacord.core.entity.activity;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityAssets;
+import org.javacord.api.entity.activity.ActivityFlag;
 import org.javacord.api.entity.activity.ActivityParty;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.emoji.Emoji;
@@ -10,6 +11,7 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,6 +31,7 @@ public class ActivityImpl implements Activity {
     private final Long startTime;
     private final Long endTime;
     private final Emoji emoji;
+    private final EnumSet<ActivityFlag> flags = EnumSet.noneOf(ActivityFlag.class);
 
     /**
      * Creates a new activity object.
@@ -45,6 +48,7 @@ public class ActivityImpl implements Activity {
         this.party = data.has("party") ? new ActivityPartyImpl(data.get("party")) : null;
         this.assets = data.has("assets") ? new ActivityAssetsImpl(this, data.get("assets")) : null;
         this.applicationId = data.has("application_id") ? data.get("application_id").asLong() : null;
+
         if (data.has("timestamps")) {
             JsonNode timestamps = data.get("timestamps");
             this.startTime = timestamps.has("start") ? timestamps.get("start").asLong() : null;
@@ -53,6 +57,7 @@ public class ActivityImpl implements Activity {
             this.startTime = null;
             this.endTime = null;
         }
+
         if (data.has("emoji")) {
             JsonNode emoji = data.get("emoji");
             if (emoji.has("id")) {
@@ -62,6 +67,15 @@ public class ActivityImpl implements Activity {
             }
         } else {
             this.emoji = null;
+        }
+
+        if (data.has("flags")) {
+            int flags = data.get("flags").asInt();
+            for (ActivityFlag flag : ActivityFlag.values()) {
+                if ((flag.asInt() & flags) == flag.asInt()) {
+                    this.flags.add(flag);
+                }
+            }
         }
     }
 
@@ -142,6 +156,11 @@ public class ActivityImpl implements Activity {
     }
 
     @Override
+    public EnumSet<ActivityFlag> getFlags() {
+        return EnumSet.copyOf(flags);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ActivityImpl)) {
             return false;
@@ -156,7 +175,9 @@ public class ActivityImpl implements Activity {
                 && Objects.deepEquals(assets, otherActivity.assets)
                 && Objects.deepEquals(applicationId, otherActivity.applicationId)
                 && Objects.deepEquals(startTime, otherActivity.startTime)
-                && Objects.deepEquals(endTime, otherActivity.endTime);
+                && Objects.deepEquals(endTime, otherActivity.endTime)
+                && Objects.deepEquals(emoji, otherActivity.emoji)
+                && Objects.deepEquals(flags, otherActivity.flags);
     }
 
     @Override
@@ -173,6 +194,7 @@ public class ActivityImpl implements Activity {
         int startTimeHash = startTime == null ? 0 : startTime.toString().hashCode();
         int endTimeHash = endTime == null ? 0 : endTime.toString().hashCode();
         int emojiHash = emoji == null ? 0 : emoji.hashCode();
+        int flagsHash = flags == null ? 0 : flags.hashCode();
 
         hash = hash * 11 + typeHash;
         hash = hash * 13 + nameHash;
@@ -185,6 +207,7 @@ public class ActivityImpl implements Activity {
         hash = hash * 41 + startTimeHash;
         hash = hash * 43 + endTimeHash;
         hash = hash * 47 + emojiHash;
+        hash = hash * 53 + flagsHash;
         return hash;
     }
 }
