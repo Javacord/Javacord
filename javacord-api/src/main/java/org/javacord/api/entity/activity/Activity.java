@@ -4,6 +4,7 @@ import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.emoji.Emoji;
 
 import java.time.Instant;
+import java.util.EnumSet;
 import java.util.Optional;
 
 /**
@@ -81,4 +82,11 @@ public interface Activity extends Nameable {
      */
     Optional<Emoji> getEmoji();
 
+    /**
+     * Gets the activity flags of this activity.
+     * The flags describe what the payload includes.
+     *
+     * @return the activity flags.
+     */
+    EnumSet<ActivityFlag> getFlags();
 }
