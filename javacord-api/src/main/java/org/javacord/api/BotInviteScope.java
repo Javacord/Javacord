@@ -25,6 +25,7 @@ public enum BotInviteScope {
     APPLICATIONS_BUILDS_UPLOAD("applications.builds.upload"),
     APPLICATIONS_BUILDS_READ("applications.builds.read"),
     APPLICATIONS_COMMANDS("applications.commands"),
+    APPLICATIONS_COMMANDS_UPDATE("applications.commands.update"),
     APPLICATIONS_COMMANDS_PERMISSIONS_UPDATE("applications.commands.permissions.update"),
     APPLICATIONS_STORE_UPDATE("applications.store.update"),
     APPLICATIONS_ENTITLEMENTS("applications.entitlements"),
