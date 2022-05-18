@@ -59,5 +59,16 @@ public interface ApplicationCommandUpdaterDelegate<T extends ApplicationCommand>
      * @param server The server where the command should be updated.
      * @return A future with the updated application command to check if the update was successful.
      */
-    CompletableFuture<T> updateForServer(Server server);
+    default CompletableFuture<T> updateForServer(Server server) {
+        return updateForServer(server.getApi(), server.getId());
+    }
+
+    /**
+     * Performs the queued update.
+     *
+     * @param api The DiscordApi.
+     * @param server The server where the command should be updated.
+     * @return A future with the updated application command to check if the update was successful.
+     */
+    CompletableFuture<T> updateForServer(DiscordApi api, long server);
 }
