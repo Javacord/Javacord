@@ -67,6 +67,13 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     boolean getDefaultPermission();
 
     /**
+     * Gets the server id of this command if it is not global.
+     *
+     * @return The server of this command.
+     */
+    Optional<Long> getServerId();
+
+    /**
      * Gets the server of this command if it is not global.
      *
      * @return The server of this command.
@@ -93,10 +100,20 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     CompletableFuture<Void> deleteGlobal();
 
     /**
-     * Deletes this application command globally.
+     * Deletes this application command for a server.
      *
      * @param server The server where the command should be deleted from.
      * @return A future to check if the deletion was successful.
      */
-    CompletableFuture<Void> deleteForServer(Server server);
+    default CompletableFuture<Void> deleteForServer(Server server) {
+        return deleteForServer(server.getId());
+    }
+
+    /**
+     * Deletes this application command for a server.
+     *
+     * @param server The server where the command should be deleted from.
+     * @return A future to check if the deletion was successful.
+     */
+    CompletableFuture<Void> deleteForServer(long server);
 }

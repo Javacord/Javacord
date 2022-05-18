@@ -1581,9 +1581,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server, List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
+            long server, List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(clientId), String.valueOf(server))
                 .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
                 .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }

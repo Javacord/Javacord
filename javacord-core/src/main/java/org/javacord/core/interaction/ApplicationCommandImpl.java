@@ -28,6 +28,7 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     private final Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
 
     private final Server server;
+    private final Long serverId;
 
     /**
      * Class constructor.
@@ -46,8 +47,11 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
         data.path("description_localizations").fields().forEachRemaining(e ->
                 descriptionLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         defaultPermission = !data.hasNonNull("default_permission") || data.get("default_permission").asBoolean();
-        server = data.has("guild_id")
-                ? api.getPossiblyUnreadyServerById(data.get("guild_id").asLong()).orElseThrow(AssertionError::new)
+        serverId = data.has("guild_id")
+                ? data.get("guild_id").asLong()
+                : null;
+        server = serverId != null
+                ? api.getPossiblyUnreadyServerById(serverId).orElse(null)
                 : null;
     }
 
@@ -92,18 +96,23 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
+    public Optional<Long> getServerId() {
+        return Optional.ofNullable(serverId);
+    }
+
+    @Override
     public Optional<Server> getServer() {
         return Optional.ofNullable(server);
     }
 
     @Override
     public boolean isGlobalApplicationCommand() {
-        return server == null;
+        return serverId == null;
     }
 
     @Override
     public boolean isServerApplicationCommand() {
-        return server != null;
+        return serverId != null;
     }
 
     @Override
@@ -114,9 +123,9 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
-    public CompletableFuture<Void> deleteForServer(Server server) {
+    public CompletableFuture<Void> deleteForServer(long server) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(getApplicationId()), server.getIdAsString(), getIdAsString())
+                .setUrlParameters(String.valueOf(getApplicationId()), String.valueOf(server), getIdAsString())
                 .execute(result -> null);
     }
 }

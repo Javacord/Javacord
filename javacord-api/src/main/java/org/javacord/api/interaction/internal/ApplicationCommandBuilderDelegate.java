@@ -1,7 +1,6 @@
 package org.javacord.api.interaction.internal;
 
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
 
@@ -58,9 +57,10 @@ public interface ApplicationCommandBuilderDelegate<T extends ApplicationCommand>
     /**
      * Creates an application command for a specific server.
      *
+     * @param api The discord api instance.
      * @param server The server.
      * @return The built application command.
      */
-    CompletableFuture<T> createForServer(Server server);
+    CompletableFuture<T> createForServer(DiscordApi api, long server);
 
 }

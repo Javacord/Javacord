@@ -96,7 +96,20 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
      * @return The updated application command.
      */
     public CompletableFuture<T> updateForServer(Server server) {
-        return delegate.updateForServer(server);
+        return delegate.updateForServer(server.getApi(), server.getId());
+    }
+
+    /**
+     * Updates an application command on the given server.
+     * When used to update multiple server application commands at once
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} should be used instead.
+     *
+     * @param api The DiscordApi instance.
+     * @param server The server where the command should be updated.
+     * @return The updated application command.
+     */
+    public CompletableFuture<T> updateForServer(DiscordApi api, long server) {
+        return delegate.updateForServer(api, server);
     }
 
     /**
