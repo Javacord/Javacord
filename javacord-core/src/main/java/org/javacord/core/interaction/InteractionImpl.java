@@ -149,10 +149,7 @@ public abstract class InteractionImpl implements Interaction {
                 .includeAuthorizationHeader(false)
                 .consumeGlobalRatelimit(false)
                 .setBody(body)
-                .execute(result -> {
-                    System.out.println(result.getJsonBody());
-                    return null;
-                });
+                .execute(result -> null);
     }
 
     @Override
