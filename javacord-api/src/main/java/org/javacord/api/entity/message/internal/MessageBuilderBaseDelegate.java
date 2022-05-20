@@ -301,6 +301,13 @@ public interface MessageBuilderBaseDelegate {
     void addAttachmentAsSpoiler(URL url);
 
     /**
+     * Edits a message with an attachment.
+     *
+     * @param message The message to edit.
+     */
+    void editMessageWithAttachment(Message message);
+
+    /**
      * Controls the mention behavior.
      *
      * @param allowedMentions The mention object to specify which mention should ping.

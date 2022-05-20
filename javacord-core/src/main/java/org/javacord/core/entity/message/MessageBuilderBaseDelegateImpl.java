@@ -410,6 +410,14 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void editMessageWithAttachment(Message message) {
+        if (message == null) {
+            throw new IllegalArgumentException("message cannot be null!");
+        }
+       //leave it for now
+    }
+
+    @Override
     public void setAllowedMentions(AllowedMentions allowedMentions) {
         if (allowedMentions == null) {
             throw new IllegalArgumentException("mention cannot be null!");
