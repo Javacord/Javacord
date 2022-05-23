@@ -42,27 +42,8 @@ public class SlashCommandUpdaterDelegateImpl extends ApplicationCommandUpdaterDe
         this.slashCommandOptions = slashCommandOptions;
     }
 
-    private void prepareBody(ObjectNode body) {
-        if (name != null && !name.isEmpty()) {
-            body.put("name", name);
-        }
-
-        if (!nameLocalizations.isEmpty()) {
-            ObjectNode nameLocalizationsJsonObject = body.putObject("name_localizations");
-            nameLocalizations.forEach(
-                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
-        }
-
-        if (description != null && !description.isEmpty()) {
-            body.put("description", description);
-        }
-
-        if (!descriptionLocalizations.isEmpty()) {
-            ObjectNode descriptionLocalizationsJsonObject = body.putObject("description_localizations");
-            descriptionLocalizations.forEach(
-                    (locale, localization) ->
-                            descriptionLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
-        }
+    protected void prepareBody(ObjectNode body) {
+        super.prepareBody(body);
 
         if (!slashCommandOptions.isEmpty()) {
             ArrayNode array = body.putArray("options");
@@ -70,8 +51,6 @@ public class SlashCommandUpdaterDelegateImpl extends ApplicationCommandUpdaterDe
                 array.add(((SlashCommandOptionImpl) slashCommandOption).toJsonNode());
             }
         }
-
-        body.put("default_permission", defaultPermission);
     }
 
     @Override

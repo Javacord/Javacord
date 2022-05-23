@@ -25,20 +25,6 @@ public class UserContextMenuUpdaterDelegateImpl extends ApplicationCommandUpdate
         this.commandId = commandId;
     }
 
-    private void prepareBody(ObjectNode body) {
-        if (name != null && !name.isEmpty()) {
-            body.put("name", name);
-        }
-
-        if (!nameLocalizations.isEmpty()) {
-            ObjectNode nameLocalizationsJsonObject = body.putObject("name_localizations");
-            nameLocalizations.forEach(
-                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
-        }
-
-        body.put("default_permission", defaultPermission);
-    }
-
     @Override
     public CompletableFuture<UserContextMenu> updateGlobal(DiscordApi api) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
