@@ -35,20 +35,6 @@ public class MessageContextMenuUpdaterDelegateImpl extends ApplicationCommandUpd
         this.defaultPermission = defaultPermission;
     }
 
-    private void prepareBody(ObjectNode body) {
-        if (name != null && !name.isEmpty()) {
-            body.put("name", name);
-        }
-
-        if (!nameLocalizations.isEmpty()) {
-            ObjectNode nameLocalizationsJsonObject = body.putObject("name_localizations");
-            nameLocalizations.forEach(
-                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
-        }
-
-        body.put("default_permission", defaultPermission);
-    }
-
     @Override
     public CompletableFuture<MessageContextMenu> updateGlobal(DiscordApi api) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
