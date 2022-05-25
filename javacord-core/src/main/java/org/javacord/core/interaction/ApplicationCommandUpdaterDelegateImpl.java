@@ -1,10 +1,12 @@
 package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +23,9 @@ public abstract class ApplicationCommandUpdaterDelegateImpl<T extends Applicatio
 
     protected Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
 
-    protected boolean defaultPermission = true;
+    protected Long defaultMemberPermissions = -1L;
+
+    protected Boolean dmPermission = null;
 
     @Override
     public void setName(String name) {
@@ -44,8 +48,23 @@ public abstract class ApplicationCommandUpdaterDelegateImpl<T extends Applicatio
     }
 
     @Override
-    public void setDefaultPermission(boolean defaultPermission) {
-        this.defaultPermission = defaultPermission;
+    public void setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
+        this.defaultMemberPermissions = Arrays.stream(requiredPermissions).mapToLong(PermissionType::getValue).sum();
+    }
+
+    @Override
+    public void setDefaultEnabledForEveryone() {
+        this.defaultMemberPermissions = null;
+    }
+
+    @Override
+    public void setDefaultDisabled() {
+        this.defaultMemberPermissions = 0L;
+    }
+
+    @Override
+    public void setEnabledInDms(boolean enabledInDms) {
+        this.dmPermission = enabledInDms;
     }
 
     protected void prepareBody(ObjectNode body) {
@@ -70,6 +89,13 @@ public abstract class ApplicationCommandUpdaterDelegateImpl<T extends Applicatio
                             descriptionLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
         }
 
-        body.put("default_permission", defaultPermission);
+        if (defaultMemberPermissions == null || defaultMemberPermissions != -1L) {
+            body.put("default_member_permissions",
+                    defaultMemberPermissions != null ? String.valueOf(defaultMemberPermissions) : null);
+        }
+
+        if (dmPermission != null) {
+            body.put("dm_permission", dmPermission);
+        }
     }
 }

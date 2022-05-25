@@ -45,6 +45,7 @@ import org.javacord.core.util.handler.channel.thread.ThreadDeleteHandler;
 import org.javacord.core.util.handler.channel.thread.ThreadListSyncHandler;
 import org.javacord.core.util.handler.channel.thread.ThreadMembersUpdateHandler;
 import org.javacord.core.util.handler.channel.thread.ThreadUpdateHandler;
+import org.javacord.core.util.handler.guild.ApplicationCommandPermissionsUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildBanAddHandler;
 import org.javacord.core.util.handler.guild.GuildBanRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildCreateHandler;
@@ -804,6 +805,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         addHandler(new GuildUpdateHandler(api));
         addHandler(new VoiceServerUpdateHandler(api));
         addHandler(new VoiceStateUpdateHandler(api));
+        addHandler(new ApplicationCommandPermissionsUpdateHandler(api));
 
         // role
         addHandler(new GuildRoleCreateHandler(api));

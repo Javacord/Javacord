@@ -4,6 +4,7 @@ public enum ApplicationCommandPermissionType {
 
     ROLE(1),
     USER(2),
+    CHANNEL(3),
     UNKNOWN(-1);
 
     private final int value;

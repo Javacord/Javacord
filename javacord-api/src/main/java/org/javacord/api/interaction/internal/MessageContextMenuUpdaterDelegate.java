@@ -11,10 +11,4 @@ public interface MessageContextMenuUpdaterDelegate extends ApplicationCommandUpd
      */
     void setName(String name);
 
-    /**
-     * Sets the new application command default permission.
-     *
-     * @param defaultPermission The default permission to set.
-     */
-    void setDefaultPermission(boolean defaultPermission);
 }

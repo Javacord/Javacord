@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -44,11 +43,9 @@ import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.ApplicationCommandBuilder;
-import org.javacord.api.interaction.ApplicationCommandPermissions;
 import org.javacord.api.interaction.ApplicationCommandType;
 import org.javacord.api.interaction.MessageContextMenu;
 import org.javacord.api.interaction.ServerApplicationCommandPermissions;
-import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
 import org.javacord.api.listener.GloballyAttachableListener;
@@ -78,7 +75,6 @@ import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
 import org.javacord.core.interaction.ApplicationCommandImpl;
-import org.javacord.core.interaction.ApplicationCommandPermissionsImpl;
 import org.javacord.core.interaction.MessageContextMenuImpl;
 import org.javacord.core.interaction.ServerApplicationCommandPermissionsImpl;
 import org.javacord.core.interaction.SlashCommandImpl;
@@ -1548,27 +1544,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 RestEndpoint.APPLICATION_COMMAND_PERMISSIONS)
                 .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
                 .execute(result -> new ServerApplicationCommandPermissionsImpl(this, result.getJsonBody()));
-    }
-
-    @Override
-    public CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
-            Server server, List<ServerApplicationCommandPermissionsBuilder> slashCommandPermissionsBuilders) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (ServerApplicationCommandPermissionsBuilder permission : slashCommandPermissionsBuilders) {
-            ObjectNode node = JsonNodeFactory.instance.objectNode();
-            node.put("id", permission.getCommandId());
-            ArrayNode array = node.putArray("permissions");
-            for (ApplicationCommandPermissions permissionPermission : permission.getPermissions()) {
-                array.add(((ApplicationCommandPermissionsImpl) permissionPermission).toJsonNode());
-            }
-            body.add(node);
-        }
-
-        return new RestRequest<List<ServerApplicationCommandPermissions>>(server.getApi(), RestMethod.PUT,
-                RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
-                .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
-                .setBody(body)
-                .execute(result -> jsonToServerApplicationCommandPermissionsList(result.getJsonBody()));
     }
 
     @Override

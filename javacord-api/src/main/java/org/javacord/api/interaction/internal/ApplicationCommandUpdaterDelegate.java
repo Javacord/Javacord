@@ -1,6 +1,7 @@
 package org.javacord.api.interaction.internal;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
@@ -39,11 +40,32 @@ public interface ApplicationCommandUpdaterDelegate<T extends ApplicationCommand>
     void addDescriptionLocalization(DiscordLocale locale, String localization);
 
     /**
-     * Sets the new application command default permission.
+     * Sets the default required permissions for this command.
+     * This can later be overridden by server admins.
      *
-     * @param defaultPermission The default permission to set.
+     * @param requiredPermissions The required permissions to use this command.
      */
-    void setDefaultPermission(boolean defaultPermission);
+    void setDefaultEnabledForPermissions(PermissionType... requiredPermissions);
+
+    /**
+     * Enables this command for use by all users.
+     * This can later be overridden by server admins.
+     */
+    void setDefaultEnabledForEveryone();
+
+    /**
+     * Sets whether this command should be disabled and only usable by server administrators by default.
+     * This can later be overridden by server administrators.
+     */
+    void setDefaultDisabled();
+
+    /**
+     * Sets whether this command is able to be used in DMs. By default, this is {@code true}
+     * This has no effect on server commands.
+     *
+     * @param enabledInDms Whether the command is enabled in DMs.
+     */
+    void setEnabledInDms(boolean enabledInDms);
 
     /**
      * Performs the queued update.

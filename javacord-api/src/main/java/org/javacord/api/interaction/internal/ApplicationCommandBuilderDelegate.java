@@ -39,12 +39,32 @@ public interface ApplicationCommandBuilderDelegate<T extends ApplicationCommand>
     void addDescriptionLocalization(DiscordLocale locale, String localization);
 
     /**
-     * Sets the default permission for the application command
-     * whether the command is enabled by default when the app is added to a server.
+     * Sets the default required permissions for this command.
+     * This can later be overridden by server admins.
      *
-     * @param defaultPermission The default permission.
+     * @param requiredPermissions The required permissions to use this command.
      */
-    void setDefaultPermission(Boolean defaultPermission);
+    void setDefaultEnabledForPermissions(PermissionType... requiredPermissions);
+
+    /**
+     * Enables this command for use by all users.
+     * This can later be overridden by server admins.
+     */
+    void setDefaultEnabledForEveryone();
+
+    /**
+     * Sets whether this command should be disabled and only usable by server administrators by default.
+     * This can later be overridden by server administrators.
+     */
+    void setDefaultDisabled();
+
+    /**
+     * Sets whether this command is able to be used in DMs. By default, this is {@code true}
+     * This has no effect on server commands.
+     *
+     * @param enabledInDms Whether the command is enabled in DMs.
+     */
+    void setEnabledInDms(boolean enabledInDms);
 
     /**
      * Creates a global application command.
