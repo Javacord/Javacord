@@ -47,8 +47,6 @@ import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
@@ -100,8 +98,6 @@ import org.javacord.core.entity.sticker.StickerBuilderDelegateImpl;
 import org.javacord.core.entity.sticker.StickerUpdaterDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookBuilderDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
-import org.javacord.core.interaction.ApplicationCommandPermissionsBuilderDelegateImpl;
-import org.javacord.core.interaction.ApplicationCommandPermissionsUpdaterDelegateImpl;
 import org.javacord.core.interaction.MessageContextMenuBuilderDelegateImpl;
 import org.javacord.core.interaction.MessageContextMenuUpdaterDelegateImpl;
 import org.javacord.core.interaction.SlashCommandBuilderDelegateImpl;
@@ -308,17 +304,6 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public SlashCommandOptionBuilderDelegate createSlashCommandOptionBuilderDelegate() {
         return new SlashCommandOptionBuilderDelegateImpl();
-    }
-
-    @Override
-    public ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
-            Server server) {
-        return new ApplicationCommandPermissionsUpdaterDelegateImpl(server);
-    }
-
-    @Override
-    public ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
-        return new ApplicationCommandPermissionsBuilderDelegateImpl();
     }
 
     @Override

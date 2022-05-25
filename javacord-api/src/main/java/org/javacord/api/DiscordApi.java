@@ -38,7 +38,6 @@ import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.interaction.ApplicationCommandUpdater;
 import org.javacord.api.interaction.MessageContextMenu;
 import org.javacord.api.interaction.ServerApplicationCommandPermissions;
-import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
@@ -260,17 +259,6 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      */
     CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
             Server server, long commandId);
-
-    /**
-     * Updates multiple server application command permissions at once.
-     *
-     * @param server The server where the application command permissions should be updated on.
-     * @param applicationCommandPermissionsBuilders The application command permissions builders,
-     *     which should be updated.
-     * @return A list of the updated server application command permissions.
-     */
-    CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
-            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders);
 
     /**
      * Bulk overwrites the global application commands.

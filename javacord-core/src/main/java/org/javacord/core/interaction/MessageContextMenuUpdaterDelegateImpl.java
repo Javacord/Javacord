@@ -30,11 +30,6 @@ public class MessageContextMenuUpdaterDelegateImpl extends ApplicationCommandUpd
     }
 
     @Override
-    public void setDefaultPermission(boolean defaultPermission) {
-        this.defaultPermission = defaultPermission;
-    }
-
-    @Override
     public CompletableFuture<MessageContextMenu> updateGlobal(DiscordApi api) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         prepareBody(body);

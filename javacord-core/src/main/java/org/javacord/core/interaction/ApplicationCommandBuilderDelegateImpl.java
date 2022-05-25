@@ -12,6 +12,7 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +25,8 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
     protected String description;
     protected Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
 
-    protected Boolean defaultPermission;
+    protected Long defaultMemberPermissions = null;
+    protected Boolean dmPermission = true;
 
     @Override
     public void setName(String name) {
@@ -47,8 +49,23 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
     }
 
     @Override
-    public void setDefaultPermission(Boolean defaultPermission) {
-        this.defaultPermission = defaultPermission;
+    public void setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
+        this.defaultMemberPermissions = Arrays.stream(requiredPermissions).mapToLong(PermissionType::getValue).sum();
+    }
+
+    @Override
+    public void setDefaultEnabledForEveryone() {
+        this.defaultMemberPermissions = null;
+    }
+
+    @Override
+    public void setDefaultDisabled() {
+        this.defaultMemberPermissions = 0L;
+    }
+
+    @Override
+    public void setEnabledInDms(boolean enabledInDms) {
+        this.dmPermission = enabledInDms;
     }
 
     @Override
@@ -92,9 +109,10 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
                             descriptionLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
         }
 
-        if (defaultPermission != null) {
-            jsonBody.put("default_permission", defaultPermission.booleanValue());
-        }
+        jsonBody.put("default_member_permissions",
+                defaultMemberPermissions != null ? String.valueOf(defaultMemberPermissions) : null);
+
+        jsonBody.put("dm_permission", dmPermission);
 
         return jsonBody;
     }

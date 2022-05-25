@@ -47,8 +47,6 @@ import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
@@ -524,26 +522,6 @@ public class DelegateFactory {
      */
     public static SlashCommandOptionBuilderDelegate createSlashCommandOptionBuilderDelegate() {
         return delegateFactoryDelegate.createSlashCommandOptionBuilderDelegate();
-    }
-
-    /**
-     * Creates a new application command permissions updater delegate.
-     *
-     * @param server The server.
-     * @return The application command permissions updater delegate.
-     */
-    public static ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
-            Server server) {
-        return delegateFactoryDelegate.createApplicationCommandPermissionsUpdaterDelegate(server);
-    }
-
-    /**
-     * Creates a new application command permissions builder delegate.
-     *
-     * @return The application command permissions builder delegate.
-     */
-    public static ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
-        return delegateFactoryDelegate.createApplicationCommandPermissionsBuilderDelegate();
     }
 
     /**
