@@ -1701,4 +1701,13 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
                 .orElseThrow(() -> new IllegalStateException(
                         "In order to create a thread the channel of this message must be a ServerTextChannel"));
     }
+
+    /**
+     * Gets the message as a JSON String.
+     * Has to be enabled first by setting {@link DiscordApi#setSaveMessageJsonAsString(boolean)} to true.
+     *
+     * @return The message as a JSON String.
+     */
+    Optional<String> getMessageJsonString();
+
 }
