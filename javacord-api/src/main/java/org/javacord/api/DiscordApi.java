@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerNewsChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
@@ -1523,6 +1524,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Set<ServerThreadChannel> getPublicServerThreadChannels();
 
     /**
+     * Gets a collection with all server news channels of the bot.
+     *
+     * @return A collection with all server news channels of the bot.
+     */
+    Collection<ServerNewsChannel> getServerNewsChannels();
+
+    /**
      * Gets a collection with all server voice channels of the bot.
      *
      * @return A collection with all server voice channels of the bot.
@@ -1944,6 +1952,58 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
                 getServerThreadChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toSet()));
+    }
+
+    /**
+     * Gets a server news channel by its id.
+     *
+     * @param id The id of the server news channel.
+     * @return The server news channel with the given id.
+     */
+    default Optional<ServerNewsChannel> getServerNewsChannelById(long id) {
+        return getChannelById(id).flatMap(Channel::asServerNewsChannel);
+    }
+
+    /**
+     * Gets a server news channel by its id.
+     *
+     * @param id The id of the server news channel.
+     * @return The server news channel with the given id.
+     */
+    default Optional<ServerNewsChannel> getServerNewsChannelById(String id) {
+        try {
+            return getServerNewsChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all server news channels with the given name.
+     * This method is case sensitive!
+     *
+     * @param name The name of the server news channels.
+     * @return A collection with all server news channels with the given name.
+     */
+    default Collection<ServerNewsChannel> getServerNewsChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getServerNewsChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a collection with all server news channels with the given name.
+     * This method is case insensitive!
+     *
+     * @param name The name of the server news channels.
+     * @return A collection with all server news channels with the given name.
+     */
+    default Collection<ServerNewsChannel> getServerNewsChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getServerNewsChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
     }
 
     /**
