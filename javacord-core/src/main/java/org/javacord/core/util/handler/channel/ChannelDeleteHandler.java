@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -41,20 +42,14 @@ public class ChannelDeleteHandler extends PacketHandler {
             case SERVER_TEXT_CHANNEL:
                 handleServerTextChannel(packet);
                 break;
-            case PRIVATE_CHANNEL:
-                handlePrivateChannel(packet);
-                break;
             case SERVER_VOICE_CHANNEL:
                 handleServerVoiceChannel(packet);
                 break;
             case SERVER_STAGE_VOICE_CHANNEL:
                 handleServerStageVoiceChannel(packet);
                 break;
-            case GROUP_CHANNEL:
-                logger.info("Received CHANNEL_DELETE packet for a group channel. This should be impossible.");
-                break;
-            case CHANNEL_CATEGORY:
-                handleCategory(packet);
+            case SERVER_FORUM_CHANNEL:
+                handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
                 // TODO Handle server news channel differently
@@ -64,6 +59,15 @@ public class ChannelDeleteHandler extends PacketHandler {
                 // TODO Handle store channels
                 logger.debug("Received CHANNEL_DELETE packet for a store channel. These are not supported in this"
                         + " Javacord version and get ignored!");
+                break;
+            case GROUP_CHANNEL:
+                logger.info("Received CHANNEL_DELETE packet for a group channel. This should be impossible.");
+                break;
+            case CHANNEL_CATEGORY:
+                handleCategory(packet);
+                break;
+            case PRIVATE_CHANNEL:
+                handlePrivateChannel(packet);
                 break;
             default:
                 logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
@@ -107,6 +111,28 @@ public class ChannelDeleteHandler extends PacketHandler {
         api.removeObjectListeners(ServerTextChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(TextChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+    }
+
+    /**
+     * Handles server forum channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleServerForumChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getForumChannelById(channelId))
+                .ifPresent(channel -> {
+                    dispatchServerChannelDeleteEvent(channel);
+                    api.forEachCachedMessageWhere(
+                            msg -> msg.getChannel().getId() == channelId,
+                            msg -> api.removeMessageFromCache(msg.getId())
+                    );
+                });
+        api.removeObjectListeners(ServerForumChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(Channel.class, channelId);
     }
 

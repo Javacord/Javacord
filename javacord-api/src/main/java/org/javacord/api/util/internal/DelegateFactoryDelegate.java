@@ -4,12 +4,15 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerForumChannelBuilderDelegate;
+import org.javacord.api.entity.channel.internal.ServerForumChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
@@ -139,6 +142,14 @@ public interface DelegateFactoryDelegate {
     ServerTextChannelBuilderDelegate createServerTextChannelBuilderDelegate(Server server);
 
     /**
+     * Creates a new server forum channel builder delegate.
+     *
+     * @param server The server of the server forum channel.
+     * @return A new server forum channel builder delegate.
+     */
+    ServerForumChannelBuilderDelegate createServerForumChannelBuilderDelegate(Server server);
+
+    /**
      * Creates a new server thread channel builder delegate.
      *
      * @param serverTextChannel The server text channel where the thread will be created in.
@@ -259,6 +270,14 @@ public interface DelegateFactoryDelegate {
      * @return A new server text channel updater delegate.
      */
     ServerTextChannelUpdaterDelegate createServerTextChannelUpdaterDelegate(ServerTextChannel channel);
+
+    /**
+     * Creates a new server forum channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server forum channel updater delegate.
+     */
+    ServerForumChannelUpdaterDelegate createServerForumChannelUpdaterDelegate(ServerForumChannel channel);
 
     /**
      * Creates a new server voice channel updater delegate.

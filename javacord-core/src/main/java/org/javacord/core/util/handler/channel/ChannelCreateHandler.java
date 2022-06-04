@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -44,20 +45,14 @@ public class ChannelCreateHandler extends PacketHandler {
             case SERVER_TEXT_CHANNEL:
                 handleServerTextChannel(packet);
                 break;
-            case PRIVATE_CHANNEL:
-                handlePrivateChannel(packet);
-                break;
             case SERVER_VOICE_CHANNEL:
                 handleServerVoiceChannel(packet);
                 break;
             case SERVER_STAGE_VOICE_CHANNEL:
                 handleServerStageVoiceChannel(packet);
                 break;
-            case GROUP_CHANNEL:
-                logger.info("Received CHANNEL_CREATE packet for a group channel. This should be impossible.");
-                break;
-            case CHANNEL_CATEGORY:
-                handleChannelCategory(packet);
+            case SERVER_FORUM_CHANNEL:
+                handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
                 logger.debug("Received CHANNEL_CREATE packet for a news channel. In this Javacord version it is "
@@ -69,9 +64,33 @@ public class ChannelCreateHandler extends PacketHandler {
                 logger.debug("Received CHANNEL_CREATE packet for a store channel. These are not supported in this"
                         + " Javacord version and get ignored!");
                 break;
+            case PRIVATE_CHANNEL:
+                handlePrivateChannel(packet);
+                break;
+            case GROUP_CHANNEL:
+                logger.info("Received CHANNEL_CREATE packet for a group channel. This should be impossible.");
+                break;
+            case CHANNEL_CATEGORY:
+                handleChannelCategory(packet);
+                break;
             default:
                 logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
         }
+    }
+
+    /**
+     * Handles server forum channels creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleServerForumChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
+        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
+            ServerChannel serverChannel = ((ServerImpl) server).getOrCreateServerForumChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(serverChannel);
+
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
+        });
     }
 
     /**

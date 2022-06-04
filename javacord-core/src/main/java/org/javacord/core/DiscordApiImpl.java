@@ -21,6 +21,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
@@ -2125,6 +2126,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Collection<ServerTextChannel> getServerTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
+    }
+
+    @Override
+    public Set<ServerForumChannel> getServerForumChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_FORUM_CHANNEL);
     }
 
     @Override
