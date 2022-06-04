@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
@@ -1519,6 +1520,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Collection<ServerTextChannel> getServerTextChannels();
 
     /**
+     * Gets a set with all server forum channels of the bot.
+     *
+     * @return A collection with all server forum channels of the bot.
+     */
+    Set<ServerForumChannel> getServerForumChannels();
+
+    /**
      * Gets a set with all the server thread channels of the bot.
      *
      * @return A set with all server thread channels of the bot.
@@ -1909,6 +1917,58 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
                 getServerTextChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a server forum channel by its id.
+     *
+     * @param id The id of the server forum channel.
+     * @return The server forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getServerForumChannelById(long id) {
+        return getChannelById(id).flatMap(Channel::asServerForumChannel);
+    }
+
+    /**
+     * Gets a server forum channel by its id.
+     *
+     * @param id The id of the server forum channel.
+     * @return The server forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getServerForumChannelById(String id) {
+        try {
+            return getServerForumChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all server forum channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the server forum channels.
+     * @return A collection with all server forum channels with the given name.
+     */
+    default Set<ServerForumChannel> getServerForumChannelsByName(String name) {
+        return Collections.unmodifiableSet(
+                getServerForumChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toSet()));
+    }
+
+    /**
+     * Gets a collection with all server forum channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the server forum channels.
+     * @return A collection with all server forum channels with the given name.
+     */
+    default Set<ServerForumChannel> getServerForumChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
+                getServerForumChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toSet()));
     }
 
     /**

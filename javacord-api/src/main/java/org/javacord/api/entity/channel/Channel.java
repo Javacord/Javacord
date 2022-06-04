@@ -79,6 +79,15 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     }
 
     /**
+     * Gets the channel as server forum channel.
+     *
+     * @return The channel as server forum channel.
+     */
+    default Optional<ServerForumChannel> asServerForumChannel() {
+        return as(ServerForumChannel.class);
+    }
+
+    /**
      * Gets the channel as server voice channel.
      *
      * @return The channel as server voice channel.

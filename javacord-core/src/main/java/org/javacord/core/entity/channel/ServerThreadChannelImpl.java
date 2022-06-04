@@ -1,7 +1,7 @@
 package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.util.cache.MessageCache;
@@ -117,8 +117,8 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
-    public ServerTextChannel getParent() {
-        return getServer().getTextChannelById(parentId)
+    public RegularServerChannel getParent() {
+        return getServer().getRegularChannelById(parentId)
                 .orElseThrow(() -> new AssertionError("Thread has no parent channel."));
     }
 
