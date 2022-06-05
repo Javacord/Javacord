@@ -3,7 +3,6 @@ package org.javacord.core.entity.activity;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityAssets;
-import org.javacord.api.entity.activity.ActivityButtons;
 import org.javacord.api.entity.activity.ActivityFlag;
 import org.javacord.api.entity.activity.ActivityParty;
 import org.javacord.api.entity.activity.ActivitySecrets;
@@ -14,6 +13,7 @@ import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -39,12 +39,12 @@ public class ActivityImpl implements Activity {
     private final Emoji emoji;
     private final Boolean instance;
     private final EnumSet<ActivityFlag> flags = EnumSet.noneOf(ActivityFlag.class);
-    private final List<ActivityButtons> buttons = new ArrayList<>();
+    private final List<String> buttonLabels = new ArrayList<>();
 
     /**
      * Creates a new activity object.
      *
-     * @param api The discord api instance.
+     * @param api  The discord api instance.
      * @param data The json data of the activity.
      */
     public ActivityImpl(DiscordApiImpl api, JsonNode data) {
@@ -89,19 +89,14 @@ public class ActivityImpl implements Activity {
             }
         }
 
-        if (data.has("buttons")) {
-            for (JsonNode button : data.get("buttons")) {
-                ActivityButtonsImpl activityButtons = new ActivityButtonsImpl(button);
-                this.buttons.add(activityButtons);
-            }
-        }
+        data.path("buttons").forEach(buttonLabel -> buttonLabels.add(buttonLabel.asText()));
     }
 
     /**
      * Creates a new activity object.
      *
-     * @param type The type of the activity.
-     * @param name The name of the activity.
+     * @param type         The type of the activity.
+     * @param name         The name of the activity.
      * @param streamingUrl The streamingUrl of the activity.
      */
     public ActivityImpl(ActivityType type, String name, String streamingUrl) {
@@ -197,8 +192,8 @@ public class ActivityImpl implements Activity {
     }
 
     @Override
-    public List<ActivityButtons> getButtons() {
-        return buttons;
+    public List<String> getButtonLabels() {
+        return Collections.unmodifiableList(buttonLabels);
     }
 
     @Override
@@ -219,7 +214,7 @@ public class ActivityImpl implements Activity {
                 && Objects.deepEquals(endTime, otherActivity.endTime)
                 && Objects.deepEquals(emoji, otherActivity.emoji)
                 && Objects.deepEquals(flags, otherActivity.flags)
-                && Objects.deepEquals(buttons, otherActivity.buttons)
+                && Objects.deepEquals(buttonLabels, otherActivity.buttonLabels)
                 && Objects.deepEquals(secrets, otherActivity.secrets)
                 && Objects.deepEquals(instance, otherActivity.instance);
     }
@@ -242,7 +237,7 @@ public class ActivityImpl implements Activity {
         int createdAtHash = createdAt == null ? 0 : createdAt.hashCode();
         int secretsHash = secrets == null ? 0 : secrets.hashCode();
         int instanceHash = instance == null ? 0 : instance.hashCode();
-        int buttonsHash = buttons == null ? 0 : buttons.hashCode();
+        int buttonsHash = buttonLabels == null ? 0 : buttonLabels.hashCode();
 
         hash = hash * 11 + typeHash;
         hash = hash * 13 + nameHash;
