@@ -113,9 +113,9 @@ public interface Activity extends Nameable {
     EnumSet<ActivityFlag> getFlags();
 
     /**
-     * Gets the custom buttons shown in the Rich Presence (max 2).
+     * Gets the custom button labels shown in the Rich Presence (max 2).
      *
-     * @return The custom buttons shown in the Rich Presence (max 2).
+     * @return The custom button labels shown in the Rich Presence (max 2).
      */
-    List<ActivityButtons> getButtons();
+    List<String> getButtonLabels();
 }
