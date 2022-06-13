@@ -57,9 +57,11 @@ tasks.jar {
                 ).joinToString(),
                 // work-around for https://github.com/bndtools/bnd/issues/2227
                 "-fixupmessages" to listOf(
-                    "^Classes found in the wrong directory:",
-                    """\\{META-INF/versions/9/module-info\\.class=module-info,""",
-                    """META-INF/versions/9/org/javacord/core/entity/message/MessageSetImpl\\.class=org\\.javacord\\.core\\.entity\\.message\\.MessageSetImpl}$"""
+                    """^Classes found in the wrong directory:""",
+                    """\\{META-INF/versions/9/org/javacord/core/entity/message/MessageSetImpl$1.class=org.javacord.core.entity.message.MessageSetImpl$1,""",
+                    """META-INF/versions/9/module-info.class=module-info,""",
+                    """META-INF/versions/9/org/javacord/core/entity/message/MessageSetImpl.class=org.javacord.core.entity.message.MessageSetImpl,""",
+                    """META-INF/versions/9/org/javacord/core/entity/message/MessageSetImpl$2.class=org.javacord.core.entity.message.MessageSetImpl$2}$"""
                 ).joinToString(" ")
             )
         )
