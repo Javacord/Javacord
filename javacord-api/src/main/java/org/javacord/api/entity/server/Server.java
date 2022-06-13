@@ -21,6 +21,8 @@ import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.CustomEmojiBuilder;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.PermissionState;
@@ -2390,6 +2392,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<ServerChannel> getChannels();
 
     /**
+     * Gets a sorted list (by position) with all regular channels of the server.
+     *
+     * @return A sorted list (by position) with all regular channels of the server.
+     */
+    List<RegularServerChannel> getRegularChannels();
+
+    /**
      * Gets a sorted list (by position) with all channel categories of the server.
      *
      * @return A sorted list (by position) with all channel categories of the server.
@@ -2503,9 +2512,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param name The name of the channels.
      * @return A sorted list (by position) with all channels with the given name.
      */
-    default List<ServerChannel> getRegularChannelsByName(String name) {
+    default List<RegularServerChannel> getRegularChannelsByName(String name) {
         return Collections.unmodifiableList(
-                getChannels().stream()
+                getRegularChannels().stream()
                         .filter(channel -> channel.getName().equals(name))
                         .collect(Collectors.toList()));
     }
@@ -2517,9 +2526,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param name The name of the channels.
      * @return A sorted list (by position) with all channels with the given name.
      */
-    default List<ServerChannel> getRegularChannelsByNameIgnoreCase(String name) {
+    default List<RegularServerChannel> getRegularChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
-                getChannels().stream()
+                getRegularChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
@@ -2576,6 +2585,58 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
                 getChannelCategories().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets an unknown channel by its id.
+     *
+     * @param id The id of the unknown channel.
+     * @return The unknown channel with the given id.
+     */
+    default Optional<UnknownServerChannel> getUnknownChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof UnknownServerChannel)
+                .map(channel -> (UnknownServerChannel) channel);
+    }
+
+    /**
+     * Gets an unknown channel by its id.
+     *
+     * @param id The id of the unknown channel.
+     * @return The unknown channel with the given id.
+     */
+    default Optional<UnknownServerChannel> getUnknownChannelById(String id) {
+        try {
+            return getUnknownChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets an unknown regular channel by its id.
+     *
+     * @param id The id of the unknown regular channel.
+     * @return The unknown regular channel with the given id.
+     */
+    default Optional<UnknownRegularServerChannel> getUnknownRegularChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof UnknownRegularServerChannel)
+                .map(channel -> (UnknownRegularServerChannel) channel);
+    }
+
+    /**
+     * Gets an unknown regular channel by its id.
+     *
+     * @param id The id of the unknown regular channel.
+     * @return The unknown regular channel with the given id.
+     */
+    default Optional<UnknownRegularServerChannel> getUnknownRegularChannelById(String id) {
+        try {
+            return getUnknownRegularChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**

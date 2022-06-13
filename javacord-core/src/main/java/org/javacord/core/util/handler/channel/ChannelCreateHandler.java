@@ -6,10 +6,12 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
-import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import org.javacord.api.event.channel.user.PrivateChannelCreateEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
@@ -73,9 +75,57 @@ public class ChannelCreateHandler extends PacketHandler {
             case CHANNEL_CATEGORY:
                 handleChannelCategory(packet);
                 break;
-            default:
-                logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
+            default: {
+                try {
+                    if (packet.has("position")) {
+                        showFallbackWarningMessage(packet.get("type").asInt(), "UnknownRegularServerChannel");
+                        handleUnknownRegularServerChannel(packet);
+                    } else {
+                        showFallbackWarningMessage(packet.get("type").asInt(), "UnknownServerChannel");
+                        handleUnknownServerChannel(packet);
+                    }
+                } catch (Exception exception) {
+                    logger.warn("An error occurred when trying to use a fallback channel implementation", exception);
+                }
+            }
         }
+    }
+
+    private void showFallbackWarningMessage(int channelType, String fallbackName) {
+        logger.warn("Encountered not handled channel type: {}. "
+                        + "Trying to use the {} fallback implementation",
+                channelType, fallbackName);
+    }
+
+    /**
+     * Handles unknown server channels creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleUnknownServerChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
+        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
+            UnknownServerChannel unknownServerChannel = ((ServerImpl) server).getOrCreateUnknownServerChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(unknownServerChannel);
+
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
+        });
+    }
+
+    /**
+     * Handles unknown regular server channels creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleUnknownRegularServerChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
+        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
+            UnknownRegularServerChannel unknownRegularServerChannel =
+                    ((ServerImpl) server).getOrCreateUnknownRegularServerChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(unknownRegularServerChannel);
+
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
+        });
     }
 
     /**
@@ -86,8 +136,8 @@ public class ChannelCreateHandler extends PacketHandler {
     private void handleServerForumChannel(JsonNode channel) {
         long serverId = channel.get("guild_id").asLong();
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
-            ServerChannel serverChannel = ((ServerImpl) server).getOrCreateServerForumChannel(channel);
-            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(serverChannel);
+            ServerForumChannel serverForumChannel = ((ServerImpl) server).getOrCreateServerForumChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(serverForumChannel);
 
             api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
         });

@@ -123,8 +123,16 @@ public class ChannelUpdateHandler extends PacketHandler {
                 handleRegularServerChannel(packet);
                 handleChannelCategory(packet);
                 break;
-            default:
-                logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
+            default: {
+                try {
+                    handleServerChannel(packet);
+                    if (packet.has("position")) {
+                        handleRegularServerChannel(packet);
+                    }
+                } catch (Exception exception) {
+                    logger.warn("An error occurred when trying to update a fallback channel implementation", exception);
+                }
+            }
         }
     }
 

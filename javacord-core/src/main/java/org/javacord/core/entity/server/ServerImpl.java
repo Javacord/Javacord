@@ -26,6 +26,8 @@ import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
@@ -59,6 +61,8 @@ import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.channel.UnknownRegularServerChannelImpl;
+import org.javacord.core.entity.channel.UnknownServerChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.sticker.StickerImpl;
@@ -356,6 +360,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     case SERVER_TEXT_CHANNEL:
                         getOrCreateServerTextChannel(channel);
                         break;
+                    case SERVER_FORUM_CHANNEL:
+                        getOrCreateServerForumChannel(channel);
+                        break;
                     case SERVER_VOICE_CHANNEL:
                         getOrCreateServerVoiceChannel(channel);
                         break;
@@ -376,8 +383,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         logger.debug("{} has a store channel. These are not supported in this Javacord version"
                                 + " and get ignored!", this);
                         break;
-                    default:
-                        logger.warn("Unknown or unexpected channel type. Your Javacord version might be outdated!");
+                    default: {
+                        try {
+                            if (channel.has("position")) {
+                                showFallbackWarningMessage(channel.get("type").asInt(), "UnknownRegularServerChannel");
+                                getOrCreateUnknownRegularServerChannel(channel);
+                            } else {
+                                showFallbackWarningMessage(channel.get("type").asInt(), "UnknownServerChannel");
+                                getOrCreateUnknownServerChannel(channel);
+                            }
+                        } catch (Exception exception) {
+                            logger.warn("An error occurred when trying to use a fallback channel implementation",
+                                    exception);
+                        }
+                    }
+
                 }
             }
         }
@@ -493,6 +513,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         api.addServerToCache(this);
+    }
+
+    private void showFallbackWarningMessage(int channelType, String fallbackName) {
+        logger.warn("Encountered not handled channel type: {}. "
+                        + "Trying to use the {} fallback implementation",
+                channelType, fallbackName);
     }
 
     /**
@@ -830,6 +856,35 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     // Invalid channel type
                     return null;
             }
+        }
+    }
+
+    /**
+     * Gets or creates an unknown server channel.
+     *
+     * @param data The json data of the channel.
+     * @return The unknown server channel.
+     */
+    public UnknownServerChannel getOrCreateUnknownServerChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            return getUnknownChannelById(id).orElseGet(() -> new UnknownServerChannelImpl(api, this, data));
+        }
+    }
+
+    /**
+     * Gets or creates an unknown regular server channel.
+     *
+     * @param data The json data of the channel.
+     * @return The unknown regular server channel.
+     */
+    public UnknownRegularServerChannel getOrCreateUnknownRegularServerChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            return getUnknownRegularChannelById(id)
+                    .orElseGet(() -> new UnknownRegularServerChannelImpl(api, this, data));
         }
     }
 
@@ -1735,6 +1790,17 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         serverThreadChannels));
 
         return Collections.unmodifiableList(channels);
+    }
+
+    @Override
+    public List<RegularServerChannel> getRegularChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(RegularServerChannel.class::isInstance)
+                .map(Channel::asRegularServerChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
     }
 
     @Override
