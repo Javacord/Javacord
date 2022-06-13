@@ -22,16 +22,15 @@ buildscript {
 if (JavaVersion.current().java9Compatible) {
     subprojects {
         task compileJava9(type: JavaCompile, dependsOn: [sourceSets.main.compileClasspath,
-                                                         sourceSets.main.runtimeClasspath]) {
+                                                         sourceSets.main.runtimeClasspath,
+                                                         compileJava]) {
             description 'Compiles main Java 9 source'
-            source sourceSets.main.java.matching { exclude 'org/javacord/core/entity/message/MessageSetImpl.java' }
             source 'src/main/java9/'
             classpath = files()
             destinationDirectory = file("$buildDir/classes/java9/main")
             sourceCompatibility = 9
             targetCompatibility = 9
-            options.compilerArgs << '--add-modules' << 'java.annotation'
-            options.compilerArgs << '--add-reads' << "org.javacord.$shortName=java.annotation"
+            options.compilerArgs << '--patch-module' << ("org.javacord.$shortName=${compileJava.destinationDirectory.get()}" as String)
             afterEvaluate {
                 // access SourceDirectorySet#asPath in afterEvaluate
                 // or projects get evaluated before all configuration is done
@@ -44,9 +43,7 @@ if (JavaVersion.current().java9Compatible) {
             manifest {
                 attributes 'Multi-Release': true
             }
-            from(compileJava9) {
-                include 'module-info.class'
-                include 'org/javacord/core/entity/message/MessageSetImpl.class'
+            from(compileJava9.destinationDirectory) {
                 into 'META-INF/versions/9/'
             }
         }
