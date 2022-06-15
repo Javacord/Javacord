@@ -3,7 +3,7 @@ package org.javacord.core.entity.webhook;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.core.util.FileContainer;
@@ -26,7 +26,7 @@ public class WebhookBuilderDelegateImpl implements WebhookBuilderDelegate {
     /**
      * The channel for the webhook.
      */
-    protected final ServerTextChannel channel;
+    protected final TextableRegularServerChannel channel;
 
     /**
      * The reason for the creation.
@@ -48,7 +48,7 @@ public class WebhookBuilderDelegateImpl implements WebhookBuilderDelegate {
      *
      * @param channel The channel for the webhook.
      */
-    public WebhookBuilderDelegateImpl(ServerTextChannel channel) {
+    public WebhookBuilderDelegateImpl(TextableRegularServerChannel channel) {
         this.channel = channel;
     }
 

@@ -17,6 +17,11 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
     protected Integer bitrate = null;
 
     /**
+     * The nsfw flag to update.
+     */
+    protected Boolean nsfw = null;
+
+    /**
      * The user limit to update.
      */
     protected Integer userLimit = null;
@@ -30,11 +35,6 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
      * Whether the category should be modified or not.
      */
     protected boolean modifyCategory = false;
-
-    /**
-     * Whether the channel is nsfw or not.
-     */
-    protected Boolean nsfw = null;
 
     /**
      * Creates a new server voice channel updater.
@@ -72,7 +72,7 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
     }
 
     @Override
-    public void setNsfw(boolean nsfw) {
+    public void setNsfw(Boolean nsfw) {
         this.nsfw = nsfw;
     }
 
@@ -83,16 +83,16 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
             body.put("bitrate", bitrate.intValue());
             patchChannel = true;
         }
+        if (nsfw != null) {
+            body.put("nsfw", nsfw.booleanValue());
+            patchChannel = true;
+        }
         if (userLimit != null) {
             body.put("user_limit", userLimit.intValue());
             patchChannel = true;
         }
         if (modifyCategory) {
             body.put("parent_id", category == null ? null : category.getIdAsString());
-            patchChannel = true;
-        }
-        if (nsfw != null) {
-            body.put("nsfw", nsfw);
             patchChannel = true;
         }
         return patchChannel;

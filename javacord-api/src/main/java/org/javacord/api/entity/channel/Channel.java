@@ -79,6 +79,15 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     }
 
     /**
+     * Gets the channel as textable regular server channel.
+     *
+     * @return The channel as textable regular server channel.
+     */
+    default Optional<TextableRegularServerChannel> asTextableRegularServerChannel() {
+        return as(TextableRegularServerChannel.class);
+    }
+
+    /**
      * Gets the channel as server forum channel.
      *
      * @return The channel as server forum channel.

@@ -12,6 +12,7 @@ import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
@@ -28,7 +29,6 @@ import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -1237,6 +1237,16 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     }
 
     /**
+     * Gets the server voice channel of the message.
+     * Only present if the message was sent in a server.
+     *
+     * @return The server voice channel.
+     */
+    default Optional<ServerVoiceChannel> getServerVoiceChannel() {
+        return getChannel().asServerVoiceChannel();
+    }
+
+    /**
      * Gets the server thread channel of the message.
      * Only present if the message was sent in a thread in a server.
      *
@@ -1262,7 +1272,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return The server of the message.
      */
     default Optional<Server> getServer() {
-        return getServerTextChannel()
+        return Optional.of(getChannel())
                 .map(Channel::asServerChannel)
                 .orElseGet(() -> getServerThreadChannel().flatMap(Channel::asServerChannel))
                 .map(ServerChannel::getServer);

@@ -2,6 +2,7 @@ package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.thread.ThreadMetadata;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.ServerThreadChannelAttachableListenerManager;
 
@@ -15,6 +16,77 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface ServerThreadChannel extends ServerChannel, TextChannel, Mentionable,
         ServerThreadChannelAttachableListenerManager {
+
+    @Override
+    default boolean canSee(User user) {
+        return getParent().canSee(user)
+                && (isPublic()
+                || isPrivate()
+                && getMembers().stream().anyMatch(threadMember -> threadMember.getUserId() == user.getId()));
+    }
+
+    @Override
+    default boolean canWrite(User user) {
+        return canSee(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.SEND_MESSAGES_IN_THREADS);
+    }
+
+    @Override
+    default boolean canUseExternalEmojis(User user) {
+        return canWrite(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.USE_EXTERNAL_EMOJIS);
+    }
+
+    @Override
+    default boolean canEmbedLinks(User user) {
+        return canWrite(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.EMBED_LINKS);
+    }
+
+    @Override
+    default boolean canReadMessageHistory(User user) {
+        return canSee(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.READ_MESSAGE_HISTORY);
+    }
+
+    @Override
+    default boolean canUseTts(User user) {
+        return canWrite(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.SEND_TTS_MESSAGES);
+    }
+
+    @Override
+    default boolean canAttachFiles(User user) {
+        return canWrite(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.ATTACH_FILE);
+    }
+
+    @Override
+    default boolean canAddNewReactions(User user) {
+        return canSee(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.ADD_REACTIONS);
+    }
+
+    @Override
+    default boolean canManageMessages(User user) {
+        return canSee(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MANAGE_MESSAGES);
+    }
+
+    @Override
+    default boolean canMentionEveryone(User user) {
+        return canWrite(user) && getParent().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MENTION_EVERYONE);
+    }
 
     /**
      * The parent regular server channel of this thread.
