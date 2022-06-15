@@ -33,7 +33,7 @@ dependencies {
     implementation("com.codahale:xsalsa20poly1305:0.11.0")
 
     // logging
-    implementation("org.apache.logging.log4j:log4j-api:2.17.1")
+    implementation("org.apache.logging.log4j:log4j-api:2.17.2")
 
     // Vavr, mainly for immutable collections
     // We are using 0.10.1, because of an issue in 0.10.2: https://github.com/vavr-io/vavr/issues/2573
