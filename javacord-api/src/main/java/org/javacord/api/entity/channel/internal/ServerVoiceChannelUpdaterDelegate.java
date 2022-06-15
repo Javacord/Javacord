@@ -46,5 +46,5 @@ public interface ServerVoiceChannelUpdaterDelegate extends RegularServerChannelU
      * @param nsfw Whether the channel should be marked as 'not safe for work'
      *             or not.
      */
-    void setNsfw(boolean nsfw);
+    void setNsfw(Boolean nsfw);
 }

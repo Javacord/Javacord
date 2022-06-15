@@ -8,6 +8,7 @@ import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
@@ -191,7 +192,7 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
-    public WebhookBuilderDelegate createWebhookBuilderDelegate(ServerTextChannel channel) {
+    public WebhookBuilderDelegate createWebhookBuilderDelegate(TextableRegularServerChannel channel) {
         return new WebhookBuilderDelegateImpl(channel);
     }
 
