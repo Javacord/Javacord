@@ -8,7 +8,6 @@ import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.MessageComponentInteraction;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.InteractionCallbackType;
-import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
@@ -33,7 +32,7 @@ public abstract class MessageComponentInteractionImpl extends InteractionImpl im
     public MessageComponentInteractionImpl(DiscordApiImpl api, TextChannel channel, JsonNode jsonData) {
         super(api, channel, jsonData);
 
-        message = new MessageImpl(api, channel, jsonData.get("message"));
+        message = api.getOrCreateMessage(channel, jsonData.get("message"));
 
         JsonNode data = jsonData.get("data");
         this.customId = data.get("custom_id").asText();
