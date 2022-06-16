@@ -54,9 +54,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     public CompletableFuture<Message> crossPost(String channelId, String messageId) {
         return new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channelId, messageId, "crosspost")
-                .execute(result ->
-                        new MessageImpl(api, api.getTextChannelById(channelId).orElseThrow(() ->
-                                new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
+                .execute(result -> api.getOrCreateMessage(api.getTextChannelById(channelId).orElseThrow(() ->
+                        new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
     }
 
     @Override
