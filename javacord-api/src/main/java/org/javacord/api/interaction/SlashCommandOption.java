@@ -336,6 +336,26 @@ public interface SlashCommandOption {
     }
 
     /**
+     * Create a new {@link SlashCommandOptionType#ATTACHMENT} slash command option to be used with a
+     * slash command builder. This is a convenience method.
+     *
+     * @param name        The name of the option.
+     * @param description The description of the option.
+     * @param required    Whether this option is required.
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createAttachmentOption(String name,
+                                                  String description,
+                                                  boolean required) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.ATTACHMENT)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
+                .build();
+    }
+
+    /**
      * Create a new {@link SlashCommandOptionType#LONG} slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
