@@ -236,8 +236,8 @@ class DiscordApiImplTest extends Specification {
         given:
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
-            ConfigurationProperties.httpProxyServerUsername username
-            ConfigurationProperties.httpProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationPassword password
 
         and:
             MockProxyManager.mockProxy.when(
@@ -272,8 +272,8 @@ class DiscordApiImplTest extends Specification {
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
             String credentials = Credentials.basic username, password
-            ConfigurationProperties.httpProxyServerUsername username
-            ConfigurationProperties.httpProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationPassword password
 
         and:
             MockProxyManager.mockProxy.when(
@@ -379,8 +379,8 @@ class DiscordApiImplTest extends Specification {
         and:
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
-            ConfigurationProperties.socksProxyServerUsername username
-            ConfigurationProperties.socksProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationPassword password
 
         and:
             def defaultAuthenticator = Authenticator.theAuthenticator
@@ -512,8 +512,8 @@ class DiscordApiImplTest extends Specification {
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
             String credentials = Credentials.basic username, password
-            ConfigurationProperties.httpProxyServerUsername username
-            ConfigurationProperties.httpProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationUsername password
 
         and:
             MockProxyManager.mockProxy.when(

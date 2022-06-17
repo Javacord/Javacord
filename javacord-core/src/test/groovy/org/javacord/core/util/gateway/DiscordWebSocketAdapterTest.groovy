@@ -223,8 +223,8 @@ class DiscordWebSocketAdapterTest extends Specification {
         given:
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
-            ConfigurationProperties.httpProxyServerUsername username
-            ConfigurationProperties.httpProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationPassword password
 
         and:
             MockProxyManager.mockProxy.when(
@@ -269,8 +269,8 @@ class DiscordWebSocketAdapterTest extends Specification {
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
             String credentials = Credentials.basic username, password
-            ConfigurationProperties.httpProxyServerUsername username
-            ConfigurationProperties.httpProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationPassword password
 
         and:
             MockProxyManager.mockProxy.when(
@@ -594,8 +594,8 @@ class DiscordWebSocketAdapterTest extends Specification {
             def username = UUID.randomUUID().toString()
             def password = UUID.randomUUID().toString()
             String credentials = Credentials.basic username, password
-            ConfigurationProperties.httpProxyServerUsername username
-            ConfigurationProperties.httpProxyServerPassword password
+            ConfigurationProperties.proxyAuthenticationUsername username
+            ConfigurationProperties.proxyAuthenticationPassword password
 
         and:
             MockProxyManager.mockProxy.when(
