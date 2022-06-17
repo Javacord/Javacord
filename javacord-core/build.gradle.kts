@@ -24,7 +24,7 @@ dependencies {
     // the JSON-lib because Discord returns in JSON format
     // Update when upgrading to Java 11+
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.6")
 
     // the web socket
     implementation("com.neovisionaries:nv-websocket-client:2.14")

@@ -24,6 +24,6 @@ project(':javacord-core') {
         testImplementation 'org.mock-server:mockserver-netty:5.13.2'
         testImplementation 'io.netty:netty-codec-http'
 
-        testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
+        testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.2'
     }
 }
