@@ -1,12 +1,14 @@
 package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.AttachmentImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -32,6 +34,7 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
 
         JsonNode data = jsonData.get("data");
         Map<Long, User> resolvedUsers = new HashMap<>();
+        Map<Long, Attachment> resolvedAttachments = new HashMap<>();
         if (data.has("resolved")) {
             JsonNode resolved = data.get("resolved");
             if (jsonData.has("guild_id")) {
@@ -54,11 +57,20 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
                     }
                 });
             }
+
+            if (resolved.has("attachments")) {
+                resolved.get("attachments").fields().forEachRemaining(attachmentNode ->
+                        resolvedAttachments.put(
+                                Long.parseLong(attachmentNode.getKey()),
+                                new AttachmentImpl(api, attachmentNode.getValue())
+                        )
+                );
+            }
         }
         options = new ArrayList<>();
         if (data.has("options") && data.get("options").isArray()) {
             for (JsonNode optionJson : data.get("options")) {
-                options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers));
+                options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers, resolvedAttachments));
             }
         }
     }

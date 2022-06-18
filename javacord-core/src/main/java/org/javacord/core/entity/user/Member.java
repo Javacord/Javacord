@@ -112,6 +112,20 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     Optional<Instant> getServerBoostingSinceTimestamp();
 
     /**
+     * Gets the muted state of this member.
+     *
+     * @return Whether or not this member is muted.
+     */
+    boolean isMuted();
+
+    /**
+     * Gets the deafened state of this member.
+     *
+     * @return Whether or not this member is deafened.
+     */
+    boolean isDeafened();
+
+    /**
      * Gets the self-muted state of this member.
      *
      * @return Whether this member is self-muted.

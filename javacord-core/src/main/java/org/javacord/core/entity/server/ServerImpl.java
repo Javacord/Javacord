@@ -21,10 +21,13 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
@@ -53,10 +56,13 @@ import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.RegularServerChannelImpl;
+import org.javacord.core.entity.channel.ServerForumChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.channel.UnknownRegularServerChannelImpl;
+import org.javacord.core.entity.channel.UnknownServerChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.sticker.StickerImpl;
@@ -91,7 +97,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -211,16 +216,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * A map with all roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
-
-    /**
-     * A set with all members that are muted.
-     */
-    private final Set<Long> muted = new ConcurrentSkipListSet<>();
-
-    /**
-     * A set with all members that are deafened.
-     */
-    private final Set<Long> deafened = new ConcurrentSkipListSet<>();
 
     /**
      * A list with all custom emojis from this server.
@@ -365,6 +360,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     case SERVER_TEXT_CHANNEL:
                         getOrCreateServerTextChannel(channel);
                         break;
+                    case SERVER_FORUM_CHANNEL:
+                        getOrCreateServerForumChannel(channel);
+                        break;
                     case SERVER_VOICE_CHANNEL:
                         getOrCreateServerVoiceChannel(channel);
                         break;
@@ -385,8 +383,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         logger.debug("{} has a store channel. These are not supported in this Javacord version"
                                 + " and get ignored!", this);
                         break;
-                    default:
-                        logger.warn("Unknown or unexpected channel type. Your Javacord version might be outdated!");
+                    default: {
+                        try {
+                            if (channel.has("position")) {
+                                showFallbackWarningMessage(channel.get("type").asInt(), "UnknownRegularServerChannel");
+                                getOrCreateUnknownRegularServerChannel(channel);
+                            } else {
+                                showFallbackWarningMessage(channel.get("type").asInt(), "UnknownServerChannel");
+                                getOrCreateUnknownServerChannel(channel);
+                            }
+                        } catch (Exception exception) {
+                            logger.warn("An error occurred when trying to use a fallback channel implementation",
+                                    exception);
+                        }
+                    }
+
                 }
             }
         }
@@ -502,6 +513,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         api.addServerToCache(this);
+    }
+
+    private void showFallbackWarningMessage(int channelType, String fallbackName) {
+        logger.warn("Encountered not handled channel type: {}. "
+                        + "Trying to use the {} fallback implementation",
+                channelType, fallbackName);
     }
 
     /**
@@ -823,13 +840,60 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
+     * Gets or creates a server forum channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server forum channel.
+     */
+    public ServerForumChannel getOrCreateServerForumChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            switch (type) {
+                case SERVER_FORUM_CHANNEL:
+                    return getForumChannelById(id).orElseGet(() -> new ServerForumChannelImpl(api, this, data));
+                default:
+                    // Invalid channel type
+                    return null;
+            }
+        }
+    }
+
+    /**
+     * Gets or creates an unknown server channel.
+     *
+     * @param data The json data of the channel.
+     * @return The unknown server channel.
+     */
+    public UnknownServerChannel getOrCreateUnknownServerChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            return getUnknownChannelById(id).orElseGet(() -> new UnknownServerChannelImpl(api, this, data));
+        }
+    }
+
+    /**
+     * Gets or creates an unknown regular server channel.
+     *
+     * @param data The json data of the channel.
+     * @return The unknown regular server channel.
+     */
+    public UnknownRegularServerChannel getOrCreateUnknownRegularServerChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            return getUnknownRegularChannelById(id)
+                    .orElseGet(() -> new UnknownRegularServerChannelImpl(api, this, data));
+        }
+    }
+
+    /**
      * Removes a member from the server.
      *
      * @param userId The id of the user to remove.
      */
     public void removeMember(long userId) {
-        muted.remove(userId);
-        deafened.remove(userId);
         api.removeMemberFromCache(userId, getId());
     }
 
@@ -865,34 +929,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public void incrementMemberCount() {
         memberCount.incrementAndGet();
-    }
-
-    /**
-     * Sets the muted state of the user with the given id.
-     *
-     * @param userId The id of the user.
-     * @param muted  Whether the user with the given id is muted or not.
-     */
-    public void setMuted(long userId, boolean muted) {
-        if (muted) {
-            this.muted.add(userId);
-        } else {
-            this.muted.remove(userId);
-        }
-    }
-
-    /**
-     * Sets the deafened state of the user with the given id.
-     *
-     * @param userId   The id of the user.
-     * @param deafened Whether the user with the given id is deafened or not.
-     */
-    public void setDeafened(long userId, boolean deafened) {
-        if (deafened) {
-            this.deafened.add(userId);
-        } else {
-            this.deafened.remove(userId);
-        }
     }
 
     /**
@@ -1231,12 +1267,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public boolean isMuted(long userId) {
-        return muted.contains(userId);
+        return getRealMemberById(userId)
+                .map(Member::isMuted)
+                .orElse(false);
     }
 
     @Override
     public boolean isDeafened(long userId) {
-        return deafened.contains(userId);
+        return getRealMemberById(userId)
+                .map(Member::isDeafened)
+                .orElse(false);
     }
 
     @Override
@@ -1735,21 +1775,32 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             channels.addAll(category.getChannels());
         });
 
-        final Map<ServerTextChannel, List<ServerThreadChannel>> serverTextChannelThreads = new HashMap<>();
+        final Map<RegularServerChannel, List<ServerThreadChannel>> regularServerChannelThreads = new HashMap<>();
         getThreadChannels().forEach(serverThreadChannel -> {
-            final ServerTextChannel serverTextChannel = serverThreadChannel.getParent();
-            serverTextChannelThreads.merge(serverTextChannel,
+            final RegularServerChannel regularServerChannel = serverThreadChannel.getParent();
+            regularServerChannelThreads.merge(regularServerChannel,
                     new ArrayList<>(Collections.singletonList(serverThreadChannel)),
                     (serverThreadChannels, serverThreadChannels2) -> {
                         serverThreadChannels.addAll(serverThreadChannels2);
                         return new ArrayList<>(serverThreadChannels);
                     });
         });
-        serverTextChannelThreads.forEach(
+        regularServerChannelThreads.forEach(
                 (serverTextChannel, serverThreadChannels) -> channels.addAll(channels.indexOf(serverTextChannel) + 1,
                         serverThreadChannels));
 
         return Collections.unmodifiableList(channels);
+    }
+
+    @Override
+    public List<RegularServerChannel> getRegularChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(RegularServerChannel.class::isInstance)
+                .map(Channel::asRegularServerChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -1768,6 +1819,17 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(ServerTextChannel.class::isInstance)
                 .map(Channel::asServerTextChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<ServerForumChannel> getForumChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(ServerForumChannel.class::isInstance)
+                .map(Channel::asServerForumChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
@@ -1801,6 +1863,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         return api.getEntityCache().get().getChannelCache().getChannelById(id)
                 .filter(ServerChannel.class::isInstance)
                 .map(ServerChannel.class::cast);
+    }
+
+    @Override
+    public Optional<RegularServerChannel> getRegularChannelById(long id) {
+        return api.getEntityCache().get().getChannelCache().getChannelById(id)
+                .filter(RegularServerChannel.class::isInstance)
+                .map(RegularServerChannel.class::cast);
     }
 
     @Override

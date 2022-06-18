@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -17,10 +22,13 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     private final long id;
     private final long applicationId;
     private final String name;
+    private final Map<DiscordLocale, String> nameLocalizations = new HashMap<>();
     private final boolean defaultPermission;
     private final String description;
+    private final Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
 
     private final Server server;
+    private final Long serverId;
 
     /**
      * Class constructor.
@@ -33,10 +41,17 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
         id = data.get("id").asLong();
         applicationId = data.get("application_id").asLong();
         name = data.get("name").asText();
+        data.path("name_localizations").fields().forEachRemaining(e ->
+                nameLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         description = data.get("description").asText();
+        data.path("description_localizations").fields().forEachRemaining(e ->
+                descriptionLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         defaultPermission = !data.hasNonNull("default_permission") || data.get("default_permission").asBoolean();
-        server = data.has("guild_id")
-                ? api.getPossiblyUnreadyServerById(data.get("guild_id").asLong()).orElseThrow(AssertionError::new)
+        serverId = data.has("guild_id")
+                ? data.get("guild_id").asLong()
+                : null;
+        server = serverId != null
+                ? api.getPossiblyUnreadyServerById(serverId).orElse(null)
                 : null;
     }
 
@@ -61,13 +76,28 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
+    public Map<DiscordLocale, String> getNameLocalizations() {
+        return Collections.unmodifiableMap(nameLocalizations);
+    }
+
+    @Override
     public String getDescription() {
         return description;
     }
 
     @Override
+    public Map<DiscordLocale, String> getDescriptionLocalizations() {
+        return Collections.unmodifiableMap(descriptionLocalizations);
+    }
+
+    @Override
     public boolean getDefaultPermission() {
         return defaultPermission;
+    }
+
+    @Override
+    public Optional<Long> getServerId() {
+        return Optional.ofNullable(serverId);
     }
 
     @Override
@@ -77,12 +107,12 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
 
     @Override
     public boolean isGlobalApplicationCommand() {
-        return server == null;
+        return serverId == null;
     }
 
     @Override
     public boolean isServerApplicationCommand() {
-        return server != null;
+        return serverId != null;
     }
 
     @Override
@@ -93,9 +123,9 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
-    public CompletableFuture<Void> deleteForServer(Server server) {
+    public CompletableFuture<Void> deleteForServer(long server) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(getApplicationId()), server.getIdAsString(), getIdAsString())
+                .setUrlParameters(String.valueOf(getApplicationId()), String.valueOf(server), getIdAsString())
                 .execute(result -> null);
     }
 }

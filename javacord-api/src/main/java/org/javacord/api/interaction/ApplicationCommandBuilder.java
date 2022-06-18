@@ -27,6 +27,41 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
     }
 
     /**
+     * Adds a name localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The command name localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addNameLocalization(DiscordLocale locale, String localization) {
+        delegate.addNameLocalization(locale, localization);
+        return (T) this;
+    }
+
+    /**
+     * Sets the description of the slash command.
+     *
+     * @param description The description.
+     * @return The current instance in order to chain call methods.
+     */
+    public T setDescription(String description) {
+        delegate.setDescription(description);
+        return (T) this;
+    }
+
+    /**
+     * Adds a description localization for the given locale.
+     *
+     * @param locale The locale to add a localization for.
+     * @param localization The command description localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addDescriptionLocalization(DiscordLocale locale, String localization) {
+        delegate.addDescriptionLocalization(locale, localization);
+        return (T) this;
+    }
+
+    /**
      * Sets the default permission for the message context menu
      * whether the context menu is enabled by default when the app is added to a server.
      *
@@ -68,7 +103,21 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
      * @return The built application command.
      */
     public CompletableFuture<R> createForServer(Server server) {
-        return delegate.createForServer(server);
+        return delegate.createForServer(server.getApi(), server.getId());
+    }
+
+
+    /**
+     * Creates an application command for a specific server.
+     * When used to create multiple server application commands at once
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} should be used instead.
+     *
+     * @param api The discord api instance.
+     * @param server The server.
+     * @return The built application command.
+     */
+    public CompletableFuture<R> createForServer(DiscordApi api, long server) {
+        return delegate.createForServer(api, server);
     }
 
 }

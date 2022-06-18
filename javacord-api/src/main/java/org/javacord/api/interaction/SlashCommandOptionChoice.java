@@ -1,5 +1,6 @@
 package org.javacord.api.interaction;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -13,6 +14,13 @@ public interface SlashCommandOptionChoice {
      * @return The name of the choice.
      */
     String getName();
+
+    /**
+     * Gets the name localizations for this choice.
+     *
+     * @return The name localizations for this choice.
+     */
+    Map<DiscordLocale, String> getNameLocalizations();
 
     /**
      * Gets the string value of this choice.

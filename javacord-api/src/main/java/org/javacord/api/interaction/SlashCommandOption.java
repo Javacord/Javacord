@@ -1,9 +1,11 @@
 package org.javacord.api.interaction;
 
 import org.javacord.api.entity.channel.ChannelType;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,11 +30,25 @@ public interface SlashCommandOption {
     String getName();
 
     /**
+     * Gets the name localizations for this option.
+     *
+     * @return The name localizations for this option.
+     */
+    Map<DiscordLocale, String> getNameLocalizations();
+
+    /**
      * Gets the description of this option.
      *
      * @return The description of this option.
      */
     String getDescription();
+
+    /**
+     * Gets the description localizations for this option.
+     *
+     * @return The description localizations for this option.
+     */
+    Map<DiscordLocale, String> getDescriptionLocalizations();
 
     /**
      * Checks whether this option is required.
@@ -316,6 +332,26 @@ public interface SlashCommandOption {
                 .setRequired(required)
                 .setDecimalMinValue(minValue)
                 .setDecimalMaxValue(maxValue)
+                .build();
+    }
+
+    /**
+     * Create a new {@link SlashCommandOptionType#ATTACHMENT} slash command option to be used with a
+     * slash command builder. This is a convenience method.
+     *
+     * @param name        The name of the option.
+     * @param description The description of the option.
+     * @param required    Whether this option is required.
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createAttachmentOption(String name,
+                                                  String description,
+                                                  boolean required) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.ATTACHMENT)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
                 .build();
     }
 

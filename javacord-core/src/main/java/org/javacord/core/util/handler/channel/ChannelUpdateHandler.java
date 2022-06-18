@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
@@ -28,6 +29,7 @@ import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeUserL
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.RegularServerChannelImpl;
 import org.javacord.core.entity.channel.ServerChannelImpl;
+import org.javacord.core.entity.channel.ServerForumChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
@@ -82,9 +84,6 @@ public class ChannelUpdateHandler extends PacketHandler {
                 handleRegularServerChannel(packet);
                 handleServerTextChannel(packet);
                 break;
-            case PRIVATE_CHANNEL:
-                handlePrivateChannel(packet);
-                break;
             case SERVER_VOICE_CHANNEL:
                 handleServerChannel(packet);
                 handleRegularServerChannel(packet);
@@ -96,13 +95,10 @@ public class ChannelUpdateHandler extends PacketHandler {
                 handleServerVoiceChannel(packet);
                 handleServerStageVoiceChannel(packet);
                 break;
-            case GROUP_CHANNEL:
-                logger.info("Received CHANNEL_UPDATE packet for a group channel. This should be impossible.");
-                break;
-            case CHANNEL_CATEGORY:
+            case SERVER_FORUM_CHANNEL:
                 handleServerChannel(packet);
                 handleRegularServerChannel(packet);
-                handleChannelCategory(packet);
+                //handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
                 logger.debug("Received CHANNEL_UPDATE packet for a news channel. In this Javacord version it is "
@@ -116,8 +112,27 @@ public class ChannelUpdateHandler extends PacketHandler {
                 logger.debug("Received CHANNEL_UPDATE packet for a store channel. These are not supported in this"
                         + " Javacord version and get ignored!");
                 break;
-            default:
-                logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
+            case PRIVATE_CHANNEL:
+                handlePrivateChannel(packet);
+                break;
+            case GROUP_CHANNEL:
+                logger.info("Received CHANNEL_UPDATE packet for a group channel. This should be impossible.");
+                break;
+            case CHANNEL_CATEGORY:
+                handleServerChannel(packet);
+                handleRegularServerChannel(packet);
+                handleChannelCategory(packet);
+                break;
+            default: {
+                try {
+                    handleServerChannel(packet);
+                    if (packet.has("position")) {
+                        handleRegularServerChannel(packet);
+                    }
+                } catch (Exception exception) {
+                    logger.warn("An error occurred when trying to update a fallback channel implementation", exception);
+                }
+            }
         }
     }
 
@@ -383,6 +398,22 @@ public class ChannelUpdateHandler extends PacketHandler {
             );
 
         }
+    }
+
+    /**
+     * Handles a server forum channel update.
+     *
+     * @param jsonChannel The json channel data.
+     */
+    private void handleServerForumChannel(JsonNode jsonChannel) {
+        long channelId = jsonChannel.get("id").asLong();
+        Optional<ServerForumChannel> optionalChannel = api.getServerForumChannelById(channelId);
+        if (!optionalChannel.isPresent()) {
+            LoggerUtil.logMissingChannel(logger, channelId);
+            return;
+        }
+
+        ServerForumChannelImpl channel = (ServerForumChannelImpl) optionalChannel.get();
     }
 
     /**

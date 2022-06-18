@@ -13,13 +13,6 @@ import java.util.List;
 public interface SlashCommandBuilderDelegate extends ApplicationCommandBuilderDelegate<SlashCommand> {
 
     /**
-     * Sets the description of the slash command.
-     *
-     * @param description The name.
-     */
-    void setDescription(String description);
-
-    /**
      * Adds a slash command option to the slash command.
      *
      * @param option The option.

@@ -21,6 +21,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
@@ -1581,9 +1582,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
-            Server server, List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
+            long server, List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
         return new RestRequest<List<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+                .setUrlParameters(String.valueOf(clientId), String.valueOf(server))
                 .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
                 .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
@@ -2125,6 +2126,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Collection<ServerTextChannel> getServerTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
+    }
+
+    @Override
+    public Set<ServerForumChannel> getServerForumChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_FORUM_CHANNEL);
     }
 
     @Override

@@ -3,6 +3,7 @@ import java.time.Instant
 plugins {
     `java-library`
     id("com.gorylenko.gradle-git-properties") version "2.4.0"
+    id("biz.aQute.bnd.builder") version "6.2.0"
 }
 
 repositories {
@@ -28,4 +29,22 @@ java {
 gitProperties {
     customProperty("version", version)
     customProperty("buildTimestamp", Instant.now())
+}
+
+tasks.jar {
+    bundle {
+        val version by archiveVersion
+        bnd(
+            mapOf(
+                "Export-Package" to listOf(
+                    "!org.javacord.*.internal.*",
+                    "*",
+                    "version=$version",
+                    "-noimport:=true"
+                ).joinToString(";"),
+                // work-around for https://github.com/bndtools/bnd/issues/2227
+                "-fixupmessages" to "^Classes found in the wrong directory: \\\\{META-INF/versions/9/module-info\\\\.class=module-info}$"
+            )
+        )
+    }
 }

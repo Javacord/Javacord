@@ -19,6 +19,7 @@ public enum SlashCommandOptionType {
      * Any double between -2^53 and 2^53. This is the NUMBER option according to the Discord docs.
      */
     DECIMAL(10),
+    ATTACHMENT(11),
     UNKNOWN(-1);
 
     private final int value;

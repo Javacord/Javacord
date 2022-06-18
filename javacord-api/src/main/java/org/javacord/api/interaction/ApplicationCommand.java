@@ -4,6 +4,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.Specializable;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,6 +39,13 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     String getName();
 
     /**
+     * Gets the name localizations of this command.
+     *
+     * @return The name localizations of this command.
+     */
+    Map<DiscordLocale, String> getNameLocalizations();
+
+    /**
      * Gets the description of this command.
      *
      * @return The description of this command.
@@ -45,11 +53,25 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     String getDescription();
 
     /**
+     * Gets the description localizations of this command.
+     *
+     * @return The description localizations of this command.
+     */
+    Map<DiscordLocale, String> getDescriptionLocalizations();
+
+    /**
      * Gets the default permission of this command.
      *
      * @return The default permission of this command.
      */
     boolean getDefaultPermission();
+
+    /**
+     * Gets the server id of this command if it is not global.
+     *
+     * @return The server of this command.
+     */
+    Optional<Long> getServerId();
 
     /**
      * Gets the server of this command if it is not global.
@@ -78,10 +100,20 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     CompletableFuture<Void> deleteGlobal();
 
     /**
-     * Deletes this application command globally.
+     * Deletes this application command for a server.
      *
      * @param server The server where the command should be deleted from.
      * @return A future to check if the deletion was successful.
      */
-    CompletableFuture<Void> deleteForServer(Server server);
+    default CompletableFuture<Void> deleteForServer(Server server) {
+        return deleteForServer(server.getId());
+    }
+
+    /**
+     * Deletes this application command for a server.
+     *
+     * @param server The server where the command should be deleted from.
+     * @return A future to check if the deletion was successful.
+     */
+    CompletableFuture<Void> deleteForServer(long server);
 }

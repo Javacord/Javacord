@@ -10,7 +10,7 @@ import spock.lang.Subject
 @Subject(RestRequestResult)
 class RestRequestResultTest extends Specification {
 
-    def 'jsonBody is not null, but NullNode if response body is empty'() {
+    def 'jsonBody is not null, but MissingNode if response body is empty'() {
         given:
             def request = new Request.Builder()
                     .url('http://localhost')
@@ -20,7 +20,7 @@ class RestRequestResultTest extends Specification {
                     .protocol(Protocol.HTTP_1_1)
                     .code(0)
                     .message('')
-                    .body(ResponseBody.create(null, ''))
+                    .body(ResponseBody.create('', null))
                     .build()
 
         when:
@@ -28,7 +28,7 @@ class RestRequestResultTest extends Specification {
 
         then:
             result.jsonBody != null
-            result.jsonBody.isNull()
+            result.jsonBody.isMissingNode()
     }
 
 }

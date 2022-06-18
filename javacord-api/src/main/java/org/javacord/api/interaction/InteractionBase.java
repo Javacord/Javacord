@@ -133,13 +133,13 @@ public interface InteractionBase extends DiscordEntity {
      *
      * @return The user selected language.
      */
-    String getLocale();
+    DiscordLocale getLocale();
 
     /**
      * Gets the server's preferred locale, if invoked in a server.
      *
      * @return The server's preferred locale.
      */
-    Optional<String> getServerLocale();
+    Optional<DiscordLocale> getServerLocale();
 
 }

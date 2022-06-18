@@ -13,6 +13,7 @@ import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.Interaction;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
@@ -51,8 +52,8 @@ public abstract class InteractionImpl implements Interaction {
     private final UserImpl user;
     private final String token;
     private final int version;
-    private final String locale;
-    private final String serverLocale;
+    private final DiscordLocale locale;
+    private final DiscordLocale serverLocale;
 
     /**
      * Class constructor.
@@ -83,8 +84,9 @@ public abstract class InteractionImpl implements Interaction {
         }
         token = jsonData.get("token").asText();
         version = jsonData.get("version").asInt();
-        locale = jsonData.get("locale").asText();
-        serverLocale = jsonData.hasNonNull("guild_locale") ? jsonData.get("guild_locale").asText() : null;
+        locale = DiscordLocale.fromLocaleCode(jsonData.get("locale").asText());
+        serverLocale = jsonData.hasNonNull("guild_locale")
+                ? DiscordLocale.fromLocaleCode(jsonData.get("guild_locale").asText()) : null;
     }
 
     @Override
@@ -147,10 +149,7 @@ public abstract class InteractionImpl implements Interaction {
                 .includeAuthorizationHeader(false)
                 .consumeGlobalRatelimit(false)
                 .setBody(body)
-                .execute(result -> {
-                    System.out.println(result.getJsonBody());
-                    return null;
-                });
+                .execute(result -> null);
     }
 
     @Override
@@ -184,12 +183,12 @@ public abstract class InteractionImpl implements Interaction {
     }
 
     @Override
-    public String getLocale() {
+    public DiscordLocale getLocale() {
         return locale;
     }
 
     @Override
-    public Optional<String> getServerLocale() {
+    public Optional<DiscordLocale> getServerLocale() {
         return Optional.ofNullable(serverLocale);
     }
 }
