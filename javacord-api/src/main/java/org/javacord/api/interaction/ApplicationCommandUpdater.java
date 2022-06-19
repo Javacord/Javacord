@@ -72,9 +72,9 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
      * @param requiredPermissions The required permissions to use this command.
      * @return The current instance in order to chain call methods.
      */
-    public T setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
+    public B setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
         delegate.setDefaultEnabledForPermissions(EnumSet.copyOf(Arrays.asList(requiredPermissions)));
-        return (T) this;
+        return (B) this;
     }
 
     /**
@@ -85,9 +85,9 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
      * @param requiredPermissions The required permissions to use this command.
      * @return The current instance in order to chain call methods.
      */
-    public T setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions) {
+    public B setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions) {
         delegate.setDefaultEnabledForPermissions(requiredPermissions);
-        return (T) this;
+        return (B) this;
     }
 
     /**
@@ -95,9 +95,9 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
      * This can later be overridden by server admins.
      * @return The current instance in order to chain call methods.
      */
-    public T setDefaultEnabledForEveryone() {
+    public B setDefaultEnabledForEveryone() {
         delegate.setDefaultEnabledForEveryone();
-        return (T) this;
+        return (B) this;
     }
 
     /**
@@ -106,9 +106,9 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
      *
      * @return Whether this command is disabled by default.
      */
-    public T setDefaultDisabled() {
+    public B setDefaultDisabled() {
         delegate.setDefaultDisabled();
-        return (T) this;
+        return (B) this;
     }
 
     /**
@@ -118,9 +118,9 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
      * @param enabledInDms Whether the command is enabled in DMs
      * @return The current instance in order to chain call methods.
      */
-    public T setEnabledInDms(boolean enabledInDms) {
+    public B setEnabledInDms(boolean enabledInDms) {
         delegate.setEnabledInDms(enabledInDms);
-        return (T) this;
+        return (B) this;
     }
 
     /**
