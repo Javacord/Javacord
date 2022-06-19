@@ -57,7 +57,6 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
                 .collect(Collectors.toCollection(() -> EnumSet.noneOf(PermissionType.class))) : null;
         data.path("description_localizations").fields().forEachRemaining(e ->
                 descriptionLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
-        defaultPermission = !data.hasNonNull("default_permission") || data.get("default_permission").asBoolean();
         serverId = data.has("guild_id")
                 ? data.get("guild_id").asLong()
                 : null;

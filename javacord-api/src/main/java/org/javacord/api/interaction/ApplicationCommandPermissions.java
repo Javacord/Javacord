@@ -2,6 +2,7 @@ package org.javacord.api.interaction;
 
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 
 import java.util.Optional;
@@ -51,16 +52,28 @@ public interface ApplicationCommandPermissions {
     Optional<ServerChannel> getChannel();
 
     /**
+     * Gets the server this command permissions belongs to.
+     *
+     * @return The server this command permissions belongs to.
+     */
+    Server getServer();
+
+    /**
      * Gets whether these permissions affect all the server's channels.
      *
      * @return Whether these permissions affect all the server's channels.
      */
-    boolean affectsAllChannels();
+    default boolean affectsAllChannels() {
+        return getId() == getServer().getId() - 1;
+    }
 
     /**
      * Gets whether these permissions affect the everyone role.
      *
      * @return Whether these permissions affect the everyone role.
      */
-    boolean affectsEveryoneRole();
+    default boolean affectsEveryoneRole() {
+        return getId() == getServer().getEveryoneRole().getId();
+    }
+
 }

@@ -1,9 +1,11 @@
 package org.javacord.api.interaction.internal;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
 
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 public interface ApplicationCommandBuilderDelegate<T extends ApplicationCommand> {
@@ -44,7 +46,7 @@ public interface ApplicationCommandBuilderDelegate<T extends ApplicationCommand>
      *
      * @param requiredPermissions The required permissions to use this command.
      */
-    void setDefaultEnabledForPermissions(PermissionType... requiredPermissions);
+    void setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions);
 
     /**
      * Enables this command for use by all users.

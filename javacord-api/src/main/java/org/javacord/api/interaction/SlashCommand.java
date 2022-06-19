@@ -1,9 +1,11 @@
 package org.javacord.api.interaction;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ public interface SlashCommand extends ApplicationCommand {
      * Call {@link SlashCommandBuilder#createForServer(Server)} or
      * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
-     * @param name The name of the new slash command.
+     * @param name        The name of the new slash command.
      * @param description The description of the new slash command.
      * @return The new slash command builder
      */
@@ -36,9 +38,9 @@ public interface SlashCommand extends ApplicationCommand {
      * Call {@link SlashCommandBuilder#createForServer(Server)} or
      * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
-     * @param name The name of the new slash command.
+     * @param name        The name of the new slash command.
      * @param description The description of the new slash command.
-     * @param options The options to add to the command
+     * @param options     The options to add to the command
      * @return The new slash command builder
      */
     static SlashCommandBuilder with(String name, String description, SlashCommandOptionBuilder... options) {
@@ -52,13 +54,84 @@ public interface SlashCommand extends ApplicationCommand {
      * Call {@link SlashCommandBuilder#createForServer(Server)} or
      * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
-     * @param name The name of the new slash command.
+     * @param name        The name of the new slash command.
      * @param description The description of the new slash command.
-     * @param options The options to add to the command
+     * @param options     The options to add to the command
      * @return The new slash command builder
      */
     static SlashCommandBuilder with(String name, String description, List<SlashCommandOption> options) {
         return with(name, description).setOptions(options);
+    }
+
+    /**
+     * Create a new slash command builder with the given name and description.
+     * Call {@link SlashCommandBuilder#createForServer(Server)} or
+     * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name                The name of the new slash command.
+     * @param description         The description of the new slash command.
+     * @param requiredPermissions The required permissions to be able to use this command.
+     * @return The new slash command builder
+     */
+    static SlashCommandBuilder withRequiredPermissions(String name, String description,
+                                                       PermissionType... requiredPermissions) {
+        return new SlashCommandBuilder()
+                .setName(name)
+                .setDefaultEnabledForPermissions(requiredPermissions)
+                .setDescription(description);
+    }
+
+    /**
+     * Create a new slash command builder with the given name and description.
+     * Call {@link SlashCommandBuilder#createForServer(Server)} or
+     * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name                The name of the new slash command.
+     * @param description         The description of the new slash command.
+     * @param requiredPermissions The required permissions to be able to use this command.
+     * @return The new slash command builder
+     */
+    static SlashCommandBuilder withRequiredPermissions(String name, String description,
+                                                       EnumSet<PermissionType> requiredPermissions) {
+        return new SlashCommandBuilder()
+                .setName(name)
+                .setDefaultEnabledForPermissions(requiredPermissions)
+                .setDescription(description);
+    }
+
+
+    /**
+     * Create a new slash command builder with the given name, description and options.
+     * Call {@link SlashCommandBuilder#createForServer(Server)} or
+     * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name                The name of the new slash command.
+     * @param description         The description of the new slash command.
+     * @param options             The options to add to the command
+     * @param requiredPermissions The required permissions to be able to use this command.
+     * @return The new slash command builder
+     */
+    static SlashCommandBuilder withRequiredPermissions(String name, String description,
+                                                       List<SlashCommandOption> options,
+                                                       PermissionType... requiredPermissions) {
+        return with(name, description).setOptions(options).setDefaultEnabledForPermissions(requiredPermissions);
+    }
+
+    /**
+     * Create a new slash command builder with the given name, description and options.
+     * Call {@link SlashCommandBuilder#createForServer(Server)} or
+     * {@link SlashCommandBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
+     *
+     * @param name                The name of the new slash command.
+     * @param description         The description of the new slash command.
+     * @param options             The options to add to the command
+     * @param requiredPermissions The required permissions to be able to use this command.
+     * @return The new slash command builder
+     */
+    static SlashCommandBuilder withRequiredPermissions(String name, String description,
+                                                       List<SlashCommandOption> options,
+                                                       EnumSet<PermissionType> requiredPermissions) {
+        return with(name, description).setOptions(options).setDefaultEnabledForPermissions(requiredPermissions);
     }
 
     /**
