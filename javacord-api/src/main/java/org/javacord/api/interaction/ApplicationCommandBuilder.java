@@ -4,6 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -71,6 +73,19 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
      * @return The current instance in order to chain call methods.
      */
     public T setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
+        delegate.setDefaultEnabledForPermissions(EnumSet.copyOf(Arrays.asList(requiredPermissions)));
+        return (T) this;
+    }
+
+    /**
+     * Sets the default required permissions to be able to use this command.
+     * Passing no arguments will cause the command to be available to admins only.
+     * This can later be overridden by server admins.
+     *
+     * @param requiredPermissions The required permissions to use this command.
+     * @return The current instance in order to chain call methods.
+     */
+    public T setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions) {
         delegate.setDefaultEnabledForPermissions(requiredPermissions);
         return (T) this;
     }

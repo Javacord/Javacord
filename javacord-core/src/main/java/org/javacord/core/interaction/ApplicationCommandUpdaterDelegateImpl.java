@@ -6,7 +6,7 @@ import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.internal.ApplicationCommandUpdaterDelegate;
 
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,8 +48,8 @@ public abstract class ApplicationCommandUpdaterDelegateImpl<T extends Applicatio
     }
 
     @Override
-    public void setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
-        this.defaultMemberPermissions = Arrays.stream(requiredPermissions).mapToLong(PermissionType::getValue).sum();
+    public void setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions) {
+        this.defaultMemberPermissions = requiredPermissions.stream().mapToLong(PermissionType::getValue).sum();
     }
 
     @Override

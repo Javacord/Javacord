@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
@@ -12,7 +13,7 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -49,8 +50,8 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
     }
 
     @Override
-    public void setDefaultEnabledForPermissions(PermissionType... requiredPermissions) {
-        this.defaultMemberPermissions = Arrays.stream(requiredPermissions).mapToLong(PermissionType::getValue).sum();
+    public void setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions) {
+        this.defaultMemberPermissions = requiredPermissions.stream().mapToLong(PermissionType::getValue).sum();
     }
 
     @Override

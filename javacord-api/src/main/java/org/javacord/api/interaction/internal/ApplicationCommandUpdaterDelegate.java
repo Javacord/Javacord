@@ -6,6 +6,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.DiscordLocale;
 
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 public interface ApplicationCommandUpdaterDelegate<T extends ApplicationCommand> {
@@ -45,7 +46,7 @@ public interface ApplicationCommandUpdaterDelegate<T extends ApplicationCommand>
      *
      * @param requiredPermissions The required permissions to use this command.
      */
-    void setDefaultEnabledForPermissions(PermissionType... requiredPermissions);
+    void setDefaultEnabledForPermissions(EnumSet<PermissionType> requiredPermissions);
 
     /**
      * Enables this command for use by all users.

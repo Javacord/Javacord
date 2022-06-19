@@ -79,13 +79,8 @@ public class ApplicationCommandPermissionsImpl implements ApplicationCommandPerm
     }
 
     @Override
-    public boolean affectsAllChannels() {
-        return id == server.getId() - 1;
-    }
-
-    @Override
-    public boolean affectsEveryoneRole() {
-        return id == server.getEveryoneRole().getId();
+    public Server getServer() {
+        return server;
     }
 
 }
