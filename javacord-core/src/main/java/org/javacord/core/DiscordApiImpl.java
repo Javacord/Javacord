@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.ApplicationInfo;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
@@ -959,6 +960,19 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             if (channel == null) {
                 return cache;
             }
+
+            //Remove all ServerThreadChannels when the parent channel is removed
+            channel.asServerChannel().ifPresent(serverChannel -> {
+                if (serverChannel.asServerThreadChannel().isPresent()) {
+                    return;
+                }
+
+                serverChannel.getServer().getThreadChannels().stream()
+                        .filter(c -> c.getParent().getId() == serverChannel.getId())
+                        .mapToLong(DiscordEntity::getId)
+                        .forEach(this::removeChannelFromCache);
+            });
+
             if (channel instanceof Cleanupable) {
                 ((Cleanupable) channel).cleanup();
             }

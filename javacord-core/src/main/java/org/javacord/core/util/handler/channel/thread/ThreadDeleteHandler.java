@@ -51,19 +51,13 @@ public class ThreadDeleteHandler extends PacketHandler {
         final long channelId = packet.get("id").asLong();
         api.getPossiblyUnreadyServerById(serverId)
                 .flatMap(server -> server.getThreadChannelById(channelId))
-                .ifPresent(channel -> {
-                    dispatchThreadDeleteEvent(channel);
-                    api.forEachCachedMessageWhere(
-                            msg -> msg.getChannel().getId() == channelId,
-                            msg -> api.removeMessageFromCache(msg.getId())
-                    );
-                });
+                .ifPresent(this::dispatchThreadDeleteEvent);
         api.removeObjectListeners(ServerThreadChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(TextChannel.class, channelId);
         api.removeObjectListeners(Channel.class, channelId);
 
-        api.removeChannelFromCache(packet.get("id").asLong());
+        api.removeChannelFromCache(channelId);
     }
 
     /**

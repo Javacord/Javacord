@@ -1066,12 +1066,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         this.serverFeatures.addAll(serverFeatures);
     }
 
-    /**
-     * Gets an unordered collection with all channels in the server.
-     *
-     * @return An unordered collection with all channels in the server.
-     */
-    public Collection<ServerChannel> getUnorderedChannels() {
+    @Override
+    public Set<ServerChannel> getUnorderedChannels() {
         return api.getEntityCache().get().getChannelCache().getChannelsOfServer(getId());
     }
 
