@@ -2392,6 +2392,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<ServerChannel> getChannels();
 
     /**
+     * Gets an unordered collection with all channels in the server.
+     *
+     * @return An unordered collection with all channels in the server.
+     */
+    Set<ServerChannel> getUnorderedChannels();
+
+    /**
      * Gets a sorted list (by position) with all regular channels of the server.
      *
      * @return A sorted list (by position) with all regular channels of the server.

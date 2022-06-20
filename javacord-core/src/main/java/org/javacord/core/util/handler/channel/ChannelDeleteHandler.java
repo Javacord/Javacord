@@ -168,13 +168,7 @@ public class ChannelDeleteHandler extends PacketHandler {
         long channelId = channelJson.get("id").asLong();
         api.getPossiblyUnreadyServerById(serverId)
                 .flatMap(server -> server.getForumChannelById(channelId))
-                .ifPresent(channel -> {
-                    dispatchServerChannelDeleteEvent(channel);
-                    api.forEachCachedMessageWhere(
-                            msg -> msg.getChannel().getId() == channelId,
-                            msg -> api.removeMessageFromCache(msg.getId())
-                    );
-                });
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
         api.removeObjectListeners(ServerForumChannel.class, channelId);
         api.removeObjectListeners(RegularServerChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
