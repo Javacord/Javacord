@@ -18,6 +18,8 @@ dependencies {
 allprojects {
     group = "org.javacord"
 
+    description = "An easy to use multithreaded library for creating Discord bots in Java"
+
     apply(plugin = "java-library")
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
