@@ -7,6 +7,9 @@ Javacord is a modern library that focuses on simplicity and speed 🚀.
 By reducing itself to standard Java classes and features like [`Optional`](https://javacord.org/wiki/essential-knowledge/optionals.html)s and [`CompletableFuture`](https://javacord.org/wiki/essential-knowledge/completable-futures.html)s, it is extremely easy to use for every Java developer, as it does not require you to learn any new frameworks or complex abstractions. 
 It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
 
+> *Starting in early 2023, support for Java 8 will be discontinued and Java 11 will be the new minimum requirement for using Javacord.
+> If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of this year.*
+
 ## 🎉 Basic Usage
 
 The following example logs the bot in and replies to every "!ping" message with "Pong!". 
@@ -82,6 +85,7 @@ public class MyFirstBot {
 }
 ```
 A more detailed version of how to use slash commands can be found in the [wiki](https://javacord.org/wiki/basic-tutorials/interactions/commands.html) 
+
 ## 📦 Download / Installation
 
 The recommended way to get Javacord is to use a build manager, like Gradle or Maven.  
@@ -93,7 +97,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 ```groovy
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.4.0' }
+dependencies { implementation 'org.javacord:javacord:3.5.0' }
 ```
 
 #### Maven
@@ -102,7 +106,7 @@ dependencies { implementation 'org.javacord:javacord:3.4.0' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.4.0</version>
+    <version>3.5.0</version>
     <type>pom</type>
 </dependency>
 ```
@@ -110,7 +114,7 @@ dependencies { implementation 'org.javacord:javacord:3.4.0' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.4.0")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.5.0")
 ```
 
 ### Optional Logger Dependency
