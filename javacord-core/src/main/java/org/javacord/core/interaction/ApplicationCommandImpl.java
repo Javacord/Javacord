@@ -2,14 +2,23 @@ package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public abstract class ApplicationCommandImpl implements ApplicationCommand {
 
@@ -17,10 +26,14 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     private final long id;
     private final long applicationId;
     private final String name;
-    private final boolean defaultPermission;
+    private final Map<DiscordLocale, String> nameLocalizations = new HashMap<>();
     private final String description;
+    private final Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
+    private final EnumSet<PermissionType> defaultMemberPermission;
+    private final boolean dmPermission;
 
     private final Server server;
+    private final Long serverId;
 
     /**
      * Class constructor.
@@ -33,11 +46,24 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
         id = data.get("id").asLong();
         applicationId = data.get("application_id").asLong();
         name = data.get("name").asText();
+        data.path("name_localizations").fields().forEachRemaining(e ->
+                nameLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         description = data.get("description").asText();
-        defaultPermission = !data.hasNonNull("default_permission") || data.get("default_permission").asBoolean();
-        server = data.has("guild_id")
-                ? api.getPossiblyUnreadyServerById(data.get("guild_id").asLong()).orElseThrow(AssertionError::new)
+        Long defaultMemberPermissionsBitset = data.hasNonNull("default_member_permissions")
+                ? data.get("default_member_permissions").asLong() : null;
+        defaultMemberPermission = defaultMemberPermissionsBitset != null
+                ? Arrays.stream(PermissionType.values())
+                .filter(type -> type.isSet(defaultMemberPermissionsBitset))
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(PermissionType.class))) : null;
+        data.path("description_localizations").fields().forEachRemaining(e ->
+                descriptionLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
+        serverId = data.has("guild_id")
+                ? data.get("guild_id").asLong()
                 : null;
+        server = serverId != null
+                ? api.getPossiblyUnreadyServerById(serverId).orElse(null)
+                : null;
+        dmPermission = server == null && (!data.has("dm_permission") || data.get("dm_permission").asBoolean());
     }
 
     @Override
@@ -61,13 +87,39 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
+    public Map<DiscordLocale, String> getNameLocalizations() {
+        return Collections.unmodifiableMap(nameLocalizations);
+    }
+
+    @Override
     public String getDescription() {
         return description;
     }
 
     @Override
-    public boolean getDefaultPermission() {
-        return defaultPermission;
+    public Map<DiscordLocale, String> getDescriptionLocalizations() {
+        return Collections.unmodifiableMap(descriptionLocalizations);
+    }
+
+    @Override
+    public Optional<EnumSet<PermissionType>> getDefaultRequiredPermissions() {
+        return defaultMemberPermission != null
+                ? Optional.of(EnumSet.copyOf(defaultMemberPermission)) : Optional.empty();
+    }
+
+    @Override
+    public boolean isDisabledByDefault() {
+        return defaultMemberPermission.isEmpty();
+    }
+
+    @Override
+    public boolean isEnabledInDms() {
+        return server != null && dmPermission;
+    }
+
+    @Override
+    public Optional<Long> getServerId() {
+        return Optional.ofNullable(serverId);
     }
 
     @Override
@@ -77,12 +129,12 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
 
     @Override
     public boolean isGlobalApplicationCommand() {
-        return server == null;
+        return serverId == null;
     }
 
     @Override
     public boolean isServerApplicationCommand() {
-        return server != null;
+        return serverId != null;
     }
 
     @Override
@@ -93,9 +145,9 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     }
 
     @Override
-    public CompletableFuture<Void> deleteForServer(Server server) {
+    public CompletableFuture<Void> deleteForServer(long server) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_APPLICATION_COMMANDS)
-                .setUrlParameters(String.valueOf(getApplicationId()), server.getIdAsString(), getIdAsString())
+                .setUrlParameters(String.valueOf(getApplicationId()), String.valueOf(server), getIdAsString())
                 .execute(result -> null);
     }
 }

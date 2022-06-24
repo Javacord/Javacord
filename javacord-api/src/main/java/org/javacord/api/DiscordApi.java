@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
@@ -37,7 +38,6 @@ import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.interaction.ApplicationCommandUpdater;
 import org.javacord.api.interaction.MessageContextMenu;
 import org.javacord.api.interaction.ServerApplicationCommandPermissions;
-import org.javacord.api.interaction.ServerApplicationCommandPermissionsBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.UserContextMenu;
 import org.javacord.api.listener.GloballyAttachableListenerManager;
@@ -261,17 +261,6 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
             Server server, long commandId);
 
     /**
-     * Updates multiple server application command permissions at once.
-     *
-     * @param server The server where the application command permissions should be updated on.
-     * @param applicationCommandPermissionsBuilders The application command permissions builders,
-     *     which should be updated.
-     * @return A list of the updated server application command permissions.
-     */
-    CompletableFuture<List<ServerApplicationCommandPermissions>> batchUpdateApplicationCommandPermissions(
-            Server server, List<ServerApplicationCommandPermissionsBuilder> applicationCommandPermissionsBuilders);
-
-    /**
      * Bulk overwrites the global application commands.
      * This should be preferably used when updating and/or creating multiple
      * application commands at once instead of {@link ApplicationCommandUpdater#updateGlobal(DiscordApi)}
@@ -295,8 +284,25 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *                                      which should be used to perform the bulk overwrite.
      * @return A list containing all application commands.
      */
-    CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+    default CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
             Server server,
+            List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
+        return bulkOverwriteServerApplicationCommands(server.getId(), applicationCommandBuilderList);
+    }
+
+    /**
+     * Bulk overwrites the servers application commands.
+     * This should be preferably used when updating and/or creating multiple
+     * application commands at once instead of {@link ApplicationCommandUpdater#updateForServer(Server)}
+     * and {@link ApplicationCommandBuilder#createForServer(Server)}
+     *
+     * @param server                        The server where the bulk overwrite should be performed on
+     *                                      which should be used to perform the bulk overwrite.
+     * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
+     * @return A list containing all application commands.
+     */
+    CompletableFuture<List<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            long server,
             List<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList);
 
     /**
@@ -1502,6 +1508,13 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     Collection<ServerTextChannel> getServerTextChannels();
 
     /**
+     * Gets a set with all server forum channels of the bot.
+     *
+     * @return A collection with all server forum channels of the bot.
+     */
+    Set<ServerForumChannel> getServerForumChannels();
+
+    /**
      * Gets a set with all the server thread channels of the bot.
      *
      * @return A set with all server thread channels of the bot.
@@ -1892,6 +1905,58 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
                 getServerTextChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a server forum channel by its id.
+     *
+     * @param id The id of the server forum channel.
+     * @return The server forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getServerForumChannelById(long id) {
+        return getChannelById(id).flatMap(Channel::asServerForumChannel);
+    }
+
+    /**
+     * Gets a server forum channel by its id.
+     *
+     * @param id The id of the server forum channel.
+     * @return The server forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getServerForumChannelById(String id) {
+        try {
+            return getServerForumChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a collection with all server forum channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the server forum channels.
+     * @return A collection with all server forum channels with the given name.
+     */
+    default Set<ServerForumChannel> getServerForumChannelsByName(String name) {
+        return Collections.unmodifiableSet(
+                getServerForumChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toSet()));
+    }
+
+    /**
+     * Gets a collection with all server forum channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the server forum channels.
+     * @return A collection with all server forum channels with the given name.
+     */
+    default Set<ServerForumChannel> getServerForumChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
+                getServerForumChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toSet()));
     }
 
     /**

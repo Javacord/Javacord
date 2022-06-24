@@ -39,6 +39,8 @@ public final class MemberImpl implements Member {
     private final String avatarHash;
     private final String joinedAt;
     private final String serverBoostingSince;
+    private final boolean deafened;
+    private final boolean muted;
     private final boolean selfDeafened;
     private final boolean selfMuted;
     private final Instant communicationDisabledUntil;
@@ -55,6 +57,8 @@ public final class MemberImpl implements Member {
     public MemberImpl(DiscordApiImpl api, ServerImpl server, JsonNode data, UserImpl user) {
         this.api = api;
         this.server = server;
+        this.selfMuted = false;
+        this.selfDeafened = false;
 
         if (data.hasNonNull("user")) {
             this.user = new UserImpl(api, data.get("user"), this, null);
@@ -90,14 +94,14 @@ public final class MemberImpl implements Member {
         }
 
         if (data.hasNonNull("deaf")) {
-            selfDeafened = data.get("deaf").asBoolean();
+            deafened = data.get("deaf").asBoolean();
         } else {
-            selfDeafened = false;
+            deafened = false;
         }
         if (data.hasNonNull("mute")) {
-            selfMuted = data.get("mute").asBoolean();
+            muted = data.get("mute").asBoolean();
         } else {
-            selfMuted = false;
+            muted = false;
         }
 
         communicationDisabledUntil = data.hasNonNull("communication_disabled_until")
@@ -106,8 +110,8 @@ public final class MemberImpl implements Member {
     }
 
     private MemberImpl(DiscordApiImpl api, ServerImpl server, UserImpl user, String nickname, List<Long> roleIds,
-                       String avatarHash, String joinedAt, String serverBoostingSince, boolean selfDeafened,
-                       boolean selfMuted, boolean pending, Instant communicationDisabledUntil) {
+                       String avatarHash, String joinedAt, String serverBoostingSince, boolean deafened, boolean muted,
+                       boolean selfDeafened, boolean selfMuted, boolean pending, Instant communicationDisabledUntil) {
         this.api = api;
         this.server = server;
         this.user = user;
@@ -116,8 +120,10 @@ public final class MemberImpl implements Member {
         this.avatarHash = avatarHash;
         this.joinedAt = joinedAt;
         this.serverBoostingSince = serverBoostingSince;
-        this.selfDeafened = selfDeafened;
+        this.muted = muted;
+        this.deafened = deafened;
         this.selfMuted = selfMuted;
+        this.selfDeafened = selfDeafened;
         this.pending = pending;
         this.communicationDisabledUntil = communicationDisabledUntil;
     }
@@ -130,7 +136,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setUser(UserImpl user) {
         return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
-                selfDeafened, selfMuted, pending, communicationDisabledUntil);
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
     }
 
     /**
@@ -140,8 +146,9 @@ public final class MemberImpl implements Member {
      * @return The new member.
      */
     public MemberImpl setPartialUser(JsonNode partialUserJson) {
-        return new MemberImpl(api, server, user.replacePartialUserData(partialUserJson), nickname, roleIds, avatarHash,
-                joinedAt, serverBoostingSince, selfDeafened, selfMuted, pending, communicationDisabledUntil);
+        return new MemberImpl(api, server, user.replacePartialUserData(partialUserJson), nickname, roleIds, avatarHash, 
+                joinedAt, serverBoostingSince, deafened, muted, selfDeafened, selfMuted, pending, 
+                communicationDisabledUntil);
     }
 
     /**
@@ -153,7 +160,7 @@ public final class MemberImpl implements Member {
     public MemberImpl setRoleIds(List<Long> roleIds) {
         roleIds.add(server.getEveryoneRole().getId());
         return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
-                selfDeafened, selfMuted, pending, communicationDisabledUntil);
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
     }
 
     /**
@@ -173,7 +180,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setNickname(String nickname) {
         return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
-                selfDeafened, selfMuted, pending, communicationDisabledUntil);
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
     }
 
     /**
@@ -184,7 +191,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setTimeout(Instant timeout) {
         return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
-                selfDeafened, selfMuted, pending, timeout);
+                deafened, muted, selfDeafened, selfMuted, pending, timeout);
     }
 
     /**
@@ -195,7 +202,7 @@ public final class MemberImpl implements Member {
      */
     public MemberImpl setServerBoostingSince(String serverBoostingSince) {
         return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
-                selfDeafened, selfMuted, pending,communicationDisabledUntil);
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
     }
 
     /**
@@ -205,6 +212,50 @@ public final class MemberImpl implements Member {
      */
     public String getServerBoostingSince() {
         return serverBoostingSince;
+    }
+
+    /**
+     * Creates a new member object with the new muted status.
+     *
+     * @param muted Whether the user is muted or not.
+     * @return The new member.
+     */
+    public MemberImpl setMuted(boolean muted) {
+        return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
+    }
+
+    /**
+     * Creates a new member object with the new deafened status.
+     *
+     * @param deafened Whether the user is deafened or not.
+     * @return The new member.
+     */
+    public MemberImpl setDeafened(boolean deafened) {
+        return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
+    }
+
+    /**
+     * Creates a new member object with the new self-muted status.
+     *
+     * @param selfMuted Whether the user is self-muted or not.
+     * @return The new member.
+     */
+    public MemberImpl setSelfMuted(boolean selfMuted) {
+        return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
+    }
+
+    /**
+     * Creates a new member object with the new self-deafened status.
+     *
+     * @param selfDeafened Whether the user is self-deafened or not.
+     * @return The new member.
+     */
+    public MemberImpl setSelfDeafened(boolean selfDeafened) {
+        return new MemberImpl(api, server, user, nickname, roleIds, avatarHash, joinedAt, serverBoostingSince,
+                deafened, muted, selfDeafened, selfMuted, pending, communicationDisabledUntil);
     }
 
     @Override
@@ -295,6 +346,16 @@ public final class MemberImpl implements Member {
         return Optional.ofNullable(serverBoostingSince)
                 .map(OffsetDateTime::parse)
                 .map(OffsetDateTime::toInstant);
+    }
+
+    @Override
+    public boolean isMuted() {
+        return muted;
+    }
+
+    @Override
+    public boolean isDeafened() {
+        return deafened;
     }
 
     @Override

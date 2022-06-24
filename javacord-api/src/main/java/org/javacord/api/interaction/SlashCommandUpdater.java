@@ -23,17 +23,6 @@ public class SlashCommandUpdater
     }
 
     /**
-     * Sets the new description of the slash command.
-     *
-     * @param description The description to set.
-     * @return The current instance in order to chain call methods.
-     */
-    public SlashCommandUpdater setDescription(String description) {
-        delegate.setDescription(description);
-        return this;
-    }
-
-    /**
      * Sets the new slash command options.
      *
      * @param slashCommandOptions The slash command options to set.

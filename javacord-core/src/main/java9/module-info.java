@@ -1,12 +1,12 @@
 @SuppressWarnings("requires-transitive-automatic")
 module org.javacord.core {
-    requires logging.interceptor;
-    requires xsalsa20poly1305;
+    requires okhttp3.logging;
+    requires com.codahale.xsalsa20poly1305;
 
     requires java.logging;
 
     requires transitive org.javacord.api;
-    requires transitive okhttp;
+    requires transitive okhttp3;
     requires transitive com.fasterxml.jackson.databind;
     requires transitive nv.websocket.client;
     requires transitive org.apache.logging.log4j;

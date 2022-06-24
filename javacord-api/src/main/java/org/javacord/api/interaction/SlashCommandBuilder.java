@@ -21,17 +21,6 @@ public class SlashCommandBuilder
     }
 
     /**
-     * Sets the description of the slash command.
-     *
-     * @param description The name.
-     * @return The current instance in order to chain call methods.
-     */
-    public SlashCommandBuilder setDescription(String description) {
-        delegate.setDescription(description);
-        return this;
-    }
-
-    /**
      * Adds a slash command option to the slash command.
      *
      * @param option The option.

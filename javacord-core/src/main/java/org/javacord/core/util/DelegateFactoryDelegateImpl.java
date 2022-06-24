@@ -4,12 +4,15 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerForumChannelBuilderDelegate;
+import org.javacord.api.entity.channel.internal.ServerForumChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
@@ -44,8 +47,6 @@ import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
@@ -66,6 +67,8 @@ import org.javacord.core.audio.AudioSourceBaseDelegateImpl;
 import org.javacord.core.entity.channel.ChannelCategoryBuilderDelegateImpl;
 import org.javacord.core.entity.channel.RegularServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerChannelUpdaterDelegateImpl;
+import org.javacord.core.entity.channel.ServerForumChannelBuilderDelegateImpl;
+import org.javacord.core.entity.channel.ServerForumChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelBuilderDelegateImpl;
@@ -95,8 +98,6 @@ import org.javacord.core.entity.sticker.StickerBuilderDelegateImpl;
 import org.javacord.core.entity.sticker.StickerUpdaterDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookBuilderDelegateImpl;
 import org.javacord.core.entity.webhook.WebhookUpdaterDelegateImpl;
-import org.javacord.core.interaction.ApplicationCommandPermissionsBuilderDelegateImpl;
-import org.javacord.core.interaction.ApplicationCommandPermissionsUpdaterDelegateImpl;
 import org.javacord.core.interaction.MessageContextMenuBuilderDelegateImpl;
 import org.javacord.core.interaction.MessageContextMenuUpdaterDelegateImpl;
 import org.javacord.core.interaction.SlashCommandBuilderDelegateImpl;
@@ -161,6 +162,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ServerTextChannelBuilderDelegate createServerTextChannelBuilderDelegate(Server server) {
         return new ServerTextChannelBuilderDelegateImpl((ServerImpl) server);
+    }
+
+    @Override
+    public ServerForumChannelBuilderDelegate createServerForumChannelBuilderDelegate(Server server) {
+        return new ServerForumChannelBuilderDelegateImpl((ServerImpl) server);
     }
 
     @Override
@@ -241,6 +247,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
+    public ServerForumChannelUpdaterDelegate createServerForumChannelUpdaterDelegate(ServerForumChannel channel) {
+        return new ServerForumChannelUpdaterDelegateImpl(channel);
+    }
+
+    @Override
     public ServerVoiceChannelUpdaterDelegate createServerVoiceChannelUpdaterDelegate(ServerVoiceChannel channel) {
         return new ServerVoiceChannelUpdaterDelegateImpl(channel);
     }
@@ -293,17 +304,6 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public SlashCommandOptionBuilderDelegate createSlashCommandOptionBuilderDelegate() {
         return new SlashCommandOptionBuilderDelegateImpl();
-    }
-
-    @Override
-    public ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
-            Server server) {
-        return new ApplicationCommandPermissionsUpdaterDelegateImpl(server);
-    }
-
-    @Override
-    public ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
-        return new ApplicationCommandPermissionsBuilderDelegateImpl();
     }
 
     @Override

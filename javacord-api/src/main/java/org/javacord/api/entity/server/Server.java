@@ -12,13 +12,17 @@ import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.CustomEmojiBuilder;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.PermissionState;
@@ -2388,6 +2392,20 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<ServerChannel> getChannels();
 
     /**
+     * Gets an unordered collection with all channels in the server.
+     *
+     * @return An unordered collection with all channels in the server.
+     */
+    Set<ServerChannel> getUnorderedChannels();
+
+    /**
+     * Gets a sorted list (by position) with all regular channels of the server.
+     *
+     * @return A sorted list (by position) with all regular channels of the server.
+     */
+    List<RegularServerChannel> getRegularChannels();
+
+    /**
      * Gets a sorted list (by position) with all channel categories of the server.
      *
      * @return A sorted list (by position) with all channel categories of the server.
@@ -2400,6 +2418,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return A sorted list (by position) with all text channels of the server.
      */
     List<ServerTextChannel> getTextChannels();
+
+    /**
+     * Gets a sorted list (by position) with all forum channels of the server.
+     *
+     * @return A sorted list (by position) with all forum channels of the server.
+     */
+    List<ServerForumChannel> getForumChannels();
 
     /**
      * Gets a sorted list (by position) with all voice channels of the server.
@@ -2466,6 +2491,56 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Gets a regular channel by its id.
+     *
+     * @param id The id of the regular channel.
+     * @return The regular channel with the given id.
+     */
+    Optional<RegularServerChannel> getRegularChannelById(long id);
+
+    /**
+     * Gets a regular channel by its id.
+     *
+     * @param id The id of the regular channel.
+     * @return The regular channel with the given id.
+     */
+    default Optional<RegularServerChannel> getRegularChannelById(String id) {
+        try {
+            return getRegularChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a sorted list (by position) with all channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the channels.
+     * @return A sorted list (by position) with all channels with the given name.
+     */
+    default List<RegularServerChannel> getRegularChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getRegularChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the channels.
+     * @return A sorted list (by position) with all channels with the given name.
+     */
+    default List<RegularServerChannel> getRegularChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getRegularChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
      * Gets a channel category by its id.
      *
      * @param id The id of the channel category.
@@ -2520,6 +2595,58 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Gets an unknown channel by its id.
+     *
+     * @param id The id of the unknown channel.
+     * @return The unknown channel with the given id.
+     */
+    default Optional<UnknownServerChannel> getUnknownChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof UnknownServerChannel)
+                .map(channel -> (UnknownServerChannel) channel);
+    }
+
+    /**
+     * Gets an unknown channel by its id.
+     *
+     * @param id The id of the unknown channel.
+     * @return The unknown channel with the given id.
+     */
+    default Optional<UnknownServerChannel> getUnknownChannelById(String id) {
+        try {
+            return getUnknownChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets an unknown regular channel by its id.
+     *
+     * @param id The id of the unknown regular channel.
+     * @return The unknown regular channel with the given id.
+     */
+    default Optional<UnknownRegularServerChannel> getUnknownRegularChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof UnknownRegularServerChannel)
+                .map(channel -> (UnknownRegularServerChannel) channel);
+    }
+
+    /**
+     * Gets an unknown regular channel by its id.
+     *
+     * @param id The id of the unknown regular channel.
+     * @return The unknown regular channel with the given id.
+     */
+    default Optional<UnknownRegularServerChannel> getUnknownRegularChannelById(String id) {
+        try {
+            return getUnknownRegularChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Gets a text channel by its id.
      *
      * @param id The id of the text channel.
@@ -2540,6 +2667,32 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<ServerTextChannel> getTextChannelById(String id) {
         try {
             return getTextChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a forum channel by its id.
+     *
+     * @param id The id of the forum channel.
+     * @return The forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getForumChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerForumChannel)
+                .map(channel -> (ServerForumChannel) channel);
+    }
+
+    /**
+     * Gets a forum channel by its id.
+     *
+     * @param id The id of the forum channel.
+     * @return The forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getForumChannelById(String id) {
+        try {
+            return getForumChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -2569,7 +2722,6 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         }
     }
 
-
     /**
      * Gets a sorted list (by position) with all text channels with the given name.
      * This method is case-sensitive!
@@ -2594,6 +2746,34 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default List<ServerTextChannel> getTextChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getTextChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all text channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the text channels.
+     * @return A sorted list (by position) with all text channels with the given name.
+     */
+    default List<ServerForumChannel> getForumChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getForumChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all forum channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the text channels.
+     * @return A sorted list (by position) with all text channels with the given name.
+     */
+    default List<ServerForumChannel> getForumChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getForumChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }

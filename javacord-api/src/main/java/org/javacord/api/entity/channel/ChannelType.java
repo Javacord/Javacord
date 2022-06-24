@@ -18,6 +18,8 @@ public enum ChannelType {
     SERVER_PUBLIC_THREAD(11, true, false, true, false),
     SERVER_PRIVATE_THREAD(12, true, false, true, false),
     SERVER_STAGE_VOICE_CHANNEL(13, false, true, true, true),
+    SERVER_DIRECTORY_CHANNEL(14, false, false, true, true),
+    SERVER_FORUM_CHANNEL(15, false, false, true, true),
     UNKNOWN(-1, false, false, false, false);
 
     private static final ChannelType[] textChannelTypes = Arrays.stream(ChannelType.values())

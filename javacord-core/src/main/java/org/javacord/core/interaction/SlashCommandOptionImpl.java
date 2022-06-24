@@ -5,14 +5,17 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.SlashCommandOptionType;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +23,9 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
 
     private final SlashCommandOptionType type;
     private final String name;
+    private final Map<DiscordLocale, String> nameLocalizations;
     private final String description;
+    private final Map<DiscordLocale, String> descriptionLocalizations;
     private final boolean required;
     private final List<SlashCommandOptionChoice> choices;
     private final List<SlashCommandOption> options;
@@ -39,7 +44,13 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     public SlashCommandOptionImpl(JsonNode data) {
         type = SlashCommandOptionType.fromValue(data.get("type").intValue());
         name = data.get("name").asText();
+        nameLocalizations = new HashMap<>();
+        data.path("name_localizations").fields().forEachRemaining(e ->
+                nameLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         description = data.get("description").asText();
+        descriptionLocalizations = new HashMap<>();
+        data.path("description_localizations").fields().forEachRemaining(e ->
+                descriptionLocalizations.put(DiscordLocale.fromLocaleCode(e.getKey()), e.getValue().asText()));
         required = data.has("required") && data.get("required").asBoolean(false);
         autocomplete = data.has("autocomplete") && data.get("autocomplete").asBoolean();
         choices = new ArrayList<>();
@@ -86,7 +97,9 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
      *
      * @param type The type.
      * @param name The name.
+     * @param nameLocalizations The name localizations.
      * @param description The description.
+     * @param descriptionLocalizations The description localizations.
      * @param required If the option is required.
      * @param autocomplete If the option is autocompletable.
      * @param choices The choices.
@@ -100,7 +113,9 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     public SlashCommandOptionImpl(
             SlashCommandOptionType type,
             String name,
+            Map<DiscordLocale, String> nameLocalizations,
             String description,
+            Map<DiscordLocale, String> descriptionLocalizations,
             boolean required,
             boolean autocomplete,
             List<SlashCommandOptionChoice> choices,
@@ -113,7 +128,9 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     ) {
         this.type = type;
         this.name = name;
+        this.nameLocalizations = nameLocalizations;
         this.description = description;
+        this.descriptionLocalizations = descriptionLocalizations;
         this.required = required;
         this.autocomplete = autocomplete;
         this.choices = choices;
@@ -136,8 +153,18 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     }
 
     @Override
+    public Map<DiscordLocale, String> getNameLocalizations() {
+        return Collections.unmodifiableMap(nameLocalizations);
+    }
+
+    @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public Map<DiscordLocale, String> getDescriptionLocalizations() {
+        return Collections.unmodifiableMap(descriptionLocalizations);
     }
 
     @Override
@@ -223,6 +250,17 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             if (decimalMaxValue != null) {
                 node.put("max_value", decimalMaxValue);
             }
+        }
+        if (!nameLocalizations.isEmpty()) {
+            ObjectNode nameLocalizationsJsonObject = node.putObject("name_localizations");
+            nameLocalizations.forEach(
+                    (locale, localization) -> nameLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
+        }
+        if (!descriptionLocalizations.isEmpty()) {
+            ObjectNode descriptionLocalizationsJsonObject = node.putObject("description_localizations");
+            descriptionLocalizations.forEach(
+                    (locale, localization) ->
+                            descriptionLocalizationsJsonObject.put(locale.getLocaleCode(), localization));
         }
         return node;
     }

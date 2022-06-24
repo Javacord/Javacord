@@ -4,12 +4,15 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerForumChannelBuilderDelegate;
+import org.javacord.api.entity.channel.internal.ServerForumChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
@@ -44,8 +47,6 @@ import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.entity.webhook.internal.WebhookUpdaterDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsBuilderDelegate;
-import org.javacord.api.interaction.internal.ApplicationCommandPermissionsUpdaterDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuBuilderDelegate;
 import org.javacord.api.interaction.internal.MessageContextMenuUpdaterDelegate;
 import org.javacord.api.interaction.internal.SlashCommandBuilderDelegate;
@@ -242,6 +243,16 @@ public class DelegateFactory {
     }
 
     /**
+     * Creates a new server forum channel builder delegate.
+     *
+     * @param server The server of the server forum channel.
+     * @return A new server forum channel builder delegate.
+     */
+    public static ServerForumChannelBuilderDelegate createServerForumChannelBuilderDelegate(Server server) {
+        return delegateFactoryDelegate.createServerForumChannelBuilderDelegate(server);
+    }
+
+    /**
      * Creates a new server thread channel builder delegate.
      *
      * @param serverTextChannel The server text channel where the thread will be created in.
@@ -394,6 +405,17 @@ public class DelegateFactory {
     }
 
     /**
+     * Creates a new server forum channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server forum channel updater delegate.
+     */
+    public static ServerForumChannelUpdaterDelegate createServerForumChannelUpdaterDelegate(
+            ServerForumChannel channel) {
+        return delegateFactoryDelegate.createServerForumChannelUpdaterDelegate(channel);
+    }
+
+    /**
      * Creates a new server voice channel updater delegate.
      *
      * @param channel The channel to update.
@@ -500,26 +522,6 @@ public class DelegateFactory {
      */
     public static SlashCommandOptionBuilderDelegate createSlashCommandOptionBuilderDelegate() {
         return delegateFactoryDelegate.createSlashCommandOptionBuilderDelegate();
-    }
-
-    /**
-     * Creates a new application command permissions updater delegate.
-     *
-     * @param server The server.
-     * @return The application command permissions updater delegate.
-     */
-    public static ApplicationCommandPermissionsUpdaterDelegate createApplicationCommandPermissionsUpdaterDelegate(
-            Server server) {
-        return delegateFactoryDelegate.createApplicationCommandPermissionsUpdaterDelegate(server);
-    }
-
-    /**
-     * Creates a new application command permissions builder delegate.
-     *
-     * @return The application command permissions builder delegate.
-     */
-    public static ApplicationCommandPermissionsBuilderDelegate createApplicationCommandPermissionsBuilderDelegate() {
-        return delegateFactoryDelegate.createApplicationCommandPermissionsBuilderDelegate();
     }
 
     /**

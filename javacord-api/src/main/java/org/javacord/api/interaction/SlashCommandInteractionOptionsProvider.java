@@ -1,5 +1,6 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
@@ -152,6 +153,16 @@ public interface SlashCommandInteractionOptionsProvider {
     }
 
     /**
+     * Gets the attachment value of an option having the specified name.
+     *
+     * @param name The name of the option to search for.
+     * @return An Optional with the attachment value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Attachment> getOptionAttachmentValueByName(String name) {
+        return getOptionByName(name).flatMap(SlashCommandInteractionOption::getAttachmentValue);
+    }
+
+    /**
      * Gets the option at the specified index, if present.
      *
      * @param index The index of the option to search for.
@@ -278,5 +289,15 @@ public interface SlashCommandInteractionOptionsProvider {
      */
     default Optional<Double> getOptionDecimalValueByIndex(int index) {
         return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getDecimalValue);
+    }
+
+    /**
+     * Gets the attachment value of an option at the specified index.
+     *
+     * @param index The index of the option to search for.
+     * @return An Optional with the attachment value of such an option if it exists; an empty Optional otherwise
+     */
+    default Optional<Attachment> getOptionAttachmentValueByIndex(int index) {
+        return getOptionByIndex(index).flatMap(SlashCommandInteractionOption::getAttachmentValue);
     }
 }

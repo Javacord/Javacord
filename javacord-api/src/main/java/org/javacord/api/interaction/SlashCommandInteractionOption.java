@@ -1,5 +1,6 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
@@ -109,6 +110,16 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
      * @return The channel value of this option.
      */
     Optional<ServerChannel> getChannelValue();
+
+    /**
+     * Gets the attachment value of this option.
+     *
+     * <p>If this option does not have an attachment value or the option itself is a subcommand or group,
+     *     the optional will be empty.
+     *
+     * @return The attachment value of this option.
+     */
+    Optional<Attachment> getAttachmentValue();
 
     /**
      * Gets the role value of this option.

@@ -1,7 +1,11 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+
+import java.util.Optional;
 
 public interface ApplicationCommandPermissions {
 
@@ -27,19 +31,49 @@ public interface ApplicationCommandPermissions {
     boolean getPermission();
 
     /**
-     * Creates a application command permissions which can be used by {@link ApplicationCommandPermissionsUpdater}
-     * to update the permission.
+     * Returns the role that these permissions affect.
      *
-     * @param id The id of the role or user which should be updated.
-     * @param type The type this ID belongs to.
-     * @param permission True if the command should be enabled.
-     * @return The built ApplicationCommandPermissions.
+     * @return The role that these permissions affect.
      */
-    static ApplicationCommandPermissions create(long id, ApplicationCommandPermissionType type, boolean permission) {
-        return new ApplicationCommandPermissionsBuilder()
-                .setId(id)
-                .setType(type)
-                .setPermission(permission)
-                .build();
+    Optional<Role> getRole();
+
+    /**
+     * Returns the user that these permissions affect.
+     *
+     * @return The user that these permissions affect.
+     */
+    Optional<User> getUser();
+
+    /**
+     * Gets the channel that these permissions affect, if it is a single channel.
+     *
+     * @return The channel that these permissions affect.
+     */
+    Optional<ServerChannel> getChannel();
+
+    /**
+     * Gets the server this command permissions belongs to.
+     *
+     * @return The server this command permissions belongs to.
+     */
+    Server getServer();
+
+    /**
+     * Gets whether these permissions affect all the server's channels.
+     *
+     * @return Whether these permissions affect all the server's channels.
+     */
+    default boolean affectsAllChannels() {
+        return getId() == getServer().getId() - 1;
     }
+
+    /**
+     * Gets whether these permissions affect the everyone role.
+     *
+     * @return Whether these permissions affect the everyone role.
+     */
+    default boolean affectsEveryoneRole() {
+        return getId() == getServer().getEveryoneRole().getId();
+    }
+
 }

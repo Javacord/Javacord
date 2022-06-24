@@ -947,12 +947,12 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @return A list with all channels mentioned in this message.
      */
-    default List<ServerTextChannel> getMentionedChannels() {
-        List<ServerTextChannel> mentionedChannels = new ArrayList<>();
+    default List<ServerChannel> getMentionedChannels() {
+        List<ServerChannel> mentionedChannels = new ArrayList<>();
         Matcher channelMention = DiscordRegexPattern.CHANNEL_MENTION.matcher(getContent());
         while (channelMention.find()) {
             String channelId = channelMention.group("id");
-            getApi().getServerTextChannelById(channelId)
+            getApi().getServerChannelById(channelId)
                     .filter(channel -> !mentionedChannels.contains(channel))
                     .ifPresent(mentionedChannels::add);
         }

@@ -16,11 +16,11 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
         ServerThreadChannelAttachableListenerManager {
 
     /**
-     * The parent server text channel of this thread.
+     * The parent regular server channel of this thread.
      *
      * @return The parent of this thread.
      */
-    ServerTextChannel getParent();
+    RegularServerChannel getParent();
 
     /**
      * Gets an approximate count of messages in this thread that stops counting at 50.

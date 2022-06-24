@@ -1,13 +1,14 @@
 package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.text.InternalServerTextChannelAttachableListenerManager;
+import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -22,8 +23,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ServerThreadChannel}.
  */
-public class ServerThreadChannelImpl extends ServerChannelImpl implements ServerThreadChannel, InternalTextChannel,
-        InternalServerTextChannelAttachableListenerManager {
+public class ServerThreadChannelImpl extends ServerChannelImpl implements ServerThreadChannel, Cleanupable,
+        InternalTextChannel, InternalServerTextChannelAttachableListenerManager {
 
     /**
      * The message cache of the server text channel.
@@ -112,13 +113,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
-
-        api.addChannelToCache(this);
     }
 
     @Override
-    public ServerTextChannel getParent() {
-        return getServer().getTextChannelById(parentId)
+    public RegularServerChannel getParent() {
+        return getServer().getRegularChannelById(parentId)
                 .orElseThrow(() -> new AssertionError("Thread has no parent channel."));
     }
 
@@ -215,5 +214,15 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     @Override
     public String getMentionTag() {
         return "<#" + getIdAsString() + ">";
+    }
+
+    @Override
+    public void cleanup() {
+        messageCache.cleanup();
+
+        ((DiscordApiImpl) getApi()).forEachCachedMessageWhere(
+                msg -> msg.getChannel().getId() == getId(),
+                msg -> ((DiscordApiImpl) getApi()).removeMessageFromCache(msg.getId())
+        );
     }
 }

@@ -3,6 +3,7 @@ package org.javacord.core.interaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.permission.Role;
@@ -34,6 +35,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     private final Long channelValue;
     private final Long roleValue;
     private final Long mentionableValue;
+    private final Attachment attachmentValue;
     /**
      * This is the NUMBER option according to the Discord docs.
      */
@@ -51,9 +53,10 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
      * @param api           The DiscordApi instance.
      * @param jsonData      The json data of the option.
      * @param resolvedUsers The map of resolved users and their ID.
+     * @param resolvedAttachments The map of resolved attachments and their ID.
      */
     public SlashCommandInteractionOptionImpl(final DiscordApi api, final JsonNode jsonData,
-                                             Map<Long, User> resolvedUsers) {
+                                             Map<Long, User> resolvedUsers, Map<Long, Attachment> resolvedAttachments) {
         this.api = api;
         this.resolvedUsers = resolvedUsers;
         name = jsonData.get("name").asText();
@@ -70,6 +73,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         Long localRoleValue = null;
         Long localMentionableValue = null;
         Double localDecimalValue = null;
+        Attachment localAttachmentValue = null;
 
         final int typeInt = jsonData.get("type").asInt();
         final SlashCommandOptionType slashCommandOptionType = SlashCommandOptionType.fromValue(typeInt);
@@ -78,7 +82,8 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
             case SUB_COMMAND_GROUP:
                 if (jsonData.has("options") && jsonData.get("options").isArray()) {
                     for (final JsonNode optionJson : jsonData.get("options")) {
-                        options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers));
+                        options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers,
+                                resolvedAttachments));
                     }
                 }
                 break;
@@ -114,6 +119,10 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
                 localDecimalValue = valueNode.asDouble();
                 localStringRepresentation = String.valueOf(localDecimalValue);
                 break;
+            case ATTACHMENT:
+                localAttachmentValue = resolvedAttachments.get(Long.parseLong(valueNode.asText()));
+                localStringRepresentation = valueNode.asText();
+                break;
             default:
                 LOGGER.warn("Received slash command option of unknown type <{}>. "
                         + "Please contact the developer!", typeInt);
@@ -128,6 +137,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
         roleValue = localRoleValue;
         mentionableValue = localMentionableValue;
         decimalValue = localDecimalValue;
+        attachmentValue = localAttachmentValue;
     }
 
     @Override
@@ -176,6 +186,11 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     public Optional<ServerChannel> getChannelValue() {
         return Optional.ofNullable(channelValue)
                 .flatMap(api::getServerChannelById);
+    }
+
+    @Override
+    public Optional<Attachment> getAttachmentValue() {
+        return Optional.ofNullable(attachmentValue);
     }
 
     @Override

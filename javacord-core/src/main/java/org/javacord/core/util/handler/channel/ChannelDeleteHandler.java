@@ -6,11 +6,15 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.event.channel.server.ServerChannelDeleteEvent;
 import org.javacord.core.event.channel.server.ServerChannelDeleteEventImpl;
@@ -41,20 +45,14 @@ public class ChannelDeleteHandler extends PacketHandler {
             case SERVER_TEXT_CHANNEL:
                 handleServerTextChannel(packet);
                 break;
-            case PRIVATE_CHANNEL:
-                handlePrivateChannel(packet);
-                break;
             case SERVER_VOICE_CHANNEL:
                 handleServerVoiceChannel(packet);
                 break;
             case SERVER_STAGE_VOICE_CHANNEL:
                 handleServerStageVoiceChannel(packet);
                 break;
-            case GROUP_CHANNEL:
-                logger.info("Received CHANNEL_DELETE packet for a group channel. This should be impossible.");
-                break;
-            case CHANNEL_CATEGORY:
-                handleCategory(packet);
+            case SERVER_FORUM_CHANNEL:
+                handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
                 // TODO Handle server news channel differently
@@ -65,11 +63,60 @@ public class ChannelDeleteHandler extends PacketHandler {
                 logger.debug("Received CHANNEL_DELETE packet for a store channel. These are not supported in this"
                         + " Javacord version and get ignored!");
                 break;
-            default:
-                logger.warn("Unknown or unexpected channel type. Your Javacord version might be out of date!");
+            case GROUP_CHANNEL:
+                logger.info("Received CHANNEL_DELETE packet for a group channel. This should be impossible.");
+                break;
+            case CHANNEL_CATEGORY:
+                handleCategory(packet);
+                break;
+            case PRIVATE_CHANNEL:
+                handlePrivateChannel(packet);
+                break;
+            default: {
+                try {
+                    handleUnknownRegularServerChannel(packet);
+                    handleUnknownServerChannel(packet);
+                } catch (Exception exception) {
+                    logger.warn("An error occurred when trying to delete a fallback channel", exception);
+                }
+            }
         }
         api.removeChannelFromCache(packet.get("id").asLong());
     }
+
+    /**
+     * Handles unknown server channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleUnknownServerChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getUnknownChannelById(channelId))
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
+        api.removeObjectListeners(UnknownServerChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+    }
+
+    /**
+     * Handles unknown regular server channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleUnknownRegularServerChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getUnknownRegularChannelById(channelId))
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
+        api.removeObjectListeners(UnknownRegularServerChannel.class, channelId);
+        api.removeObjectListeners(RegularServerChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+    }
+
 
     /**
      * Handles server text channel deletion.
@@ -105,8 +152,26 @@ public class ChannelDeleteHandler extends PacketHandler {
                     );
                 });
         api.removeObjectListeners(ServerTextChannel.class, channelId);
+        api.removeObjectListeners(RegularServerChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(TextChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+    }
+
+    /**
+     * Handles server forum channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleServerForumChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getForumChannelById(channelId))
+                .ifPresent(this::dispatchServerChannelDeleteEvent);
+        api.removeObjectListeners(ServerForumChannel.class, channelId);
+        api.removeObjectListeners(RegularServerChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(Channel.class, channelId);
     }
 
@@ -122,6 +187,7 @@ public class ChannelDeleteHandler extends PacketHandler {
                 .flatMap(server -> server.getVoiceChannelById(channelId))
                 .ifPresent(this::dispatchServerChannelDeleteEvent);
         api.removeObjectListeners(ServerVoiceChannel.class, channelId);
+        api.removeObjectListeners(RegularServerChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(VoiceChannel.class, channelId);
         api.removeObjectListeners(Channel.class, channelId);
@@ -140,6 +206,7 @@ public class ChannelDeleteHandler extends PacketHandler {
                 .ifPresent(this::dispatchServerChannelDeleteEvent);
         api.removeObjectListeners(ServerStageVoiceChannel.class, channelId);
         api.removeObjectListeners(ServerVoiceChannel.class, channelId);
+        api.removeObjectListeners(RegularServerChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(VoiceChannel.class, channelId);
         api.removeObjectListeners(Channel.class, channelId);

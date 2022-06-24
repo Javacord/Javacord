@@ -1,9 +1,12 @@
 package org.javacord.api.interaction;
 
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.Specializable;
 
+import java.util.EnumSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -38,6 +41,13 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     String getName();
 
     /**
+     * Gets the name localizations of this command.
+     *
+     * @return The name localizations of this command.
+     */
+    Map<DiscordLocale, String> getNameLocalizations();
+
+    /**
      * Gets the description of this command.
      *
      * @return The description of this command.
@@ -45,11 +55,43 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     String getDescription();
 
     /**
-     * Gets the default permission of this command.
+     * Gets the description localizations of this command.
      *
-     * @return The default permission of this command.
+     * @return The description localizations of this command.
      */
-    boolean getDefaultPermission();
+    Map<DiscordLocale, String> getDescriptionLocalizations();
+
+    /**
+     * Gets the default required permissions for this command.
+     * This may differ from the actual permissions of the command if they have been changed by a server administrator.
+     *
+     * @return The default required permissions for this command.
+     */
+    Optional<EnumSet<PermissionType>> getDefaultRequiredPermissions();
+
+    /**
+     * Gets whether this command is disabled and only usable by server administrators by default.
+     * Note that this is different to {@link #getDefaultRequiredPermissions} returning
+     * {@link PermissionType#ADMINISTRATOR}.
+     *
+     * @return Whether this command is disabled by default.
+     */
+    boolean isDisabledByDefault();
+
+    /**
+     * Gets whether this command is able to be used in DMs.
+     * Will always return {@code false} for server commands.
+     *
+     * @return Whether the command is enabled in DMs
+     */
+    boolean isEnabledInDms();
+
+    /**
+     * Gets the server id of this command if it is not global.
+     *
+     * @return The server of this command.
+     */
+    Optional<Long> getServerId();
 
     /**
      * Gets the server of this command if it is not global.
@@ -78,10 +120,20 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     CompletableFuture<Void> deleteGlobal();
 
     /**
-     * Deletes this application command globally.
+     * Deletes this application command for a server.
      *
      * @param server The server where the command should be deleted from.
      * @return A future to check if the deletion was successful.
      */
-    CompletableFuture<Void> deleteForServer(Server server);
+    default CompletableFuture<Void> deleteForServer(Server server) {
+        return deleteForServer(server.getId());
+    }
+
+    /**
+     * Deletes this application command for a server.
+     *
+     * @param server The server where the command should be deleted from.
+     * @return A future to check if the deletion was successful.
+     */
+    CompletableFuture<Void> deleteForServer(long server);
 }

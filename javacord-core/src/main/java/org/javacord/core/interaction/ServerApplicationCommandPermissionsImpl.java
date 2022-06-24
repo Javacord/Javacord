@@ -29,7 +29,7 @@ public class ServerApplicationCommandPermissionsImpl implements ServerApplicatio
 
         permissions = new ArrayList<>();
         for (JsonNode jsonNode : data.get("permissions")) {
-            permissions.add(new ApplicationCommandPermissionsImpl(jsonNode));
+            permissions.add(new ApplicationCommandPermissionsImpl(server, jsonNode));
         }
     }
 
