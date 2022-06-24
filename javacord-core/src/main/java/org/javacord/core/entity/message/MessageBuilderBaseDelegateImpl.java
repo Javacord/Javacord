@@ -408,15 +408,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         attachments.add(new FileContainer(url, true));
         attachmentsChanged = true;
     }
-
-    @Override
-    public void editMessageWithAttachment(Message message) {
-        if (message == null) {
-            throw new IllegalArgumentException("message cannot be null!");
-        }
-       //leave it for now
-    }
-
+    
     @Override
     public void setAllowedMentions(AllowedMentions allowedMentions) {
         if (allowedMentions == null) {

@@ -716,11 +716,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("compress", true)
                 .put("large_threshold", 250)
                 .putObject("properties")
-                .put("$os", System.getProperty("os.name"))
-                .put("$browser", "Javacord")
-                .put("$device", "Javacord")
-                .put("$referrer", "")
-                .put("$referring_domain", "");
+                .put("os", System.getProperty("os.name"))
+                .put("browser", "Javacord")
+                .put("device", "Javacord");
 
         data.put("intents", Intent.calculateBitmask(api.getIntents().toArray(new Intent[0])));
 
