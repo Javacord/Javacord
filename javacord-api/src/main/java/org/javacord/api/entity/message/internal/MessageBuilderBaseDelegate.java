@@ -299,14 +299,7 @@ public interface MessageBuilderBaseDelegate {
      * @param url The url of the attachment.
      */
     void addAttachmentAsSpoiler(URL url);
-
-    /**
-     * Edits a message with an attachment.
-     *
-     * @param message The message to edit.
-     */
-    void editMessageWithAttachment(Message message);
-
+    
     /**
      * Controls the mention behavior.
      *

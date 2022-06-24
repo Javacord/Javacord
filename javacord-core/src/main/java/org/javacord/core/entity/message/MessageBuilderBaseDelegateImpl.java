@@ -408,7 +408,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         attachments.add(new FileContainer(url, true));
         attachmentsChanged = true;
     }
-    
+
     @Override
     public void setAllowedMentions(AllowedMentions allowedMentions) {
         if (allowedMentions == null) {
