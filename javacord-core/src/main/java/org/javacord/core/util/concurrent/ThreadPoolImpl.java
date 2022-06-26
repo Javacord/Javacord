@@ -3,6 +3,7 @@ package org.javacord.core.util.concurrent;
 import org.javacord.api.util.concurrent.ThreadPool;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -11,6 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * The implementation of {@link ThreadPool}.
@@ -78,5 +80,18 @@ public class ThreadPoolImpl implements ThreadPool {
             executorService.shutdown();
         }
         return Optional.ofNullable(executorService);
+    }
+
+    @Override
+    public <T> CompletableFuture<T> runAfter(Supplier<CompletableFuture<T>> task, long duration, TimeUnit unit) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        getDaemonScheduler().schedule(() -> task.get().whenComplete((result, ex) -> {
+            if (ex != null) {
+                future.completeExceptionally(ex);
+            } else {
+                future.complete(result);
+            }
+        }), duration, unit);
+        return future;
     }
 }
