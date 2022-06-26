@@ -2,6 +2,7 @@ package org.javacord.api.entity.message;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.channel.AutoArchiveDuration;
@@ -44,7 +45,7 @@ import java.util.stream.Stream;
 /**
  * This class represents a Discord message.
  */
-public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFromCache<Message>,
+public interface Message extends DiscordEntity, Deletable, Comparable<Message>, UpdatableFromCache<Message>,
         MessageAttachableListenerManager {
 
     /**
@@ -141,18 +142,10 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     /**
      * Deletes the message.
      *
-     * @return A future to tell us if the deletion was successful.
-     */
-    default CompletableFuture<Void> delete() {
-        return delete(null);
-    }
-
-    /**
-     * Deletes the message.
-     *
      * @param reason The audit log reason for the deletion.
      * @return A future to tell us if the deletion was successful.
      */
+    @Override
     default CompletableFuture<Void> delete(String reason) {
         return Message.delete(getApi(), getChannel().getId(), getId(), reason);
     }

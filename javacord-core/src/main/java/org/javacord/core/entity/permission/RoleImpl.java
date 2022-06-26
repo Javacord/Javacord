@@ -305,8 +305,9 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     @Override
-    public CompletableFuture<Void> delete() {
+    public CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.ROLE)
+                .setAuditLogReason(reason)
                 .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .execute(result -> null);
     }

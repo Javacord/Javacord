@@ -1,6 +1,7 @@
 package org.javacord.api.entity.server;
 
 import org.javacord.api.audio.AudioConnection;
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Nameable;
@@ -65,7 +66,8 @@ import java.util.stream.Collectors;
 /**
  * The class represents a Discord server, sometimes also called guild.
  */
-public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Server>, ServerAttachableListenerManager {
+public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFromCache<Server>,
+        ServerAttachableListenerManager {
 
     /**
      * Gets the audio connection in this server.
@@ -1640,13 +1642,6 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default CompletableFuture<Void> removeUserTimeout(User user, String reason) {
         return createUpdater().setUserTimeout(user, Instant.MIN).setAuditLogReason(reason).update();
     }
-
-    /**
-     * Deletes the server.
-     *
-     * @return A future to check if the deletion was successful.
-     */
-    CompletableFuture<Void> delete();
 
     /**
      * Leaves the server.
