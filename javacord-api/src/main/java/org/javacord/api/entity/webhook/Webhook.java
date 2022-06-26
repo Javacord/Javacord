@@ -1,5 +1,6 @@
 package org.javacord.api.entity.webhook;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Updatable;
@@ -20,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a webhook.
  * Webhook objects won't receive any updates!
  */
-public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttachableListenerManager {
+public interface Webhook extends DiscordEntity, Deletable, Updatable<Webhook>, WebhookAttachableListenerManager {
 
     /**
      * Gets the server id of the webhook.
@@ -102,23 +103,6 @@ public interface Webhook extends DiscordEntity, Updatable<Webhook>, WebhookAttac
      * @return The webhook as incoming webhook.
      */
     Optional<IncomingWebhook> asIncomingWebhook();
-
-    /**
-     * Deletes the webhook.
-     *
-     * @return A future to tell us if the deletion was successful.
-     */
-    default CompletableFuture<Void> delete() {
-        return delete(null);
-    }
-
-    /**
-     * Deletes the webhook.
-     *
-     * @param reason The audit log reason for the deletion.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> delete(String reason);
 
     /**
      * Gets the updater for this webhook.

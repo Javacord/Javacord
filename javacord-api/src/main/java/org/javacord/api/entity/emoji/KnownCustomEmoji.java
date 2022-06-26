@@ -1,5 +1,6 @@
 package org.javacord.api.entity.emoji;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
@@ -14,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a known custom emoji.
  */
-public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownCustomEmoji>,
+public interface KnownCustomEmoji extends CustomEmoji, Deletable, UpdatableFromCache<KnownCustomEmoji>,
                                           KnownCustomEmojiAttachableListenerManager {
 
     /**
@@ -23,23 +24,6 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
      * @return The server of the emoji.
      */
     Server getServer();
-
-    /**
-     * Deletes the emoji.
-     *
-     * @return A future to tell us if the deletion was successful.
-     */
-    default CompletableFuture<Void> delete() {
-        return delete(null);
-    }
-
-    /**
-     * Deletes the emoji.
-     *
-     * @param reason The reason for the deletion.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> delete(String reason);
 
     /**
      * Creates an updater for this emoji.

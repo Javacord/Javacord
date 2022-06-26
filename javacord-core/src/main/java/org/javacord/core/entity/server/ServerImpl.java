@@ -1574,10 +1574,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         return Optional.ofNullable(roles.get(id));
     }
 
+
     @Override
-    public CompletableFuture<Void> delete() {
+    public CompletableFuture<Void> delete(String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER)
                 .setUrlParameters(getIdAsString())
+                .setAuditLogReason(reason)
                 .execute(result -> null);
     }
 
