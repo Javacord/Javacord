@@ -14,8 +14,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server channel.
  */
-public interface
-ServerChannel extends Channel, Nameable, Deletable, ServerChannelAttachableListenerManager {
+public interface ServerChannel extends Channel, Nameable, Deletable, ServerChannelAttachableListenerManager {
 
     /**
      * Gets the server of the channel.

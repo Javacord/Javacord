@@ -1,8 +1,11 @@
 package org.javacord.api.util.concurrent;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * This class creates and contains thread pools which are used by Javacord.
@@ -58,4 +61,19 @@ public interface ThreadPool {
      * @return The removed and shutdown executor service with the given thread name.
      */
     Optional<ExecutorService> removeAndShutdownSingleThreadExecutorService(String threadName);
+
+    /**
+     * Executes code after a given duration.
+     *
+     * <p>Tasks will be scheduled on the daemon executor, allowing the bot to shutdown without
+     * all tasks being executed. This method is not meant to persist scheduled task over
+     * multiple bot life cycles.</p>
+     *
+     * @param task The code to run.
+     * @param duration The duration to run the code after.
+     * @param unit The unit of the duration given.
+     * @return A future that completes when the scheduled task is finished.
+     * @param <T> The return type of the future.
+     */
+    <T> CompletableFuture<T> runAfter(Supplier<CompletableFuture<T>> task, long duration, TimeUnit unit);
 }

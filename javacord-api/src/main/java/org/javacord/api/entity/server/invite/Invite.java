@@ -10,7 +10,6 @@ import org.javacord.api.entity.user.User;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents an invite object.
