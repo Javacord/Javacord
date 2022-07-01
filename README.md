@@ -5,7 +5,7 @@ An easy to use multithreaded library for creating Discord bots in Java.
 
 Javacord is a modern library that focuses on simplicity and speed 🚀.
 By reducing itself to standard Java classes and features like [`Optional`](https://javacord.org/wiki/essential-knowledge/optionals.html)s and [`CompletableFuture`](https://javacord.org/wiki/essential-knowledge/completable-futures.html)s, it is extremely easy to use for every Java developer, as it does not require you to learn any new frameworks or complex abstractions. 
-It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
+It has rich [documentation](#-documentation) and an [outstanding community on Discord](#-support) that loves to help with any specific problems and questions.
 
 > *Starting in early 2023, support for Java 8 will be discontinued and Java 11 will be the new minimum requirement for using Javacord.
 > If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of this year.*
@@ -39,12 +39,11 @@ public class MyFirstBot {
 
 <img src="https://javacord.org/img/javacord-readme/ping-pong-white.gif"> 
 
-More sophisticated examples can be found at the [end of the README](#-more-examples). 
+You can find more sophisticated  examples can be found at the [end of the README](#-more-examples). 
 You can also check out the [example bot](https://github.com/Javacord/Example-Bot) for a fully functional bot.
 
 ### */* Slash commands
-First, you need to create the ping pong slash command. Run this code **one single time** to create the command:
-
+First, you need to create the ping pong slash command. Run this code **once** to create the command:
 ```java
 public class MyFirstBot {
 
@@ -84,7 +83,7 @@ public class MyFirstBot {
     }
 }
 ```
-A more detailed version of how to use slash commands can be found in the [wiki](https://javacord.org/wiki/basic-tutorials/interactions/commands.html) 
+You can find a more detailed version of how to use slash commands can be found in the [wiki](https://javacord.org/wiki/basic-tutorials/interactions/commands.html) 
 
 ## 📦 Download / Installation
 
@@ -155,20 +154,15 @@ Javacord's Discord community is an excellent resource if you have questions abou
 The version number has a 3-digit format: `major.minor.trivial`
 * `major`: Increased extremely rarely to mark a major release (usually a rewrite affecting very huge parts of the library).
 * `minor`: Any backward incompatible change to the api.
-* `trivial`: A backward compatible change to the **api**. This is usually an important bugfix (or a bunch of smaller ones)
- or a backwards compatible feature addition.
+* `trivial`: A backward compatible change to the api. This is usually an important bug fix (or a bunch of smaller ones) or a backwards compatible feature addition.
  
 ## 🔨 Deprecation Policy
 
-A method or class that is marked as deprecated can be removed with the next minor release (but it will usually stay for
-several minor releases). A minor release might remove a class or method without having it deprecated, but we will do our
-best to deprecate it before removing it. We are unable to guarantee this though, because we might have to remove / replace
-something due to changes made by Discord, which we are unable to control. Usually you can expect a deprecated method or
-class to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
+They can remove a method or class that is marked as deprecated with the next minor release (but it will usually stay for several minor releases). A minor release might remove a class or method without having it deprecated, but we will do our best to deprecate it before removing it. We are unable to guarantee this, though, because we might have to remove / replace something due to changes made by Discord, which we are unable to control. Usually you can expect a deprecated method or class to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
 
 ## 🥇 Large Bots Using Javacord
 
-Javacord is used by many large bots. Here are just a few of them:
+Many large bots use Javacord. Here are just a few of them:
 * [**Yunite**](https://yunite.xyz/): A bot for Fortnite which runs on over 100,000 servers with over ten million users.
 * [**Beemo**](https://beemo.gg/): A bot that prevents raids of many large servers such as [discord.gg/LeagueOfLegends](https://discord.gg/LeagueOfLegends), [discord.gg/VALORANT](https://discord.gg/VALORANT), and many more.
 
@@ -199,7 +193,7 @@ new MessageBuilder()
 
 ### Listeners in Their Own Class 🗃
 
-All the examples use inline listeners for simplicity. For better readability it is also possible to have listeners in their own class:
+All the examples use inline listeners for simplicity. For better readability, it is also possible to have listeners in their own class:
 
 ```java
 public class MyListener implements MessageCreateListener {
@@ -218,9 +212,9 @@ public class MyListener implements MessageCreateListener {
 api.addListener(new MyListener());
 ```
 
-For commands, you have the option of using one of the many existing command frameworks such as
+For commands, you have the option of using one of the many existing command frameworks, such as
 * [**Command Framework**](https://github.com/Vampire/command-framework) by [@Vampire](https://github.com/Vampire)
-* [**Sdcf4j**](https://github.com/Bastian/sdcf4j) by [@Bastian](https://github.com/Bastian)
+* [**Sdcf4j**](https://github.com/Bastian/sdcf4j) by [@Bastian](https://github.com/Bastian) **Does not work with the latest version**
 
 or even write your own!
 
