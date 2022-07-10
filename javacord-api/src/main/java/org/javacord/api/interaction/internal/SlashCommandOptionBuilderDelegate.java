@@ -138,6 +138,20 @@ public interface SlashCommandOptionBuilderDelegate {
     void setDecimalMaxValue(double decimalMaxValue);
 
     /**
+     * Sets the {@link SlashCommandOptionType#STRING} min length for the slash command option.
+     *
+     * @param minLength The min length.
+     */
+    void setMinLength(long minLength);
+
+    /**
+     * Sets the {@link SlashCommandOptionType#STRING} max length for the slash command option.
+     *
+     * @param maxLength The max length.
+     */
+    void setMaxLength(long maxLength);
+
+    /**
      * Build the slash command option.
      *
      * @return The built option.

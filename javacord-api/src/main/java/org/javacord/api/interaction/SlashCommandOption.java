@@ -117,6 +117,20 @@ public interface SlashCommandOption {
     Optional<Double> getDecimalMaxValue();
 
     /**
+     * If the option is an {@link SlashCommandOptionType#STRING} type, the minimum allowed length.
+     *
+     * @return The minimum allowed length.
+     */
+    Optional<Long> getMinLength();
+
+    /**
+     * If the option is an {@link SlashCommandOptionType#STRING} type, the maximum allowed length.
+     *
+     * @return The maximum allowed length.
+     */
+    Optional<Long> getMaxLength();
+
+    /**
      * Create a new slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
@@ -441,6 +455,32 @@ public interface SlashCommandOption {
                 .setName(name)
                 .setDescription(description)
                 .setRequired(required)
+                .build();
+    }
+
+    /**
+     * Create a new {@link SlashCommandOptionType#STRING} slash command option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name        The name of the option.
+     * @param description The description of the option.
+     * @param required    Whether this option is required
+     * @param minLength   The minimum allowed length.
+     * @param maxLength   The maximum allowed length.
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createStringOption(String name,
+                                                 String description,
+                                                 boolean required,
+                                                 long minLength,
+                                                 long maxLength) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.STRING)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
+                .setMinLength(minLength)
+                .setMaxLength(maxLength)
                 .build();
     }
 
