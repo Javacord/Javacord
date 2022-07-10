@@ -32,6 +32,9 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     private Double decimalMinValue;
     private Double decimalMaxValue;
 
+    private Long minLength;
+    private Long maxLength;
+
     @Override
     public void setType(SlashCommandOptionType type) {
         this.type = type;
@@ -130,9 +133,19 @@ public class SlashCommandOptionBuilderDelegateImpl implements SlashCommandOption
     }
 
     @Override
+    public void setMinLength(long minLength) {
+        this.minLength = minLength;
+    }
+
+    @Override
+    public void setMaxLength(long maxLength) {
+        this.maxLength = maxLength;
+    }
+
+    @Override
     public SlashCommandOption build() {
         return new SlashCommandOptionImpl(type, name, nameLocalizations, description, descriptionLocalizations,
                 required, autocompletable, choices, options, channelTypes, longMinValue, longMaxValue,
-                decimalMinValue, decimalMaxValue);
+                decimalMinValue, decimalMaxValue, minLength, maxLength);
     }
 }
