@@ -43,7 +43,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * Sends the message as a followup message.
      *
      * @param interaction The interaction.
-     * @return The sent message.
+     * @return The message that was sent.
      */
     CompletableFuture<Message> sendFollowupMessage(InteractionBase interaction);
 
@@ -61,7 +61,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      *
      * @param interaction The interaction.
      * @param messageId   The message id of the followup message which should be edited.
-     * @return The sent message.
+     * @return The message that was sent.
      */
     CompletableFuture<Void> deleteFollowupMessage(InteractionBase interaction, String messageId);
 
@@ -70,7 +70,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      *
      * @param interaction The interaction.
      * @param messageId   The message id of the followup message which should be edited.
-     * @return The sent message.
+     * @return The message that was sent.
      */
     CompletableFuture<Message> editFollowupMessage(InteractionBase interaction, String messageId);
 

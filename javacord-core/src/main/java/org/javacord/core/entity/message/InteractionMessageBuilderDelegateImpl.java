@@ -90,13 +90,22 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         topBody.put("type", InteractionCallbackType.UPDATE_MESSAGE.getId());
         topBody.set("data", data);
 
-        return new RestRequest<Void>(interaction.getApi(),
+        RestRequest<Void> request = new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
                 .consumeGlobalRatelimit(false)
                 .includeAuthorizationHeader(false)
-                .setBody(topBody)
-                .execute(result -> null);
+                .setBody(topBody);
+
+        if (!attachments.isEmpty()) {
+            List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+
+            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
+        } else {
+            request.setBody(topBody);
+        }
+
+        return request.execute(result -> null);
     }
 
     @Override

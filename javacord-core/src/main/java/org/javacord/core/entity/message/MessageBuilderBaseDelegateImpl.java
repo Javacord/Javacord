@@ -713,7 +713,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                 mediaType = "application/octet-stream";
             }
             multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
-                    RequestBody.create(MediaType.parse(mediaType), bytes));
+                    RequestBody.create(bytes, MediaType.parse(mediaType)));
         }
 
         request.setMultipartBody(multipartBodyBuilder.build());
