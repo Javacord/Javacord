@@ -13,13 +13,11 @@ public interface MessageContextMenu extends ContextMenu {
      * {@link MessageContextMenuBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name        The name of the new message context menu command.
-     * @param description The description of the new message context menu command.
      * @return The new message context menu builder
      */
-    static MessageContextMenuBuilder with(String name, String description) {
+    static MessageContextMenuBuilder with(String name) {
         return new MessageContextMenuBuilder()
-                .setName(name)
-                .setDescription(description);
+                .setName(name);
     }
 
 
@@ -29,16 +27,13 @@ public interface MessageContextMenu extends ContextMenu {
      * {@link MessageContextMenuBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name                The name of the new message context menu command.
-     * @param description         The description of the new message context menu command.
      * @param requiredPermissions The required permissions to be able to use this command.
      * @return The new message context menu builder
      */
-    static MessageContextMenuBuilder withRequiredPermissions(String name, String description,
-                                                             PermissionType... requiredPermissions) {
+    static MessageContextMenuBuilder withRequiredPermissions(String name, PermissionType... requiredPermissions) {
         return new MessageContextMenuBuilder()
                 .setName(name)
-                .setDefaultEnabledForPermissions(requiredPermissions)
-                .setDescription(description);
+                .setDefaultEnabledForPermissions(requiredPermissions);
     }
 
     /**
@@ -47,16 +42,13 @@ public interface MessageContextMenu extends ContextMenu {
      * {@link MessageContextMenuBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name                The name of the new message context menu command.
-     * @param description         The description of the new message context menu command.
      * @param requiredPermissions The required permissions to be able to use this command.
      * @return The new message context menu builder
      */
-    static MessageContextMenuBuilder withRequiredPermissions(String name, String description,
-                                                             EnumSet<PermissionType> requiredPermissions) {
+    static MessageContextMenuBuilder withRequiredPermissions(String name, EnumSet<PermissionType> requiredPermissions) {
         return new MessageContextMenuBuilder()
                 .setName(name)
-                .setDefaultEnabledForPermissions(requiredPermissions)
-                .setDescription(description);
+                .setDefaultEnabledForPermissions(requiredPermissions);
     }
 
     /**
