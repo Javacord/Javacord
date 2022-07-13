@@ -13,13 +13,11 @@ public interface UserContextMenu extends ContextMenu {
      * {@link UserContextMenuBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name        The name of the new user context menu command.
-     * @param description The description of the new user context menu command.
      * @return The new user context menu builder
      */
-    static UserContextMenuBuilder with(String name, String description) {
+    static UserContextMenuBuilder with(String name) {
         return new UserContextMenuBuilder()
-                .setName(name)
-                .setDescription(description);
+                .setName(name);
     }
 
     /**
@@ -28,16 +26,13 @@ public interface UserContextMenu extends ContextMenu {
      * {@link UserContextMenuBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name                The name of the new user context menu command.
-     * @param description         The description of the new user context menu command.
      * @param requiredPermissions The required permissions to be able to use this command.
      * @return The new user context menu builder
      */
-    static UserContextMenuBuilder withRequiredPermissions(String name, String description,
-                                                          PermissionType... requiredPermissions) {
+    static UserContextMenuBuilder withRequiredPermissions(String name, PermissionType... requiredPermissions) {
         return new UserContextMenuBuilder()
                 .setName(name)
-                .setDefaultEnabledForPermissions(requiredPermissions)
-                .setDescription(description);
+                .setDefaultEnabledForPermissions(requiredPermissions);
     }
 
     /**
@@ -46,16 +41,13 @@ public interface UserContextMenu extends ContextMenu {
      * {@link UserContextMenuBuilder#createGlobal(DiscordApi)} on the returned builder to submit to Discord.
      *
      * @param name                The name of the new user context menu command.
-     * @param description         The description of the new user context menu command.
      * @param requiredPermissions The required permissions to be able to use this command.
      * @return The new user context menu builder
      */
-    static UserContextMenuBuilder withRequiredPermissions(String name, String description,
-                                                          EnumSet<PermissionType> requiredPermissions) {
+    static UserContextMenuBuilder withRequiredPermissions(String name, EnumSet<PermissionType> requiredPermissions) {
         return new UserContextMenuBuilder()
                 .setName(name)
-                .setDefaultEnabledForPermissions(requiredPermissions)
-                .setDescription(description);
+                .setDefaultEnabledForPermissions(requiredPermissions);
     }
 
     /**
