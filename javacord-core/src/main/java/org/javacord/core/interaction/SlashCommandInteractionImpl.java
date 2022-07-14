@@ -115,4 +115,17 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
         }
     }
 
+    @Override
+    public String getFullCommandName() {
+        return getCommandName() + getNestedCommandNamesRecursive(getOptions());
+    }
+
+    private String getNestedCommandNamesRecursive(List<SlashCommandInteractionOption> options) {
+        if (!options.isEmpty() && options.get(0).isSubcommandOrGroup()) {
+            return " " + options.get(0).getName() + getNestedCommandNamesRecursive(options.get(0).getOptions());
+        } else {
+            return "";
+        }
+    }
+
 }
