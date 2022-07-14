@@ -371,7 +371,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * A map with all stickers.
      */
-    private static final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
     /**
      * A map with all cached messages.

@@ -8,7 +8,7 @@ By reducing itself to standard Java classes and features like [`Optional`](https
 It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
 
 > *Starting in early 2023, support for Java 8 will be discontinued and Java 11 will be the new minimum requirement for using Javacord.
-> If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of this year.*
+> If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of 2022.*
 
 ## 🎉 Basic Usage
 
