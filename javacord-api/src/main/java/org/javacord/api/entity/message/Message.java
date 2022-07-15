@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -812,6 +813,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return The activity of the message.
      */
     Optional<MessageActivity> getActivity();
+
+    /**
+     * Gets the flags of the message.
+     *
+     * @return The flags of the message.
+     */
+    EnumSet<MessageFlag> getFlags();
 
     /**
      * Checks if the message is pinned.
