@@ -77,6 +77,11 @@ public class MessageAuthorImpl implements MessageAuthor {
     }
 
     @Override
+    public Optional<Long> getWebhookId() {
+        return Optional.ofNullable(webhookId);
+    }
+
+    @Override
     public Message getMessage() {
         return message;
     }
