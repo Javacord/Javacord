@@ -441,22 +441,22 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     CompletableFuture<Void> unpin(String channelId, String messageId);
 
     /**
-     * Gets a set with all users who reacted with the given emoji.
+     * Gets all users who reacted with the given emoji.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji     The emoji of the reaction.
-     * @return A set with all users who reacted with the given emoji
+     * @return All users who reacted with the given emoji
      */
     CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji);
 
     /**
-     * Gets a set with all users who reacted with the given emoji.
+     * Gets all users who reacted with the given emoji.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji     The emoji of the reaction.
-     * @return A set with all users who reacted with the given emoji
+     * @return All users who reacted with the given emoji
      */
     CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji);
 

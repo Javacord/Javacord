@@ -9,7 +9,7 @@ public interface ActionRow extends HighLevelComponent {
     /**
      * Get all components of the action row.
      *
-     * @return A list which holds the components.
+     * @return All components of the action row.
      */
     List<LowLevelComponent> getComponents();
 

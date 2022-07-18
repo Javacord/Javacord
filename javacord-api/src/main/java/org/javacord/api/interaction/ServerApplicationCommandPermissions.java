@@ -36,7 +36,7 @@ public interface ServerApplicationCommandPermissions {
     /**
      * Gets the permissions of this server application command permissions.
      *
-     * @return A set containing the application command permissions.
+     * @return The application command permissions.
      */
     Set<ApplicationCommandPermissions> getPermissions();
 }

@@ -107,7 +107,7 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     Instant getArchiveTimestamp();
 
     /**
-     * A set of the members of the thread.
+     * Gets all members of the thread.
      *
      * @return The members of the current thread.
      */
@@ -185,10 +185,10 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     }
 
     /**
-     * Gets a set of all members in this thread.
+     * Gets all members in this thread.
      * Requires the {@link org.javacord.api.entity.intent.Intent#GUILD_MEMBERS} intent.
      *
-     * @return a set of all members in this thread.
+     * @return All members in this thread.
      */
     CompletableFuture<Set<ThreadMember>> getThreadMembers();
 

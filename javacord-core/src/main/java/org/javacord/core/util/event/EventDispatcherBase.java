@@ -67,7 +67,7 @@ public abstract class EventDispatcherBase {
             Collections.synchronizedMap(new HashMap<>());
 
     /**
-     * A list with all objects which currently have a running listener.
+     * All objects which currently have a running listener.
      */
     private final Set<DispatchQueueSelector> runningListeners = Collections.synchronizedSet(new HashSet<>());
 

@@ -33,11 +33,11 @@ public class IncomingWebhookImpl extends WebhookImpl implements IncomingWebhook 
     }
 
     /**
-     * Gets the incoming webhooks with a token from a json array.
+     * Gets all incoming webhooks with a token from a json array.
      *
      * @param api The discord api instance.
      * @param jsonArray The json array of the webhooks.
-     * @return A list of all the incoming webhooks from the array.
+     * @return All the incoming webhooks from the array.
      */
     public static List<IncomingWebhook> createIncomingWebhooksFromJsonArray(DiscordApi api, JsonNode jsonArray) {
         List<IncomingWebhook> webhooks = new ArrayList<>();

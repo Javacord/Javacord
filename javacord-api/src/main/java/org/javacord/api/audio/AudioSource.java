@@ -32,9 +32,9 @@ public interface AudioSource extends AudioSourceAttachableListenerManager, Speci
     boolean removeTransformer(AudioTransformer transformer);
 
     /**
-     * Gets a list of all transformers of this audio source.
+     * Gets all transformers of this audio source.
      *
-     * @return A list with all transformers.
+     * @return All transformers.
      */
     List<AudioTransformer> getTransformers();
 

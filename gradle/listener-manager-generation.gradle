@@ -493,10 +493,10 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
             uncachedMessageAttachableListenerManagerInterface
                     .addMethod("get${listener.name}s")
                     .setJavadocComment("""
-                        Gets a list with all registered {@code $listener.name}s.
+                        Gets registered {@code $listener.name}s.
 
                         @param messageId The id of the message.
-                        @return A list with all registered {@code $listener.name}s.
+                        @return All registered {@code $listener.name}s.
                     """.stripIndent())
                     .setType("List<$listener.name>")
                     .addParameter(messageIdType, 'messageId')
@@ -507,9 +507,9 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
     def getListenersMethod = attachableListenerManagerInterface
             .addMethod("get${listener.name}s", *(globallyAttachable ? [Modifier.DEFAULT] : []))
             .setJavadocComment("""
-                Gets a list with all registered {@code $listener.name}s.
+                Gets all registered {@code $listener.name}s.
 
-                @return A list with all registered {@code $listener.name}s.
+                @return All registered {@code $listener.name}s.
             """.stripIndent())
             .setType("List<$listener.name>")
 
@@ -591,11 +591,11 @@ def addMessageSpecificConcreteListenerMethods(
         attachableListenerManagerInterface
                 .addMethod("get${listener.name}s", Modifier.STATIC)
                 .setJavadocComment("""
-                    Gets a list with all registered {@code $listener.name}s of a specific message.
+                    Gets all registered {@code $listener.name}s of a specific message.
 
                     @param api The discord api instance.
                     @param messageId The id of the message.
-                    @return A list with all registered {@code $listener.name}s.
+                    @return  with all registered {@code $listener.name}s.
                 """.stripIndent())
                 .setType("List<$listener.name>")
                 .addParameter('DiscordApi', 'api')
@@ -899,7 +899,7 @@ def addGenericGloballyAttachableListenerMethods(
 
                 @param listenerClass The class of the listener.
                 @param <T> The class of the listener.
-                @return A list with all listeners of the given type.
+                @return All listeners of the given type.
             '''.stripIndent())
             .addTypeParameter('T extends GloballyAttachableListener')
             .setType('List<T>')

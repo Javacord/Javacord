@@ -32,7 +32,7 @@ public class RatelimitManager {
     private final DiscordApiImpl api;
 
     /**
-     * A set with all buckets.
+     * All buckets.
      */
     private final Set<RatelimitBucket> buckets = new HashSet<>();
 
@@ -46,9 +46,9 @@ public class RatelimitManager {
     }
 
     /**
-     * Gets a set with all ratelimit buckets.
+     * Gets all ratelimit buckets.
      *
-     * @return A set with all ratelimit buckets.
+     * @return All ratelimit buckets.
      */
     public Set<RatelimitBucket> getBuckets() {
         return buckets;

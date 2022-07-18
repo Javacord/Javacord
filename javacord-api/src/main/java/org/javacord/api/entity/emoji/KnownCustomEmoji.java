@@ -51,9 +51,9 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     }
 
     /**
-     * Gets a set with all whitelisted roles.
+     * Gets all whitelisted roles.
      *
-     * @return A set with all whitelisted roles.
+     * @return All whitelisted roles.
      */
     Optional<Set<Role>> getWhitelistedRoles();
 

@@ -102,10 +102,10 @@ public class MemberCache {
     }
 
     /**
-     * Gets a list with all servers that the user with the given id is a member of.
+     * Gets all servers that the user with the given id is a member of.
      *
      * @param userId The id of the user.
-     * @return A list with all servers that the user with the given id is a member of.
+     * @return All servers that the user with the given id is a member of.
      */
     public Set<Server> getServers(long userId) {
         return ImmutableToJavaMapper.mapToJava(
@@ -124,29 +124,29 @@ public class MemberCache {
     }
 
     /**
-     * Gets a set with all channels in the cache.
+     * Gets all channels in the cache.
      *
-     * @return A set with all channels.
+     * @return All channels.
      */
     public Set<Member> getMembers() {
         return ImmutableToJavaMapper.mapToJava(cache.getAll());
     }
 
     /**
-     * Get a set with all members with the given id.
+     * Get all members with the given id.
      *
      * @param id The id of the member.
-     * @return A set with all member with the given id.
+     * @return All member with the given id.
      */
     public Set<Member> getMembersById(long id) {
         return ImmutableToJavaMapper.mapToJava(cache.findByIndex(ID_INDEX_NAME, id));
     }
 
     /**
-     * Get a set with all members in the server with the given id.
+     * Get all members in the server with the given id.
      *
      * @param serverId The server id.
-     * @return A set with all member of the server with the given id.
+     * @return All member of the server with the given id.
      */
     public Set<Member> getMembersByServer(long serverId) {
         return ImmutableToJavaMapper.mapToJava(cache.findByIndex(SERVER_ID_INDEX_NAME, serverId));

@@ -337,9 +337,9 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     }
 
     /**
-     * Gets a list with all pinned messages.
+     * Gets all pinned messages.
      *
-     * @return A list with all pinned messages.
+     * @return All pinned messages.
      */
     CompletableFuture<MessageSet> getPins();
 
@@ -834,24 +834,24 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     MessageCache getMessageCache();
 
     /**
-     * Gets a list of all webhooks in this channel.
+     * Gets all webhooks in this channel.
      *
-     * @return A list of all webhooks in this channel.
+     * @return All webhooks in this channel.
      */
     CompletableFuture<List<Webhook>> getWebhooks();
 
     /**
-     * Gets a list of all incoming webhooks in this channel, they are not guaranteed to have an accessible token.
+     * Gets all incoming webhooks in this channel, they are not guaranteed to have an accessible token.
      *
-     * @return A list of all incoming webhooks in this channel.
+     * @return All incoming webhooks in this channel.
      */
     CompletableFuture<List<Webhook>> getAllIncomingWebhooks();
 
     /**
-     * Gets a list of incoming webhooks in this channel.
+     * Gets all incoming webhooks in this channel.
      * This method only returns webhooks with a token, that the bot can access.
      *
-     * @return A list of all incoming webhooks in this channel.
+     * @return All incoming webhooks in this channel.
      */
     CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks();
 

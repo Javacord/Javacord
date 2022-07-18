@@ -164,9 +164,9 @@ public final class MemberImpl implements Member {
     }
 
     /**
-     * Gets a list with the member's role ids.
+     * Gets the member's role ids.
      *
-     * @return A list with the member's role ids.
+     * @return The member's role ids.
      */
     public List<Long> getRoleIds() {
         return roleIds;

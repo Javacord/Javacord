@@ -23,16 +23,16 @@ public interface InteractionSlashCommandCallbackData {
     String getContent();
 
     /**
-     * Gets a list with all embeds.
+     * Gets all embeds.
      *
-     * @return A list with all embeds.
+     * @return All embeds.
      */
     List<Embed> getEmbeds();
 
     /**
-     * Gets a list with all allowed mentions.
+     * Gets all allowed mentions.
      *
-     * @return A list with all allowed mentions.
+     * @return All allowed mentions.
      */
     List<AllowedMentions> getAllowedMentions();
 

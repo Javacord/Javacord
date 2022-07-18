@@ -108,9 +108,9 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     boolean isDisplayedSeparately();
 
     /**
-     * Gets a set with all users who have this role.
+     * Gets all users who have this role.
      *
-     * @return A set with all users who have this role.
+     * @return All users who have this role.
      */
     Set<User> getUsers();
 

@@ -116,7 +116,7 @@ public class Index<K, E> {
     }
 
     /**
-     * Gets a set with all elements with the given key.
+     * Gets all elements with the given key.
      *
      * <p>This method has an effective time complexity of {@code O(1)}.
      *
