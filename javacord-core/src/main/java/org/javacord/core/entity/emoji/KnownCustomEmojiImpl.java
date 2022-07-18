@@ -33,7 +33,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     private final Server server;
 
     /**
-     * A list with all whitelisted roles.
+     * All whitelisted roles.
      * Might be <code>null</code>!
      */
     private volatile Collection<Role> whitelist;

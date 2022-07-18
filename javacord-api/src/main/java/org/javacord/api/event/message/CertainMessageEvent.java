@@ -51,9 +51,9 @@ public interface CertainMessageEvent extends MessageEvent {
     }
 
     /**
-     * Gets a list with all attachments of the event's message.
+     * Gets all attachments of the event's message.
      *
-     * @return A list with all attachments of the event's message.
+     * @return All attachments of the event's message.
      * @see Message#getAttachments()
      */
     default List<MessageAttachment> getMessageAttachments() {

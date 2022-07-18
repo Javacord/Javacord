@@ -27,7 +27,7 @@ public abstract class AudioSourceBase implements AudioSource {
     private final AudioSourceBaseDelegate delegate;
 
     /**
-     * A list with all transformers of the audio source.
+     * All transformers of the audio source.
      */
     private final List<AudioTransformer> transformers = Collections.synchronizedList(new ArrayList<>());
 

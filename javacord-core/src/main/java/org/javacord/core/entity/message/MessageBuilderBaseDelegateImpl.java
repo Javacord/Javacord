@@ -92,7 +92,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected String nonce = null;
 
     /**
-     * A list with all attachments which should be added to the message.
+     * All attachments which should be added to the message.
      */
     protected final List<FileContainer> attachments = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected boolean attachmentsChanged = false;
 
     /**
-     * A list with all the components which should be added to the message.
+     * All components which should be added to the message.
      */
     protected final List<HighLevelComponent> components = new ArrayList<>();
 

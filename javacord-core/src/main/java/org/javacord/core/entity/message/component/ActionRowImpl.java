@@ -116,7 +116,7 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
     /**
      * Get the components of the action row.
      *
-     * @return A list which contains components.
+     * @return The components.
      */
     @Override
     public List<LowLevelComponent> getComponents() {

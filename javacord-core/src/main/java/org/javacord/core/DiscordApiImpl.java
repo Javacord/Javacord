@@ -359,12 +359,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final ConcurrentHashMap<Long, Server> nonReadyServers = new ConcurrentHashMap<>();
 
     /**
-     * A set with all unavailable servers.
+     * All unavailable servers.
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
 
     /**
-     * A map with all known custom emoji.
+     * All known custom emoji.
      */
     private final ConcurrentHashMap<Long, KnownCustomEmoji> customEmojis = new ConcurrentHashMap<>();
 
@@ -863,9 +863,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Gets a collection with all servers, including ready and not ready ones.
+     * Gets all servers, including ready and not ready ones.
      *
-     * @return A collection with all servers.
+     * @return All servers.
      */
     public Collection<Server> getAllServers() {
         ArrayList<Server> allServers = new ArrayList<>(nonReadyServers.values());
@@ -1373,7 +1373,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param objectId      The id of the object.
      * @param listenerClass The listener class.
      * @param <T>           The type of the listener.
-     * @return A list with all object listeners of the given type.
+     * @return All object listeners of the given type.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> List<T> getObjectListeners(
@@ -2010,7 +2010,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Get messages from the cache that satisfy a given condition.
      *
      * @param filter The filter for messages to be included.
-     * @return A set of cached messages satisfying the condition.
+     * @return The cached messages satisfying the condition.
      */
     public MessageSet getCachedMessagesWhere(Predicate<Message> filter) {
         messageCacheLock.lock();

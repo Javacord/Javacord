@@ -208,27 +208,27 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private final ReentrantLock audioConnectionLock = new ReentrantLock();
 
     /**
-     * A list with all consumers who will be informed when the server is ready.
+     * All consumers who will be informed when the server is ready.
      */
     private final List<Consumer<Server>> readyConsumers = new ArrayList<>();
 
     /**
-     * A map with all roles of the server.
+     * All roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
 
     /**
-     * A list with all custom emojis from this server.
+     * All custom emojis from this server.
      */
     private final Set<KnownCustomEmoji> customEmojis = new HashSet<>();
 
     /**
-     * A list with all features from this server.
+     * All features from this server.
      */
     private final Collection<ServerFeature> serverFeatures = new ArrayList<>();
 
     /**
-     * A map with all stickers from this server.
+     * All stickers from this server.
      */
     private final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
@@ -1423,7 +1423,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
-     * Gets a set with the real member objects of the server.
+     * Gets the real member objects of the server.
      *
      * @return The real members.
      */

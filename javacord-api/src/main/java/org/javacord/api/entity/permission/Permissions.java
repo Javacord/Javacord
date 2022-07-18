@@ -43,9 +43,9 @@ public interface Permissions {
     }
 
     /**
-     * Gets a set with permission types which are set to ({@link PermissionState#ALLOWED}).
+     * Gets the permission types which are set to ({@link PermissionState#ALLOWED}).
      *
-     * @return A set with all allowed permissions.
+     * @return All allowed permissions.
      */
     default Set<PermissionType> getAllowedPermission() {
         return Collections.unmodifiableSet(Arrays.stream(PermissionType.values())
@@ -54,9 +54,9 @@ public interface Permissions {
     }
 
     /**
-     * Gets a set with permission types which are set to ({@link PermissionState#DENIED}).
+     * Gets the permission types which are set to ({@link PermissionState#DENIED}).
      *
-     * @return A set with all denied permissions.
+     * @return All denied permissions.
      */
     default Set<PermissionType> getDeniedPermissions() {
         return Collections.unmodifiableSet(Arrays.stream(PermissionType.values())
@@ -65,9 +65,9 @@ public interface Permissions {
     }
 
     /**
-     * Gets a set with permission types which are set to ({@link PermissionState#UNSET}).
+     * Gets the permission types which are set to ({@link PermissionState#UNSET}).
      *
-     * @return A set with all unset permissions.
+     * @return All unset permissions.
      */
     default Set<PermissionType> getUnsetPermissions() {
         return Collections.unmodifiableSet(Arrays.stream(PermissionType.values())

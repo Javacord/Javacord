@@ -35,17 +35,17 @@ public class AuditLogImpl implements AuditLog {
     private final Server server;
 
     /**
-     * A set with all involved webhooks.
+     * All involved webhooks.
      */
     private final Set<Webhook> involvedWebhooks = new HashSet<>();
 
     /**
-     * A set with all involved users.
+     * All involved users.
      */
     private final Set<User> involvedUsers = new HashSet<>();
 
     /**
-     * A list with all entries.
+     * All entries.
      */
     private final List<AuditLogEntry> entries = new ArrayList<>();
 

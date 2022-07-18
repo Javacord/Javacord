@@ -9,8 +9,8 @@ import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -206,9 +206,9 @@ public interface DiscordApiBuilderDelegate {
      * anything but {@code 0} before calling this method.
      *
      * @param shards The shards to connect, starting with {@code 0}!
-     * @return A set of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    Set<CompletableFuture<DiscordApi>> loginShards(int... shards);
+    List<CompletableFuture<DiscordApi>> loginShards(int... shards);
 
     /**
      * Sets the recommended total shards.

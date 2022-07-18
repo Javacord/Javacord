@@ -65,18 +65,18 @@ public interface SlashCommandOption {
     boolean isAutocompletable();
 
     /**
-     * Gets a list with all choices for this option.
+     * Gets all choices for this option.
      *
      * <p>If this option has any choices, they are the only valid values for a user to pick.
      *
-     * @return A list with all choices for this option.
+     * @return All choices for this option.
      */
     List<SlashCommandOptionChoice> getChoices();
 
     /**
      * If this option is a subcommand or subcommand group type, this nested options will be the parameters.
      *
-     * @return A list with the nested options.
+     * @return The nested options.
      */
     List<SlashCommandOption> getOptions();
 
@@ -84,7 +84,7 @@ public interface SlashCommandOption {
      * If the option is of type {@link SlashCommandOptionType#CHANNEL}, the channels shown will be restricted to these
      * types.
      *
-     * @return A set with the channel types that are shown.
+     * @return The channel types that are shown.
      */
     Set<ChannelType> getChannelTypes();
 

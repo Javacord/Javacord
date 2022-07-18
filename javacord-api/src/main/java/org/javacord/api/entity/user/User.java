@@ -182,7 +182,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Gets all clients of the user that are not {@link UserStatus#OFFLINE offline}.
      *
-     * @return A set with the clients.
+     * @return The DiscordClients.
      * @see #getStatusOnClient(DiscordClient)
      */
     default Set<DiscordClient> getCurrentClients() {

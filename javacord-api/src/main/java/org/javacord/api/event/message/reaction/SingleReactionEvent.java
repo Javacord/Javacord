@@ -55,9 +55,9 @@ public interface SingleReactionEvent extends ReactionEvent, OptionalUserEvent {
     CompletableFuture<Integer> requestCount();
 
     /**
-     * Gets a set with all users who used the reaction.
+     * Gets all users who used the reaction.
      *
-     * @return A set with all users who used the reaction.
+     * @return All users who used the reaction.
      */
     CompletableFuture<Set<User>> getUsers();
 

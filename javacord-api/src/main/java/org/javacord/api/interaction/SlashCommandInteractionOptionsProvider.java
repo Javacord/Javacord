@@ -16,10 +16,10 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface SlashCommandInteractionOptionsProvider {
     /**
-     * Gets a list with the params and values from the user, or, if this command contains subcommands and/or
+     * Gets the params and values from the user, or, if this command contains subcommands and/or
      * subcommand groups, a list of subcommands and subcommand groups.
      *
-     * @return A list with the params and values from the user.
+     * @return The params and values from the user.
      */
     List<SlashCommandInteractionOption> getOptions();
 

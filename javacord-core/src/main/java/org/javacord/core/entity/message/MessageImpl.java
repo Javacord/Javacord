@@ -128,12 +128,12 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private volatile boolean cacheForever = false;
 
     /**
-     * A list with all embeds.
+     * All embeds.
      */
     private final List<Embed> embeds = new ArrayList<>();
 
     /**
-     * A list with all reactions.
+     * All reactions.
      */
     private final List<Reaction> reactions = new ArrayList<>();
 

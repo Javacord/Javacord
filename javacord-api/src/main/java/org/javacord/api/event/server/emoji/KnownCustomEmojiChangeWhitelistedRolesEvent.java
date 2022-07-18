@@ -11,16 +11,16 @@ import java.util.Set;
 public interface KnownCustomEmojiChangeWhitelistedRolesEvent extends KnownCustomEmojiEvent {
 
     /**
-     * Gets a set with the old whitelisted roles.
+     * Gets the old whitelisted roles.
      *
-     * @return A set with the old whitelisted roles.
+     * @return The old whitelisted roles.
      */
     Optional<Set<Role>> getOldWhitelistedRoles();
 
     /**
-     * Gets a set with the new whitelisted roles.
+     * Gets the new whitelisted roles.
      *
-     * @return A set with the new whitelisted roles.
+     * @return The new whitelisted roles.
      */
     Optional<Set<Role>> getNewWhitelistedRoles();
 

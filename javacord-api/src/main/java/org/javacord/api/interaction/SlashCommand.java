@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 public interface SlashCommand extends ApplicationCommand {
 
     /**
-     * Gets a list with all options (i.e., parameters) for this command.
+     * Gets all options (i.e., parameters) for this command.
      *
-     * @return A list with all options (i.e., parameters) for this command.
+     * @return All options (i.e., parameters) for this command.
      */
     List<SlashCommandOption> getOptions();
 

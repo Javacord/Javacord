@@ -237,10 +237,10 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
-    public Set<CompletableFuture<DiscordApi>> loginShards(int... shards) {
+    public List<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         Objects.requireNonNull(shards);
         if (shards.length == 0) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         if (Arrays.stream(shards).distinct().count() != shards.length) {
             throw new IllegalArgumentException("shards cannot be started multiple times!");
@@ -258,7 +258,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             logger.info("Creating {} out of {} shards ({})", shards.length, getTotalShards(), shards);
         }
 
-        Set<CompletableFuture<DiscordApi>> result = new HashSet<>(shards.length);
+        List<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
         int currentShard = getCurrentShard();
         for (int shard : shards) {
             if (currentShard != 0) {

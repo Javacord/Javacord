@@ -8,16 +8,16 @@ import java.util.Set;
 public interface ArchivedThreads {
 
     /**
-     * Gets a list with the active threads.
+     * Gets the active threads.
      *
-     * @return A list containing the active Server Thread Channels.
+     * @return The active Server Thread Channels.
      */
     List<ServerThreadChannel> getServerThreadChannels();
 
     /**
-     * A set with the thread member objects for each returned thread the current user has joined.
+     * Gets the thread member objects for each returned thread the current user has joined.
      *
-     * @return A list containing the thread members.
+     * @return The thread members.
      */
     Set<ThreadMember> getThreadMembers();
 

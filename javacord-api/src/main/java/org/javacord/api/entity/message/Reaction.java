@@ -13,35 +13,35 @@ import java.util.concurrent.CompletableFuture;
 public interface Reaction {
 
     /**
-     * Gets a set with all users who used this reaction.
+     * Gets all users who used this reaction.
      *
      * @param api The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji The emoji of the reaction.
-     * @return A set with all users who used this reaction.
+     * @return All users who used this reaction.
      */
     static CompletableFuture<Set<User>> getUsers(DiscordApi api, long channelId, long messageId, Emoji emoji) {
         return api.getUncachedMessageUtil().getUsersWhoReactedWithEmoji(channelId, messageId, emoji);
     }
 
     /**
-     * Gets a set with all users who used this reaction.
+     * Gets all users who used this reaction.
      *
      * @param api The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji The emoji of the reaction.
-     * @return A set with all users who used this reaction.
+     * @return All users who used this reaction.
      */
     static CompletableFuture<Set<User>> getUsers(DiscordApi api, String channelId, String messageId, Emoji emoji) {
         return api.getUncachedMessageUtil().getUsersWhoReactedWithEmoji(channelId, messageId, emoji);
     }
 
     /**
-     * Gets a set with all users who used this reaction.
+     * Gets all users who used this reaction.
      *
-     * @return A set with all users who used this reaction.
+     * @return All users who used this reaction.
      */
     default CompletableFuture<Set<User>> getUsers() {
         return Reaction.getUsers(

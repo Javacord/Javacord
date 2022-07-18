@@ -72,7 +72,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private final Instant archiveTimestamp;
 
     /**
-     * A collection of the thread's users.
+     * The thread's users.
      */
     private final Set<ThreadMember> members;
 

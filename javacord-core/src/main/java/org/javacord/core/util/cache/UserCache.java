@@ -53,9 +53,9 @@ public class UserCache {
     }
 
     /**
-     * Gets a set with all channels in the cache.
+     * Gets all channels in the cache.
      *
-     * @return A set with all channels.
+     * @return All channels.
      */
     public Set<User> getUsers() {
         return ImmutableToJavaMapper.mapToJava(cache.getAll());

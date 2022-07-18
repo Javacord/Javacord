@@ -113,9 +113,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     boolean canDispatchEvents();
 
     /**
-     * Gets a set with all global commands for the application.
+     * Gets all global commands for the application.
      *
-     * @return A set with all global commands.
+     * @return All global commands.
      */
     CompletableFuture<Set<ApplicationCommand>> getGlobalApplicationCommands();
 
@@ -128,10 +128,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long applicationCommandId);
 
     /**
-     * Gets a set with all application commands for the given server.
+     * Gets all application commands for the given server.
      *
      * @param server The server to get the application commands from.
-     * @return A set with all application commands from the server.
+     * @return All application commands from the server.
      */
     CompletableFuture<Set<ApplicationCommand>> getServerApplicationCommands(Server server);
 
@@ -145,9 +145,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long applicationCommandId);
 
     /**
-     * Gets a set with all global slash commands for the application.
+     * Gets all global slash commands for the application.
      *
-     * @return A set with all global slash commands.
+     * @return All global slash commands.
      */
     CompletableFuture<Set<SlashCommand>> getGlobalSlashCommands();
 
@@ -160,10 +160,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<SlashCommand> getGlobalSlashCommandById(long commandId);
 
     /**
-     * Gets a set with all slash commands for the given server.
+     * Gets all slash commands for the given server.
      *
      * @param server The server to get the slash commands from.
-     * @return A set with all slash commands from the server.
+     * @return All slash commands from the server.
      */
     CompletableFuture<Set<SlashCommand>> getServerSlashCommands(Server server);
 
@@ -177,9 +177,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId);
 
     /**
-     * Gets a set with all global user context menus for the application.
+     * Gets all global user context menus for the application.
      *
-     * @return A set with all global user context menus.
+     * @return All global user context menus.
      */
     CompletableFuture<Set<UserContextMenu>> getGlobalUserContextMenus();
 
@@ -192,10 +192,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<UserContextMenu> getGlobalUserContextMenuById(long commandId);
 
     /**
-     * Gets a set with all user context menus for the given server.
+     * Gets all user context menus for the given server.
      *
      * @param server The server to get the user context menus from.
-     * @return A set with all user context menus from the server.
+     * @return All user context menus from the server.
      */
     CompletableFuture<Set<UserContextMenu>> getServerUserContextMenus(Server server);
 
@@ -209,9 +209,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<UserContextMenu> getServerUserContextMenuById(Server server, long commandId);
 
     /**
-     * Gets a set with all global message context menus for the application.
+     * Gets all global message context menus for the application.
      *
-     * @return A set with all global message context menus.
+     * @return All global message context menus.
      */
     CompletableFuture<Set<MessageContextMenu>> getGlobalMessageContextMenus();
 
@@ -224,10 +224,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<MessageContextMenu> getGlobalMessageContextMenuById(long commandId);
 
     /**
-     * Gets a set with all message context menus for the given server.
+     * Gets all message context menus for the given server.
      *
      * @param server The server to get the message context menus from.
-     * @return A set with all message context menus from the server.
+     * @return All message context menus from the server.
      */
     CompletableFuture<Set<MessageContextMenu>> getServerMessageContextMenus(Server server);
 
@@ -241,10 +241,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CompletableFuture<MessageContextMenu> getServerMessageContextMenuById(Server server, long commandId);
 
     /**
-     * Gets a set of all server application command permissions from the given server.
+     * Gets all server application command permissions from the given server.
      *
      * @param server The server.
-     * @return A set containing the server application command permissions.
+     * @return All server application command permissions.
      */
     CompletableFuture<Set<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(Server server);
 
@@ -266,7 +266,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @param applicationCommandBuilderList A set containing the ApplicationCommandBuilders
      *                                      which should be used to perform the bulk overwrite.
-     * @return A set containing all application commands.
+     * @return All application commands.
      */
     CompletableFuture<Set<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
             Set<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList);
@@ -280,7 +280,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @param applicationCommandBuilderList A set containing the ApplicationCommandBuilders.
      * @param server                        The server where the bulk overwrite should be performed on
      *                                      which should be used to perform the bulk overwrite.
-     * @return A set containing all application commands.
+     * @return All application commands.
      */
     default CompletableFuture<Set<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
             Server server,
@@ -297,7 +297,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @param server                        The server where the bulk overwrite should be performed on
      *                                      which should be used to perform the bulk overwrite.
      * @param applicationCommandBuilderList A list containing the ApplicationCommandBuilders.
-     * @return A list containing all application commands.
+     * @return All application commands.
      */
     CompletableFuture<Set<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
             long server,
@@ -659,9 +659,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with the ids of all unavailable servers.
+     * Gets the ids of all unavailable servers.
      *
-     * @return A set with the ids of all unavailable servers.
+     * @return The ids of all unavailable servers.
      */
     Set<Long> getUnavailableServers();
 
@@ -852,9 +852,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all currently cached users.
+     * Gets all currently cached users.
      *
-     * @return A set with all currently cached users.
+     * @return All currently cached users.
      */
     Set<User> getCachedUsers();
 
@@ -1035,11 +1035,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all users with the given name.
+     * Gets all users with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the users.
-     * @return A set with all users with the given name.
+     * @return All users with the given name.
      */
     default Set<User> getCachedUsersByName(String name) {
         return Collections.unmodifiableSet(
@@ -1049,11 +1049,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all users with the given name.
+     * Gets all users with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the users.
-     * @return A set with all users with the given name.
+     * @return All users with the given name.
      */
     default Set<User> getCachedUsersByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1063,12 +1063,12 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all users with the given nickname on the given server.
+     * Gets all users with the given nickname on the given server.
      * This method is case-sensitive!
      *
      * @param nickname The nickname of the users.
      * @param server The server where to lookup the nickname.
-     * @return A set with all users with the given nickname on the given server.
+     * @return All users with the given nickname on the given server.
      */
     default Set<User> getCachedUsersByNickname(String nickname, Server server) {
         return Collections.unmodifiableSet(
@@ -1078,12 +1078,12 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all users with the given nickname on the given server.
+     * Gets all users with the given nickname on the given server.
      * This method is case-insensitive!
      *
      * @param nickname The nickname of the users.
      * @param server The server where to lookup the nickname.
-     * @return A set with all users with the given nickname on the given server.
+     * @return All users with the given nickname on the given server.
      */
     default Set<User> getCachedUsersByNicknameIgnoreCase(String nickname, Server server) {
         return Collections.unmodifiableSet(
@@ -1093,12 +1093,12 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all users with the given display name on the given server.
+     * Gets all users with the given display name on the given server.
      * This method is case-sensitive!
      *
      * @param displayName The display name of the users.
      * @param server The server where to lookup the display name.
-     * @return A set with all users with the given display name on the given server.
+     * @return All users with the given display name on the given server.
      */
     default Set<User> getCachedUsersByDisplayName(String displayName, Server server) {
         return Collections.unmodifiableSet(
@@ -1108,12 +1108,12 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all users with the given display name on the given server.
+     * Gets all users with the given display name on the given server.
      * This method is case-insensitive!
      *
      * @param displayName The display name of the users.
      * @param server The server where to lookup the display name.
-     * @return A set with all users with the given display name on the given server.
+     * @return All users with the given display name on the given server.
      */
     default Set<User> getCachedUsersByDisplayNameIgnoreCase(String displayName, Server server) {
         return Collections.unmodifiableSet(
@@ -1212,9 +1212,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all servers the bot is in.
+     * Gets all servers the bot is in.
      *
-     * @return A set with all servers the bot is in.
+     * @return All servers the bot is in.
      */
     Set<Server> getServers();
 
@@ -1245,11 +1245,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all servers with the given name.
+     * Gets all servers with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the servers.
-     * @return A set with all servers with the given name.
+     * @return All servers with the given name.
      */
     default Set<Server> getServersByName(String name) {
         return Collections.unmodifiableSet(
@@ -1259,11 +1259,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all servers with the given name.
+     * Gets all servers with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the servers.
-     * @return A set with all servers with the given name.
+     * @return All servers with the given name.
      */
     default Set<Server> getServersByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1273,9 +1273,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all known custom emojis.
+     * Gets all known custom emojis.
      *
-     * @return A set with all known custom emojis.
+     * @return All known custom emojis.
      */
     Set<KnownCustomEmoji> getCustomEmojis();
 
@@ -1304,11 +1304,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all custom emojis with the given name in the server.
+     * Gets all custom emojis with the given name in the server.
      * This method is case-sensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A set with all custom emojis with the given name in this server.
+     * @return All custom emojis with the given name in this server.
      */
     default Set<KnownCustomEmoji> getCustomEmojisByName(String name) {
         return Collections.unmodifiableSet(
@@ -1318,11 +1318,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all custom emojis with the given name in the server.
+     * Gets all custom emojis with the given name in the server.
      * This method is case-insensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A set with all custom emojis with the given name in this server.
+     * @return All custom emojis with the given name in this server.
      */
     default Set<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1346,7 +1346,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(long id, String name, boolean animated);
 
     /**
-     * Gets a list of all default sticker packs, which are available to nitro users.
+     * Gets all default sticker packs, which are available to nitro users.
      *
      * @return The nitro packs available to nitro users.
      */
@@ -1397,9 +1397,9 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all roles the bot knows.
+     * Gets all roles the bot knows.
      *
-     * @return A set with all roles the bot knows.
+     * @return All roles the bot knows.
      */
     default Set<Role> getRoles() {
         Set<Role> roles = new HashSet<>();
@@ -1436,11 +1436,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all roles with the given name.
+     * Gets all roles with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the roles.
-     * @return A set with all roles with the given name.
+     * @return All roles with the given name.
      */
     default Set<Role> getRolesByName(String name) {
         return Collections.unmodifiableSet(
@@ -1450,11 +1450,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all roles with the given name.
+     * Gets all roles with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the roles.
-     * @return A set with all roles with the given name.
+     * @return All roles with the given name.
      */
     default Set<Role> getRolesByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1464,100 +1464,100 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all channels of the bot.
+     * Gets all channels of the bot.
      *
-     * @return A set with all channels of the bot.
+     * @return All channels of the bot.
      */
     Set<Channel> getChannels();
 
     /**
-     * Gets a set with all private channels of the bot.
+     * Gets all private channels of the bot.
      *
-     * @return A set with all private channels of the bot.
+     * @return All private channels of the bot.
      */
     Set<PrivateChannel> getPrivateChannels();
 
     /**
-     * Gets a set with all server channels of the bot.
+     * Gets all server channels of the bot.
      *
-     * @return A set with all server channels of the bot.
+     * @return All server channels of the bot.
      */
     Set<ServerChannel> getServerChannels();
 
     /**
-     * Gets a set with all regular server channels of the bot.
+     * Gets all regular server channels of the bot.
      *
-     * @return A set with all regular server channels of the bot.
+     * @return All regular server channels of the bot.
      */
     Set<RegularServerChannel> getRegularServerChannels();
 
     /**
-     * Gets a set with all channel categories of the bot.
+     * Gets all channel categories of the bot.
      *
-     * @return A set with all channel categories of the bot.
+     * @return All channel categories of the bot.
      */
     Set<ChannelCategory> getChannelCategories();
 
     /**
-     * Gets a set with all server text channels of the bot.
+     * Gets all server text channels of the bot.
      *
-     * @return A set with all server text channels of the bot.
+     * @return All server text channels of the bot.
      */
     Set<ServerTextChannel> getServerTextChannels();
 
     /**
-     * Gets a set with all server forum channels of the bot.
+     * Gets all server forum channels of the bot.
      *
-     * @return A collection with all server forum channels of the bot.
+     * @return All server forum channels of the bot.
      */
     Set<ServerForumChannel> getServerForumChannels();
 
     /**
-     * Gets a set with all the server thread channels of the bot.
+     * Gets all the server thread channels of the bot.
      *
-     * @return A set with all server thread channels of the bot.
+     * @return All server thread channels of the bot.
      */
     Set<ServerThreadChannel> getServerThreadChannels();
 
     /**
-     * Gets a set with all the private threads of the bot.
+     * Gets all the private threads of the bot.
      *
-     * @return A set with all private threads of the bot.
+     * @return All private threads of the bot.
      */
     Set<ServerThreadChannel> getPrivateServerThreadChannels();
 
     /**
-     * Gets a set with all the public threads of the bot.
+     * Gets all the public threads of the bot.
      *
-     * @return A set with all the public threads of the bot.
+     * @return All the public threads of the bot.
      */
     Set<ServerThreadChannel> getPublicServerThreadChannels();
 
     /**
-     * Gets a set with all server voice channels of the bot.
+     * Gets all server voice channels of the bot.
      *
-     * @return A set with all server voice channels of the bot.
+     * @return All server voice channels of the bot.
      */
     Set<ServerVoiceChannel> getServerVoiceChannels();
 
     /**
-     * Gets a set with all server stage voice channels of the bot.
+     * Gets all server stage voice channels of the bot.
      *
-     * @return A set with all server stage voice channels of the bot.
+     * @return All server stage voice channels of the bot.
      */
     Set<ServerStageVoiceChannel> getServerStageVoiceChannels();
 
     /**
-     * Gets a set with all text channels of the bot.
+     * Gets all text channels of the bot.
      *
-     * @return A set with all text channels of the bot.
+     * @return All text channels of the bot.
      */
     Set<TextChannel> getTextChannels();
 
     /**
-     * Gets a set with all voice channels of the bot.
+     * Gets all voice channels of the bot.
      *
-     * @return A set with all voice channels of the bot.
+     * @return All voice channels of the bot.
      */
     Set<VoiceChannel> getVoiceChannels();
 
@@ -1584,22 +1584,22 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all channels with the given name.
+     * Gets all channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the channels.
-     * @return A set with all channels with the given name.
+     * @return All channels with the given name.
      */
     default Set<Channel> getChannelsByName(String name) {
         return Collections.unmodifiableSet(getServerChannelsByName(name));
     }
 
     /**
-     * Gets a set with all channels with the given name.
+     * Gets all channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the channels.
-     * @return A set with all channels with the given name.
+     * @return All channels with the given name.
      */
     default Set<Channel> getChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(getServerChannelsByNameIgnoreCase(name));
@@ -1630,22 +1630,22 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all text channels with the given name.
+     * Gets all text channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the text channels.
-     * @return A set with all text channels with the given name.
+     * @return All text channels with the given name.
      */
     default Set<TextChannel> getTextChannelsByName(String name) {
         return Collections.unmodifiableSet(getServerTextChannelsByName(name));
     }
 
     /**
-     * Gets a set with all text channels with the given name.
+     * Gets all text channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the text channels.
-     * @return A set with all text channels with the given name.
+     * @return All text channels with the given name.
      */
     default Set<TextChannel> getTextChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(getServerTextChannelsByNameIgnoreCase(name));
@@ -1676,22 +1676,22 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all voice channels with the given name.
+     * Gets all voice channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the voice channels.
-     * @return A set with all voice channels with the given name.
+     * @return All voice channels with the given name.
      */
     default Set<VoiceChannel> getVoiceChannelsByName(String name) {
         return Collections.unmodifiableSet(getServerVoiceChannelsByName(name));
     }
 
     /**
-     * Gets a set with all voice channels with the given name.
+     * Gets all voice channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the voice channels.
-     * @return A set with all voice channels with the given name.
+     * @return All voice channels with the given name.
      */
     default Set<VoiceChannel> getVoiceChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(getServerVoiceChannelsByNameIgnoreCase(name));
@@ -1722,11 +1722,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server channels with the given name.
+     * Gets all server channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server channels.
-     * @return A set with all server channels with the given name.
+     * @return All server channels with the given name.
      */
     default Set<ServerChannel> getServerChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -1736,11 +1736,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server channels with the given name.
+     * Gets all server channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server channels.
-     * @return A set with all server channels with the given name.
+     * @return All server channels with the given name.
      */
     default Set<ServerChannel> getServerChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1774,11 +1774,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all regular server channels with the given name.
+     * Gets all regular server channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the regular server channels.
-     * @return A set with all regular server channels with the given name.
+     * @return All regular server channels with the given name.
      */
     default Set<RegularServerChannel> getRegularServerChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -1788,11 +1788,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all regular server channels with the given name.
+     * Gets all regular server channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the regular server channels.
-     * @return A set with all regular server channels with the given name.
+     * @return All regular server channels with the given name.
      */
     default Set<RegularServerChannel> getRegularServerChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1826,11 +1826,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all channel categories with the given name.
+     * Gets all channel categories with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the channel categories.
-     * @return A set with all channel categories with the given name.
+     * @return All channel categories with the given name.
      */
     default Set<ChannelCategory> getChannelCategoriesByName(String name) {
         return Collections.unmodifiableSet(
@@ -1840,11 +1840,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all channel categories with the given name.
+     * Gets all channel categories with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the channel categories.
-     * @return A set with all channel categories with the given name.
+     * @return All channel categories with the given name.
      */
     default Set<ChannelCategory> getChannelCategoriesByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1878,11 +1878,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server text channels with the given name.
+     * Gets all server text channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server text channels.
-     * @return A set with all server text channels with the given name.
+     * @return All server text channels with the given name.
      */
     default Set<ServerTextChannel> getServerTextChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -1892,11 +1892,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server text channels with the given name.
+     * Gets all server text channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server text channels.
-     * @return A set with all server text channels with the given name.
+     * @return All server text channels with the given name.
      */
     default Set<ServerTextChannel> getServerTextChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1930,11 +1930,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a collection with all server forum channels with the given name.
+     * Gets all server forum channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server forum channels.
-     * @return A collection with all server forum channels with the given name.
+     * @return All server forum channels with the given name.
      */
     default Set<ServerForumChannel> getServerForumChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -1944,11 +1944,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a collection with all server forum channels with the given name.
+     * Gets all server forum channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server forum channels.
-     * @return A collection with all server forum channels with the given name.
+     * @return All server forum channels with the given name.
      */
     default Set<ServerForumChannel> getServerForumChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -1982,11 +1982,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server thread channels with the given name.
+     * Gets all server thread channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server thread channels.
-     * @return A set with all server thread channels with the given name.
+     * @return All server thread channels with the given name.
      */
     default Set<ServerThreadChannel> getServerThreadChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -1996,11 +1996,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server thread channels with the given name.
+     * Gets all server thread channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server thread channels.
-     * @return A set with all server thread channels with the given name.
+     * @return All server thread channels with the given name.
      */
     default Set<ServerThreadChannel> getServerThreadChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -2034,11 +2034,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server voice channels with the given name.
+     * Gets all server voice channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server voice channels.
-     * @return A set with all server voice channels with the given name.
+     * @return All server voice channels with the given name.
      */
     default Set<ServerVoiceChannel> getServerVoiceChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -2048,11 +2048,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server voice channels with the given name.
+     * Gets all server voice channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server voice channels.
-     * @return A set with all server voice channels with the given name.
+     * @return All server voice channels with the given name.
      */
     default Set<ServerVoiceChannel> getServerVoiceChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
@@ -2086,11 +2086,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server stage voice channels with the given name.
+     * Gets all server stage voice channels with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the server stage voice channels.
-     * @return A set with all server stage voice channels with the given name.
+     * @return All server stage voice channels with the given name.
      */
     default Set<ServerStageVoiceChannel> getServerStageVoiceChannelsByName(String name) {
         return Collections.unmodifiableSet(
@@ -2100,11 +2100,11 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets a set with all server stage voice channels with the given name.
+     * Gets all server stage voice channels with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the server stage voice channels.
-     * @return A set with all server stage voice channels with the given name.
+     * @return All server stage voice channels with the given name.
      */
     default Set<ServerStageVoiceChannel> getServerStageVoiceChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(

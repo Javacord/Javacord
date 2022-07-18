@@ -28,23 +28,23 @@ public interface AuditLog {
     Server getServer();
 
     /**
-     * Gets a set with all webhooks, which can be found in this audit log.
+     * Gets all webhooks, which can be found in this audit log.
      *
-     * @return A set with all webhooks, which can be found in this audit log.
+     * @return All webhooks, which can be found in this audit log.
      */
     Set<Webhook> getInvolvedWebhooks();
 
     /**
-     * Gets a set with all users, which can be found in this audit log.
+     * Gets all users, which can be found in this audit log.
      *
-     * @return A set with all users, which can be found in this audit log.
+     * @return All users, which can be found in this audit log.
      */
     Set<User> getInvolvedUsers();
 
     /**
-     * Gets a list with all entries.
+     * Gets all entries.
      *
-     * @return A list with all entries.
+     * @return All entries.
      */
     List<AuditLogEntry> getEntries();
 

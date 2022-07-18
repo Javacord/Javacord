@@ -165,11 +165,11 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
     Optional<CompletableFuture<Mentionable>> requestMentionableValue();
 
     /**
-     * Gets a list with all options of this option, if this option denotes a subcommand or group.
+     * Gets all options of this option, if this option denotes a subcommand or group.
      *
      * <p>If this option does not denote a subcommand or group, the list will be empty.
      *
-     * @return A list with all options.
+     * @return All options.
      */
     @Override // due to different JavaDoc; signature identical
     List<SlashCommandInteractionOption> getOptions();
