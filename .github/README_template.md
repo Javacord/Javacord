@@ -95,7 +95,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 #### Gradle
 
-```groovy
+```gradle
 repositories { mavenCentral() }
 dependencies { implementation 'org.javacord:javacord:$version' }
 ```
@@ -124,7 +124,7 @@ with being able to configure log format, log targets (console, file, database, D
 log levels per class, and much more.
 
 For example, Log4j Core in Gradle
-```groovy
+```gradle
 dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.17.1' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-config.html) wiki article for further information.
