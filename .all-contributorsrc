@@ -58,6 +58,18 @@
         "review",
         "question"
       ]
+    },
+    {
+      "login": "bassner",
+      "name": "Patrick Bassner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23171488?v=4",
+      "profile": "https://github.com/bassner",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "question"
+      ]
     }
   ],
   "projectName": "Javacord",
