@@ -70,6 +70,18 @@
         "review",
         "question"
       ]
+    },
+    {
+      "login": "Mysterypotatoguy",
+      "name": "Mysterypotatoguy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17689082?v=4",
+      "profile": "https://github.com/Mysterypotatoguy",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "question"
+      ]
     }
   ],
   "projectName": "Javacord",
