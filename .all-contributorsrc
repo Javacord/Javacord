@@ -6,7 +6,7 @@
   "contributorsPerLine": 7,
   "contributorsSortAlphabetically": false,
   "types": {},
-  "skipCi": true,
+  "skipCi": false,
   "contributors": [
   ]
 }
