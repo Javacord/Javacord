@@ -8,5 +8,22 @@
   "types": {},
   "skipCi": false,
   "contributors": [
-  ]
+    {
+      "login": "KILLEliteMaste",
+      "name": "Dominic Fellbaum",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31566807?v=4",
+      "profile": "https://github.com/KILLEliteMaste",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "review",
+        "question"
+      ]
+    }
+  ],
+  "projectName": "Javacord",
+  "projectOwner": "Javacord",
+  "repoType": "github",
+  "repoHost": "https://github.com"
 }
