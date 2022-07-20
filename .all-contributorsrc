@@ -46,6 +46,18 @@
         "review",
         "question"
       ]
+    },
+    {
+      "login": "Vampire",
+      "name": "Björn Kautler",
+      "avatar_url": "https://avatars.githubusercontent.com/u/325196?v=4",
+      "profile": "https://github.com/Vampire",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "question"
+      ]
     }
   ],
   "projectName": "Javacord",
