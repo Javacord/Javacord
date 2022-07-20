@@ -22,7 +22,7 @@ public class UserUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        api.setYourself(new UserImpl(api, packet.get("user"), (MemberImpl) null, null));
+        api.setYourself(new UserImpl(api, packet, (MemberImpl) null, null));
     }
 
 }
