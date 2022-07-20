@@ -20,6 +20,19 @@
         "review",
         "question"
       ]
+    },
+    {
+      "login": "Saladoc",
+      "name": "Saladoc",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36816545?v=4",
+      "profile": "https://github.com/Saladoc",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "review",
+        "question"
+      ]
     }
   ],
   "projectName": "Javacord",
