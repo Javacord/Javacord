@@ -8,6 +8,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://github.com/KILLEliteMaste"><img src="https://avatars.githubusercontent.com/u/31566807?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dominic Fellbaum</b></sub></a><br /><a href="#maintenance-KILLEliteMaste" title="Maintenance">🚧</a> <a href="https://github.com/Javacord/Javacord/commits?author=KILLEliteMaste" title="Code">💻</a> <a href="https://github.com/Javacord/Javacord/commits?author=KILLEliteMaste" title="Documentation">📖</a> <a href="https://github.com/Javacord/Javacord/pulls?q=is%3Apr+reviewed-by%3AKILLEliteMaste" title="Reviewed Pull Requests">👀</a> <a href="#question-KILLEliteMaste" title="Answering Questions">💬</a></td>
+    <td align="center"><a href="https://github.com/Saladoc"><img src="https://avatars.githubusercontent.com/u/36816545?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Saladoc</b></sub></a><br /><a href="#maintenance-Saladoc" title="Maintenance">🚧</a> <a href="https://github.com/Javacord/Javacord/commits?author=Saladoc" title="Code">💻</a> <a href="https://github.com/Javacord/Javacord/commits?author=Saladoc" title="Documentation">📖</a> <a href="https://github.com/Javacord/Javacord/pulls?q=is%3Apr+reviewed-by%3ASaladoc" title="Reviewed Pull Requests">👀</a> <a href="#question-Saladoc" title="Answering Questions">💬</a></td>
   </tr>
 </table>
 
