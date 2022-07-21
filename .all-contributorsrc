@@ -6,7 +6,7 @@
   "contributorsPerLine": 7,
   "contributorsSortAlphabetically": false,
   "types": {},
-  "skipCi": false,
+  "skipCi": true,
   "contributors": [
     {
       "login": "KILLEliteMaste",
