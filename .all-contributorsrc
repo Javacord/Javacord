@@ -82,6 +82,15 @@
         "review",
         "question"
       ]
+    },
+    {
+      "login": "wasdennnoch",
+      "name": "Adrian Paschkowski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10065021?v=4",
+      "profile": "https://wasdennnoch.me",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
