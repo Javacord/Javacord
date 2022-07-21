@@ -1,8 +1,9 @@
 name: Main
 on:
   pull_request:
-    branches-ignore:
-      - 'all-contributors/**'
+    paths-ignore:
+      - 'CONTRIBUTORS.md'
+      - '.all-contributorsrc'
   push:
     branches-ignore:
       - 'all-contributors/**'
