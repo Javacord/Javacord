@@ -15,6 +15,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Mysterypotatoguy"><img src="https://avatars.githubusercontent.com/u/17689082?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mysterypotatoguy</b></sub></a><br /><a href="#maintenance-Mysterypotatoguy" title="Maintenance">🚧</a> <a href="https://github.com/Javacord/Javacord/commits?author=Mysterypotatoguy" title="Code">💻</a> <a href="https://github.com/Javacord/Javacord/pulls?q=is%3Apr+reviewed-by%3AMysterypotatoguy" title="Reviewed Pull Requests">👀</a> <a href="#question-Mysterypotatoguy" title="Answering Questions">💬</a></td>
     <td align="center"><a href="https://wasdennnoch.me"><img src="https://avatars.githubusercontent.com/u/10065021?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Adrian Paschkowski</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=wasdennnoch" title="Code">💻</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/Joshix-1"><img src="https://avatars.githubusercontent.com/u/57299889?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joshix-1</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=Joshix-1" title="Code">💻</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-restore -->
