@@ -1271,9 +1271,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Optional<Instant> getServerBoostingSinceTimestamp(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerBoostingSinceTimestamp);
+    }
+
+    @Override
     public Optional<Instant> getTimeout(User user) {
         return getRealMemberById(user.getId())
                 .flatMap(Member::getTimeout);
+    }
+
+    @Override
+    public Optional<String> getUserServerAvatarHash(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerAvatarHash);
     }
 
     @Override

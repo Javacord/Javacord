@@ -289,6 +289,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
+    public Optional<Instant> getServerBoostingSinceTimestamp(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getServerBoostingSinceTimestamp(this);
+        } else {
+            return member.getServerBoostingSinceTimestamp();
+        }
+    }
+
+    @Override
     public String getDisplayName(Server server) {
         if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
             return server.getNickname(this).orElseGet(this::getName);
@@ -366,6 +375,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             return server.getRoleColor(this);
         } else {
             return member.getRoleColor();
+        }
+    }
+
+    @Override
+    public Optional<String> getServerAvatarHash(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getUserServerAvatarHash(this);
+        } else {
+            return member.getServerAvatarHash();
         }
     }
 

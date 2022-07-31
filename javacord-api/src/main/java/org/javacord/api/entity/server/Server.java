@@ -177,6 +177,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<String> getNickname(User user);
 
     /**
+     * Gets the timestamp of when this member started boosting the server.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this member started boosting the server.
+     */
+    Optional<Instant> getServerBoostingSinceTimestamp(User user);
+
+    /**
      * Gets the timestamp of when the user's timeout will expire
      * and the user will be able to communicate in the server again.
      * The returned Instant may be in the past which indicates that the user is not timed out.
@@ -199,6 +207,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<Instant> getActiveTimeout(User user) {
         return getTimeout(user).filter(Instant.now()::isBefore);
     }
+
+    /**
+     * Gets the user's server specific avatar hash.
+     *
+     * @param user The user.
+     * @return The user's server specific avatar hash.
+     */
+    Optional<String> getUserServerAvatarHash(User user);
 
     /**
      * Gets the user's server specific avatar.

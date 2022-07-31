@@ -242,6 +242,14 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Icon getAvatar(int size);
 
     /**
+     * Gets the member's server avatar hash.
+     *
+     * @param server The server.
+     * @return The member's server avatar hash.
+     */
+    Optional<String> getServerAvatarHash(Server server);
+
+    /**
      * Gets the user's server-specific avatar in the given server.
      *
      * @param server The server.
@@ -374,6 +382,14 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return The nickname of the user.
      */
     Optional<String> getNickname(Server server);
+
+    /**
+     * Gets the timestamp of when this member started boosting the server.
+     *
+     * @param server The server.
+     * @return The timestamp of when this member started boosting the server.
+     */
+    Optional<Instant> getServerBoostingSinceTimestamp(Server server);
 
     /**
      * Timeouts the user on the given server.
