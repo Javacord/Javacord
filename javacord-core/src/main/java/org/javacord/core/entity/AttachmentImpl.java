@@ -40,6 +40,11 @@ public class AttachmentImpl implements Attachment {
     private final String fileName;
 
     /**
+     * The description of the attachment.
+     */
+    private final String description;
+
+    /**
      * The size of the attachment in bytes.
      */
     private final int size;
@@ -79,6 +84,7 @@ public class AttachmentImpl implements Attachment {
         this.api = api;
         id = data.get("id").asLong();
         fileName = data.get("filename").asText();
+        description = data.hasNonNull("description") ? data.get("description").asText() : null;
         size = data.get("size").asInt();
         url = data.get("url").asText();
         proxyUrl = data.get("proxy_url").asText();
@@ -100,6 +106,11 @@ public class AttachmentImpl implements Attachment {
     @Override
     public String getFileName() {
         return fileName;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
     }
 
     @Override

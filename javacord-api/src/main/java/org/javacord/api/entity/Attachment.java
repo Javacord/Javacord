@@ -20,6 +20,13 @@ public interface Attachment extends DiscordEntity {
     String getFileName();
 
     /**
+     * Gets the description of the attachment.
+     *
+     * @return The description of the attachment.
+     */
+    String getDescription();
+
+    /**
      * Gets the size of the attachment in bytes.
      *
      * @return The size of the attachment in bytes.
