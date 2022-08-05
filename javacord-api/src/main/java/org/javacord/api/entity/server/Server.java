@@ -89,7 +89,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @return The server's available features.
      */
-    Collection<ServerFeature> getFeatures();
+    Set<ServerFeature> getFeatures();
 
     /**
      * Gets the boost level of the server.
@@ -510,7 +510,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @return The invites of the server.
      */
-    CompletableFuture<Collection<RichInvite>> getInvites();
+    CompletableFuture<Set<RichInvite>> getInvites();
 
     /**
      * Checks if all members of the server are in the cache.
@@ -527,11 +527,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     void requestMembersChunks();
 
     /**
-     * Gets a collection with all members of the server.
+     * Gets all members of the server.
      *
-     * @return A collection with all members of the server.
+     * @return All members of the server.
      */
-    Collection<User> getMembers();
+    Set<User> getMembers();
 
     /**
      * Gets a member by its id.
@@ -612,87 +612,87 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection with all members with the given name.
+     * Gets all members with the given name.
      * This method is case-sensitive!
      *
      * @param name The name of the members.
-     * @return A collection with all members with the given name.
+     * @return All members with the given name.
      */
-    default Collection<User> getMembersByName(String name) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByName(String name) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getName().equals(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given name.
+     * Gets all members with the given name.
      * This method is case-insensitive!
      *
      * @param name The name of the members.
-     * @return A collection with all members with the given name.
+     * @return All members with the given name.
      */
-    default Collection<User> getMembersByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getName().equalsIgnoreCase(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given nickname on this server.
+     * Gets all members with the given nickname on this server.
      * This method is case-sensitive!
      *
      * @param nickname The nickname of the members.
-     * @return A collection with all members with the given nickname on this server.
+     * @return All members with the given nickname on this server.
      */
-    default Collection<User> getMembersByNickname(String nickname) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByNickname(String nickname) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getNickname(this).map(nickname::equals).orElse(false))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given nickname on this server.
+     * Gets all members with the given nickname on this server.
      * This method is case-insensitive!
      *
      * @param nickname The nickname of the members.
-     * @return A collection with all members with the given nickname on this server.
+     * @return All members with the given nickname on this server.
      */
-    default Collection<User> getMembersByNicknameIgnoreCase(String nickname) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByNicknameIgnoreCase(String nickname) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getNickname(this).map(nickname::equalsIgnoreCase).orElse(false))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given display name on this server.
+     * Gets all members with the given display name on this server.
      * This method is case-sensitive!
      *
      * @param displayName The display name of the members.
-     * @return A collection with all members with the given display name on this server.
+     * @return All members with the given display name on this server.
      */
-    default Collection<User> getMembersByDisplayName(String displayName) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByDisplayName(String displayName) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getDisplayName(this).equals(displayName))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given display name on this server.
+     * Gets all members with the given display name on this server.
      * This method is case-insensitive!
      *
      * @param displayName The display name of the members.
-     * @return A collection with all members with the given display name on this server.
+     * @return All members with the given display name on this server.
      */
-    default Collection<User> getMembersByDisplayNameIgnoreCase(String displayName) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByDisplayNameIgnoreCase(String displayName) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getDisplayName(this).equalsIgnoreCase(displayName))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
@@ -811,14 +811,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The allowed permissions of the given user.
      */
-    default Collection<PermissionType> getAllowedPermissions(User user) {
-        Collection<PermissionType> allowed = new HashSet<>();
+    default Set<PermissionType> getAllowedPermissions(User user) {
+        Set<PermissionType> allowed = new HashSet<>();
         if (isOwner(user)) {
             allowed.addAll(Arrays.asList(PermissionType.values()));
         } else {
             getRoles(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
         }
-        return Collections.unmodifiableCollection(allowed);
+        return Collections.unmodifiableSet(allowed);
     }
 
     /**
@@ -827,13 +827,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The unset permissions of the given user.
      */
-    default Collection<PermissionType> getUnsetPermissions(User user) {
+    default Set<PermissionType> getUnsetPermissions(User user) {
         if (isOwner(user)) {
             return Collections.emptySet();
         }
-        Collection<PermissionType> unset = new HashSet<>();
+        Set<PermissionType> unset = new HashSet<>();
         getRoles(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
-        return Collections.unmodifiableCollection(unset);
+        return Collections.unmodifiableSet(unset);
     }
 
     /**
@@ -2179,47 +2179,47 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     CompletableFuture<Ban> requestBan(long userId);
 
     /**
-     * Gets a collection with all server bans.
+     * Gets all server bans.
      * Note: This method fires <code>ceil((number of bans + 1) / 1000)</code> requests to Discord
      * as the API returns the results in pages and Javacord collects all pages into one collection.
      * If you want to control pagination yourself, use {@link Server#getBans(Integer, Long)}.
      *
-     * @return A collection with all server bans.
+     * @return All server bans.
      */
-    CompletableFuture<Collection<Ban>> getBans();
+    CompletableFuture<Set<Ban>> getBans();
 
     /**
-     * Gets a collection with up to <code>limit</code> server bans, only taking users with an ID higher than
+     * Gets up to <code>limit</code> server bans, only taking users with an ID higher than
      * <code>after</code> into account.
      * This can be used to get a specific page of bans.
      * To get all pages / all bans at once, use {@link Server#getBans()}.
      *
-     * @param limit how many bans should be returned at most. Must be within [0, 1000]. If null, it will default to 1000
-     * @param after should be a snowflake to only take bans of users with IDs higher
+     * @param limit How many bans should be returned at most. Must be within [0, 1000]. If null, it will default to 1000
+     * @param after Should be a snowflake to only take bans of users with IDs higher
      *              than this parameter into account; can be null
-     * @return A collection with server bans on the given page with at most <code>limit</code> entries.
+     * @return Server bans on the given page with at most <code>limit</code> entries.
      */
-    CompletableFuture<Collection<Ban>> getBans(Integer limit, Long after);
+    CompletableFuture<Set<Ban>> getBans(Integer limit, Long after);
 
     /**
-     * Gets a list of all webhooks in this server.
+     * Gets all webhooks in this server.
      *
-     * @return A list of all webhooks in this server.
+     * @return All webhooks in this server.
      */
     CompletableFuture<List<Webhook>> getWebhooks();
 
     /**
-     * Gets a list of all incoming webhooks in this server, they are not guaranteed to have an accessible token.
+     * Gets all incoming webhooks in this server, they are not guaranteed to have an accessible token.
      *
-     * @return A list of all incoming webhooks in this server.
+     * @return All incoming webhooks in this server.
      */
     CompletableFuture<List<Webhook>> getAllIncomingWebhooks();
 
     /**
-     * Gets a list of incoming webhooks in this server.
+     * Gets all incoming webhooks in this server.
      * This method only returns webhooks with a token, that the bot can access.
      *
-     * @return A list of all incoming webhooks in this server.
+     * @return All incoming webhooks in this server.
      */
     CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks();
 
@@ -2275,11 +2275,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection with all custom emojis of this server.
+     * Gets all custom emojis of this server.
      *
-     * @return A collection with all custom emojis of this server.
+     * @return All custom emojis of this server.
      */
-    Collection<KnownCustomEmoji> getCustomEmojis();
+    Set<KnownCustomEmoji> getCustomEmojis();
 
     /**
      * Gets a custom emoji in this server by its id.
@@ -2306,39 +2306,39 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection of all custom emojis with the given name in the server.
+     * Gets all custom emojis with the given name in the server.
      * This method is case-sensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A collection of all custom emojis with the given name in this server.
+     * @return All custom emojis with the given name in this server.
      */
-    default Collection<KnownCustomEmoji> getCustomEmojisByName(String name) {
-        return Collections.unmodifiableList(
+    default Set<KnownCustomEmoji> getCustomEmojisByName(String name) {
+        return Collections.unmodifiableSet(
                 getCustomEmojis().stream()
                         .filter(emoji -> emoji.getName().equals(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection of all custom emojis with the given name in the server.
+     * Gets all custom emojis with the given name in the server.
      * This method is case-insensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A collection of all custom emojis with the given name in this server.
+     * @return All custom emojis with the given name in this server.
      */
-    default Collection<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
-        return Collections.unmodifiableCollection(
+    default Set<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
                 getCustomEmojis().stream()
                         .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a list with all slash commands for the given server.
+     * Gets all slash commands for the given server.
      *
-     * @return A list with all slash commands from the server.
+     * @return All slash commands from the server.
      */
-    CompletableFuture<List<SlashCommand>> getSlashCommands();
+    CompletableFuture<Set<SlashCommand>> getSlashCommands();
 
     /**
      * Gets a server slash command by its id.
@@ -3392,10 +3392,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a list of sticker by their name. The name is case-sensitive!
+     * Gets stickers by their name. The name is case-sensitive!
      *
      * @param name The name of the stickers.
-     * @return A list of stickers with the given name.
+     * @return Stickers with the given name.
      */
     default Set<Sticker> getStickersByName(String name) {
         return getStickers().stream()
@@ -3404,10 +3404,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a list of sticker by their name. The name is case-insensitive!
+     * Gets stickers by their name. The name is case-insensitive!
      *
      * @param name The name of the stickers.
-     * @return A list of stickers with the given name.
+     * @return Stickers with the given name.
      */
     default Set<Sticker> getStickersByNameIgnoreCase(String name) {
         return getStickers().stream()

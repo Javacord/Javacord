@@ -26,8 +26,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -351,8 +353,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji) {
-        CompletableFuture<List<User>> future = new CompletableFuture<>();
+    public CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji) {
+        CompletableFuture<Set<User>> future = new CompletableFuture<>();
         api.getThreadPool().getExecutorService().submit(() -> {
             try {
                 final String value = emoji.asUnicodeEmoji().orElseGet(() -> emoji.asCustomEmoji()
@@ -378,7 +380,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                     users.addAll(incompleteUsers);
                     requestMore = incompleteUsers.size() >= 100;
                 }
-                future.complete(Collections.unmodifiableList(users));
+                future.complete(Collections.unmodifiableSet(new HashSet<>(users)));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -387,11 +389,11 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji) {
+    public CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji) {
         try {
             return getUsersWhoReactedWithEmoji(Long.parseLong(channelId), Long.parseLong(messageId), emoji);
         } catch (NumberFormatException e) {
-            CompletableFuture<List<User>> future = new CompletableFuture<>();
+            CompletableFuture<Set<User>> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
         }

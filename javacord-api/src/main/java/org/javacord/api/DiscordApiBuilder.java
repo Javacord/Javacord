@@ -13,7 +13,7 @@ import org.javacord.api.util.ratelimit.Ratelimiter;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -46,9 +46,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * It is invalid to call {@link #setCurrentShard(int)} with
      * anything but {@code 0} before calling this method.
      *
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    public Collection<CompletableFuture<DiscordApi>> loginAllShards() {
+    public List<CompletableFuture<DiscordApi>> loginAllShards() {
         return loginShards(shard -> true);
     }
 
@@ -58,9 +58,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * anything but {@code 0} before calling this method.
      *
      * @param shardsCondition The predicate for identifying shards to connect, starting with {@code 0}!
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    public Collection<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
+    public List<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
         return loginShards(IntStream.range(0, delegate.getTotalShards()).filter(shardsCondition).toArray());
     }
 
@@ -70,9 +70,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * anything but {@code 0} before calling this method.
      *
      * @param shards The shards to connect, starting with {@code 0}!
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
+    public List<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         return delegate.loginShards(shards);
     }
 

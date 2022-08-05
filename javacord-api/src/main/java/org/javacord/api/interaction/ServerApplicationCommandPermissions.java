@@ -2,7 +2,7 @@ package org.javacord.api.interaction;
 
 import org.javacord.api.entity.server.Server;
 
-import java.util.List;
+import java.util.Set;
 
 public interface ServerApplicationCommandPermissions {
     /**
@@ -36,7 +36,7 @@ public interface ServerApplicationCommandPermissions {
     /**
      * Gets the permissions of this server application command permissions.
      *
-     * @return A list containing the application command permissions.
+     * @return The application command permissions.
      */
-    List<ApplicationCommandPermissions> getPermissions();
+    Set<ApplicationCommandPermissions> getPermissions();
 }

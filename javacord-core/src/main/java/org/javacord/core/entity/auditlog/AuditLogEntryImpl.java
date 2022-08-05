@@ -73,7 +73,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
     private final AuditLogEntryTarget target;
 
     /**
-     * A list with all changes.
+     * All changes.
      */
     private final List<AuditLogChange<?>> changes = new ArrayList<>();
 

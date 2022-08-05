@@ -5,8 +5,8 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The class represents an audit log.
@@ -28,23 +28,23 @@ public interface AuditLog {
     Server getServer();
 
     /**
-     * Gets a collection with all webhooks, which can be found in this audit log.
+     * Gets all webhooks, which can be found in this audit log.
      *
-     * @return A collection with all webhooks, which can be found in this audit log.
+     * @return All webhooks, which can be found in this audit log.
      */
-    Collection<Webhook> getInvolvedWebhooks();
+    Set<Webhook> getInvolvedWebhooks();
 
     /**
-     * Gets a collection with all users, which can be found in this audit log.
+     * Gets all users, which can be found in this audit log.
      *
-     * @return A collection with all users, which can be found in this audit log.
+     * @return All users, which can be found in this audit log.
      */
-    Collection<User> getInvolvedUsers();
+    Set<User> getInvolvedUsers();
 
     /**
-     * Gets a list with all entries.
+     * Gets all entries.
      *
-     * @return A list with all entries.
+     * @return All entries.
      */
     List<AuditLogEntry> getEntries();
 

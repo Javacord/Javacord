@@ -21,7 +21,6 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -238,7 +237,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
-    public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
+    public List<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         Objects.requireNonNull(shards);
         if (shards.length == 0) {
             return Collections.emptyList();
@@ -259,7 +258,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             logger.info("Creating {} out of {} shards ({})", shards.length, getTotalShards(), shards);
         }
 
-        Collection<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
+        List<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
         int currentShard = getCurrentShard();
         for (int shard : shards) {
             if (currentShard != 0) {

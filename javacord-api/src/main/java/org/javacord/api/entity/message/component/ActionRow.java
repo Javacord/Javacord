@@ -7,9 +7,9 @@ import java.util.List;
  */
 public interface ActionRow extends HighLevelComponent {
     /**
-     * Get all the components of the action row.
+     * Get all components of the action row.
      *
-     * @return A list which holds components.
+     * @return All components of the action row.
      */
     List<LowLevelComponent> getComponents();
 

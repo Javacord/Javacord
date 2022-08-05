@@ -4,7 +4,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.user.User;
 
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -13,37 +13,37 @@ import java.util.concurrent.CompletableFuture;
 public interface Reaction {
 
     /**
-     * Gets a list with all users who used this reaction.
+     * Gets all users who used this reaction.
      *
      * @param api The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji The emoji of the reaction.
-     * @return A list with all users who used this reaction.
+     * @return All users who used this reaction.
      */
-    static CompletableFuture<List<User>> getUsers(DiscordApi api, long channelId, long messageId, Emoji emoji) {
+    static CompletableFuture<Set<User>> getUsers(DiscordApi api, long channelId, long messageId, Emoji emoji) {
         return api.getUncachedMessageUtil().getUsersWhoReactedWithEmoji(channelId, messageId, emoji);
     }
 
     /**
-     * Gets a list with all users who used this reaction.
+     * Gets all users who used this reaction.
      *
      * @param api The discord api instance.
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji The emoji of the reaction.
-     * @return A list with all users who used this reaction.
+     * @return All users who used this reaction.
      */
-    static CompletableFuture<List<User>> getUsers(DiscordApi api, String channelId, String messageId, Emoji emoji) {
+    static CompletableFuture<Set<User>> getUsers(DiscordApi api, String channelId, String messageId, Emoji emoji) {
         return api.getUncachedMessageUtil().getUsersWhoReactedWithEmoji(channelId, messageId, emoji);
     }
 
     /**
-     * Gets a list with all users who used this reaction.
+     * Gets all users who used this reaction.
      *
-     * @return A list with all users who used this reaction.
+     * @return All users who used this reaction.
      */
-    default CompletableFuture<List<User>> getUsers() {
+    default CompletableFuture<Set<User>> getUsers() {
         return Reaction.getUsers(
                 getMessage().getApi(), getMessage().getChannel().getId(), getMessage().getId(), getEmoji());
     }

@@ -16,11 +16,11 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.listener.user.UserAttachableListenerManager;
+
 import java.awt.Color;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -64,13 +64,31 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     boolean isBot();
 
     /**
-     * Checks if this user is the owner of the current account.
-     * Always returns <code>false</code> if logged in to a user account.
+     * Checks if this user is the owner of the current account or the current account's team.
      *
      * @return Whether this user is the owner of the current account.
      */
     default boolean isBotOwner() {
-        return getApi().getOwnerId() == getId();
+        return getApi().getOwnerId().isPresent() && getApi().getOwnerId().get() == getId();
+    }
+
+    /**
+     * Checks if this user is a member of the team of the current account.
+     *
+     * @return Whether this user is a member of the team of the current account.
+     */
+    default boolean isTeamMember() {
+        return getApi().getCachedTeam().map(team -> team.getOwnerId() == getId()
+                || team.getTeamMembers().stream().anyMatch(teamMember -> teamMember.getId() == getId())).orElse(false);
+    }
+
+    /**
+     * Checks if this user is the owner or a member of the team of the current account.
+     *
+     * @return Whether this user is the owner or a member of the team of the current account.
+     */
+    default boolean isBotOwnerOrTeamMember() {
+        return isBotOwner() || isTeamMember();
     }
 
     /**
@@ -95,10 +113,10 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @return The server voice channels the user is connected to.
      */
-    default Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
-        return Collections.unmodifiableCollection(getApi().getServerVoiceChannels().stream()
+    default Set<ServerVoiceChannel> getConnectedVoiceChannels() {
+        return Collections.unmodifiableSet(getApi().getServerVoiceChannels().stream()
                 .filter(this::isConnected)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toSet()));
     }
 
     /**
@@ -183,7 +201,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Gets all clients of the user that are not {@link UserStatus#OFFLINE offline}.
      *
-     * @return A set with the clients.
+     * @return The DiscordClients.
      * @see #getStatusOnClient(DiscordClient)
      */
     default Set<DiscordClient> getCurrentClients() {

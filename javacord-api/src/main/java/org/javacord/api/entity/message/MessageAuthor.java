@@ -98,12 +98,22 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
      * Checks if the author is the owner of the current account.
-     * Always returns <code>false</code> if logged in to a user account.
+     *
+     * <p>Will return false if the account is owned by a team.</p>
      *
      * @return Whether the author is the owner of the current account.
      */
     default boolean isBotOwner() {
-        return isUser() && getApi().getOwnerId() == getId();
+        return asUser().map(User::isBotOwner).orElse(false);
+    }
+
+    /**
+     * Checks if the author is a member of the team owning the bot account.
+     *
+     * @return Whether the author is a member of the team owning the bot account.
+     */
+    default boolean isTeamMember() {
+        return asUser().map(User::isTeamMember).orElse(false);
     }
 
     /**
@@ -519,13 +529,15 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
      * Always returns {@code false} if the author is not a user or if the channel is not a voice channel.
      *
      * @return Whether the author can connect to the voice channel or not.
+     * @deprecated Use {@link ServerVoiceChannel#canConnect(User)} instead.
      */
+    @Deprecated
     default boolean canConnectToVoiceChannel() {
         return getMessage()
-                .getChannel()
-                .asVoiceChannel()
-                .flatMap(voiceChannel -> asUser().map(voiceChannel::canConnect))
-                .orElse(false);
+            .getChannel()
+            .asVoiceChannel()
+            .flatMap(voiceChannel -> asUser().map(voiceChannel::canConnect))
+            .orElse(false);
     }
 
     /**
@@ -534,7 +546,9 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
      * Always returns {@code false} if the author is not a user or if the channel is not a voice channel.
      *
      * @return Whether the author can mute other users in the voice channel or not.
+     * @deprecated Use {@link ServerVoiceChannel#canMuteUsers(User)} instead.
      */
+    @Deprecated
     default boolean canMuteUsersInVoiceChannel() {
         return getMessage()
                 .getChannel()

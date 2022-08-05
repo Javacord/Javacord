@@ -34,6 +34,8 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
     private final Long longMaxValue;
     private final Double decimalMinValue;
     private final Double decimalMaxValue;
+    private final Long maxLength;
+    private final Long minLength;
     private final boolean autocomplete;
 
     /**
@@ -79,12 +81,25 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             longMaxValue = data.has("max_value") ? data.get("max_value").asLong() : null;
             decimalMinValue = null;
             decimalMaxValue = null;
+            minLength = null;
+            maxLength = null;
         } else if (type == SlashCommandOptionType.DECIMAL) {
             decimalMinValue = data.has("min_value") ? data.get("min_value").asDouble() : null;
             decimalMaxValue = data.has("max_value") ? data.get("max_value").asDouble() : null;
             longMinValue = null;
             longMaxValue = null;
+            minLength = null;
+            maxLength = null;
+        } else if (type == SlashCommandOptionType.STRING) {
+            minLength = data.has("min_length") ? data.get("min_length").asLong() : null;
+            maxLength = data.has("max_length") ? data.get("max_length").asLong() : null;
+            longMinValue = null;
+            longMaxValue = null;
+            decimalMinValue = null;
+            decimalMaxValue = null;
         } else {
+            minLength = null;
+            maxLength = null;
             longMinValue = null;
             longMaxValue = null;
             decimalMinValue = null;
@@ -109,6 +124,8 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
      * @param longMaxValue The {@link SlashCommandOptionType#LONG} max value
      * @param decimalMinValue The {@link SlashCommandOptionType#DECIMAL} min value
      * @param decimalMaxValue The {@link SlashCommandOptionType#DECIMAL} max value
+     * @param minLength The {@link SlashCommandOptionType#STRING} min length.
+     * @param maxLength The {@link SlashCommandOptionType#STRING} max length.
      */
     public SlashCommandOptionImpl(
             SlashCommandOptionType type,
@@ -124,7 +141,9 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             Long longMinValue,
             Long longMaxValue,
             Double decimalMinValue,
-            Double decimalMaxValue
+            Double decimalMaxValue,
+            Long minLength,
+            Long maxLength
     ) {
         this.type = type;
         this.name = name;
@@ -140,6 +159,8 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         this.longMaxValue = longMaxValue;
         this.decimalMinValue = decimalMinValue;
         this.decimalMaxValue = decimalMaxValue;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
     }
 
     @Override
@@ -212,6 +233,16 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
         return Optional.ofNullable(decimalMaxValue);
     }
 
+    @Override
+    public Optional<Long> getMinLength() {
+        return Optional.ofNullable(minLength);
+    }
+
+    @Override
+    public Optional<Long> getMaxLength() {
+        return Optional.ofNullable(maxLength);
+    }
+
     /**
      * Creates a json node with the option's data.
      *
@@ -249,6 +280,13 @@ public class SlashCommandOptionImpl implements SlashCommandOption {
             }
             if (decimalMaxValue != null) {
                 node.put("max_value", decimalMaxValue);
+            }
+        } else if (type == SlashCommandOptionType.STRING) {
+            if (minLength != null) {
+                node.put("min_length", minLength);
+            }
+            if (maxLength != null) {
+                node.put("max_length", maxLength);
             }
         }
         if (!nameLocalizations.isEmpty()) {

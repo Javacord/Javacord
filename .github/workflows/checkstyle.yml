@@ -1,5 +1,8 @@
 name: Codestyle
-on: pull_request
+on:
+  pull_request:
+    branches-ignore:
+      - 'all-contributors/**'
 
 jobs:
   checkstyle_job:

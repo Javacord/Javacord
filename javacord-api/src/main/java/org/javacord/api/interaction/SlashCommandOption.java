@@ -65,18 +65,18 @@ public interface SlashCommandOption {
     boolean isAutocompletable();
 
     /**
-     * Gets a list with all choices for this option.
+     * Gets all choices for this option.
      *
      * <p>If this option has any choices, they are the only valid values for a user to pick.
      *
-     * @return A list with all choices for this option.
+     * @return All choices for this option.
      */
     List<SlashCommandOptionChoice> getChoices();
 
     /**
      * If this option is a subcommand or subcommand group type, this nested options will be the parameters.
      *
-     * @return A list with the nested options.
+     * @return The nested options.
      */
     List<SlashCommandOption> getOptions();
 
@@ -84,7 +84,7 @@ public interface SlashCommandOption {
      * If the option is of type {@link SlashCommandOptionType#CHANNEL}, the channels shown will be restricted to these
      * types.
      *
-     * @return A set with the channel types that are shown.
+     * @return The channel types that are shown.
      */
     Set<ChannelType> getChannelTypes();
 
@@ -115,6 +115,20 @@ public interface SlashCommandOption {
      * @return The maximum value permitted.
      */
     Optional<Double> getDecimalMaxValue();
+
+    /**
+     * If the option is an {@link SlashCommandOptionType#STRING} type, the minimum allowed length.
+     *
+     * @return The minimum allowed length.
+     */
+    Optional<Long> getMinLength();
+
+    /**
+     * If the option is an {@link SlashCommandOptionType#STRING} type, the maximum allowed length.
+     *
+     * @return The maximum allowed length.
+     */
+    Optional<Long> getMaxLength();
 
     /**
      * Create a new slash command option to be used with a slash command builder.
@@ -441,6 +455,32 @@ public interface SlashCommandOption {
                 .setName(name)
                 .setDescription(description)
                 .setRequired(required)
+                .build();
+    }
+
+    /**
+     * Create a new {@link SlashCommandOptionType#STRING} slash command option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name        The name of the option.
+     * @param description The description of the option.
+     * @param required    Whether this option is required
+     * @param minLength   The minimum allowed length.
+     * @param maxLength   The maximum allowed length.
+     * @return The new slash command option builder.
+     */
+    static SlashCommandOption createStringOption(String name,
+                                                 String description,
+                                                 boolean required,
+                                                 long minLength,
+                                                 long maxLength) {
+        return new SlashCommandOptionBuilder()
+                .setType(SlashCommandOptionType.STRING)
+                .setName(name)
+                .setDescription(description)
+                .setRequired(required)
+                .setMinLength(minLength)
+                .setMaxLength(maxLength)
                 .build();
     }
 

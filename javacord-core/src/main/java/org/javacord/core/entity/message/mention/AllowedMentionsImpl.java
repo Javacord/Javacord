@@ -6,15 +6,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.mention.AllowedMentionType;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AllowedMentionsImpl implements AllowedMentions {
 
 
-    private final List<Long> allowedRoleMentions;
-    private final List<Long> allowedUserMentions;
+    private final Set<Long> allowedRoleMentions;
+    private final Set<Long> allowedUserMentions;
 
     private final EnumSet<AllowedMentionType> allowedMentionTypes = EnumSet.noneOf(AllowedMentionType.class);
 
@@ -28,7 +28,7 @@ public class AllowedMentionsImpl implements AllowedMentions {
      * @param allowedUserMentions    Mentions added user ids.
      */
     public AllowedMentionsImpl(boolean mentionAllRoles, boolean mentionAllUsers, boolean mentionEveryoneAndHere,
-                               ArrayList<Long> allowedRoleMentions, ArrayList<Long> allowedUserMentions) {
+                               HashSet<Long> allowedRoleMentions, HashSet<Long> allowedUserMentions) {
         this.allowedRoleMentions = allowedRoleMentions;
         this.allowedUserMentions = allowedUserMentions;
         if (mentionAllRoles) {
@@ -43,12 +43,12 @@ public class AllowedMentionsImpl implements AllowedMentions {
     }
 
     @Override
-    public List<Long> getAllowedRoleMentions() {
+    public Set<Long> getAllowedRoleMentions() {
         return allowedRoleMentions;
     }
 
     @Override
-    public List<Long> getAllowedUserMentions() {
+    public Set<Long> getAllowedUserMentions() {
         return allowedUserMentions;
     }
 

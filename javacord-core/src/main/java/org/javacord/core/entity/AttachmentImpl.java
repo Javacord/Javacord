@@ -143,17 +143,17 @@ public class AttachmentImpl implements Attachment {
     }
 
     @Override
-    public InputStream downloadAsInputStream() throws IOException {
+    public InputStream asInputStream() throws IOException {
         return new FileContainer(getUrl()).asInputStream(getApi());
     }
 
     @Override
-    public CompletableFuture<byte[]> downloadAsByteArray() {
+    public CompletableFuture<byte[]> asByteArray() {
         return new FileContainer(getUrl()).asByteArray(getApi());
     }
 
     @Override
-    public CompletableFuture<BufferedImage> downloadAsImage() {
+    public CompletableFuture<BufferedImage> asImage() {
         return new FileContainer(getUrl()).asBufferedImage(getApi());
     }
 

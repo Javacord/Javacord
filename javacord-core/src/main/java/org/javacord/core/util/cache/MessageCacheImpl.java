@@ -34,7 +34,7 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
     private static final Logger logger = LoggerUtil.getLogger(MessageCacheImpl.class);
 
     /**
-     * A list with all messages.
+     * All messages.
      */
     private final List<Reference<? extends Message>> messages = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class MessageCacheImpl implements MessageCache, Cleanupable {
     private final Future<?> messagesCleanupFuture;
 
     /**
-     * A list with all messages that should be cached forever.
+     * All messages that should be cached forever.
      */
     private final List<Message> cacheForeverMessages = Collections.synchronizedList(new ArrayList<>());
 

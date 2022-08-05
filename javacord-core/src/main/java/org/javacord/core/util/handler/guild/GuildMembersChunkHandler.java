@@ -31,7 +31,7 @@ public class GuildMembersChunkHandler extends PacketHandler {
                     List<Member> members = server.addAndGetMembers(packet.get("members"));
                     ServerMembersChunkEventImpl event = new ServerMembersChunkEventImpl(
                             server,
-                            members.stream().map(Member::getUser).collect(Collectors.toList())
+                            members.stream().map(Member::getUser).collect(Collectors.toSet())
                     );
                     api.getEventDispatcher().dispatchServerMembersChunkEvent(server, server, event);
                 });

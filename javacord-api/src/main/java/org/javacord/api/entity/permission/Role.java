@@ -12,8 +12,8 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.server.role.RoleAttachableListenerManager;
 
 import java.awt.Color;
-import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -108,11 +108,11 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     boolean isDisplayedSeparately();
 
     /**
-     * Gets a collection with all users who have this role.
+     * Gets all users who have this role.
      *
-     * @return A collection with all users who have this role.
+     * @return All users who have this role.
      */
-    Collection<User> getUsers();
+    Set<User> getUsers();
 
     /**
      * Checks whether the specified user has this role.
@@ -289,7 +289,7 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
      *
      * @return The allowed permissions of the role.
      */
-    default Collection<PermissionType> getAllowedPermissions() {
+    default Set<PermissionType> getAllowedPermissions() {
         return getPermissions().getAllowedPermission();
     }
 
@@ -298,7 +298,7 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
      *
      * @return The unset permissions of the role.
      */
-    default Collection<PermissionType> getUnsetPermissions() {
+    default Set<PermissionType> getUnsetPermissions() {
         return getPermissions().getUnsetPermissions();
     }
 

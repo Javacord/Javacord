@@ -1,0 +1,12 @@
+name: Main
+on:
+  pull_request:
+    paths:
+      - 'CONTRIBUTORS.md'
+      - '.all-contributorsrc'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No build required" '

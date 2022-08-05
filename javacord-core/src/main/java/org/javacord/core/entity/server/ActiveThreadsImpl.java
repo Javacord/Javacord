@@ -8,7 +8,9 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ActiveThreadsImpl implements ActiveThreads {
 
@@ -20,7 +22,7 @@ public class ActiveThreadsImpl implements ActiveThreads {
     /**
      * The Thread members.
      */
-    final List<ThreadMember> threadMembers;
+    final Set<ThreadMember> threadMembers;
 
     /**
      * Creates a new ActiveThread.
@@ -35,7 +37,7 @@ public class ActiveThreadsImpl implements ActiveThreads {
             serverThreadChannels.add(server.getOrCreateServerThreadChannel(jsonNode));
         }
 
-        threadMembers = new ArrayList<>();
+        threadMembers = new HashSet<>();
         for (final JsonNode jsonNode : data.get("members")) {
             threadMembers.add(new ThreadMemberImpl(api, server, jsonNode));
         }
@@ -47,7 +49,7 @@ public class ActiveThreadsImpl implements ActiveThreads {
     }
 
     @Override
-    public List<ThreadMember> getThreadMembers() {
-        return Collections.unmodifiableList(threadMembers);
+    public Set<ThreadMember> getThreadMembers() {
+        return Collections.unmodifiableSet(threadMembers);
     }
 }

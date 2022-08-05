@@ -1,0 +1,109 @@
+{
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 100,
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": false,
+  "types": {},
+  "skipCi": false,
+  "contributors": [
+    {
+      "login": "KILLEliteMaste",
+      "name": "Dominic Fellbaum",
+      "avatar_url": "https://avatars.githubusercontent.com/u/31566807?v=4",
+      "profile": "https://github.com/KILLEliteMaste",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "review",
+        "question"
+      ]
+    },
+    {
+      "login": "Saladoc",
+      "name": "Saladoc",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36816545?v=4",
+      "profile": "https://github.com/Saladoc",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "review",
+        "question"
+      ]
+    },
+    {
+      "login": "Bastian",
+      "name": "Bastian Oppermann",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5033001?v=4",
+      "profile": "https://github.com/Bastian",
+      "contributions": [
+        "maintenance",
+        "code",
+        "doc",
+        "review",
+        "question"
+      ]
+    },
+    {
+      "login": "Vampire",
+      "name": "Björn Kautler",
+      "avatar_url": "https://avatars.githubusercontent.com/u/325196?v=4",
+      "profile": "https://github.com/Vampire",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "question"
+      ]
+    },
+    {
+      "login": "bassner",
+      "name": "Patrick Bassner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23171488?v=4",
+      "profile": "https://github.com/bassner",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "question"
+      ]
+    },
+    {
+      "login": "Mysterypotatoguy",
+      "name": "Mysterypotatoguy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17689082?v=4",
+      "profile": "https://github.com/Mysterypotatoguy",
+      "contributions": [
+        "maintenance",
+        "code",
+        "review",
+        "question"
+      ]
+    },
+    {
+      "login": "wasdennnoch",
+      "name": "Adrian Paschkowski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10065021?v=4",
+      "profile": "https://wasdennnoch.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Joshix-1",
+      "name": "Joshix-1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57299889?v=4",
+      "profile": "https://github.com/Joshix-1",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "projectName": "Javacord",
+  "projectOwner": "Javacord",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}

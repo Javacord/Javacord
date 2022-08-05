@@ -91,7 +91,7 @@ public class WebhookImpl implements Webhook, Specializable<WebhookImpl>, Interna
      *
      * @param api The discord api instance.
      * @param jsonArray The json array of the webhooks.
-     * @return A list of all the incoming webhooks from the array.
+     * @return All incoming webhooks from the array.
      */
     public static List<Webhook> createAllIncomingWebhooksFromJsonArray(DiscordApi api, JsonNode jsonArray) {
         List<Webhook> webhooks = new ArrayList<>();

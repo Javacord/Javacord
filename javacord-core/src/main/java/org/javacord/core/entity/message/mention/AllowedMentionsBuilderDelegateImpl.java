@@ -3,18 +3,18 @@ package org.javacord.core.entity.message.mention;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * The implementation of {@link AllowedMentionsBuilderDelegate}.
  */
 public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilderDelegate {
 
-    // Lists
-    private final ArrayList<Long> allowedUserMentions = new ArrayList<>();
+    // Sets
+    private final HashSet<Long> allowedUserMentions = new HashSet<>();
 
-    private final ArrayList<Long> allowedRoleMentions = new ArrayList<>();
+    private final HashSet<Long> allowedRoleMentions = new HashSet<>();
 
     // General Mentions
     private boolean mentionAllRoles = false;

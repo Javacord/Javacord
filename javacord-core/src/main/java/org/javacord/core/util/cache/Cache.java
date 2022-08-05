@@ -23,7 +23,7 @@ import java.util.function.Function;
 public class Cache<T> {
 
     /**
-     * A set with all elements in the cache.
+     * All elements in the cache.
      */
     private final Set<T> elements;
 
@@ -137,7 +137,7 @@ public class Cache<T> {
     }
 
     /**
-     * Gets a set with all elements in the cache.
+     * Gets all elements in the cache.
      *
      * <p>This method has a time complexity of {@code O(1)}.
      *
@@ -164,13 +164,13 @@ public class Cache<T> {
     }
 
     /**
-     * Gets a set with all elements in the cache that have the given key.
+     * Gets all elements in the cache that have the given key.
      *
      * <p>This method has an effective time complexity of {@code O(1)}.
      *
      * @param indexName The name of the index.
      * @param key The key of the elements.
-     * @return A set with all the elements that have the given key.
+     * @return All the elements that have the given key.
      * @throws IllegalArgumentException If the cache has no index with the given name.
      */
     public Set<T> findByIndex(String indexName, Object key) {

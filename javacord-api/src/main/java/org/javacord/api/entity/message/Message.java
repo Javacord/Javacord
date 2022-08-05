@@ -786,7 +786,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Gets a list of all custom emojis in the message.
+     * Gets all custom emojis in the message.
      *
      * @return The list of custom emojis in the message.
      */
@@ -835,9 +835,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     boolean mentionsEveryone();
 
     /**
-     * Gets a list with all embeds of the message.
+     * Gets all embeds of the message.
      *
-     * @return A list with all embeds of the message.
+     * @return All embeds of the message.
      */
     List<Embed> getEmbeds();
 
@@ -901,30 +901,30 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     void setCachedForever(boolean cachedForever);
 
     /**
-     * Gets a list with all reactions of the message.
+     * Gets all reactions of the message.
      *
-     * @return A list which contains all reactions of the message.
+     * @return All reactions of the message.
      */
     List<Reaction> getReactions();
 
     /**
-     * Gets a list with all components of the message.
+     * Gets all components of the message.
      *
-     * @return A list which contains all components of the message.
+     * @return All components of the message.
      */
     List<HighLevelComponent> getComponents();
 
     /**
-     * Gets a list with all users mentioned in this message.
+     * Gets all users mentioned in this message.
      *
-     * @return A list with all users mentioned in this message.
+     * @return All users mentioned in this message.
      */
     List<User> getMentionedUsers();
 
     /**
-     * Gets a list with all roles mentioned in this message.
+     * Gets all roles mentioned in this message.
      *
-     * @return A list with all roles mentioned in this message.
+     * @return All roles mentioned in this message.
      */
     List<Role> getMentionedRoles();
 
@@ -943,9 +943,9 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     Set<StickerItem> getStickerItems();
 
     /**
-     * Gets a list with all channels mentioned in this message.
+     * Gets all channels mentioned in this message.
      *
-     * @return A list with all channels mentioned in this message.
+     * @return All channels mentioned in this message.
      */
     default List<ServerChannel> getMentionedChannels() {
         List<ServerChannel> mentionedChannels = new ArrayList<>();

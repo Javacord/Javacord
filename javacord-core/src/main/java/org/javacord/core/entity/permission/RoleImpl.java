@@ -23,10 +23,10 @@ import org.javacord.core.util.rest.RestRequest;
 import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -271,7 +271,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     @Override
-    public Collection<User> getUsers() {
+    public Set<User> getUsers() {
         if (isEveryoneRole()) {
             return getServer().getMembers();
         }

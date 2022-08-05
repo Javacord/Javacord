@@ -5,9 +5,9 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.InviteBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.listener.channel.server.ServerChannelAttachableListenerManager;
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -36,7 +36,7 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
      *
      * @return The invites of the server.
      */
-    CompletableFuture<Collection<RichInvite>> getInvites();
+    CompletableFuture<Set<RichInvite>> getInvites();
 
     /**
      * Create an updater for this channel.

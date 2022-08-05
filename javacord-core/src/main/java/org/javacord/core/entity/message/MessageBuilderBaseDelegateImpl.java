@@ -92,7 +92,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected String nonce = null;
 
     /**
-     * A list with all attachments which should be added to the message.
+     * All attachments which should be added to the message.
      */
     protected final List<FileContainer> attachments = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected boolean attachmentsChanged = false;
 
     /**
-     * A list with all the components which should be added to the message.
+     * All components which should be added to the message.
      */
     protected final List<HighLevelComponent> components = new ArrayList<>();
 
@@ -281,51 +281,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     @Override
     public void setTts(boolean tts) {
         this.tts = tts;
-    }
-
-    @Override
-    public void addFile(BufferedImage image, String fileName) {
-        addAttachment(image, fileName);
-    }
-
-    @Override
-    public void addFile(File file) {
-        addAttachment(file);
-    }
-
-    @Override
-    public void addFile(Icon icon) {
-        addAttachment(icon);
-    }
-
-    @Override
-    public void addFile(URL url) {
-        addAttachment(url);
-    }
-
-    @Override
-    public void addFile(byte[] bytes, String fileName) {
-        addAttachment(bytes, fileName);
-    }
-
-    @Override
-    public void addFile(InputStream stream, String fileName) {
-        addAttachment(stream, fileName);
-    }
-
-    @Override
-    public void addFileAsSpoiler(File file) {
-        addAttachmentAsSpoiler(file);
-    }
-
-    @Override
-    public void addFileAsSpoiler(Icon icon) {
-        addAttachmentAsSpoiler(icon);
-    }
-
-    @Override
-    public void addFileAsSpoiler(URL url) {
-        addAttachmentAsSpoiler(url);
     }
 
     @Override

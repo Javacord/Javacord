@@ -7,6 +7,7 @@ import org.javacord.api.listener.message.UncachedMessageAttachableListenerManage
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -440,24 +441,24 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     CompletableFuture<Void> unpin(String channelId, String messageId);
 
     /**
-     * Gets a list with all users who reacted with the given emoji.
+     * Gets all users who reacted with the given emoji.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji     The emoji of the reaction.
-     * @return A list with all users who reacted with the given emoji
+     * @return All users who reacted with the given emoji
      */
-    CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji);
+    CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji);
 
     /**
-     * Gets a list with all users who reacted with the given emoji.
+     * Gets all users who reacted with the given emoji.
      *
      * @param channelId The id of the message's channel.
      * @param messageId The id of the message.
      * @param emoji     The emoji of the reaction.
-     * @return A list with all users who reacted with the given emoji
+     * @return All users who reacted with the given emoji
      */
-    CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji);
+    CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji);
 
     /**
      * Removes the reaction of the given user.

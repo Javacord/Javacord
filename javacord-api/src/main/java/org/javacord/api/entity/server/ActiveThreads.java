@@ -3,6 +3,7 @@ package org.javacord.api.entity.server;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
 import java.util.List;
+import java.util.Set;
 
 public interface ActiveThreads {
 
@@ -18,5 +19,5 @@ public interface ActiveThreads {
      *
      * @return The thread members.
      */
-    List<ThreadMember> getThreadMembers();
+    Set<ThreadMember> getThreadMembers();
 }

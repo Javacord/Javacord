@@ -230,6 +230,29 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
+     * Sets the {@link SlashCommandOptionType#STRING} min length for the slash command option.
+     *
+     * @param minLength The string min length.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setMinLength(long minLength) {
+        delegate.setMinLength(minLength);
+        return this;
+    }
+
+
+    /**
+     * Sets the {@link SlashCommandOptionType#STRING} max length for the slash command option.
+     *
+     * @param maxLength The string min length.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setMaxLength(long maxLength) {
+        delegate.setMaxLength(maxLength);
+        return this;
+    }
+
+    /**
      * Builds the slash command option.
      *
      * @return The built option.

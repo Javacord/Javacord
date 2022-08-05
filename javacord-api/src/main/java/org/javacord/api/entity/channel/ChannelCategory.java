@@ -21,9 +21,9 @@ public interface ChannelCategory extends RegularServerChannel, ChannelCategoryAt
     }
 
     /**
-     * Gets a list with all channels which this category contains.
+     * Gets a sorted (by position) list with all channels which this category contains.
      *
-     * @return A list with all channels which this category contains.
+     * @return All channels which this category contains.
      */
     List<RegularServerChannel> getChannels();
 

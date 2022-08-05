@@ -6,7 +6,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.internal.ApplicationCommandBuilderDelegate;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
@@ -135,7 +135,7 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
     /**
      * Creates a global application command.
      * When used to update multiple global slash commands at once
-     * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(Set)} should be used instead.
      *
      * @param api The discord api instance.
      * @return The built application command.
@@ -147,7 +147,7 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
     /**
      * Creates an application command for a specific server.
      * When used to create multiple server application commands at once
-     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, Set)} should be used instead.
      *
      * @param server The server.
      * @return The built application command.
@@ -160,7 +160,7 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
     /**
      * Creates an application command for a specific server.
      * When used to create multiple server application commands at once
-     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, List)} should be used instead.
+     * {@link DiscordApi#bulkOverwriteServerApplicationCommands(Server, Set)} should be used instead.
      *
      * @param api The discord api instance.
      * @param server The server.

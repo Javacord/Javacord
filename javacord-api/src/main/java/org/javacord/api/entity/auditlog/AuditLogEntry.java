@@ -48,9 +48,9 @@ public interface AuditLogEntry extends DiscordEntity {
     Optional<AuditLogEntryTarget> getTarget();
 
     /**
-     * Gets a list with all changes.
+     * Gets all changes.
      *
-     * @return A list with all changes.
+     * @return All changes.
      */
     List<AuditLogChange<?>> getChanges();
 
