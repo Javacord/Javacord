@@ -1,9 +1,11 @@
 package org.javacord.api.entity.message.internal;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.interaction.InteractionBase;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDelegate {
@@ -51,9 +53,20 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * Edit the message the component was attached to.
      *
      * @param interaction The interaction.
+     * @param attachmentsToKeep used to keep specific attachments, and remove the others.
      * @return The completable future to determine if the message was updated.
      */
-    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction);
+    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachmentsToKeep);
+
+    /**
+     * Edit the message the component was attached to.
+     *
+     * @param interaction The interaction.
+     * @return The completable future to determine if the message was updated.
+     */
+    default CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
+        return updateOriginalMessage(interaction, null);
+    }
 
 
     /**

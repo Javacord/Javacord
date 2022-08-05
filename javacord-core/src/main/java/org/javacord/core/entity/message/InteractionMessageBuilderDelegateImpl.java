@@ -2,6 +2,7 @@ package org.javacord.core.entity.message;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -14,6 +15,10 @@ import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -82,7 +87,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     }
 
     @Override
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, @Nullable List<Attachment> attachmentsToKeep) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         ObjectNode data = JsonNodeFactory.instance.objectNode();
         prepareCommonWebhookMessageBodyParts(data);
@@ -97,9 +102,22 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                 .includeAuthorizationHeader(false)
                 .setBody(topBody);
 
-        if (!attachments.isEmpty()) {
+        if (attachmentsToKeep == null && !attachments.isEmpty()) {
             List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
+        } else if (attachmentsToKeep != null) {
+            List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+            for (Attachment attachment : attachmentsToKeep) {
 
+                InputStream stream = null;
+                try {
+                    stream = attachment.asInputStream();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                tempAttachments.remove(new FileContainer(stream, attachment.getFileName()));
+            }
             addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
         } else {
             request.setBody(topBody);
