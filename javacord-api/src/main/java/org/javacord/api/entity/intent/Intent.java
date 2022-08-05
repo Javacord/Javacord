@@ -162,9 +162,13 @@ public enum Intent {
     DIRECT_MESSAGE_TYPING(14, false),
 
     /**
-     * MESSAGE_CONTENT is a special case as it doesn't represent individual events,
-     * but rather affects the data sent for most events that could contain message content fields
-     * (content, attachments, embeds, and components).
+     * <p>
+     * This is required to receive non-empty values for content fields (content, attachments, embeds, and components).
+     * </p>
+     * This doesn't apply for DMs, messages your bot sends, or messages in which your bot is mentioned.
+     * </p>
+     * <p>Note: This is a privileged intent which must be enabled in the bots application page in the Developer portal</p>
+     * @see <a href="https://discordapp.com/developers/applications">Discord developer portal</a>
      */
     MESSAGE_CONTENT(15, true),
 
