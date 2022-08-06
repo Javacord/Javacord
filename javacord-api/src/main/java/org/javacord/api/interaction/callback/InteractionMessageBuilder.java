@@ -1,5 +1,6 @@
 package org.javacord.api.interaction.callback;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
@@ -102,10 +103,13 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
      * Update the message the components were attached to.
      *
      * @param interaction The original interaction.
+     * @param attachmentsToKeep used to keep specific attachments, and remove the others.
+     * @param addNewAttachments used to add new attachments.
      * @return The completable future to determine if the message was updated.
      */
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
-        return delegate.updateOriginalMessage(interaction);
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachmentsToKeep,
+                                                         List<Attachment> addNewAttachments) {
+        return delegate.updateOriginalMessage(interaction, attachmentsToKeep, addNewAttachments);
     }
 
     /**

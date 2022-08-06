@@ -61,33 +61,6 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
                                                   List<Attachment> addNewAttachments);
 
     /**
-     * Edit the message the component was attached to.
-     *
-     * @param interaction The interaction.
-     * @return The completable future to determine if the message was updated.
-     */
-    default CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
-        return updateOriginalMessage(interaction, null, null);
-    }
-
-    /**
-     * Edit the message the component was attached to.
-     *
-     * @param interaction The interaction.
-     * @param attachments used to keep specific attachments or add new attachments, and remove the others.
-     * @param newOrKeepAttachments whether to keep or add  attachments.
-     * @return The completable future to determine if the message was updated.
-     */
-    default CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachments,
-                                                          boolean newOrKeepAttachments) {
-        if (newOrKeepAttachments) {
-            return updateOriginalMessage(interaction, attachments, null);
-        } else {
-            return updateOriginalMessage(interaction, null, attachments);
-        }
-    }
-
-    /**
      * Delete a follow-up message.
      *
      * @param interaction The interaction.

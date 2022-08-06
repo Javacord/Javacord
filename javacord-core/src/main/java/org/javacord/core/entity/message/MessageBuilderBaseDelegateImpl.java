@@ -9,6 +9,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -39,6 +40,7 @@ import org.javacord.core.util.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -196,6 +198,36 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     public void setContent(String content) {
         strBuilder.setLength(0);
         strBuilder.append(content);
+        contentChanged = true;
+    }
+
+    @Override
+    public void setContent(String content, Collection<Attachment> attachmentsToKeep) {
+        strBuilder.setLength(0);
+        strBuilder.append(content);
+        logger.debug("Current attachments: {}", this.attachments.size());
+        logger.debug("Attachments to keep: {}", attachmentsToKeep.size());
+
+        for (Attachment attachment : attachmentsToKeep) {
+            try {
+                InputStream input = attachment.asInputStream();
+
+                if (input == null) {
+                    logger.warn("Attachment input stream is null");
+                    return;
+                }
+
+                FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
+
+                //remove all the attachemtns apart from attachmentsToKeep
+                attachments.removeIf(fileContainer::equals);
+                attachments.add(fileContainer);
+
+                attachmentsChanged = true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         contentChanged = true;
     }
 

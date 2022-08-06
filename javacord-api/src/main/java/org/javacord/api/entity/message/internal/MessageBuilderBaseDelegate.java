@@ -1,6 +1,7 @@
 package org.javacord.api.entity.message.internal;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -102,6 +103,8 @@ public interface MessageBuilderBaseDelegate {
      * @param content The new content of the message.
      */
     void setContent(String content);
+
+    void setContent(String content, Collection<Attachment> attachmentToKeep);
 
     /**
      * Adds the embed to the message.

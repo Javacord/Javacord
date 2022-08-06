@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.component.HighLevelComponent;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 abstract class MessageBuilderBase<T> {
@@ -166,6 +168,11 @@ abstract class MessageBuilderBase<T> {
      */
     public T setContent(String content) {
         delegate.setContent(content);
+        return myClass.cast(this);
+    }
+
+    public T setContent(String content, Collection<Attachment> attachmentToKeep) {
+        delegate.setContent(content, attachmentToKeep);
         return myClass.cast(this);
     }
 
