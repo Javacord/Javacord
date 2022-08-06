@@ -87,7 +87,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     }
 
     @Override
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, @Nullable List<Attachment> attachmentsToKeep) {
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction,
+                                                         @Nullable List<Attachment> attachmentsToKeep) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         ObjectNode data = JsonNodeFactory.instance.objectNode();
         prepareCommonWebhookMessageBodyParts(data);
@@ -102,11 +103,11 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                 .includeAuthorizationHeader(false)
                 .setBody(topBody);
 
+        List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+
         if (attachmentsToKeep == null && !attachments.isEmpty()) {
-            List<FileContainer> tempAttachments = new ArrayList<>(attachments);
             addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
         } else if (attachmentsToKeep != null) {
-            List<FileContainer> tempAttachments = new ArrayList<>(attachments);
             for (Attachment attachment : attachmentsToKeep) {
 
                 InputStream stream = null;
@@ -116,7 +117,10 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                     throw new RuntimeException(e);
                 }
 
-                tempAttachments.remove(new FileContainer(stream, attachment.getFileName()));
+                FileContainer attachmentFile = new FileContainer(stream, attachment.getFileName());
+
+                //remove all the attachments that are not in the attachmentsToKeep list
+                tempAttachments.removeIf(fileContainer -> !fileContainer.equals(attachmentFile));
             }
             addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
         } else {
