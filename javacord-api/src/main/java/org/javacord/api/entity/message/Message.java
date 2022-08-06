@@ -26,11 +26,16 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -394,6 +399,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
         return new MessageUpdater(this).setContent(content).applyChanges();
     }
 
+    /**
+     * Updates the content of the message.
+     *
+     * @param content The new content of the message.
+     * @param attachmentToKeep The attachment to keep.
+     * @return A future to check if the update was successful.
+     */
     default CompletableFuture<Message> edit(String content, Collection<Attachment> attachmentToKeep) {
         return new MessageUpdater(this).setContent(content, attachmentToKeep).applyChanges();
     }

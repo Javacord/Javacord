@@ -104,6 +104,12 @@ public interface MessageBuilderBaseDelegate {
      */
     void setContent(String content);
 
+    /**
+     * Sets the content of the message.
+     *
+     * @param content The new content of the message.
+     * @param attachmentToKeep The attachment to keep.
+     */
     void setContent(String content, Collection<Attachment> attachmentToKeep);
 
     /**
