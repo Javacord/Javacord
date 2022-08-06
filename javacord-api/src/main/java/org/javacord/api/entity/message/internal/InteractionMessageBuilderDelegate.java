@@ -54,9 +54,11 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      *
      * @param interaction The interaction.
      * @param attachmentsToKeep used to keep specific attachments, and remove the others.
+     * @param addNewAttachments used to add new attachments.
      * @return The completable future to determine if the message was updated.
      */
-    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachmentsToKeep);
+    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachmentsToKeep,
+                                                  List<Attachment> addNewAttachments);
 
     /**
      * Edit the message the component was attached to.
@@ -65,9 +67,25 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * @return The completable future to determine if the message was updated.
      */
     default CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
-        return updateOriginalMessage(interaction, null);
+        return updateOriginalMessage(interaction, null, null);
     }
 
+    /**
+     * Edit the message the component was attached to.
+     *
+     * @param interaction The interaction.
+     * @param attachments used to keep specific attachments or add new attachments, and remove the others.
+     * @param newOrKeepAttachments whether to keep or add  attachments.
+     * @return The completable future to determine if the message was updated.
+     */
+    default CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachments,
+                                                          boolean newOrKeepAttachments) {
+        if (newOrKeepAttachments) {
+            return updateOriginalMessage(interaction, attachments, null);
+        } else {
+            return updateOriginalMessage(interaction, null, attachments);
+        }
+    }
 
     /**
      * Delete a follow-up message.

@@ -15,7 +15,6 @@ import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,8 +86,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     }
 
     @Override
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction,
-                                                         @Nullable List<Attachment> attachmentsToKeep) {
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> keepAttachments,
+                                                         List<Attachment> newAttachments) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         ObjectNode data = JsonNodeFactory.instance.objectNode();
         prepareCommonWebhookMessageBodyParts(data);
@@ -105,29 +104,52 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
 
         List<FileContainer> tempAttachments = new ArrayList<>(attachments);
 
-        if (attachmentsToKeep == null && !attachments.isEmpty()) {
+        if (keepAttachments == null && newAttachments == null && !attachments.isEmpty()) {
             addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
-        } else if (attachmentsToKeep != null) {
-            for (Attachment attachment : attachmentsToKeep) {
-
-                InputStream stream = null;
-                try {
-                    stream = attachment.asInputStream();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                FileContainer attachmentFile = new FileContainer(stream, attachment.getFileName());
-
-                //remove all the attachments that are not in the attachmentsToKeep list
-                tempAttachments.removeIf(fileContainer -> !fileContainer.equals(attachmentFile));
-            }
+        } else if (keepAttachments != null && newAttachments != null) {
+            keepAttachments(tempAttachments, keepAttachments, null);
+            addNewAttachments(tempAttachments, newAttachments);
+            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
+        } else if (keepAttachments != null) {
+            keepAttachments(tempAttachments, keepAttachments, null);
+            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
+        } else if (newAttachments != null) {
+            addNewAttachments(tempAttachments, newAttachments);
             addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
         } else {
             request.setBody(topBody);
         }
 
         return request.execute(result -> null);
+    }
+
+    private void keepAttachments(List<FileContainer> tempAttachments, List<Attachment> attachmentsToKeep,
+                                 InputStream stream) {
+        for (Attachment attachment : attachmentsToKeep) {
+            try {
+                stream = attachment.asInputStream();
+
+                FileContainer attachmentFile = new FileContainer(stream, attachment.getFileName());
+
+                //remove all the attachments that are not in the attachmentsToKeep list
+                tempAttachments.removeIf(fileContainer -> !fileContainer.equals(attachmentFile));
+                tempAttachments.add(attachmentFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void addNewAttachments(List<FileContainer> tempAttachments, List<Attachment> addNewAttachments) {
+        for (Attachment attachment : addNewAttachments) {
+            try {
+                InputStream stream = attachment.asInputStream();
+                FileContainer attachmentFile = new FileContainer(stream, attachment.getFileName());
+                tempAttachments.add(attachmentFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
