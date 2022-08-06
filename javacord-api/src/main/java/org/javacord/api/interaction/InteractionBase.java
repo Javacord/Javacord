@@ -3,12 +3,14 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -142,4 +144,10 @@ public interface InteractionBase extends DiscordEntity {
      */
     Optional<DiscordLocale> getServerLocale();
 
+    /**
+     * Gets the set of permissions of the app in context to the interaction.
+     *
+     * @return The app's permissions, in context of the interaction.
+     */
+    Optional<EnumSet<PermissionType>> getAppPermissions();
 }
