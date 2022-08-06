@@ -159,6 +159,11 @@ public interface MessageBuilderBaseDelegate {
     void removeAllComponents();
 
     /**
+     * Removes all the attachments from the message.
+     */
+    void removeAllAttachments();
+
+    /**
      * Sets if the message should be text to speech.
      *
      * @param tts Whether the message should be text to speech or not.

@@ -396,6 +396,16 @@ abstract class MessageBuilderBase<T> {
     }
 
     /**
+     * Removes all the attachments from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public T removeAllAttachments() {
+        delegate.removeAllAttachments();
+        return myClass.cast(this);
+    }
+
+    /**
      * Adds the embeds to the message.
      *
      * @param embeds The embeds to add.

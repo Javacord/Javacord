@@ -219,8 +219,8 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
                 FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
 
-                //remove all the attachemtns apart from attachmentsToKeep
-                attachments.removeIf(fileContainer::equals);
+                //TODO: attachments being stored is a known bug.
+                attachments.clear();
                 attachments.add(fileContainer);
 
                 attachmentsChanged = true;
@@ -308,6 +308,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     public void removeAllComponents() {
         components.clear();
         componentsChanged = true;
+    }
+
+    @Override
+    public void removeAllAttachments() {
+        attachments.clear();
+        attachmentsChanged = true;
     }
 
     @Override
