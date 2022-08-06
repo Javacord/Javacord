@@ -22,6 +22,13 @@ import java.util.concurrent.CompletableFuture;
 public interface MessageAuthor extends DiscordEntity, Nameable {
 
     /**
+     * Gets the webhook id of this author if the message was sent by a webhook.
+     *
+     * @return The webhook id of this author if the message was sent by a webhook.
+     */
+    Optional<Long> getWebhookId();
+
+    /**
      * Gets the message.
      *
      * @return The message.

@@ -1,8 +1,7 @@
 package org.javacord.api.event.message;
 
-import org.javacord.api.entity.message.embed.Embed;
+import org.javacord.api.entity.message.Message;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -11,31 +10,24 @@ import java.util.Optional;
 public interface MessageEditEvent extends RequestableMessageEvent {
 
     /**
-     * Gets the new content of the message.
+     * Gets the updated messages.
      *
-     * @return The new content of the message.
+     * @return The updated message.
      */
-    String getNewContent();
+    Message getUpdatedMessage();
 
     /**
-     * Gets the old content of the message. It will only be present, if the message is in the cache.
+     * Gets the old message with its old content. It will only be present, if the message is in the cache.
      *
-     * @return The old content of the message.
+     * @return The old message.
      */
-    Optional<String> getOldContent();
+    Optional<Message> getOldMessage();
 
     /**
-     * Gets the new embeds of the message.
+     * Gets whether this is a special case like embedding links.
      *
-     * @return The new embeds of the message.
+     * @return Whether this is a special case like embedding links.
      */
-    List<Embed> getNewEmbeds();
-
-    /**
-     * Gets the old embeds of the message. It will only be present, if the message is in the cache.
-     *
-     * @return The old embeds of the message.
-     */
-    Optional<List<Embed>> getOldEmbeds();
+    boolean isSpecialCase();
 
 }
