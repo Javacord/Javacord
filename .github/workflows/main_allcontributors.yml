@@ -4,6 +4,9 @@ on:
     paths:
       - 'CONTRIBUTORS.md'
       - '.all-contributorsrc'
+  push:
+    branches:
+      - 'all-contributors/**'
 
 jobs:
   build-and-test:
