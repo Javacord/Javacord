@@ -11,6 +11,7 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.DiscordLocale;
@@ -29,9 +30,13 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public abstract class InteractionImpl implements Interaction {
 
@@ -54,6 +59,7 @@ public abstract class InteractionImpl implements Interaction {
     private final int version;
     private final DiscordLocale locale;
     private final DiscordLocale serverLocale;
+    private final EnumSet<PermissionType> appPermissions;
 
     /**
      * Class constructor.
@@ -87,6 +93,12 @@ public abstract class InteractionImpl implements Interaction {
         locale = DiscordLocale.fromLocaleCode(jsonData.get("locale").asText());
         serverLocale = jsonData.hasNonNull("guild_locale")
                 ? DiscordLocale.fromLocaleCode(jsonData.get("guild_locale").asText()) : null;
+        Long appPermissionsBitset = jsonData.hasNonNull("app_permissions")
+                ? jsonData.get("app_permissions").asLong() : null;
+        appPermissions = appPermissionsBitset != null
+                ? Arrays.stream(PermissionType.values())
+                .filter(type -> type.isSet(appPermissionsBitset))
+                .collect(Collectors.toCollection(() -> EnumSet.noneOf(PermissionType.class))) : null;
     }
 
     @Override
@@ -190,5 +202,11 @@ public abstract class InteractionImpl implements Interaction {
     @Override
     public Optional<DiscordLocale> getServerLocale() {
         return Optional.ofNullable(serverLocale);
+    }
+
+    @Override
+    public Optional<EnumSet<PermissionType>> getBotPermissions() {
+        return appPermissions != null
+                ? Optional.of(EnumSet.copyOf(appPermissions)) : Optional.empty();
     }
 }
