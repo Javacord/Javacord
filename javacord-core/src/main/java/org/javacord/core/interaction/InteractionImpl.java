@@ -205,7 +205,7 @@ public abstract class InteractionImpl implements Interaction {
     }
 
     @Override
-    public Optional<EnumSet<PermissionType>> getAppPermissions() {
+    public Optional<EnumSet<PermissionType>> getBotPermissions() {
         return appPermissions != null
                 ? Optional.of(EnumSet.copyOf(appPermissions)) : Optional.empty();
     }
