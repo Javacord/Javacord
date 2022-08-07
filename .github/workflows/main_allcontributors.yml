@@ -11,5 +11,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    name: Build and test
     steps:
       - run: 'echo "No build required" '
