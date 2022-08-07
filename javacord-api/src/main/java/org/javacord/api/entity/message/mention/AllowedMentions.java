@@ -33,4 +33,11 @@ public interface AllowedMentions {
      */
     EnumSet<AllowedMentionType> getMentionTypes();
 
+    /**
+     * Whether to mention the replied user if this message is a reply.
+     *
+     * @return Whether to mention the replied user.
+     */
+    boolean getMentionRepliedUser();
+
 }
