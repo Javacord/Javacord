@@ -3,12 +3,14 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -142,4 +144,11 @@ public interface InteractionBase extends DiscordEntity {
      */
     Optional<DiscordLocale> getServerLocale();
 
+    /**
+     * Gets the permissions the bot has within the channel the interaction was sent from.
+     * Not present if the interaction has been invoked in a direct message.
+     *
+     * @return The bots permissions within the channel the interaction was sent from.
+     */
+    Optional<EnumSet<PermissionType>> getBotPermissions();
 }
