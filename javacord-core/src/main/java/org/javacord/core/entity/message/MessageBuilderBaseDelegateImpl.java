@@ -124,7 +124,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * Used to tell discord to check if the reference message exists.
      */
-    private boolean checkIfMessageExists = false;
+    private boolean checkIfMessageExists;
 
     /**
      * The stickers attached to the message.

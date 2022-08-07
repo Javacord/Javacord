@@ -38,7 +38,7 @@ public class MessageReferenceImpl implements MessageReference {
     /**
      * If the reference message exists.
      */
-    private final Boolean failIfNotExists;
+    private final boolean failIfNotExists;
 
     /**
      * Creates a new message reference object.
@@ -63,8 +63,7 @@ public class MessageReferenceImpl implements MessageReference {
         }
 
         this.message = message;
-        this.failIfNotExists = data.hasNonNull("fail_if_not_exists") ? data.get("fail_if_not_exists").asBoolean() :
-                true;
+        this.failIfNotExists = data.get("fail_if_not_exists").asBoolean(true);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class MessageReferenceImpl implements MessageReference {
     }
 
     @Override
-    public Optional<Boolean> doesMessageReferenceExist() {
-        return Optional.ofNullable(failIfNotExists);
+    public boolean doesMessageReferenceExist() {
+        return failIfNotExists;
     }
 }

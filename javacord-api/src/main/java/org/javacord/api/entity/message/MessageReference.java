@@ -77,10 +77,9 @@ public interface MessageReference {
     }
 
     /**
-     * Gets weather the message reference is valid.
+     * Gets whether the message reference is valid.
      *
      * @return {@code true} if the message reference is valid, {@code false} otherwise.
      */
-    //
-    Optional<Boolean> doesMessageReferenceExist();
+    boolean doesMessageReferenceExist();
 }

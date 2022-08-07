@@ -1517,7 +1517,19 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Replies to this message with the given text.
      *
      * @param messageContent The text to reply with.
-     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
+     * @return The message that was sent.
+     */
+    default CompletableFuture<Message> reply(String messageContent) {
+        return reply(messageContent, true);
+    }
+
+    /**
+     * Replies to this message with the given text.
+     *
+     * @param messageContent The text to reply with.
+     * @param checkIfMessageExists If true, tells discord to throw an error if the message reference does not exist,
+     *                             if false, then leaves out the message reference,
+     *                             if it does not exist but still sends the message.
      * @return The message that was sent.
      */
     default CompletableFuture<Message> reply(String messageContent, boolean checkIfMessageExists) {
@@ -1529,7 +1541,19 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Replies to this message with the given embed.
      *
      * @param embed The EmbedBuilder to reply with.
-     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
+     * @return The message that was sent.
+     */
+    default CompletableFuture<Message> reply(EmbedBuilder embed) {
+        return reply(embed, true);
+    }
+
+    /**
+     * Replies to this message with the given embed.
+     *
+     * @param embed The EmbedBuilder to reply with.
+     * @param checkIfMessageExists If true, tells discord to throw an error if the message reference does not exist,
+     *                             if false, then leaves out the message reference,
+     *                             if it does not exist but still sends the message.
      * @return The message that was sent.
      */
     default CompletableFuture<Message> reply(EmbedBuilder embed, boolean checkIfMessageExists) {
