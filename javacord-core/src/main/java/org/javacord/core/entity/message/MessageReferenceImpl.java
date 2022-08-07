@@ -36,7 +36,7 @@ public class MessageReferenceImpl implements MessageReference {
     private final Message message;
 
     /**
-     * if the reference message exists.
+     * If the reference message exists.
      */
     private final boolean failIfNotExists;
 
