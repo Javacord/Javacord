@@ -136,6 +136,7 @@ public class MessageUpdateHandler extends PacketHandler {
             } else {
                 if (packet.path("edited_timestamp").isNull()) {
                     newMessage = (MessageImpl) api.getOrCreateMessage(channel, packet);
+                    return;
                 } else {
                     //Cases that are unknown or not meaningful
                     return;
