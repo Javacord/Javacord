@@ -116,10 +116,11 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * Sets the message to reply to.
      *
      * @param message The message to reply to.
+     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder replyTo(Message message) {
-        delegate.replyTo(message.getId());
+    public MessageBuilder replyTo(Message message, boolean checkIfMessageExists) {
+        delegate.replyTo(message.getId(), checkIfMessageExists);
         return this;
     }
 
@@ -127,10 +128,11 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * Sets the message to reply to.
      *
      * @param messageId The id of the message to reply to.
+     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder replyTo(long messageId) {
-        delegate.replyTo(messageId);
+    public MessageBuilder replyTo(long messageId, boolean checkIfMessageExists) {
+        delegate.replyTo(messageId, checkIfMessageExists);
         return this;
     }
 

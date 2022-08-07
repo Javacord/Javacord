@@ -1517,20 +1517,23 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Replies to this message with the given text.
      *
      * @param messageContent The text to reply with.
-     * @return The sent message.
+     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
+     * @return The message that was sent.
      */
-    default CompletableFuture<Message> reply(String messageContent) {
-        return new MessageBuilder().replyTo(getId()).setContent(messageContent).send(getChannel());
+    default CompletableFuture<Message> reply(String messageContent, boolean checkIfMessageExists) {
+        return new MessageBuilder().replyTo(getId(), checkIfMessageExists).setContent(messageContent)
+                .send(getChannel());
     }
 
     /**
      * Replies to this message with the given embed.
      *
      * @param embed The EmbedBuilder to reply with.
-     * @return The sent message.
+     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
+     * @return The message that was sent.
      */
-    default CompletableFuture<Message> reply(EmbedBuilder embed) {
-        return new MessageBuilder().replyTo(getId()).setEmbed(embed).send(getChannel());
+    default CompletableFuture<Message> reply(EmbedBuilder embed, boolean checkIfMessageExists) {
+        return new MessageBuilder().replyTo(getId(), checkIfMessageExists).setEmbed(embed).send(getChannel());
     }
 
     /**
