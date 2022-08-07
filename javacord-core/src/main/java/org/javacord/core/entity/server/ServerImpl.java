@@ -1937,7 +1937,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .map(Channel::asServerThreadChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .sorted(Comparator.comparing(ServerThreadChannel::getArchiveTimestamp))
+                .sorted(Comparator.comparing(channel -> channel.getMetadata().getArchiveTimestamp()))
                 .collect(Collectors.toList()));
     }
 
