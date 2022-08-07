@@ -145,9 +145,10 @@ public interface InteractionBase extends DiscordEntity {
     Optional<DiscordLocale> getServerLocale();
 
     /**
-     * Gets the set of permissions of the app in context to the interaction.
+     * Gets the permissions the bot has within the channel the interaction was sent from.
+     * Not present if the interaction has been invoked in a direct message.
      *
-     * @return The app's permissions, in context of the interaction.
+     * @return The bots permissions within the channel the interaction was sent from.
      */
-    Optional<EnumSet<PermissionType>> getAppPermissions();
+    Optional<EnumSet<PermissionType>> getBotPermissions();
 }
