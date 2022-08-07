@@ -37,7 +37,6 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
      */
     int getMemberCount();
 
-
     /**
      * Gets the duration for newly created threads, in minutes, to automatically
      * archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080.
@@ -202,4 +201,11 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
         return new ServerThreadChannelUpdater(this);
     }
 
+    /**
+     * Gets the total number of messages ever sent in this thread.
+     * Similar to {@link #getMessageCount()} but will not decrease when messages are deleted.
+     *
+     * @return The total number of messages sent in this thread.
+     */
+    int getTotalNumberOfMessagesSent();
 }

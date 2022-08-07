@@ -4,14 +4,35 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchivedEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLockedEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMemberCountEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMembersEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMessageCountEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
+import org.javacord.core.entity.channel.ThreadMemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchivedEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLockedEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMemberCountEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMembersEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMessageCountEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class ThreadUpdateHandler extends PacketHandler {
 
@@ -52,7 +73,7 @@ public class ThreadUpdateHandler extends PacketHandler {
             return;
         }
 
-        final ServerThreadChannelImpl thread = 
+        final ServerThreadChannelImpl thread =
                 (ServerThreadChannelImpl) server.getOrCreateServerThreadChannel(jsonChannel);
 
         //Handling whether the name has changed
@@ -60,14 +81,130 @@ public class ThreadUpdateHandler extends PacketHandler {
         final String newName = jsonChannel.get("name").asText();
         if (!Objects.deepEquals(oldName, newName)) {
             thread.setName(newName);
+
             final ServerChannelChangeNameEvent event =
                     new ServerChannelChangeNameEventImpl(thread, newName, oldName);
 
-            if (server.isReady()) {
-                api.getEventDispatcher().dispatchServerChannelChangeNameEvent(
+
+            api.getEventDispatcher().dispatchServerChannelChangeNameEvent(
                         (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final int oldMessageCount = thread.getMessageCount();
+        final int newMessageCount = jsonChannel.get("message_count").asInt();
+        if (oldMessageCount != newMessageCount) {
+            thread.setMessageCount(newMessageCount);
+
+            final ServerThreadChannelChangeMessageCountEvent event =
+                    new ServerThreadChannelChangeMessageCountEventImpl(thread, newMessageCount, oldMessageCount);
+
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeMessageCountEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final int oldMemberCount = thread.getMemberCount();
+        final int newMemberCount = jsonChannel.get("member_count").asInt();
+        if (oldMemberCount != newMemberCount) {
+            thread.setMemberCount(newMemberCount);
+
+            final ServerThreadChannelChangeMemberCountEvent event =
+                    new ServerThreadChannelChangeMemberCountEventImpl(thread, newMemberCount, oldMemberCount);
+
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeMemberCountEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final int oldAutoArchiveDuration = thread.getAutoArchiveDuration();
+        final int newAutoArchiveDuration = jsonChannel.get("auto_archive_duration").asInt();
+        if (oldAutoArchiveDuration != newAutoArchiveDuration) {
+            thread.setAutoArchiveDuration(newAutoArchiveDuration);
+
+            final ServerThreadChannelChangeAutoArchiveDurationEvent event =
+                    new ServerThreadChannelChangeAutoArchiveDurationEventImpl(thread,
+                            newAutoArchiveDuration, oldAutoArchiveDuration);
+
+
+            api.getEventDispatcher()
+                    .dispatchServerThreadChannelChangeAutoArchiveDurationEvent(
+                            (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final boolean wasArchived = thread.isArchived();
+        final boolean isArchived = jsonChannel.get("archived").asBoolean();
+
+        if (wasArchived != isArchived) {
+            thread.setArchived(isArchived);
+
+            final ServerThreadChannelChangeArchivedEvent event =
+                    new ServerThreadChannelChangeArchivedEventImpl(thread, isArchived, wasArchived);
+
+
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeArchivedEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final boolean wasLocked = thread.isLocked();
+        final boolean isLocked = jsonChannel.get("locked").asBoolean();
+
+        if (wasLocked != isLocked) {
+            thread.setLocked(isLocked);
+
+            final ServerThreadChannelChangeLockedEvent event =
+                    new ServerThreadChannelChangeLockedEventImpl(thread, isLocked, wasLocked);
+
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeLockedEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final Instant oldArchiveTimestamp = thread.getArchiveTimestamp();
+        final Instant newArchiveTimestamp = OffsetDateTime.parse(jsonChannel.get("archive_timestamp").asText())
+                .toInstant();
+
+        if (!Objects.deepEquals(oldArchiveTimestamp, newArchiveTimestamp)) {
+            thread.setArchiveTimestamp(newArchiveTimestamp);
+
+            final ServerThreadChannelChangeArchiveTimestampEvent event =
+                    new ServerThreadChannelChangeArchiveTimestampEventImpl(thread,
+                            newArchiveTimestamp, oldArchiveTimestamp);
+
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeArchiveTimestampEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final Set<ThreadMember> oldMembers = thread.getMembers();
+        final Set<ThreadMember> newMembers = new HashSet<>();
+        if (jsonChannel.hasNonNull("member")) {
+            // If userId is not included, that means this came from a GUILD_CREATE event
+            // This means the userId is the bot's and the thread id is from this thread
+            // See https://github.com/Javacord/Javacord/issues/898
+            if (jsonChannel.get("member").hasNonNull("user_id")) {
+                newMembers.add(new ThreadMemberImpl(api, server, jsonChannel.get("member")));
+            } else {
+                newMembers.add(new ThreadMemberImpl(api, server, jsonChannel.get("member"),
+                        thread.getId(), api.getYourself().getId()));
             }
         }
 
+        if (!Objects.deepEquals(oldMembers, newMembers)) {
+            thread.setMembers(newMembers);
+
+            final ServerThreadChannelChangeMembersEvent event =
+                    new ServerThreadChannelChangeMembersEventImpl(thread, newMembers, oldMembers);
+
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeMembersEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final int oldNumberOfMessages = thread.getTotalNumberOfMessagesSent();
+        final int newNumberOfMessages = jsonChannel.get("total_message_count").asInt(0);
+        if (oldNumberOfMessages != newNumberOfMessages) {
+            thread.setTotalNumberOfMessagesSent(newNumberOfMessages);
+        }
     }
 }

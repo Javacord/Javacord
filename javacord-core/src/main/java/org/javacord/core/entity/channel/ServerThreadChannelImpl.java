@@ -39,27 +39,27 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     /**
      * The count of messages in the thread.
      */
-    private final int messageCount;
+    private int messageCount;
 
     /**
      * The count of members in the thread.
      */
-    private final int memberCount;
+    private int memberCount;
 
     /**
      * The auto archive duration.
      */
-    private final int autoArchiveDuration;
+    private int autoArchiveDuration;
 
     /**
      * Whether the thread is archived.
      */
-    private final boolean isArchived;
+    private boolean isArchived;
 
     /**
      * Whether the thread is locked.
      */
-    private final boolean isLocked;
+    private boolean isLocked;
 
     /**
      * The id of the creator of the channel.
@@ -69,12 +69,17 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     /**
      * The timestamp when the thread's archive status was last changed.
      */
-    private final Instant archiveTimestamp;
+    private Instant archiveTimestamp;
 
     /**
      * The thread's users.
      */
     private final Set<ThreadMember> members;
+
+    /**
+     * The number of messages that are sent.
+     */
+    private int totalNumberOfMessagesSent;
 
     /**
      * Creates a new server text channel object.
@@ -113,6 +118,71 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
+
+        totalNumberOfMessagesSent = data.path("total_message_count").asInt(0);
+    }
+
+    /**
+     * Used to set a new owner id.
+     *
+     * @param messageCount The new message count.
+     */
+    public void setMessageCount(int messageCount) {
+        this.messageCount = messageCount;
+    }
+
+    /**
+     * Used to set a new member count.
+     *
+     * @param memberCount The new member count.
+     */
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    /**
+     * Used to set a new auto archive duration.
+     *
+     * @param autoArchiveDuration The new auto archive duration.
+     */
+    public void setAutoArchiveDuration(int autoArchiveDuration) {
+        this.autoArchiveDuration = autoArchiveDuration;
+    }
+
+    /**
+     * Used to set a new archive timestamp.
+     *
+     * @param archived The new archive timestamp.
+     */
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+    /**
+     * Used to set a new locked status.
+     *
+     * @param locked The new locked status.
+     */
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    /**
+     * Used to set a new archive timestamp.
+     *
+     * @param archiveTimestamp The new archive timestamp.
+     */
+    public void setArchiveTimestamp(Instant archiveTimestamp) {
+        this.archiveTimestamp = archiveTimestamp;
+    }
+
+    /**
+     * Used to set a new total for the number of messages sent.
+     *
+     * @param totalNumberOfMessagesSent The new total for the number of messages sent.
+     */
+    public void setTotalNumberOfMessagesSent(int totalNumberOfMessagesSent) {
+        this.totalNumberOfMessagesSent = totalNumberOfMessagesSent;
     }
 
     @Override
@@ -158,7 +228,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
 
     @Override
     public Set<ThreadMember> getMembers() {
-        return members;
+        return Collections.unmodifiableSet(members);
     }
 
     @Override
@@ -194,6 +264,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
                     }
                     return Collections.unmodifiableSet(threadMembers);
                 });
+    }
+
+    @Override
+    public int getTotalNumberOfMessagesSent() {
+        return totalNumberOfMessagesSent;
     }
 
     /**
