@@ -6,7 +6,13 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
-import org.javacord.api.entity.message.*;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageActivity;
+import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.entity.message.MessageReference;
+import org.javacord.api.entity.message.MessageType;
+import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
@@ -26,7 +32,14 @@ import org.javacord.core.util.cache.MessageCacheImpl;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 
@@ -65,11 +78,6 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private final MessageType type;
 
     /**
-     * The flags of the message.
-     */
-    private final EnumSet<MessageFlag> flags = EnumSet.noneOf(MessageFlag.class);
-
-    /**
      * The pinned flag of the message.
      */
     private volatile boolean pinned;
@@ -92,7 +100,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     /**
      * The author of the message.
      */
-    private MessageAuthor author;
+    private final MessageAuthor author;
 
     /**
      * The activity of the message.
@@ -152,130 +160,41 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     /**
      * Creates a new message object.
      *
-     * @param api     The discord api instance.
+     * @param api The discord api instance.
      * @param channel The channel of the message.
-     * @param data    The json data of the message.
+     * @param data The json data of the message.
      */
     public MessageImpl(DiscordApiImpl api, TextChannel channel, JsonNode data) {
         this.api = api;
         this.channel = channel;
 
         id = data.get("id").asLong();
+        content = data.get("content").asText();
+
+        pinned = data.get("pinned").asBoolean(false);
+        tts = data.get("tts").asBoolean(false);
+        mentionsEveryone = data.get("mention_everyone").asBoolean(false);
+
+        lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull()
+                ? OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant()
+                : null;
 
         type = MessageType.byType(data.get("type").asInt(), data.has("webhook_id"));
 
         Long webhookId = data.has("webhook_id") ? data.get("webhook_id").asLong() : null;
         author = new MessageAuthorImpl(this, webhookId, data);
 
-        activity = data.hasNonNull("activity")
-                ? new MessageActivityImpl(this, data.get("activity"))
-                : null;
-
-        nonce = data.hasNonNull("nonce")
-                ? data.path("nonce").asText()
-                : null;
-
-        referencedMessage = data.hasNonNull("referenced_message")
-                ? api.getOrCreateMessage(channel, data.get("referenced_message"))
-                : null;
-
-        messageReference = data.hasNonNull("message_reference")
-                ? new MessageReferenceImpl(api, referencedMessage, data.get("message_reference"))
-                : null;
-
-        setUpdatableFields(data);
-
         MessageCacheImpl cache = (MessageCacheImpl) channel.getMessageCache();
         cache.addMessage(this);
-    }
 
-    /**
-     * Create a new message with the given data.
-     *
-     * @param api               The discord api instance.
-     * @param channel           The channel of the message.
-     * @param id                The id of the message.
-     * @param type              The type of the message.
-     * @param author            The author of the message.
-     * @param activity          The activity of the message.
-     * @param content           The content of the message.
-     * @param nonce             The nonce of the message.
-     * @param referencedMessage The message referenced via message reply.
-     * @param messageReference  The message reference.
-     * @param pinned            The pinned flag of the message.
-     * @param tts               The text-to-speech flag of the message.
-     * @param mentionsEveryone  If the message mentions everyone or not.
-     * @param lastEditTime      The last edit time.
-     * @param components        The components of the message.
-     * @param embeds            The embeds of the message.
-     * @param reactions         The reactions of the message.
-     * @param attachments       The attachments of the message.
-     * @param mentions          The users mentioned in this message.
-     * @param roleMentions      The roles mentioned in this message.
-     * @param stickerItems      The sticker items in this message.
-     */
-    private MessageImpl(DiscordApiImpl api, TextChannel channel, long id, MessageType type,
-                        MessageAuthor author, MessageActivityImpl activity, String content,
-                        String nonce, Message referencedMessage, MessageReference messageReference,
-                        boolean pinned, boolean tts, boolean mentionsEveryone,
-                        Instant lastEditTime, List<HighLevelComponent> components,
-                        List<Embed> embeds, List<Reaction> reactions,
-                        List<MessageAttachment> attachments, List<User> mentions,
-                        List<Role> roleMentions, Set<StickerItem> stickerItems) {
-        this.api = api;
-        this.channel = channel;
-        this.id = id;
-        this.type = type;
-        this.author = author;
-        this.activity = activity;
-        this.content = content;
-        this.nonce = nonce;
-        this.referencedMessage = referencedMessage;
-        this.messageReference = messageReference;
-        this.pinned = pinned;
-        this.tts = tts;
-        this.mentionsEveryone = mentionsEveryone;
-        this.lastEditTime = lastEditTime;
-        this.components.addAll(components);
-        this.embeds.addAll(embeds);
-        this.reactions.addAll(reactions);
-        this.attachments.addAll(attachments);
-        this.mentions.addAll(mentions);
-        this.roleMentions.addAll(roleMentions);
-        this.stickerItems.addAll(stickerItems);
-    }
-
-    /**
-     * Copy the message.
-     *
-     * @return The message.
-     */
-    public MessageImpl copyMessage() {
-        return new MessageImpl(api, channel, id, type, author, activity, content, nonce, referencedMessage,
-                messageReference, pinned, tts, mentionsEveryone, lastEditTime, components,
-                embeds, reactions, attachments, mentions, roleMentions, stickerItems);
-    }
-
-    /**
-     * Sets the updatable fields of the message.
-     *
-     * @param data The json data of the message.
-     */
-    public void setUpdatableFields(JsonNode data) {
-        content = data.get("content").asText("");
-
-        pinned = data.path("pinned").asBoolean(false);
-        tts = data.path("tts").asBoolean(false);
-        mentionsEveryone = data.path("mention_everyone").asBoolean(false);
-
-        lastEditTime = data.has("edited_timestamp") && !data.get("edited_timestamp").isNull()
-                ? OffsetDateTime.parse(data.get("edited_timestamp").asText()).toInstant()
-                : null;
-
-        setSpecialUpdatableFields(data);
+        if (data.has("embeds")) {
+            for (JsonNode embedJson : data.get("embeds")) {
+                Embed embed = new EmbedImpl(embedJson);
+                embeds.add(embed);
+            }
+        }
 
         if (data.has("components")) {
-            components.clear();
             for (JsonNode componentJson : data.get("components")) {
                 ActionRowImpl actionRow = new ActionRowImpl(componentJson);
                 components.add(actionRow);
@@ -283,7 +202,6 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         }
 
         if (data.has("reactions")) {
-            reactions.clear();
             for (JsonNode reactionJson : data.get("reactions")) {
                 Reaction reaction = new ReactionImpl(this, reactionJson);
                 reactions.add(reaction);
@@ -291,7 +209,6 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         }
 
         if (data.has("attachments")) {
-            attachments.clear();
             for (JsonNode attachmentJson : data.get("attachments")) {
                 MessageAttachment attachment = new MessageAttachmentImpl(this, attachmentJson);
                 attachments.add(attachment);
@@ -299,7 +216,6 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         }
 
         if (data.has("mentions")) {
-            mentions.clear();
             for (JsonNode mentionJson : data.get("mentions")) {
                 User user = new UserImpl(api, mentionJson, (MemberImpl) null,
                         getServer().map(ServerImpl.class::cast).orElse(null));
@@ -307,8 +223,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             }
         }
 
-        if (data.has("mention_roles")) {
-            roleMentions.clear();
+        if (data.hasNonNull("mention_roles")) {
             getServer().ifPresent(server -> {
                 for (JsonNode roleMentionJson : data.get("mention_roles")) {
                     server.getRoleById(roleMentionJson.asText()).ifPresent(roleMentions::add);
@@ -316,52 +231,97 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             });
         }
 
-        if (data.has("sticker_items")) {
-            stickerItems.clear();
+        if (data.hasNonNull("activity")) {
+            activity = new MessageActivityImpl(this, data.get("activity"));
+        } else {
+            activity = null;
+        }
+
+        if (data.hasNonNull("nonce")) {
+            nonce = data.get("nonce").asText();
+        } else {
+            nonce = null;
+        }
+
+        if (data.hasNonNull("sticker_items")) {
             for (JsonNode stickerItemJson : data.get("sticker_items")) {
                 stickerItems.add(new StickerItemImpl(api, stickerItemJson));
             }
         }
+
+        if (data.hasNonNull("referenced_message")) {
+            referencedMessage = api.getOrCreateMessage(channel, data.get("referenced_message"));
+        } else {
+            referencedMessage = null;
+        }
+
+        if (data.hasNonNull("message_reference")) {
+            messageReference = new MessageReferenceImpl(api, referencedMessage, data.get("message_reference"));
+        } else {
+            messageReference = null;
+        }
     }
 
     /**
-     * Updated fields that are updated in special cases like embedding links.
+     * Sets the content of the message.
      *
-     * @param data The json data of the message.
-     * @return Whether a field was updated.
+     * @param content The content to set.
      */
-    public boolean setSpecialUpdatableFields(JsonNode data) {
-        boolean changed = false;
-        if (data.has("embeds")) {
-            changed = true;
-            embeds.clear();
-            for (JsonNode embedJson : data.get("embeds")) {
-                Embed embed = new EmbedImpl(embedJson);
-                embeds.add(embed);
-            }
-        }
-        if (data.has("flags")) {
-            changed = true;
-            flags.clear();
-            int flag = data.get("flags").asInt();
-            for (MessageFlag value : MessageFlag.values()) {
-                if ((flag & value.getId()) == value.getId()) {
-                    flags.add(value);
-                }
-            }
-        }
-        if (data.has("author")) {
-            changed = true;
-            author = new MessageAuthorImpl(this, author.getWebhookId().orElse(null), data);
-        }
-        return changed;
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    /**
+     * Sets the pinned flag if the message.
+     *
+     * @param pinned The pinned flag to set.
+     */
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
+    }
+
+    /**
+     * Sets the mentions everyone flag.
+     *
+     * @param mentionsEveryone The mentions everyone flag to set.
+     */
+    public void setMentionsEveryone(boolean mentionsEveryone) {
+        this.mentionsEveryone = mentionsEveryone;
+    }
+
+    /**
+     * Sets the last edit time of the message.
+     *
+     * @param lastEditTime The last edit time of the message.
+     */
+    public void setLastEditTime(Instant lastEditTime) {
+        this.lastEditTime = lastEditTime;
+    }
+
+    /**
+     * Sets the embeds of the message.
+     *
+     * @param embeds The embeds to set.
+     */
+    public void setEmbeds(List<Embed> embeds) {
+        this.embeds.clear();
+        this.embeds.addAll(embeds);
+    }
+
+    /**
+     * Set the tts flag for the message.
+     *
+     * @param tts The new flag.
+     */
+    public void setTts(boolean tts) {
+        this.tts = tts;
     }
 
     /**
      * Adds an emoji to the list of reactions.
      *
      * @param emoji The emoji.
-     * @param you   Whether this reaction is used by you or not.
+     * @param you Whether this reaction is used by you or not.
      */
     public void addReaction(Emoji emoji, boolean you) {
         Optional<Reaction> reaction = reactions.stream().filter(r -> emoji.equalsEmoji(r.getEmoji())).findAny();
@@ -375,7 +335,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * Removes an emoji from the list of reactions.
      *
      * @param emoji The emoji.
-     * @param you   Whether this reaction is used by you or not.
+     * @param you Whether this reaction is used by you or not.
      */
     public void removeReaction(Emoji emoji, boolean you) {
         Optional<Reaction> reaction = reactions.stream().filter(r -> emoji.equalsEmoji(r.getEmoji())).findAny();
@@ -444,11 +404,6 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public Optional<MessageActivity> getActivity() {
         return Optional.ofNullable(activity);
-    }
-
-    @Override
-    public EnumSet<MessageFlag> getFlags() {
-        return EnumSet.copyOf(flags);
     }
 
     @Override
@@ -584,9 +539,9 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public boolean equals(Object o) {
         return (this == o)
-                || !((o == null)
-                || (getClass() != o.getClass())
-                || (getId() != ((DiscordEntity) o).getId()));
+               || !((o == null)
+                    || (getClass() != o.getClass())
+                    || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override
