@@ -14,7 +14,7 @@ public interface ServerMemberBanListener extends ServerAttachableListener, UserA
         GloballyAttachableListener, ObjectAttachableListener {
 
     /**
-     * This method is called every time a user got banned from a server.
+     * This method is called every time a member got banned from a server.
      *
      * @param event The event.
      */

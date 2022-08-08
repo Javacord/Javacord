@@ -48,7 +48,7 @@ public class WebhooksUpdateHandler extends PacketHandler {
                     channel,
                     event);
         } else {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
         }
     }
 

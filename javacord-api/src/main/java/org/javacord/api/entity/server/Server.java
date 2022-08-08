@@ -27,10 +27,7 @@ import org.javacord.api.entity.channel.UnknownRegularServerChannel;
 import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.CustomEmojiBuilder;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
-import org.javacord.api.entity.permission.PermissionState;
-import org.javacord.api.entity.permission.PermissionType;
-import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.PermissionsBuilder;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
@@ -46,20 +43,13 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
-
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -176,71 +166,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     Region getRegion();
 
     /**
-     * Gets the nickname of a user.
-     *
-     * @param user The user to check.
-     * @return The nickname of the user.
-     */
-    Optional<String> getNickname(User user);
-
-    /**
-     * Gets the timestamp of when this member started boosting the server.
-     *
-     * @param user The user to check.
-     * @return The timestamp of when this member started boosting the server.
-     */
-    Optional<Instant> getServerBoostingSinceTimestamp(User user);
-
-    /**
-     * Gets the timestamp of when the user's timeout will expire
-     * and the user will be able to communicate in the server again.
-     * The returned Instant may be in the past which indicates that the user is not timed out.
-     *
-     * @param user The user to check.
-     * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
-     *         if user is currently not timed out.
-     */
-    Optional<Instant> getTimeout(User user);
-
-    /**
-     * Gets the timestamp of when the user's timeout will expire
-     * and the user will be able to communicate in the server again.
-     * The returned Instant will be checked against {@link Instant#now()} and will only return an Instant,
-     * if the timeout is active at the moment when this method is called.
-     *
-     * @param user The user to check.
-     * @return The timestamp of when this user will no longer be timed out.
-     */
-    default Optional<Instant> getActiveTimeout(User user) {
-        return getTimeout(user).filter(Instant.now()::isBefore);
-    }
-
-    /**
-     * Gets the user's server specific avatar hash.
-     *
-     * @param user The user.
-     * @return The user's server specific avatar hash.
-     */
-    Optional<String> getUserServerAvatarHash(User user);
-
-    /**
-     * Gets the user's server specific avatar.
-     *
-     * @param user The user.
-     * @return The user's server specific avatar.
-     */
-    Optional<Icon> getUserServerAvatar(User user);
-
-    /**
-     * Gets the user's server specific avatar in the given size.
-     *
-     * @param user The user.
-     * @param size The size of the image, must be any power of 2 between 16 and 4096.
-     * @return The user's server specific avatar in the given size.
-     */
-    Optional<Icon> getUserServerAvatar(User user, int size);
-
-    /**
      * Gets the pending state of the user.
      *
      * <p>Membership screening pending state is only available for servers that have
@@ -255,40 +180,12 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     boolean isPending(long userId);
 
     /**
-     * Gets your self-muted state.
-     *
-     * @return Whether you are self-muted.
-     */
-    default boolean areYouSelfMuted() {
-        return isSelfMuted(getApi().getYourself());
-    }
-
-    /**
      * Gets the self-muted state of the user with the given id.
      *
      * @param userId The id of the user to check.
      * @return Whether the user with the given id is self-muted.
      */
     boolean isSelfMuted(long userId);
-
-    /**
-     * Gets the self-muted state of the given user.
-     *
-     * @param user The user to check.
-     * @return Whether the given user is self-muted.
-     */
-    default boolean isSelfMuted(User user) {
-        return isSelfMuted(user.getId());
-    }
-
-    /**
-     * Gets your self-deafened state.
-     *
-     * @return Whether you are self-deafened.
-     */
-    default boolean areYouSelfDeafened() {
-        return isSelfDeafened(getApi().getYourself());
-    }
 
     /**
      * Gets the self-deafened state of the user with the given id.
@@ -299,25 +196,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     boolean isSelfDeafened(long userId);
 
     /**
-     * Gets the self-deafened state of the given user.
-     *
-     * @param user The user to check.
-     * @return Whether the given user is self-deafened.
-     */
-    default boolean isSelfDeafened(User user) {
-        return isSelfDeafened(user.getId());
-    }
-
-    /**
-     * Gets your muted state.
-     *
-     * @return Whether you are muted.
-     */
-    default boolean areYouMuted() {
-        return isMuted(getApi().getYourself());
-    }
-
-    /**
      * Gets the muted state of the user with the given id.
      *
      * @param userId The id of the user to check.
@@ -326,60 +204,12 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     boolean isMuted(long userId);
 
     /**
-     * Gets the muted state of the given user.
-     *
-     * @param user The user to check.
-     * @return Whether the given user is muted.
-     */
-    default boolean isMuted(User user) {
-        return isMuted(user.getId());
-    }
-
-    /**
-     * Gets your deafened state.
-     *
-     * @return Whether you are deafened.
-     */
-    default boolean areYouDeafened() {
-        return isDeafened(getApi().getYourself());
-    }
-
-    /**
      * Gets the deafened state of the user with the given id.
      *
      * @param userId The id of the user to check.
      * @return Whether the user with the given id is deafened.
      */
     boolean isDeafened(long userId);
-
-    /**
-     * Gets the deafened state of the given user.
-     *
-     * @param user The user to check.
-     * @return Whether the given user is deafened.
-     */
-    default boolean isDeafened(User user) {
-        return isDeafened(user.getId());
-    }
-
-    /**
-     * Gets the display name of the user on this server.
-     * If the user has a nickname, it will return the nickname, otherwise it will return the "normal" name.
-     *
-     * @param user The user.
-     * @return The display name of the user on this server.
-     */
-    default String getDisplayName(User user) {
-        return user.getDisplayName(this);
-    }
-
-    /**
-     * Gets the timestamp of when a user joined the server.
-     *
-     * @param user The user to check.
-     * @return The timestamp of when the user joined the server.
-     */
-    Optional<Instant> getJoinedAtTimestamp(User user);
 
     /**
      * Checks if the server is considered large.
@@ -400,7 +230,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      *
      * @return The owner of the server.
      */
-    Optional<User> getOwner();
+    Optional<Member> getOwner();
 
     /**
      * Gets the owner of the server.
@@ -646,7 +476,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      *
      * @return All members of the server.
      */
-    Set<User> getMembers();
+    Set<Member> getMembers();
 
     /**
      * Gets a member by its id.
@@ -654,7 +484,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param id The id of the member.
      * @return The member with the given id.
      */
-    Optional<User> getMemberById(long id);
+    Optional<Member> getMemberById(long id);
 
     /**
      * Gets a member by its id.
@@ -662,7 +492,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param id The id of the member.
      * @return The member with the given id.
      */
-    default Optional<User> getMemberById(String id) {
+    default Optional<Member> getMemberById(String id) {
         try {
             return getMemberById(Long.parseLong(id));
         } catch (NumberFormatException e) {
@@ -677,7 +507,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
      */
-    default Optional<User> getMemberByDiscriminatedName(String discriminatedName) {
+    default Optional<Member> getMemberByDiscriminatedName(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return (nameAndDiscriminator.length > 1)
                 ? getMemberByNameAndDiscriminator(nameAndDiscriminator[0], nameAndDiscriminator[1])
@@ -691,7 +521,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
      */
-    default Optional<User> getMemberByDiscriminatedNameIgnoreCase(String discriminatedName) {
+    default Optional<Member> getMemberByDiscriminatedNameIgnoreCase(String discriminatedName) {
         String[] nameAndDiscriminator = discriminatedName.split("#", 2);
         return (nameAndDiscriminator.length > 1)
                 ? getMemberByNameAndDiscriminatorIgnoreCase(nameAndDiscriminator[0], nameAndDiscriminator[1])
@@ -706,9 +536,9 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param discriminator The discriminator of the member.
      * @return The member with the given name and discriminator.
      */
-    default Optional<User> getMemberByNameAndDiscriminator(String name, String discriminator) {
+    default Optional<Member> getMemberByNameAndDiscriminator(String name, String discriminator) {
         return getMembersByName(name).stream()
-                .filter(user -> user.getDiscriminator().equals(discriminator))
+                .filter(member -> member.getUser().getDiscriminator().equals(discriminator))
                 .findAny();
     }
 
@@ -720,9 +550,9 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param discriminator The discriminator of the member.
      * @return The member with the given name and discriminator.
      */
-    default Optional<User> getMemberByNameAndDiscriminatorIgnoreCase(String name, String discriminator) {
+    default Optional<Member> getMemberByNameAndDiscriminatorIgnoreCase(String name, String discriminator) {
         return getMembersByNameIgnoreCase(name).stream()
-                .filter(user -> user.getDiscriminator().equalsIgnoreCase(discriminator))
+                .filter(member -> member.getUser().getDiscriminator().equalsIgnoreCase(discriminator))
                 .findAny();
     }
 
@@ -733,10 +563,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param name The name of the members.
      * @return All members with the given name.
      */
-    default Set<User> getMembersByName(String name) {
+    default Set<Member> getMembersByName(String name) {
         return Collections.unmodifiableSet(
                 getMembers().stream()
-                        .filter(user -> user.getName().equals(name))
+                        .filter(member -> member.getUser().getName().equals(name))
                         .collect(Collectors.toSet()));
     }
 
@@ -747,10 +577,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param name The name of the members.
      * @return All members with the given name.
      */
-    default Set<User> getMembersByNameIgnoreCase(String name) {
+    default Set<Member> getMembersByNameIgnoreCase(String name) {
         return Collections.unmodifiableSet(
                 getMembers().stream()
-                        .filter(user -> user.getName().equalsIgnoreCase(name))
+                        .filter(member -> member.getUser().getName().equalsIgnoreCase(name))
                         .collect(Collectors.toSet()));
     }
 
@@ -761,10 +591,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param nickname The nickname of the members.
      * @return All members with the given nickname on this server.
      */
-    default Set<User> getMembersByNickname(String nickname) {
+    default Set<Member> getMembersByNickname(String nickname) {
         return Collections.unmodifiableSet(
                 getMembers().stream()
-                        .filter(user -> user.getNickname(this).map(nickname::equals).orElse(false))
+                        .filter(member -> member.getNickname().map(nickname::equals).orElse(false))
                         .collect(Collectors.toSet()));
     }
 
@@ -775,10 +605,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param nickname The nickname of the members.
      * @return All members with the given nickname on this server.
      */
-    default Set<User> getMembersByNicknameIgnoreCase(String nickname) {
+    default Set<Member> getMembersByNicknameIgnoreCase(String nickname) {
         return Collections.unmodifiableSet(
                 getMembers().stream()
-                        .filter(user -> user.getNickname(this).map(nickname::equalsIgnoreCase).orElse(false))
+                        .filter(member -> member.getNickname().map(nickname::equalsIgnoreCase).orElse(false))
                         .collect(Collectors.toSet()));
     }
 
@@ -789,10 +619,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param displayName The display name of the members.
      * @return All members with the given display name on this server.
      */
-    default Set<User> getMembersByDisplayName(String displayName) {
+    default Set<Member> getMembersByDisplayName(String displayName) {
         return Collections.unmodifiableSet(
                 getMembers().stream()
-                        .filter(user -> user.getDisplayName(this).equals(displayName))
+                        .filter(member -> member.getDisplayName().equals(displayName))
                         .collect(Collectors.toSet()));
     }
 
@@ -803,10 +633,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param displayName The display name of the members.
      * @return All members with the given display name on this server.
      */
-    default Set<User> getMembersByDisplayNameIgnoreCase(String displayName) {
+    default Set<Member> getMembersByDisplayNameIgnoreCase(String displayName) {
         return Collections.unmodifiableSet(
                 getMembers().stream()
-                        .filter(user -> user.getDisplayName(this).equalsIgnoreCase(displayName))
+                        .filter(member -> member.getDisplayName().equalsIgnoreCase(displayName))
                         .collect(Collectors.toSet()));
     }
 
@@ -824,14 +654,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @return A sorted list (by position) with all roles of the server.
      */
     List<Role> getRoles();
-
-    /**
-     * Gets a sorted list (by position) with all roles of the user in the server.
-     *
-     * @param user The user.
-     * @return A sorted list (by position) with all roles of the user in the server.
-     */
-    List<Role> getRoles(User user);
 
     /**
      * Gets a role by its id.
@@ -890,90 +712,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
                 getRoles().stream()
                         .filter(role -> role.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
-    }
-
-    /**
-     * Gets the displayed color of a user based on his roles on this server.
-     *
-     * @param user The user.
-     * @return The color.
-     */
-    default Optional<Color> getRoleColor(User user) {
-        return user.getRoles(this).stream()
-                .filter(role -> role.getColor().isPresent())
-                .max(Comparator.comparingInt(Role::getRawPosition))
-                .flatMap(Role::getColor);
-    }
-
-    /**
-     * Gets the permissions of a user.
-     *
-     * @param user The user.
-     * @return The permissions of the user.
-     */
-    default Permissions getPermissions(User user) {
-        PermissionsBuilder builder = new PermissionsBuilder();
-        getAllowedPermissions(user).forEach(type -> builder.setState(type, PermissionState.ALLOWED));
-        return builder.build();
-    }
-
-    /**
-     * Get the allowed permissions of a given user.
-     * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
-     * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
-     *
-     * @param user The user.
-     * @return The allowed permissions of the given user.
-     */
-    default Set<PermissionType> getAllowedPermissions(User user) {
-        Set<PermissionType> allowed = new HashSet<>();
-        if (isOwner(user)) {
-            allowed.addAll(Arrays.asList(PermissionType.values()));
-        } else {
-            getRoles(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
-        }
-        return Collections.unmodifiableSet(allowed);
-    }
-
-    /**
-     * Get the unset permissions of a given user.
-     *
-     * @param user The user.
-     * @return The unset permissions of the given user.
-     */
-    default Set<PermissionType> getUnsetPermissions(User user) {
-        if (isOwner(user)) {
-            return Collections.emptySet();
-        }
-        Set<PermissionType> unset = new HashSet<>();
-        getRoles(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
-        return Collections.unmodifiableSet(unset);
-    }
-
-    /**
-     * Checks if the user has a given set of permissions.
-     *
-     * @param user The user to check.
-     * @param type The permission type(s) to check.
-     * @return Whether the user has all given permissions or not.
-     * @see #getAllowedPermissions(User)
-     */
-    default boolean hasPermissions(User user, PermissionType... type) {
-        return getAllowedPermissions(user).containsAll(Arrays.asList(type));
-    }
-
-    /**
-     * Checks if the user has any of a given set of permissions.
-     *
-     * @param user The user to check.
-     * @param type The permission type(s) to check.
-     * @return Whether the user has any of the given permissions or not.
-     * @see #getAllowedPermissions(User)
-     */
-    default boolean hasAnyPermission(User user, PermissionType... type) {
-        return getAllowedPermissions(user).stream()
-                .anyMatch(allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals));
     }
 
     /**
@@ -1608,246 +1346,11 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     }
 
     /**
-     * Changes the nickname of the given user.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user     The user.
-     * @param nickname The new nickname of the user.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateNickname(User user, String nickname) {
-        return createUpdater().setNickname(user, nickname).update();
-    }
-
-    /**
-     * Changes the nickname of the given user.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user     The user.
-     * @param nickname The new nickname of the user.
-     * @param reason   The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
-        return createUpdater().setNickname(user, nickname).setAuditLogReason(reason).update();
-    }
-
-    /**
-     * Removes the nickname of the given user.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user The user.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> resetNickname(User user) {
-        return createUpdater().setNickname(user, null).update();
-    }
-
-    /**
-     * Removes the nickname of the given user.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user   The user.
-     * @param reason The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> resetNickname(User user, String reason) {
-        return createUpdater().setNickname(user, null).setAuditLogReason(reason).update();
-    }
-
-    /**
-     * Timeout the given user on this server.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user    The user.
-     * @param timeout The timestamp until the user should be timed out.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> timeoutUser(User user, Instant timeout) {
-        return createUpdater().setUserTimeout(user, timeout).update();
-    }
-
-    /**
-     * Timeout the given user on this server.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user    The user.
-     * @param timeout The timestamp until the user should be timed out.
-     * @param reason  The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> timeoutUser(User user, Instant timeout, String reason) {
-        return createUpdater().setUserTimeout(user, timeout).setAuditLogReason(reason).update();
-    }
-
-    /**
-     * Timeout the given user on this server.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user     The user.
-     * @param duration The duration of the timeout.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> timeoutUser(User user, Duration duration) {
-        return createUpdater().setUserTimeout(user, Instant.now().plus(duration)).update();
-    }
-
-    /**
-     * Timeout the given user on this server.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user     The user.
-     * @param duration The duration of the timeout.
-     * @param reason   The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> timeoutUser(User user, Duration duration, String reason) {
-        return createUpdater().setUserTimeout(user, Instant.now().plus(duration))
-                .setAuditLogReason(reason)
-                .update();
-    }
-
-    /**
-     * Remove a timeout for the given user on this server.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user The user.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> removeUserTimeout(User user) {
-        return createUpdater().setUserTimeout(user, Instant.MIN).update();
-    }
-
-    /**
-     * Remove a timeout for the given user on this server.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user   The user.
-     * @param reason The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> removeUserTimeout(User user, String reason) {
-        return createUpdater().setUserTimeout(user, Instant.MIN).setAuditLogReason(reason).update();
-    }
-
-    /**
      * Leaves the server.
      *
      * @return A future to check if the bot successfully left the server.
      */
     CompletableFuture<Void> leave();
-
-    /**
-     * Adds the given role to the given server member.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user The server member the role should be added to.
-     * @param role The role which should be added to the server member.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> addRoleToUser(User user, Role role) {
-        return addRoleToUser(user, role, null);
-    }
-
-    /**
-     * Adds the given role to the given server member.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user   The server member the role should be added to.
-     * @param role   The role which should be added to the server member.
-     * @param reason The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    CompletableFuture<Void> addRoleToUser(User user, Role role, String reason);
-
-    /**
-     * Removes the given role from the given server member.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user The server member the role should be removed from.
-     * @param role The role which should be removed from the server member.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> removeRoleFromUser(User user, Role role) {
-        return removeRoleFromUser(user, role, null);
-    }
-
-    /**
-     * Removes the given role from the given server member.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user   The server member the role should be removed from.
-     * @param role   The role which should be removed from the server member.
-     * @param reason The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    CompletableFuture<Void> removeRoleFromUser(User user, Role role, String reason);
-
-    /**
-     * Updates the roles of a server member.
-     * This will replace the roles of the server member with a provided collection.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user  The user to update the roles of.
-     * @param roles The collection of roles to replace the user's roles.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles) {
-        return createUpdater()
-                .removeAllRolesFromUser(user)
-                .addRolesToUser(user, roles)
-                .update();
-    }
-
-    /**
-     * Updates the roles of a server member.
-     * This will replace the roles of the server member with a provided collection.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param user   The user to update the roles of.
-     * @param roles  The collection of roles to replace the user's roles.
-     * @param reason The audit log reason for this update.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateRoles(User user, Collection<Role> roles, String reason) {
-        return createUpdater()
-                .removeAllRolesFromUser(user)
-                .addRolesToUser(user, roles)
-                .setAuditLogReason(reason)
-                .update();
-    }
 
     /**
      * Reorders the roles of the server.
@@ -1869,191 +1372,13 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     CompletableFuture<Void> reorderRoles(List<Role> roles, String reason);
 
     /**
-     * Moves yourself to the given channel on the server.
-     *
-     * @param channel The channel to move the user to.
-     * @return A future to check if the move was successful.
-     */
-    default CompletableFuture<Void> moveYourself(ServerVoiceChannel channel) {
-        return moveUser(getApi().getYourself(), channel);
-    }
-
-    /**
-     * Moves the given user to the given channel on the server.
-     *
-     * @param user    The user to move.
-     * @param channel The channel to move the user to.
-     * @return A future to check if the move was successful.
-     */
-    default CompletableFuture<Void> moveUser(User user, ServerVoiceChannel channel) {
-        return createUpdater().setVoiceChannel(user, channel).update();
-    }
-
-    /**
-     * Kicks the given user from any voice channel.
-     *
-     * @param user The user to kick.
-     * @return A future to check if the kick was successful.
-     */
-    default CompletableFuture<Void> kickUserFromVoiceChannel(User user) {
-        return createUpdater().setVoiceChannel(user, null).update();
-    }
-
-    /**
-     * Mutes yourself locally for the server.
-     *
-     * <p>This cannot be undone by other users. If you want to mute yourself server-side, so that others can unmute
-     * you, use {@link #muteYourself()}, {@link #muteUser(User)} or {@link #muteUser(User, String)}.
-     *
-     * @see #muteYourself()
-     * @see #muteUser(User)
-     * @see #muteUser(User, String)
-     */
-    void selfMute();
-
-    /**
-     * Unmutes yourself locally for the server.
-     *
-     * <p>This cannot be undone by other users. If you want to unmute yourself server-side, so that others can
-     * mute you, use {@link #unmuteYourself()}, {@link #unmuteUser(User)} or {@link #unmuteUser(User, String)}.
-     *
-     * @see #unmuteYourself()
-     * @see #unmuteUser(User)
-     * @see #unmuteUser(User, String)
-     */
-    void selfUnmute();
-
-    /**
-     * Mutes yourself on the server.
-     *
-     * @return A future to check if the mute was successful.
-     */
-    default CompletableFuture<Void> muteYourself() {
-        return muteUser(getApi().getYourself());
-    }
-
-    /**
-     * Unmutes yourself on the server.
-     *
-     * @return A future to check if the unmute was successful.
-     */
-    default CompletableFuture<Void> unmuteYourself() {
-        return unmuteUser(getApi().getYourself());
-    }
-
-    /**
-     * Mutes the given user on the server.
-     *
-     * @param user The user to mute.
-     * @return A future to check if the mute was successful.
-     */
-    default CompletableFuture<Void> muteUser(User user) {
-        return createUpdater().setMuted(user, true).update();
-    }
-
-    /**
-     * Mutes the given user on the server.
-     *
-     * @param user   The user to mute.
-     * @param reason The audit log reason for this action.
-     * @return A future to check if the mute was successful.
-     */
-    default CompletableFuture<Void> muteUser(User user, String reason) {
-        return createUpdater().setMuted(user, true).setAuditLogReason(reason).update();
-    }
-
-    /**
-     * Unmutes the given user on the server.
-     *
-     * @param user The user to unmute.
-     * @return A future to check if the unmute was successful.
-     */
-    default CompletableFuture<Void> unmuteUser(User user) {
-        return createUpdater().setMuted(user, false).update();
-    }
-
-    /**
-     * Unmutes the given user on the server.
-     *
-     * @param user   The user to unmute.
-     * @param reason The audit log reason for this action.
-     * @return A future to check if the unmute was successful.
-     */
-    default CompletableFuture<Void> unmuteUser(User user, String reason) {
-        return createUpdater().setMuted(user, false).setAuditLogReason(reason).update();
-    }
-
-    /**
-     * Deafens yourself locally for the server.
-     *
-     * <p>This cannot be undone by other users. If you want to deafen yourself server-side, so that others can
-     * undeafen you, use {@link #deafenYourself()}, {@link #deafenUser(User)} or {@link #deafenUser(User, String)}.
-     *
-     * @see #deafenYourself()
-     * @see #deafenUser(User)
-     * @see #deafenUser(User, String)
-     */
-    void selfDeafen();
-
-    /**
-     * Undeafens yourself locally for the server.
-     *
-     * <p>This cannot be undone by other users. If you want to undeafen yourself server-side, so that others can
-     * deafen you, use {@link #undeafenYourself()}, {@link #undeafenUser(User)} or {@link #undeafenUser(User, String)}.
-     *
-     * @see #undeafenYourself()
-     * @see #undeafenUser(User)
-     * @see #undeafenUser(User, String)
-     */
-    void selfUndeafen();
-
-    /**
-     * Deafens yourself on the server.
-     *
-     * @return A future to check if the deafen was successful.
-     */
-    default CompletableFuture<Void> deafenYourself() {
-        return deafenUser(getApi().getYourself());
-    }
-
-    /**
-     * Undeafens yourself on the server.
-     *
-     * @return A future to check if the undeafen was successful.
-     */
-    default CompletableFuture<Void> undeafenYourself() {
-        return undeafenUser(getApi().getYourself());
-    }
-
-    /**
-     * Deafens the given user on the server.
-     *
-     * @param user The user to deafen.
-     * @return A future to check if the deafen was successful.
-     */
-    default CompletableFuture<Void> deafenUser(User user) {
-        return createUpdater().setDeafened(user, true).update();
-    }
-
-    /**
-     * Deafens the given user on the server.
-     *
-     * @param user   The user to deafen.
-     * @param reason The audit log reason for this action.
-     * @return A future to check if the deafen was successful.
-     */
-    default CompletableFuture<Void> deafenUser(User user, String reason) {
-        return createUpdater().setDeafened(user, true).setAuditLogReason(reason).update();
-    }
-
-    /**
      * Requests a server member.
      *
-     * @param user The user to request as a member.
+     * @param user The member to request as a member.
      * @return A future to get a server member if it exists in the server.
      */
-    default CompletableFuture<User> requestMember(User user) {
-        return requestMember(user.getId());
+    default CompletableFuture<Member> requestMember(User user) {
+        return requestMemberById(user.getId());
     }
 
     /**
@@ -2062,57 +1387,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @param userId The user id of the member to request.
      * @return A future to get a server member if it exists in the server.
      */
-    CompletableFuture<User> requestMember(long userId);
-
-    /**
-     * Undeafens the given user on the server.
-     *
-     * @param user The user to undeafen.
-     * @return A future to check if the undeafen was successful.
-     */
-    default CompletableFuture<Void> undeafenUser(User user) {
-        return createUpdater().setDeafened(user, false).update();
-    }
-
-    /**
-     * Undeafens the given user on the server.
-     *
-     * @param user   The user to undeafen.
-     * @param reason The audit log reason for this action.
-     * @return A future to check if the undeafen was successful.
-     */
-    default CompletableFuture<Void> undeafenUser(User user, String reason) {
-        return createUpdater().setDeafened(user, false).setAuditLogReason(reason).update();
-    }
-
-    /**
-     * Kicks the given user from the server.
-     *
-     * @param user The user to kick.
-     * @return A future to check if the kick was successful.
-     */
-    default CompletableFuture<Void> kickUser(User user) {
-        return kickUser(user, null);
-    }
-
-    /**
-     * Kicks the given user from the server.
-     *
-     * @param user   The user to kick.
-     * @param reason The audit log reason for this action.
-     * @return A future to check if the kick was successful.
-     */
-    CompletableFuture<Void> kickUser(User user, String reason);
-
-    /**
-     * Bans the given user from the server.
-     *
-     * @param user The user to ban.
-     * @return A future to check if the ban was successful.
-     */
-    default CompletableFuture<Void> banUser(User user) {
-        return banUser(user.getId(), 0, TimeUnit.SECONDS, null);
-    }
+    CompletableFuture<Member> requestMemberById(long userId);
 
     /**
      * Bans the given user from the server.
@@ -2315,17 +1590,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     /**
      * Unbans the given user from the server.
      *
-     * @param user   The user to ban.
-     * @param reason The audit log reason for this action.
-     * @return A future to check if the unban was successful.
-     */
-    default CompletableFuture<Void> unbanUser(User user, String reason) {
-        return unbanUser(user.getId(), reason);
-    }
-
-    /**
-     * Unbans the given user from the server.
-     *
      * @param userId The id of the user to unban.
      * @param reason The audit log reason for this action.
      * @return A future to check if the unban was successful.
@@ -2447,21 +1711,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @return The audit log.
      */
     CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before, AuditLogActionType type);
-
-    /**
-     * Checks if a user has a given permission.
-     * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
-     * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
-     * This method also do not take into account overwritten permissions in some channels!
-     *
-     * @param user       The user.
-     * @param permission The permission to check.
-     * @return Whether the user has the permission or not.
-     */
-    default boolean hasPermission(User user, PermissionType permission) {
-        return getAllowedPermissions(user).contains(permission);
-    }
 
     /**
      * Gets all custom emojis of this server.
@@ -3152,44 +2401,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     }
 
     /**
-     * Gets the voice channel the given user is connected to on this server if any.
-     *
-     * @param user The user to check.
-     * @return The voice channel the user is connected to.
-     */
-    default Optional<ServerVoiceChannel> getConnectedVoiceChannel(User user) {
-        return getConnectedVoiceChannel(user.getId());
-    }
-
-    /**
-     * Gets a sorted (by position) list with all channels of this server the given user can see.
-     * Returns an empty list, if the user is not a member of this server.
-     *
-     * @param user The user to check.
-     * @return The visible channels of this server.
-     */
-    default List<ServerChannel> getVisibleChannels(User user) {
-        return Collections.unmodifiableList(getChannels().stream()
-                .filter(channel -> channel.canSee(user))
-                .collect(Collectors.toList()));
-    }
-
-    /**
-     * Gets the highest role of the given user in this server.
-     * The optional is empty, if the user is not a member of this server.
-     *
-     * @param user The user.
-     * @return The highest role of the given user.
-     */
-    default Optional<Role> getHighestRole(User user) {
-        List<Role> roles = getRoles(user);
-        if (roles.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.ofNullable(roles.get(roles.size() - 1));
-    }
-
-    /**
      * Checks if the given user is the owner of the server.
      *
      * @param user The user to check.
@@ -3198,450 +2409,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     default boolean isOwner(User user) {
         return getOwnerId() == user.getId();
     }
-
-    /**
-     * Checks if the given user is an administrator of the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user is an administrator of the server or not.
-     */
-    default boolean isAdmin(User user) {
-        return hasPermission(user, PermissionType.ADMINISTRATOR);
-    }
-
-    /**
-     * Checks if the given user can create new channels.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can create channels or not.
-     */
-    default boolean canCreateChannels(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_CHANNELS);
-    }
-
-    /**
-     * Checks if the user of the connected account can create new channels.
-     *
-     * @return Whether the user of the connected account can create channels or not.
-     */
-    default boolean canYouCreateChannels() {
-        return canCreateChannels(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can view the audit log of the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can view the audit log or not.
-     */
-    default boolean canViewAuditLog(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.VIEW_AUDIT_LOG);
-    }
-
-    /**
-     * Checks if the user of the connected account can view the audit log of the server.
-     *
-     * @return Whether the user of the connected account can view the audit log or not.
-     */
-    default boolean canYouViewAuditLog() {
-        return canViewAuditLog(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can change its own nickname in the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can change its own nickname or not.
-     */
-    default boolean canChangeOwnNickname(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.CHANGE_NICKNAME,
-                PermissionType.MANAGE_NICKNAMES);
-    }
-
-    /**
-     * Checks if the user of the connected account can change its own nickname in the server.
-     *
-     * @return Whether the user of the connected account can change its own nickname or not.
-     */
-    default boolean canYouChangeOwnNickname() {
-        return canChangeOwnNickname(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can manage nicknames on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can manage nicknames or not.
-     */
-    default boolean canManageNicknames(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_NICKNAMES);
-    }
-
-    /**
-     * Checks if the user of the connected account can manage nicknames on the server.
-     *
-     * @return Whether the user of the connected account can manage nicknames or not.
-     */
-    default boolean canYouManageNicknames() {
-        return canManageNicknames(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can mute members on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can mute members or not.
-     */
-    default boolean canMuteMembers(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MUTE_MEMBERS);
-    }
-
-    /**
-     * Checks if the user of the connected account can mute members on the server.
-     *
-     * @return Whether the user of the connected account can mute members or not.
-     */
-    default boolean canYouMuteMembers() {
-        return canMuteMembers(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can deafen members on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can deafen members or not.
-     */
-    default boolean canDeafenMembers(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.DEAFEN_MEMBERS);
-    }
-
-    /**
-     * Checks if the user of the connected account can deafen members on the server.
-     *
-     * @return Whether the user of the connected account can deafen members or not.
-     */
-    default boolean canYouDeafenMembers() {
-        return canDeafenMembers(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can move members on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can move members or not.
-     */
-    default boolean canMoveMembers(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MOVE_MEMBERS);
-    }
-
-    /**
-     * Checks if the user of the connected account can move members on the server.
-     *
-     * @return Whether the user of the connected account can move members or not.
-     */
-    default boolean canYouMoveMembers() {
-        return canMoveMembers(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can manage emojis on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can manage emojis or not.
-     */
-    default boolean canManageEmojis(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_SERVER_EXPRESSIONS);
-    }
-
-    /**
-     * Checks if the user of the connected account can manage emojis on the server.
-     *
-     * @return Whether the user of the connected account can manage emojis or not.
-     */
-    default boolean canYouManageEmojis() {
-        return canManageEmojis(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can use slash commands on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can use slash commands or not.
-     */
-    default boolean canUseSlashCommands(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.USE_APPLICATION_COMMANDS);
-    }
-
-    /**
-     * Checks if the user of the connected account can use slash commands on the server.
-     *
-     * @return Whether the user of the connected account can use slash commands or not.
-     */
-    default boolean canYouUseSlashCommands() {
-        return canUseSlashCommands(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can manage roles on the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can manage roles or not.
-     */
-    default boolean canManageRoles(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_ROLES);
-    }
-
-    /**
-     * Checks if the user of the connected account can manage roles on the server.
-     *
-     * @return Whether the user of the connected account can manage roles or not.
-     */
-    default boolean canYouManageRoles() {
-        return canManageRoles(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the user can manage the roles of the target user.
-     *
-     * @param user   The user that tries to manage roles.
-     * @param target The user whose roles are to be managed.
-     * @return Whether the user can manage the target's roles.
-     */
-    default boolean canManageRolesOf(User user, User target) {
-        return canManageRole(user, getHighestRole(target).orElseGet(this::getEveryoneRole));
-    }
-
-    /**
-     * Checks if the user can manage the target role.
-     *
-     * @param user   The user that tries to manage the role.
-     * @param target The role that is to be managed.
-     * @return Whether the user can manage the role.
-     */
-    default boolean canManageRole(User user, Role target) {
-        return target.getServer() == this
-                && (isOwner(user)
-                || (canManageRoles(user)
-                && getHighestRole(user).orElseGet(this::getEveryoneRole).compareTo(target) > 0));
-    }
-
-    /**
-     * Checks if the given user can manage the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can manage the server or not.
-     */
-    default boolean canManage(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_SERVER);
-    }
-
-    /**
-     * Checks if the user of the connected account can manage the server.
-     *
-     * @return Whether the user of the connected account can manage the server or not.
-     */
-    default boolean canYouManage() {
-        return canManage(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can kick users from the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can kick users or not.
-     */
-    default boolean canKickUsers(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.KICK_MEMBERS);
-    }
-
-    /**
-     * Checks if the user of the connected account can kick users from the server.
-     *
-     * @return Whether the user of the connected account can kick users or not.
-     */
-    default boolean canYouKickUsers() {
-        return canKickUsers(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can kick the other user.
-     * This method also considers the position of the user roles and the owner.
-     * If the to-be-kicked user is not part of this server, still {@code true} is returned as Discord allows this.
-     *
-     * @param user       The user which "want" to kick the other user.
-     * @param userToKick The user which should be kicked.
-     * @return Whether the given user can kick the other user or not.
-     */
-    default boolean canKickUser(User user, User userToKick) {
-        // owner can always kick, regardless of role for example
-        if (isOwner(user)) {
-            return true;
-        }
-        // user cannot kick at all
-        if (!canKickUsers(user)) {
-            return false;
-        }
-        // only returns empty optional if user is not member of server
-        // but then canKickUsers should already have kicked in
-        Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
-        Optional<Role> otherRole = getHighestRole(userToKick);
-        // otherRole empty => userToKick is not on the server => kick is allowed as Discord allows it
-        boolean userToKickOnServer = otherRole.isPresent();
-        return !userToKickOnServer || (ownRole.compareTo(otherRole.get()) > 0);
-    }
-
-    /**
-     * Checks if the user of the connected account can kick the user.
-     * This method also considers the position of the user roles and the owner.
-     *
-     * @param userToKick The user which should be kicked.
-     * @return Whether the user of the connected account can kick the user or not.
-     */
-    default boolean canYouKickUser(User userToKick) {
-        return canKickUser(getApi().getYourself(), userToKick);
-    }
-
-    /**
-     * Checks if the given user can ban users from the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can ban users or not.
-     */
-    default boolean canBanUsers(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.BAN_MEMBERS);
-    }
-
-    /**
-     * Checks if the user of the connected account can ban users from the server.
-     *
-     * @return Whether the user of the connected account can ban users or not.
-     */
-    default boolean canYouBanUsers() {
-        return canBanUsers(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can ban the other user.
-     * This method also considers the position of the user roles and the owner.
-     *
-     * @param user      The user which "want" to ban the other user.
-     * @param userToBan The user which should be banned.
-     * @return Whether the given user can ban the other user or not.
-     */
-    default boolean canBanUser(User user, User userToBan) {
-        // owner can always ban, regardless of role for example
-        if (isOwner(user)) {
-            return true;
-        }
-        // user cannot ban at all
-        if (!canBanUsers(user)) {
-            return false;
-        }
-        // only returns empty optional if user is not member of server
-        // but then canBanUsers should already have kicked in
-        Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
-        Optional<Role> otherRole = getHighestRole(userToBan);
-        // otherRole empty => userToBan is not on the server => ban is allowed
-        boolean userToBanOnServer = otherRole.isPresent();
-        return !userToBanOnServer || (ownRole.compareTo(otherRole.get()) > 0);
-    }
-
-    /**
-     * Checks if the user of the connected account can ban the user.
-     * This method also considers the position of the user roles and the owner.
-     *
-     * @param userToBan The user which should be banned.
-     * @return Whether the user of the connected account can ban the user or not.
-     */
-    default boolean canYouBanUser(User userToBan) {
-        return canBanUser(getApi().getYourself(), userToBan);
-    }
-
-    /**
-     * Checks if the given user can timeout users from the server.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can timeout users or not.
-     */
-    default boolean canTimeoutUsers(User user) {
-        return hasAnyPermission(user,
-                PermissionType.ADMINISTRATOR,
-                PermissionType.MODERATE_MEMBERS);
-    }
-
-    /**
-     * Checks if the user of the connected account can timeout users from the server.
-     *
-     * @return Whether the user of the connected account can timeout users or not.
-     */
-    default boolean canYouTimeoutUsers() {
-        return canTimeoutUsers(getApi().getYourself());
-    }
-
-    /**
-     * Check if the user of the connected account can timeout the user.
-     * This method also considers the position of the user roles and the owner.
-     *
-     * @param userToTimeout The user which should be timed out.
-     * @return Whether the user of the connected account can timeout the user or not.
-     */
-    default boolean canYouTimeoutUser(User userToTimeout) {
-        return canTimeoutUser(getApi().getYourself(), userToTimeout);
-    }
-
-    /**
-     * Checks if the given user can timeout the other user.
-     * This method also considers the position of the user roles and the owner.
-     *
-     * @param user          The user which "want" to ban the other user.
-     * @param userToTimeOut The user which should be timed out.
-     * @return Whether the given user can timeout the other user or not.
-     */
-    default boolean canTimeoutUser(User user, User userToTimeOut) {
-        // owner can always timeout, regardless of role for example
-        if (isOwner(user)) {
-            return true;
-        }
-        // user cannot timeout at all
-        if (!canTimeoutUsers(user)) {
-            return false;
-        }
-
-        // only returns empty optional if user is not member of server
-        Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
-        Optional<Role> otherRole = getHighestRole(userToTimeOut);
-
-        // otherRole empty => userToTimeOut is not on the server => timeout is allowed as Discord allows it
-        boolean userToKickOnServer = otherRole.isPresent();
-        return !userToKickOnServer || (ownRole.compareTo(otherRole.get()) > 0);
-    }
-
 
     @Override
     default Optional<Server> getCurrentCachedInstance() {
@@ -3780,6 +2547,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
         }
     }
 
+
     /**
      * True if the server widget is enabled.
      *
@@ -3844,5 +2612,280 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      *
      * @return The system channel flags for this server.
      */
-    EnumSet<SystemChannelFlag> getSystemChannelFlags();
+    public EnumSet<SystemChannelFlag> getSystemChannelFlags();
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Bot related methods
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Moves yourself to the given channel on the server.
+     *
+     * @param channel The channel to move the user to.
+     * @return A future to check if the move was successful.
+     */
+    default CompletableFuture<Void> moveYourself(ServerVoiceChannel channel) {
+        return getMemberById(getApi().getClientId())
+                .map(member -> member.moveToVoiceChannel(channel))
+                .orElseThrow(AssertionError::new);
+    }
+
+    /**
+     * Mutes yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to mute yourself server-side, so that others can unmute
+     * you, use {@link #muteYourself()}, {@link Member#mute()} or {@link Member#mute(String)}.
+     *
+     * @see #muteYourself()
+     * @see Member#mute()
+     * @see Member#mute(String)
+     */
+    void selfMute();
+
+    /**
+     * Unmutes yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to unmute yourself server-side, so that others can
+     * mute you, use {@link #unmuteYourself()}, {@link Member#unmute()} or {@link Member#unmute(String)}.
+     *
+     * @see #unmuteYourself()
+     * @see Member#unmute()
+     * @see Member#unmute(String)
+     */
+    void selfUnmute();
+
+    /**
+     * Mutes yourself on the server.
+     *
+     * @return A future to check if the mute was successful.
+     */
+    default CompletableFuture<Void> muteYourself() {
+        return getMemberById(getApi().getClientId()).map(Member::mute).orElseThrow(AssertionError::new);
+    }
+
+    /**
+     * Unmutes yourself on the server.
+     *
+     * @return A future to check if the unmute was successful.
+     */
+    default CompletableFuture<Void> unmuteYourself() {
+        return getMemberById(getApi().getClientId()).map(Member::unmute).orElseThrow(AssertionError::new);
+    }
+
+    /**
+     * Deafens yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to deafen yourself server-side, so that others can
+     * undeafen you, use {@link #deafenYourself()}, {@link Member#deafen()} or {@link Member#deafen(String)}.
+     *
+     * @see #deafenYourself()
+     * @see Member#deafen()
+     * @see Member#deafen(String)
+     */
+    void selfDeafen();
+
+    /**
+     * Undeafens yourself locally for the server.
+     *
+     * <p>This cannot be undone by other users. If you want to undeafen yourself server-side, so that others can
+     * deafen you, use {@link #undeafenYourself()}, {@link Member#undeafen()} or {@link Member#undeafen(String)}.
+     *
+     * @see #undeafenYourself()
+     * @see Member#undeafen()
+     * @see Member#undeafen(String)
+     */
+    void selfUndeafen();
+
+    /**
+     * Deafens yourself on the server.
+     *
+     * @return A future to check if the deafen was successful.
+     */
+    default CompletableFuture<Void> deafenYourself() {
+        return getMemberById(getApi().getClientId()).map(Member::deafen).orElseThrow(AssertionError::new);
+    }
+
+    /**
+     * Undeafens yourself on the server.
+     *
+     * @return A future to check if the undeafen was successful.
+     */
+    default CompletableFuture<Void> undeafenYourself() {
+        return getMemberById(getApi().getClientId()).map(Member::undeafen).orElseThrow(AssertionError::new);
+    }
+
+    /**
+     * Gets your self-muted state.
+     *
+     * @return Whether you are self-muted.
+     */
+    default boolean areYouSelfMuted() {
+        return isSelfMuted(getApi().getClientId());
+    }
+
+    /**
+     * Gets your self-deafened state.
+     *
+     * @return Whether you are self-deafened.
+     */
+    default boolean areYouSelfDeafened() {
+        return isSelfDeafened(getApi().getClientId());
+    }
+
+    /**
+     * Gets your muted state.
+     *
+     * @return Whether you are muted.
+     */
+    default boolean areYouMuted() {
+        return isMuted(getApi().getClientId());
+    }
+
+    /**
+     * Gets your deafened state.
+     *
+     * @return Whether you are deafened.
+     */
+    default boolean areYouDeafened() {
+        return isDeafened(getApi().getClientId());
+    }
+
+    /**
+     * Checks if the user of the connected account can create new channels.
+     *
+     * @return Whether the user of the connected account can create channels or not.
+     */
+    default boolean canYouCreateChannels() {
+        return getMemberById(getApi().getClientId()).map(Member::canCreateChannels).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can view the audit log of the server.
+     *
+     * @return Whether the user of the connected account can view the audit log or not.
+     */
+    default boolean canYouViewAuditLog() {
+        return getMemberById(getApi().getClientId()).map(Member::canViewAuditLog).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can change its own nickname in the server.
+     *
+     * @return Whether the user of the connected account can change its own nickname or not.
+     */
+    default boolean canYouChangeOwnNickname() {
+        return getMemberById(getApi().getClientId()).map(Member::canChangeOwnNickname).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage nicknames on the server.
+     *
+     * @return Whether the user of the connected account can manage nicknames or not.
+     */
+    default boolean canYouManageNicknames() {
+        return getMemberById(getApi().getClientId()).map(Member::canManageNicknames).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can mute members on the server.
+     *
+     * @return Whether the user of the connected account can mute members or not.
+     */
+    default boolean canYouMuteMembers() {
+        return getMemberById(getApi().getClientId()).map(Member::canMuteMembers).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can deafen members on the server.
+     *
+     * @return Whether the user of the connected account can deafen members or not.
+     */
+    default boolean canYouDeafenMembers() {
+        return getMemberById(getApi().getClientId()).map(Member::canDeafenMembers).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can move members on the server.
+     *
+     * @return Whether the user of the connected account can move members or not.
+     */
+    default boolean canYouMoveMembers() {
+        return getMemberById(getApi().getClientId()).map(Member::canMoveMembers).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage emojis on the server.
+     *
+     * @return Whether the user of the connected account can manage emojis or not.
+     */
+    default boolean canYouManageEmojis() {
+        return getMemberById(getApi().getClientId()).map(Member::canManageEmojis).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can use slash commands on the server.
+     *
+     * @return Whether the user of the connected account can use slash commands or not.
+     */
+    default boolean canYouUseSlashCommands() {
+        return getMemberById(getApi().getClientId()).map(Member::canUseSlashCommands).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage roles on the server.
+     *
+     * @return Whether the user of the connected account can manage roles or not.
+     */
+    default boolean canYouManageRoles() {
+        return getMemberById(getApi().getClientId()).map(Member::canManageRoles).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can manage the server.
+     *
+     * @return Whether the user of the connected account can manage the server or not.
+     */
+    default boolean canYouManage() {
+        return getMemberById(getApi().getClientId()).map(Member::canManage).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can kick users from the server.
+     *
+     * @return Whether the user of the connected account can kick users or not.
+     */
+    default boolean canYouKickMembers() {
+        return getMemberById(getApi().getClientId()).map(Member::canKickUsers).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can kick the user.
+     * This method also considers the position of the user roles and the owner.
+     *
+     * @param memberToKick The user which should be kicked.
+     * @return Whether the user of the connected account can kick the user or not.
+     */
+    default boolean canYouKickMember(Member memberToKick) {
+        return getMemberById(getApi().getClientId()).map(member -> member.canKickUser(memberToKick)).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can ban users from the server.
+     *
+     * @return Whether the user of the connected account can ban users or not.
+     */
+    default boolean canYouBanMembers() {
+        return getMemberById(getApi().getClientId()).map(Member::canBanUsers).orElse(false);
+    }
+
+    /**
+     * Checks if the user of the connected account can ban the user.
+     * This method also considers the position of the user roles and the owner.
+     *
+     * @param memberToBan The user which should be banned.
+     * @return Whether the user of the connected account can ban the user or not.
+     */
+    default boolean canYouBanMember(Member memberToBan) {
+        return getMemberById(getApi().getClientId()).map(member -> member.canBanUser(memberToBan)).orElse(false);
+    }
 }

@@ -2,7 +2,6 @@ package org.javacord.core.util.handler.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
@@ -22,7 +21,7 @@ public class UserUpdateHandler extends PacketHandler {
 
     @Override
     public void handle(JsonNode packet) {
-        api.setYourself(new UserImpl(api, packet, (MemberImpl) null, null));
+        api.setYourself(new UserImpl(api, packet));
     }
 
 }

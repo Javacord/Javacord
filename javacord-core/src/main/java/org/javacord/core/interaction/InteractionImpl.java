@@ -9,6 +9,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.permission.PermissionType;
@@ -21,16 +22,15 @@ import org.javacord.api.interaction.callback.InteractionFollowupMessageBuilder;
 import org.javacord.api.interaction.callback.InteractionImmediateResponseBuilder;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.message.InteractionCallbackType;
 import org.javacord.core.entity.message.component.ComponentImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -54,7 +54,8 @@ public abstract class InteractionImpl implements Interaction {
 
     private final long id;
     private final long applicationId;
-    private final UserImpl user;
+    private final MemberImpl member;
+    private final User user;
     private final String token;
     private final int version;
     private final DiscordLocale locale;
@@ -75,16 +76,18 @@ public abstract class InteractionImpl implements Interaction {
         id = jsonData.get("id").asLong();
         applicationId = jsonData.get("application_id").asLong();
         if (jsonData.hasNonNull("member")) {
-            MemberImpl member = new MemberImpl(
+            this.member = new MemberImpl(
                     api,
                     (ServerImpl) getServer().orElseThrow(AssertionError::new),
                     jsonData.get("member"),
                     null
             );
-            user = (UserImpl) member.getUser();
+            user = member.getUser();
         } else if (jsonData.hasNonNull("user")) {
-            user = new UserImpl(api, jsonData.get("user"), (MemberImpl) null, null);
+            user = new UserImpl(api, jsonData.get("user"));
+            member = null;
         } else {
+            member = null;
             user = null;
             logger.error("Received interaction without a member AND without a user field");
         }
@@ -182,6 +185,11 @@ public abstract class InteractionImpl implements Interaction {
     @Override
     public User getUser() {
         return user;
+    }
+
+    @Override
+    public Optional<Member> getMember() {
+        return Optional.ofNullable(member);
     }
 
     @Override

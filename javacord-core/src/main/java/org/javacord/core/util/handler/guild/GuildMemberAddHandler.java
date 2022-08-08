@@ -2,11 +2,9 @@ package org.javacord.core.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
-import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.server.member.ServerMemberJoinEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
@@ -31,11 +29,10 @@ public class GuildMemberAddHandler extends PacketHandler {
                 .ifPresent(server -> {
                     MemberImpl member = server.addMember(packet);
                     server.incrementMemberCount();
-                    User user = new UserImpl(api, packet.get("user"), member, server);
 
-                    ServerMemberJoinEvent event = new ServerMemberJoinEventImpl(server, user);
+                    ServerMemberJoinEvent event = new ServerMemberJoinEventImpl(member);
 
-                    api.getEventDispatcher().dispatchServerMemberJoinEvent(server, server, user, event);
+                    api.getEventDispatcher().dispatchServerMemberJoinEvent(server, server, member.getUser(), event);
                 });
     }
 

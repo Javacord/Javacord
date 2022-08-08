@@ -1,14 +1,13 @@
 package org.javacord.api.event.channel.server.voice;
 
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.event.user.UserEvent;
-
+import org.javacord.api.event.server.member.ServerMemberEvent;
 import java.util.Optional;
 
 /**
  * A server voice channel member join event.
  */
-public interface ServerVoiceChannelMemberJoinEvent extends ServerVoiceChannelEvent, UserEvent {
+public interface ServerVoiceChannelMemberJoinEvent extends ServerVoiceChannelEvent, ServerMemberEvent {
 
     /**
      * Gets the old channel of the event.

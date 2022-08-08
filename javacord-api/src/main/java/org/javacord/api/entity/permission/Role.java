@@ -7,6 +7,7 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.UpdatableFromCache;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.entity.user.User;
@@ -113,19 +114,11 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, P
     boolean isDisplayedSeparately();
 
     /**
-     * Gets all users who have this role.
+     * Gets all members who have this role.
      *
-     * @return All users who have this role.
+     * @return All members who have this role.
      */
-    Set<User> getUsers();
-
-    /**
-     * Checks whether the specified user has this role.
-     *
-     * @param user the user to check
-     * @return true if the user has this role; false otherwise
-     */
-    boolean hasUser(User user);
+    Set<Member> getMembers();
 
     /**
      * Gets the permissions of the role.
@@ -365,56 +358,56 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, P
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user the role should be added to.
+     * @param member The user the role should be added to.
      * @return A future to check if the update was successful.
-     * @see Server#addRoleToUser(User, Role)
+     * @see Member#addRole(Role)
      */
-    default CompletableFuture<Void> addUser(User user) {
-        return addUser(user, null);
+    default CompletableFuture<Void> addMember(Member member) {
+        return addMember(member, null);
     }
 
     /**
-     * Adds the role to the given user.
+     * Adds the role to the given members.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user the role should be added to.
+     * @param member The member the role should be added to.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
-     * @see Server#addRoleToUser(User, Role, String)
+     * @see Member#addRole(Role, String)
      */
-    default CompletableFuture<Void> addUser(User user, String reason) {
-        return getServer().addRoleToUser(user, this, reason);
+    default CompletableFuture<Void> addMember(Member member, String reason) {
+        return member.addRole(this, reason);
     }
 
     /**
-     * Removes the role from the given user.
+     * Removes the role from the given member.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user the role should be removed from.
+     * @param member The member the role should be removed from.
      * @return A future to check if the update was successful.
-     * @see Server#removeRoleFromUser(User, Role)
+     * @see Member#removeRole(User, Role)
      */
-    default CompletableFuture<Void> removeUser(User user) {
-        return removeUser(user, null);
+    default CompletableFuture<Void> removeMember(Member member) {
+        return removeMember(member, null);
     }
 
     /**
-     * Removes the role from the given user.
+     * Removes the role from the given member.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param user The user the role should be removed from.
+     * @param member The member the role should be removed from.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
-     * @see Server#removeRoleFromUser(User, Role, String)
+     * @see Member#removeRole(Role, String)
      */
-    default CompletableFuture<Void> removeUser(User user, String reason) {
-        return getServer().removeRoleFromUser(user, this, reason);
+    default CompletableFuture<Void> removeMember(Member member, String reason) {
+        return member.removeRole(this, reason);
     }
 
     /**

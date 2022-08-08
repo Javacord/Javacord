@@ -1,9 +1,11 @@
 package org.javacord.api.event.user;
 
+import org.javacord.api.event.server.member.ServerMemberEvent;
+
 /**
  * A user change discriminator event.
  */
-public interface UserChangeDiscriminatorEvent extends UserEvent {
+public interface UserChangeDiscriminatorEvent extends ServerMemberEvent {
 
     /**
      * Gets the new discriminator of the user.

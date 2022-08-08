@@ -1,14 +1,16 @@
 package org.javacord.core.interaction;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
+import java.util.Optional;
 
 public class MessageInteractionImpl implements MessageInteraction {
     private final Message message;
@@ -19,6 +21,8 @@ public class MessageInteractionImpl implements MessageInteraction {
     private final String name;
 
     private final UserImpl user;
+
+    private final MemberImpl member;
 
     /**
      * Class constructor.
@@ -35,22 +39,17 @@ public class MessageInteractionImpl implements MessageInteraction {
 
         name = jsonData.get("name").asText();
 
-        UserImpl userTemp = new UserImpl(
-                (DiscordApiImpl) message.getApi(),
-                jsonData.get("user"),
-                (MemberImpl) null,
-                null
-        );
+        user = new UserImpl((DiscordApiImpl) message.getApi(), jsonData.get("user"));
+
         if (jsonData.hasNonNull("member")) {
-            MemberImpl member = new MemberImpl(
+            this.member = new MemberImpl(
                     (DiscordApiImpl) message.getApi(),
                     (ServerImpl) message.getServer().orElseThrow(AssertionError::new),
                     jsonData.get("member"),
-                    userTemp
-            );
-            userTemp = (UserImpl) member.getUser();
+                    user);
+        } else {
+            member = null;
         }
-        user = userTemp;
     }
 
     @Override
@@ -76,5 +75,10 @@ public class MessageInteractionImpl implements MessageInteraction {
     @Override
     public User getUser() {
         return user;
+    }
+
+    @Override
+    public Optional<Member> getMember() {
+        return Optional.ofNullable(member);
     }
 }

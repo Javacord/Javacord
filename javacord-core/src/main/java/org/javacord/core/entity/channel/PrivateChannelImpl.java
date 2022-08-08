@@ -8,13 +8,11 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.user.PrivateChannelCreateEvent;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.user.PrivateChannelCreateEventImpl;
 import org.javacord.core.listener.channel.user.InternalPrivateChannelAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.MessageCacheImpl;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -57,7 +55,7 @@ public class PrivateChannelImpl implements PrivateChannel, Cleanupable, Internal
      */
     public PrivateChannelImpl(DiscordApiImpl api, JsonNode data) {
         this(api, data.get("id").asLong(),
-                new UserImpl(api, data.get("recipients").get(0), (MemberImpl) null, null),
+                new UserImpl(api, data.get("recipients").get(0)),
                 data.get("recipients").get(0).get("id").asLong());
     }
 

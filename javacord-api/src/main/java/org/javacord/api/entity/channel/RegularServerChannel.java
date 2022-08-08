@@ -2,11 +2,11 @@ package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.PermissionsBuilder;
-import org.javacord.api.entity.user.User;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -56,22 +56,22 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
     }
 
     /**
-     * Checks if the given user can create an instant invite to this channel.
+     * Checks if the given member can create an instant invite to this channel.
      *
-     * @param user The user to check.
-     * @return Whether the given user can create an instant invite or not.
+     * @param member The member to check.
+     * @return Whether the given member can create an instant invite or not.
      */
-    default boolean canCreateInstantInvite(User user) {
-        // The user must be able to see the channel
-        if (!canSee(user)) {
+    default boolean canCreateInstantInvite(Member member) {
+        // The member must be able to see the channel
+        if (!canSee(member.getUser())) {
             return false;
         }
         // You cannot create invites for categories
         if (getType() == ChannelType.CHANNEL_CATEGORY) {
             return false;
         }
-        // The user must be admin or have the CREATE_INSTANT_INVITE permission
-        return hasAnyPermission(user,
+        // The member must be admin or have the CREATE_INSTANT_INVITE permission
+        return hasAnyPermission(member,
                 PermissionType.ADMINISTRATOR,
                 PermissionType.CREATE_INSTANT_INVITE);
     }
@@ -82,7 +82,7 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * @return Whether the user of the connected account can create an instant invite or not.
      */
     default boolean canYouCreateInstantInvite() {
-        return canCreateInstantInvite(getApi().getYourself());
+        return getServer().getMemberById(getApi().getClientId()).map(this::canCreateInstantInvite).orElse(false);
     }
 
     /**
@@ -121,33 +121,33 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
     Map<Long, Permissions> getOverwrittenRolePermissions();
 
     /**
-     * Gets the effective overwritten permissions of a user.
-     * This method also takes into account the roles of the user.
+     * Gets the effective overwritten permissions of a member.
+     * This method also takes into account the roles of the member.
      * It doesn't take into account the "global" permissions!
      *
-     * @param user The user.
-     * @return The effective overwritten permissions of the user.
+     * @param member The member.
+     * @return The effective overwritten permissions of the member.
      */
-    Permissions getEffectiveOverwrittenPermissions(User user);
+    Permissions getEffectiveOverwrittenPermissions(Member member);
 
     /**
-     * Gets the effective permissions of a user in this channel.
+     * Gets the effective permissions of a member in this channel.
      * The returned permission object will only have {@link PermissionState#ALLOWED} and
      * {@link PermissionState#DENIED} states!
-     * It takes into account global permissions and the effective overwritten permissions of a user.
+     * It takes into account global permissions and the effective overwritten permissions of a member.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
+     * E.g. a member who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
-     * @param user The user.
-     * @return The effective permissions of the user in this channel.
+     * @param member The member.
+     * @return The effective permissions of the member in this channel.
      */
-    default Permissions getEffectivePermissions(User user) {
-        if (getServer().isOwner(user)) {
-            return getServer().getPermissions(user);
+    default Permissions getEffectivePermissions(Member member) {
+        if (getServer().isOwner(member.getUser())) {
+            return member.getPermissions();
         }
-        PermissionsBuilder builder = new PermissionsBuilder(getServer().getPermissions(user));
-        Permissions effectiveOverwrittenPermissions = getEffectiveOverwrittenPermissions(user);
+        PermissionsBuilder builder = new PermissionsBuilder(member.getPermissions());
+        Permissions effectiveOverwrittenPermissions = getEffectiveOverwrittenPermissions(member);
         Arrays.stream(PermissionType.values())
                 .filter(type -> effectiveOverwrittenPermissions.getState(type) != PermissionState.UNSET)
                 .forEachOrdered(type -> builder.setState(type, effectiveOverwrittenPermissions.getState(type)));
@@ -158,71 +158,71 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
     }
 
     /**
-     * Gets the effective allowed permissions of a user in this channel.
-     * It takes into account global permissions and the effective overwritten permissions of a user.
+     * Gets the effective allowed permissions of a member in this channel.
+     * It takes into account global permissions and the effective overwritten permissions of a member.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
+     * E.g. a member who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
-     * @param user The user.
-     * @return The effective allowed permissions of a user in this channel.
+     * @param member The member.
+     * @return The effective allowed permissions of a member in this channel.
      */
-    default Set<PermissionType> getEffectiveAllowedPermissions(User user) {
-        return getEffectivePermissions(user).getAllowedPermission();
+    default Set<PermissionType> getEffectiveAllowedPermissions(Member member) {
+        return getEffectivePermissions(member).getAllowedPermission();
     }
 
     /**
-     * Gets the effective denied permissions of a user in this channel.
-     * It takes into account global permissions and the effective overwritten permissions of a user.
+     * Gets the effective denied permissions of a member in this channel.
+     * It takes into account global permissions and the effective overwritten permissions of a member.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
+     * E.g. a member who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
-     * @param user The user.
-     * @return The effective denied permissions of a user in this channel.
+     * @param member The member.
+     * @return The effective denied permissions of a member in this channel.
      */
-    default Set<PermissionType> getEffectiveDeniedPermissions(User user) {
-        return getEffectivePermissions(user).getDeniedPermissions();
+    default Set<PermissionType> getEffectiveDeniedPermissions(Member member) {
+        return getEffectivePermissions(member).getDeniedPermissions();
     }
 
     /**
-     * Checks if the user has a given set of permissions.
+     * Checks if the member has a given set of permissions.
      *
-     * @param user The user to check.
+     * @param member The member to check.
      * @param type The permission type(s) to check.
-     * @return Whether the user has all given permissions or not.
-     * @see #getEffectiveAllowedPermissions(User)
+     * @return Whether the member has all given permissions or not.
+     * @see #getEffectiveAllowedPermissions(Member)
      */
-    default boolean hasPermissions(User user, PermissionType... type) {
-        return getEffectiveAllowedPermissions(user).containsAll(Arrays.asList(type));
+    default boolean hasPermissions(Member member, PermissionType... type) {
+        return getEffectiveAllowedPermissions(member).containsAll(Arrays.asList(type));
     }
 
     /**
-     * Checks if the user has any of a given set of permissions.
+     * Checks if the member has any of a given set of permissions.
      *
-     * @param user The user to check.
+     * @param member The member to check.
      * @param type The permission type(s) to check.
-     * @return Whether the user has any of the given permissions or not.
-     * @see #getEffectiveAllowedPermissions(User)
+     * @return Whether the member has any of the given permissions or not.
+     * @see #getEffectiveAllowedPermissions(Member)
      */
-    default boolean hasAnyPermission(User user, PermissionType... type) {
-        return getEffectiveAllowedPermissions(user).stream().anyMatch(
-                allowedPermissionType -> Arrays.stream(type).anyMatch(allowedPermissionType::equals)
+    default boolean hasAnyPermission(Member member, PermissionType... type) {
+        return getEffectiveAllowedPermissions(member).stream().anyMatch(
+                allowedPermissionType -> Arrays.asList(type).contains(allowedPermissionType)
         );
     }
 
     /**
-     * Checks if a user has a given permission.
+     * Checks if a member has a given permission.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
+     * E.g. a member who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
-     * @param user       The user.
+     * @param member       The member.
      * @param permission The permission to check.
-     * @return Whether the user has the permission or not.
+     * @return Whether the member has the permission or not.
      */
-    default boolean hasPermission(User user, PermissionType permission) {
-        return getEffectiveAllowedPermissions(user).contains(permission);
+    default boolean hasPermission(Member member, PermissionType permission) {
+        return getEffectiveAllowedPermissions(member).contains(permission);
     }
 
     /**

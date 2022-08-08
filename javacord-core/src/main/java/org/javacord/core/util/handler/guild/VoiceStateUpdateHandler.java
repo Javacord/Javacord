@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
@@ -14,20 +15,18 @@ import org.javacord.api.event.server.VoiceStateUpdateEvent;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.Member;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberJoinEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelMemberLeaveEventImpl;
 import org.javacord.core.event.server.VoiceStateUpdateEventImpl;
-import org.javacord.core.event.user.UserChangeDeafenedEventImpl;
-import org.javacord.core.event.user.UserChangeMutedEventImpl;
-import org.javacord.core.event.user.UserChangeSelfDeafenedEventImpl;
-import org.javacord.core.event.user.UserChangeSelfMutedEventImpl;
+import org.javacord.core.event.server.member.ServerMemberChangeDeafenedEventImpl;
+import org.javacord.core.event.server.member.ServerMemberChangeMutedEventImpl;
+import org.javacord.core.event.server.member.ServerMemberChangeSelfDeafenedEventImpl;
+import org.javacord.core.event.server.member.ServerMemberChangeSelfMutedEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -67,7 +66,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                     logger.info("Received a VOICE_STATE_UPDATE packet for a group channel. This should be impossible.");
                 }
             } else {
-                LoggerUtil.logMissingChannel(logger, channelId);
+                LoggerUtil.logMissingChannel(logger, channelId, packet);
             }
         }
 
@@ -100,7 +99,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 ((AudioConnectionImpl) connection).tryConnect();
             });
         } else {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
         }
     }
 
@@ -120,7 +119,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                     boolean oldDeafened = server.isDeafened(userId);
 
                     // Check the cache first to see if we can update an existing Member object.
-                    MemberImpl oldMember = (MemberImpl) server.getRealMemberById(userId).orElse(null);
+                    MemberImpl oldMember = (MemberImpl) server.getMemberById(userId).orElse(null);
                     if (oldMember == null && !packet.hasNonNull("member")) {
                         // If there is no member in the cache and we don't receive a member field,
                         // we will log it and return. I'm actually not sure if this is normal behavior;
@@ -194,28 +193,35 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                     }
 
                     if (newSelfMuted != oldSelfMuted) {
-                        UserChangeSelfMutedEventImpl event = new UserChangeSelfMutedEventImpl(newMember, oldMember);
+                        ServerMemberChangeSelfMutedEventImpl
+                                event = new ServerMemberChangeSelfMutedEventImpl(newMember, oldMember);
                         api.getEventDispatcher()
-                                .dispatchUserChangeSelfMutedEvent(server, server, newMember.getUser(), event);
+                                .dispatchServerMemberChangeSelfMutedEvent(
+                                        server, server, newMember, newMember.getUser(), event);
                     }
 
                     if (newSelfDeafened != oldSelfDeafened) {
-                        UserChangeSelfDeafenedEventImpl event = new UserChangeSelfDeafenedEventImpl(
+                        ServerMemberChangeSelfDeafenedEventImpl event = new ServerMemberChangeSelfDeafenedEventImpl(
                                 newMember, oldMember);
                         api.getEventDispatcher()
-                                .dispatchUserChangeSelfDeafenedEvent(server, server, newMember.getUser(), event);
+                                .dispatchServerMemberChangeSelfDeafenedEvent(
+                                        server, server, newMember, newMember.getUser(), event);
                     }
 
                     if (newMuted != oldMuted) {
-                        UserChangeMutedEventImpl event = new UserChangeMutedEventImpl(newMember, oldMember);
+                        ServerMemberChangeMutedEventImpl
+                                event = new ServerMemberChangeMutedEventImpl(newMember, oldMember);
                         api.getEventDispatcher()
-                                .dispatchUserChangeMutedEvent(server, server, newMember.getUser(), event);
+                                .dispatchServerMemberChangeMutedEvent(
+                                        server, server, newMember, newMember.getUser(), event);
                     }
 
                     if (newDeafened != oldDeafened) {
-                        UserChangeDeafenedEventImpl event = new UserChangeDeafenedEventImpl(newMember, oldMember);
+                        ServerMemberChangeDeafenedEventImpl
+                                event = new ServerMemberChangeDeafenedEventImpl(newMember, oldMember);
                         api.getEventDispatcher()
-                                .dispatchUserChangeDeafenedEvent(server, server, newMember.getUser(), event);
+                                .dispatchServerMemberChangeDeafenedEvent(
+                                        server, server, newMember, newMember.getUser(), event);
                     }
                 });
     }

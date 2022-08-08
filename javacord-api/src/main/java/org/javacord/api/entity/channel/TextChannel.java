@@ -116,7 +116,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * <p>Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
      * {@link #typeContinuously(Consumer)} or {@link #typeContinuouslyAfter(long, TimeUnit, Consumer)}.
      *
-     * @param delay The delay to wait until the first typing indicator is sent.
+     * @param delay    The delay to wait until the first typing indicator is sent.
      * @param timeUnit The time unit of the delay value.
      * @return An auto-closable to stop sending the typing indicator.
      * @see #type()
@@ -147,8 +147,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * ignored if it is {@code null}.
      *
      * @param exceptionHandler The handler that exceptions are given to.
-     * @param delay The delay to wait until the first typing indicator is sent.
-     * @param timeUnit The time unit of the delay value.
+     * @param delay            The delay to wait until the first typing indicator is sent.
+     * @param timeUnit         The time unit of the delay value.
      * @return An auto-closable to stop sending the typing indicator.
      * @see #type()
      * @see #typeContinuously()
@@ -387,7 +387,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     /**
      * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param before Get messages before the message with this id.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(long)
@@ -397,7 +397,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     /**
      * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param before Get messages before this message.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(Message)
@@ -412,7 +412,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param before Get messages before the message with this id.
+     * @param before    Get messages before the message with this id.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(long)
      */
@@ -424,7 +424,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param before Get messages before this message.
+     * @param before    Get messages before this message.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(Message)
      */
@@ -438,7 +438,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param before Get messages before the message with this id.
+     * @param before    Get messages before the message with this id.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(long)
      */
@@ -449,7 +449,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param before Get messages before this message.
+     * @param before    Get messages before this message.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(Message)
      */
@@ -511,7 +511,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param after Get messages after the message with this id.
+     * @param after     Get messages after the message with this id.
      * @return The messages.
      * @see #getMessagesAfterAsStream(long)
      */
@@ -523,7 +523,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param after Get messages after this message.
+     * @param after     Get messages after this message.
      * @return The messages.
      * @see #getMessagesAfterAsStream(Message)
      */
@@ -536,7 +536,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param after Get messages after the message with this id.
+     * @param after     Get messages after the message with this id.
      * @return The messages.
      * @see #getMessagesAfterAsStream(long)
      */
@@ -547,7 +547,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param after Get messages after this message.
+     * @param after     Get messages after this message.
      * @return The messages.
      * @see #getMessagesAfterAsStream(Message)
      */
@@ -589,7 +589,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param around Get messages around the message with this id.
      * @return The messages.
      * @see #getMessagesAroundAsStream(long)
@@ -604,7 +604,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param around Get messages around this message.
      * @return The messages.
      * @see #getMessagesAroundAsStream(Message)
@@ -623,7 +623,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param around Get messages around the message with this id.
+     * @param around    Get messages around the message with this id.
      * @return The messages.
      * @see #getMessagesAroundAsStream(long)
      */
@@ -639,7 +639,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param around Get messages around this message.
+     * @param around    Get messages around this message.
      * @return The messages.
      * @see #getMessagesAroundAsStream(Message)
      */
@@ -657,7 +657,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The condition that has to be met.
-     * @param around Get messages around the message with this id.
+     * @param around    Get messages around the message with this id.
      * @return The messages.
      * @see #getMessagesAroundAsStream(long)
      */
@@ -673,7 +673,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The condition that has to be met.
-     * @param around Get messages around this message.
+     * @param around    Get messages around this message.
      * @return The messages.
      * @see #getMessagesAroundAsStream(Message)
      */
@@ -720,7 +720,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * any channel, excluding the boundaries.
      *
      * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param to   The id of the other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -731,7 +731,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * any channel, excluding the boundaries.
      *
      * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param to   The other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -745,8 +745,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param from      The id of the start boundary messages.
+     * @param to        The id of the other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -758,8 +758,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param from      The start boundary messages.
+     * @param to        The other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -774,8 +774,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param from      The id of the start boundary messages.
+     * @param to        The id of the other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -787,8 +787,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param from      The start boundary messages.
+     * @param to        The other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -805,7 +805,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * so consider not using this method from a listener directly.
      *
      * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param to   The id of the other boundary messages.
      * @return The stream.
      * @see #getMessagesBetween(long, long)
      */
@@ -819,7 +819,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * so consider not using this method from a listener directly.
      *
      * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param to   The other boundary messages.
      * @return The stream.
      * @see #getMessagesBetween(long, long)
      */
@@ -990,7 +990,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * Checks if the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel.
      *
      * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to messages in this
-     *     channel or not.
+     *         channel or not.
      */
     default boolean canYouAddNewReactions() {
         return canAddNewReactions(getApi().getYourself());

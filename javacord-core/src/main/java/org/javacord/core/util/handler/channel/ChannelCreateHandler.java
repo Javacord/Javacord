@@ -16,7 +16,6 @@ import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import org.javacord.api.event.channel.user.PrivateChannelCreateEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.channel.server.ServerChannelCreateEventImpl;
 import org.javacord.core.event.channel.user.PrivateChannelCreateEventImpl;
@@ -212,7 +211,7 @@ public class ChannelCreateHandler extends PacketHandler {
         // https://github.com/discord/discord-api-docs/issues/184 and
         // https://github.com/discord/discord-api-docs/issues/2248
 
-        UserImpl recipient = new UserImpl(api, channel.get("recipients").get(0), (MemberImpl) null, null);
+        UserImpl recipient = new UserImpl(api, channel.get("recipients").get(0));
         if (!recipient.getPrivateChannel().isPresent()) {
             PrivateChannel privateChannel =
                     new PrivateChannelImpl(api, channel.get("id").asText(), recipient, recipient.getId());

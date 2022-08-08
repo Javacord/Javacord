@@ -1,9 +1,7 @@
 package org.javacord.core.entity.server;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -16,7 +14,6 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.user.User;
-import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -25,15 +22,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -486,31 +476,6 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
-    public void setNickname(User user, String nickname) {
-        userNicknames.put(user, nickname);
-    }
-
-    @Override
-    public void setUserTimeout(User user, Instant timeout) {
-        userTimeouts.put(user, timeout);
-    }
-
-    @Override
-    public void setMuted(User user, boolean muted) {
-        userMuted.put(user, muted);
-    }
-
-    @Override
-    public void setDeafened(User user, boolean deafened) {
-        userDeafened.put(user, deafened);
-    }
-
-    @Override
-    public void setVoiceChannel(User user, ServerVoiceChannel channel) {
-        userMoveTargets.put(user, channel);
-    }
-
-    @Override
     public void reorderRoles(List<Role> roles) {
         newRolesOrder = roles;
     }
@@ -547,14 +512,6 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
 
     @Override
     public CompletableFuture<Void> update() {
-        // All members that get updates
-        HashSet<User> members = new HashSet<>(userRoles.keySet());
-        members.addAll(userNicknames.keySet());
-        members.addAll(userMuted.keySet());
-        members.addAll(userDeafened.keySet());
-        members.addAll(userMoveTargets.keySet());
-        members.addAll(userTimeouts.keySet());
-
         // All tasks
         List<CompletableFuture<?>> tasks = new ArrayList<>();
 

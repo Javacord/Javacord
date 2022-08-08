@@ -3,6 +3,7 @@ package org.javacord.core.util.handler.guild.role;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.role.RoleChangeColorEvent;
@@ -104,7 +105,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 api.getEventDispatcher().dispatchRoleChangePermissionsEvent(
                         (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);
                 // If bot is affected remove messages from cache that are no longer visible
-                if (role.getUsers().stream().anyMatch(User::isYourself)) {
+                if (role.getMembers().stream().map(Member::getUser).anyMatch(User::isYourself)) {
                     Set<Long> unreadableChannels = role.getServer().getTextChannels().stream()
                             .filter(((Predicate<ServerTextChannel>) ServerTextChannel::canYouSee).negate())
                             .map(ServerTextChannel::getId)

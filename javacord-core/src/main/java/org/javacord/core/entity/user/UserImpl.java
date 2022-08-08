@@ -9,7 +9,6 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.PrivateChannel;
-import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserFlag;
@@ -17,19 +16,14 @@ import org.javacord.api.entity.user.UserStatus;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
-import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.user.InternalUserAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
-import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.Instant;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -49,20 +43,16 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     private final String name;
     private final String discriminator;
     private final String avatarHash;
-    private EnumSet<UserFlag> userFlags = EnumSet.noneOf(UserFlag.class);
+    private final EnumSet<UserFlag> userFlags = EnumSet.noneOf(UserFlag.class);
     private final boolean bot;
-    private final MemberImpl member;
 
     /**
      * Creates a new user instance.
      *
-     * @param api A discord api instance.
+     * @param api  A discord api instance.
      * @param data The json data.
-     * @param member The member, if this user is from a server.
-     * @param server The server of the user. Only requires, if the server json data contains a member object
-     *               and the member parameter is null.
      */
-    public UserImpl(DiscordApiImpl api, JsonNode data, MemberImpl member, ServerImpl server) {
+    public UserImpl(DiscordApiImpl api, JsonNode data) {
         this.api = api;
         id = data.get("id").asLong();
         name = data.get("username").asText();
@@ -82,53 +72,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         }
 
         bot = data.hasNonNull("bot") && data.get("bot").asBoolean();
-        if (member == null && data.hasNonNull("member") && server != null) {
-            this.member = new MemberImpl(api, server, data.get("member"), this);
-        } else {
-            this.member = member;
-        }
     }
 
-    /**
-     * Creates a new user instance.
-     *
-     * @param api A discord api instance.
-     * @param data The json data.
-     * @param memberJson The member json, if this user is from a server.
-     * @param server The server of the user.
-     */
-    public UserImpl(DiscordApiImpl api, JsonNode data, JsonNode memberJson, ServerImpl server) {
-        this.api = api;
-        id = data.get("id").asLong();
-        name = data.get("username").asText();
-        discriminator = data.get("discriminator").asText();
-        if (data.hasNonNull("avatar")) {
-            avatarHash = data.get("avatar").asText();
-        } else {
-            avatarHash = null;
-        }
-        if (data.has("public_flags")) {
-            int flags = data.get("public_flags").asInt();
-            for (UserFlag flag : UserFlag.values()) {
-                if ((flag.asInt() & flags) == flag.asInt()) {
-                    userFlags.add(flag);
-                }
-            }
-        }
-
-        bot = data.hasNonNull("bot") && data.get("bot").asBoolean();
-        member = new MemberImpl(api, server, memberJson, this);
-    }
-
-    private UserImpl(DiscordApiImpl api, Long id, String name, String discriminator, String avatarHash, boolean bot,
-                     MemberImpl member) {
+    private UserImpl(DiscordApiImpl api, Long id, String name, String discriminator, String avatarHash, boolean bot) {
         this.api = api;
         this.id = id;
         this.name = name;
         this.discriminator = discriminator;
         this.avatarHash = avatarHash;
         this.bot = bot;
-        this.member = member;
     }
 
     /**
@@ -156,16 +108,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             avatarHash = partialUserJson.get("avatar").asText();
         }
 
-        return new UserImpl(api, id, name, discriminator, avatarHash, bot, member);
-    }
-
-    /**
-     * The member object that belongs to this user object.
-     *
-     * @return The member.
-     */
-    public Optional<MemberImpl> getMember() {
-        return Optional.ofNullable(member);
+        return new UserImpl(api, id, name, discriminator, avatarHash, bot);
     }
 
     @Override
@@ -201,10 +144,10 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     /**
      * Gets the avatar for the given details.
      *
-     * @param api The discord api instance.
-     * @param avatarHash The avatar hash or {@code null} for default avatar.
+     * @param api           The discord api instance.
+     * @param avatarHash    The avatar hash or {@code null} for default avatar.
      * @param discriminator The discriminator if default avatar is wanted.
-     * @param userId The user id.
+     * @param userId        The user id.
      * @return The avatar for the given details.
      */
     public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId) {
@@ -214,11 +157,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     /**
      * Gets the avatar for the given details.
      *
-     * @param api The discord api instance.
-     * @param avatarHash The avatar hash or {@code null} for default avatar.
+     * @param api           The discord api instance.
+     * @param avatarHash    The avatar hash or {@code null} for default avatar.
      * @param discriminator The discriminator if default avatar is wanted.
-     * @param userId The user id.
-     * @param size The size of the image. Must be any power of 2 between 16 and 4096.
+     * @param userId        The user id.
+     * @param size          The size of the image. Must be any power of 2 between 16 and 4096.
      * @return The avatar for the given details.
      */
     public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId, int size) {
@@ -252,139 +195,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
-    public Optional<Icon> getServerAvatar(Server server) {
-        return getServerAvatar(server, DEFAULT_AVATAR_SIZE);
-    }
-
-    @Override
-    public Optional<Icon> getServerAvatar(Server server, int size) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getUserServerAvatar(this, size);
-        } else {
-            return member.getServerAvatar(size);
-        }
-    }
-
-    @Override
-    public Icon getEffectiveAvatar(Server server) {
-        return getServerAvatar(server).orElse(getAvatar());
-    }
-
-    @Override
-    public Icon getEffectiveAvatar(Server server, int size) {
-        return getServerAvatar(server, size).orElse(getAvatar(size));
-    }
-
-    @Override
     public boolean hasDefaultAvatar() {
         return avatarHash == null;
     }
 
     @Override
     public Set<Server> getMutualServers() {
-        if (api.isUserCacheEnabled()) {
-            return api.getEntityCache().get().getMemberCache().getServers(getId());
-        }
-        return member == null ? Collections.emptySet() : Collections.singleton(member.getServer());
-    }
-
-    @Override
-    public Optional<Instant> getServerBoostingSinceTimestamp(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getServerBoostingSinceTimestamp(this);
-        } else {
-            return member.getServerBoostingSinceTimestamp();
-        }
-    }
-
-    @Override
-    public String getDisplayName(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getNickname(this).orElseGet(this::getName);
-        } else {
-            return member.getNickname().orElse(getName());
-        }
-    }
-
-    @Override
-    public Optional<String> getNickname(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getNickname(this);
-        } else {
-            return member.getNickname();
-        }
-    }
-
-    @Override
-    public Optional<Instant> getTimeout(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getTimeout(this);
-        } else {
-            return member.getTimeout();
-        }
-    }
-
-    @Override
-    public boolean isPending(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.isPending(getId());
-        } else {
-            return member.isPending();
-        }
-    }
-
-    @Override
-    public boolean isSelfMuted(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.isSelfMuted(getId());
-        } else {
-            return member.isSelfMuted();
-        }
-    }
-
-    @Override
-    public boolean isSelfDeafened(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.isSelfDeafened(getId());
-        } else {
-            return member.isSelfDeafened();
-        }
-    }
-
-    @Override
-    public Optional<Instant> getJoinedAtTimestamp(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getJoinedAtTimestamp(this);
-        } else {
-            return Optional.of(member.getJoinedAtTimestamp());
-        }
-    }
-
-    @Override
-    public List<Role> getRoles(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getRoles(this);
-        } else {
-            return member.getRoles();
-        }
-    }
-
-    @Override
-    public Optional<Color> getRoleColor(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getRoleColor(this);
-        } else {
-            return member.getRoleColor();
-        }
-    }
-
-    @Override
-    public Optional<String> getServerAvatarHash(Server server) {
-        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
-            return server.getUserServerAvatarHash(this);
-        } else {
-            return member.getServerAvatarHash();
-        }
+        return api.isUserCacheEnabled()
+                ? api.getEntityCache().get().getMemberCache().getServers(getId())
+                : Collections.emptySet();
     }
 
     @Override
@@ -433,8 +252,8 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     public boolean equals(Object o) {
         return (this == o)
                 || !((o == null)
-                    || (getClass() != o.getClass())
-                    || (getId() != ((DiscordEntity) o).getId()));
+                || (getClass() != o.getClass())
+                || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override

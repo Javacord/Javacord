@@ -5,15 +5,16 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SelectMenuInteraction;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.message.component.SelectMenuOptionImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
     private final List<SelectMenuOption> selectMenuOptions = new ArrayList<>();
     private final List<SelectMenuOption> chosenSelectMenuOption = new ArrayList<>();
     private final List<ServerChannel> selectMenuChannels = new ArrayList<>();
+    private final List<Member> selectMenuMembers = new ArrayList<>();
     private final List<User> selectMenuUsers = new ArrayList<>();
     private final List<Role> selectMenuRoles = new ArrayList<>();
     private final List<Mentionable> selectMenuMentionables = new ArrayList<>();
@@ -87,11 +89,19 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
                 selectMenuRoles.addAll(getSelectMenuRoles(valuesArray));
                 break;
             case SELECT_MENU_USER:
-                selectMenuUsers.addAll(getSelectMenuUsers(dataObject));
+                List<Member> members = getSelectMenuMembers(valuesArray);
+                selectMenuMembers.addAll(members);
+                selectMenuUsers.addAll(getSelectMenuUsers(dataObject).stream()
+                        .filter(user -> members.stream().noneMatch(member -> member.getId() == user.getId()))
+                        .collect(Collectors.toList()));
                 break;
             case SELECT_MENU_MENTIONABLE:
                 selectMenuMentionables.addAll(getSelectMenuRoles(valuesArray));
-                selectMenuMentionables.addAll(getSelectMenuUsers(dataObject));
+                List<Member> memberList = getSelectMenuMembers(valuesArray);
+                selectMenuMentionables.addAll(memberList);
+                selectMenuMentionables.addAll(getSelectMenuUsers(dataObject).stream()
+                        .filter(user -> memberList.stream().noneMatch(member -> member.getId() == user.getId()))
+                        .collect(Collectors.toList()));
                 break;
             case SELECT_MENU_STRING:
                 for (JsonNode jsonNode : valuesArray) {
@@ -116,26 +126,47 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
 
         for (JsonNode value : valuesArray) {
             final long id = value.asLong();
-            Optional<User> optionalMember = getServer().flatMap(server -> server.getMemberById(id));
             Optional<User> optionalUser = getApi().getCachedUserById(id);
 
-            if (optionalMember.isPresent()) {
-                usersList.add(optionalMember.orElseThrow(AssertionError::new));
-            } else if (optionalUser.isPresent()) {
+            if (optionalUser.isPresent()) {
                 usersList.add(optionalUser.orElseThrow(AssertionError::new));
-            } else if (members.has(value.asText())) {
-                getServer().ifPresent(server -> {
-                    usersList.add(new UserImpl(((DiscordApiImpl) getApi()), users.get(value.asText()),
-                            members.get(value.asText()),
-                            (ServerImpl) server));
-                });
             } else if (users.has(value.asText())) {
-                usersList.add(new UserImpl(((DiscordApiImpl) getApi()),
-                        users.get(value.asText()), (MemberImpl) null, null));
+                usersList.add(new UserImpl(((DiscordApiImpl) getApi()), users.get(value.asText())));
             }
         }
 
         return usersList;
+    }
+
+
+    private List<Member> getSelectMenuMembers(JsonNode dataObject) {
+        List<Member> membersList = new ArrayList<>();
+        JsonNode valuesArray = dataObject.get("values");
+        JsonNode resolved = dataObject.get("resolved");
+        JsonNode users = resolved.get("users");
+        JsonNode members = resolved.get("members");
+
+        for (JsonNode value : valuesArray) {
+            final long id = value.asLong();
+            Optional<Member> optionalMember = getServer().flatMap(server -> server.getMemberById(id));
+            Optional<User> optionalUser = getApi().getCachedUserById(id);
+
+            if (optionalMember.isPresent()) {
+                membersList.add(optionalMember.orElseThrow(AssertionError::new));
+            } else if (members.has(value.asText())) {
+                getServer().ifPresent(server -> {
+                    membersList.add(new MemberImpl(
+                            ((DiscordApiImpl) getApi()),
+                            ((ServerImpl) getServer().orElseThrow(AssertionError::new)),
+                            members.get(value.asText()),
+                            optionalUser.map(user -> ((UserImpl) user))
+                                    .orElseGet(() -> new UserImpl(((DiscordApiImpl) getApi()),
+                                            users.get(value.asText())))));
+                });
+            }
+        }
+
+        return membersList;
     }
 
     private List<ServerChannel> getSelectMenuChannels(JsonNode valuesArray) {

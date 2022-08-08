@@ -5,20 +5,19 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.message.MessageImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.Member;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.event.message.reaction.ReactionAddEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
-
 import java.util.Optional;
 
 /**
@@ -55,7 +54,7 @@ public class MessageReactionAddHandler extends PacketHandler {
         }
 
         if (channel == null) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
             return;
         }
 

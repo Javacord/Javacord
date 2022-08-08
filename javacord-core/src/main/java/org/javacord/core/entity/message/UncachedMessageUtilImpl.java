@@ -14,13 +14,11 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.message.InternalUncachedMessageAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -373,7 +371,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                     List<User> incompleteUsers = request.execute(result -> {
                         List<User> paginatedUsers = new ArrayList<>();
                         for (JsonNode userJson : result.getJsonBody()) {
-                            paginatedUsers.add(new UserImpl(api, userJson, (MemberImpl) null, null));
+                            paginatedUsers.add(new UserImpl(api, userJson));
                         }
                         return Collections.unmodifiableList(paginatedUsers);
                     }).join();

@@ -58,7 +58,7 @@ public class MessageDeleteBulkHandler extends PacketHandler {
                         event);
             }
         } else {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
         }
     }
 }

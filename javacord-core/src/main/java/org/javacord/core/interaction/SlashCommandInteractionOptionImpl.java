@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
@@ -22,6 +23,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
 
     private final DiscordApi api;
     private final Map<Long, User> resolvedUsers;
+    private final Map<Long, Member> resolvedMembers;
     private final String name;
     private final String stringRepresentation;
     private final String stringValue;
@@ -50,15 +52,19 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     /**
      * Class constructor.
      *
-     * @param api           The DiscordApi instance.
-     * @param jsonData      The json data of the option.
-     * @param resolvedUsers The map of resolved users and their ID.
+     * @param api                 The DiscordApi instance.
+     * @param jsonData            The json data of the option.
+     * @param resolvedUsers       The map of resolved users and their ID.
+     * @param resolvedMembers     The map of resolved members and their ID.
      * @param resolvedAttachments The map of resolved attachments and their ID.
      */
     public SlashCommandInteractionOptionImpl(final DiscordApi api, final JsonNode jsonData,
-                                             Map<Long, User> resolvedUsers, Map<Long, Attachment> resolvedAttachments) {
+                                             Map<Long, User> resolvedUsers,
+                                             Map<Long, Member> resolvedMembers,
+                                             Map<Long, Attachment> resolvedAttachments) {
         this.api = api;
         this.resolvedUsers = resolvedUsers;
+        this.resolvedMembers = resolvedMembers;
         name = jsonData.get("name").asText();
         focused = jsonData.has("focused") ? jsonData.get("focused").asBoolean() : null;
         options = new ArrayList<>();
@@ -83,7 +89,7 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
                 if (jsonData.has("options") && jsonData.get("options").isArray()) {
                     for (final JsonNode optionJson : jsonData.get("options")) {
                         options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers,
-                                resolvedAttachments));
+                                resolvedMembers, resolvedAttachments));
                     }
                 }
                 break;
@@ -180,6 +186,18 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     public Optional<CompletableFuture<User>> requestUserValue() {
         return Optional.ofNullable(userValue)
                 .map(api::getUserById);
+    }
+
+    @Override
+    public Optional<Member> getMemberValue() {
+        return Optional.ofNullable(userValue)
+                .map(id -> resolvedMembers.get(userValue).getServer().getMemberById(id).orElseGet(() -> resolvedMembers.get(id)));
+    }
+
+    @Override
+    public Optional<CompletableFuture<Member>> requestMemberValue() {
+        return Optional.ofNullable(userValue)
+                .map(aLong ->  resolvedMembers.get(aLong).getServer().requestMemberById(aLong));
     }
 
     @Override

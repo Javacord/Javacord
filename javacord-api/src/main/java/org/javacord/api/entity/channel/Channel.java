@@ -154,11 +154,12 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
             return user.isYourself() || privateChannel.get().getRecipient()
                     .map(recipient -> recipient.equals(user)).orElse(false);
         }
-        Optional<RegularServerChannel> severChannel = asRegularServerChannel();
-        return !severChannel.isPresent()
-                || severChannel.get().hasAnyPermission(user,
-                                                       PermissionType.ADMINISTRATOR,
-                                                       PermissionType.VIEW_CHANNEL);
+        Optional<RegularServerChannel> regularServerChannel = asRegularServerChannel();
+
+        return !regularServerChannel.isPresent()
+                || regularServerChannel.flatMap(rsc -> rsc.getServer().getMemberById(user.getId()))
+                .map(member -> member.hasAnyPermission(PermissionType.ADMINISTRATOR,
+                        PermissionType.VIEW_CHANNEL)).orElse(false);
     }
 
     /**
