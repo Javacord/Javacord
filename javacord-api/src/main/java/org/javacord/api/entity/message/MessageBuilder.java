@@ -116,11 +116,10 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * Sets the message to reply to.
      *
      * @param message The message to reply to.
-     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder replyTo(Message message, boolean checkIfMessageExists) {
-        delegate.replyTo(message.getId(), checkIfMessageExists);
+    public MessageBuilder replyTo(Message message) {
+        replyTo(message, false);
         return this;
     }
 
@@ -128,11 +127,34 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * Sets the message to reply to.
      *
      * @param messageId The id of the message to reply to.
-     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
      * @return The current instance in order to chain call methods.
      */
-    public MessageBuilder replyTo(long messageId, boolean checkIfMessageExists) {
-        delegate.replyTo(messageId, checkIfMessageExists);
+    public MessageBuilder replyTo(long messageId) {
+        replyTo(messageId, false);
+        return this;
+    }
+
+    /**
+     * Sets the message to reply to.
+     *
+     * @param message The message to reply to.
+     * @param assertReferenceExists Used to tell discord if you want to check if the message exists.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder replyTo(Message message, boolean assertReferenceExists) {
+        delegate.replyTo(message.getId(), assertReferenceExists);
+        return this;
+    }
+
+    /**
+     * Sets the message to reply to.
+     *
+     * @param messageId The id of the message to reply to.
+     * @param assertReferenceExists Used to tell discord if you want to check if the message exists.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageBuilder replyTo(long messageId, boolean assertReferenceExists) {
+        delegate.replyTo(messageId, assertReferenceExists);
         return this;
     }
 

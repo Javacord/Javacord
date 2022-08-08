@@ -239,9 +239,9 @@ public interface MessageBuilderBaseDelegate {
      * Sets the message to reply to.
      *
      * @param messageId The id of the message to reply to.
-     * @param checkIfMessageExists Used to tell discord if you want to check if the message exists.
+     * @param assertReferenceExists Used to tell discord if you want to check if the message exists.
      */
-    void replyTo(long messageId, boolean checkIfMessageExists);
+    void replyTo(long messageId, boolean assertReferenceExists);
 
     /**
      * Sets the nonce of the message.
