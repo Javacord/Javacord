@@ -119,7 +119,7 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder replyTo(Message message) {
-        replyTo(message, false);
+        replyTo(message, true);
         return this;
     }
 
@@ -130,7 +130,7 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder replyTo(long messageId) {
-        replyTo(messageId, false);
+        replyTo(messageId, true);
         return this;
     }
 
