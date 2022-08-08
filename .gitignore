@@ -14,8 +14,8 @@
 *.iml
 *.ipr
 *.iws
-#TODO: Remove once done with this pr
+#TODO remove once done with api update
 javacord-core/src/test/java/Main.java
-javacord-core/src/test/java/favicon.ico
-javacord-core/src/test/java/favicon1.ico
-javacord-core/src/test/java/favicon3.ico
+/javacord-core/src/test/java/favicon.ico
+/javacord-core/src/test/java/favicon1.ico
+/javacord-core/src/test/java/favicon3.ico

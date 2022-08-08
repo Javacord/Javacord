@@ -220,7 +220,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                 FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
 
                 //TODO: attachments being stored is a known bug.
-                attachments.clear();
                 attachments.add(fileContainer);
 
                 attachmentsChanged = true;

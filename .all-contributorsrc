@@ -100,6 +100,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "shubhwip",
+      "name": "Shubham Jain",
+      "avatar_url": "https://avatars.githubusercontent.com/u/23444368?v=4",
+      "profile": "http://shubhja.in",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "AhmedA1559",
+      "name": "Ahmed A",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95593064?v=4",
+      "profile": "https://github.com/AhmedA1559",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
