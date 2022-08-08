@@ -48,7 +48,7 @@ public class MessageReactionRemoveAllHandler extends PacketHandler {
         if (channel == null) {
             if (packet.hasNonNull("guild_id")) {
                 // we don't know anything about the channel as it is part of a server and not cached
-                LoggerUtil.logMissingChannel(logger, channelId);
+                LoggerUtil.logMissingChannel(logger, channelId, packet);
                 return;
             }
             // channel is a private channel:

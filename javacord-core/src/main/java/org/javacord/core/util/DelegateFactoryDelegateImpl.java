@@ -23,6 +23,7 @@ import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegat
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
+import org.javacord.api.entity.member.internal.MemberUpdaterDelegate;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
@@ -78,6 +79,7 @@ import org.javacord.core.entity.channel.ServerVoiceChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiBuilderDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiUpdaterDelegateImpl;
+import org.javacord.core.entity.member.MemberUpdaterDelegateImpl;
 import org.javacord.core.entity.message.InteractionMessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.MessageBuilderBaseDelegateImpl;
 import org.javacord.core.entity.message.WebhookMessageBuilderDelegateImpl;
@@ -275,6 +277,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ServerUpdaterDelegate createServerUpdaterDelegate(Server server) {
         return new ServerUpdaterDelegateImpl(server);
+    }
+
+    @Override
+    public MemberUpdaterDelegate createMemberUpdaterDelegate(Server server) {
+        return new MemberUpdaterDelegateImpl(server);
     }
 
     @Override

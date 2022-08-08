@@ -23,6 +23,7 @@ import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegat
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
+import org.javacord.api.entity.member.internal.MemberUpdaterDelegate;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
@@ -317,6 +318,14 @@ public interface DelegateFactoryDelegate {
      * @return A new server updater delegate.
      */
     ServerUpdaterDelegate createServerUpdaterDelegate(Server server);
+
+    /**
+     * Creates a new member updater delegate.
+     *
+     * @param server The server the member belongs to.
+     * @return A new member updater delegate.
+     */
+    MemberUpdaterDelegate createMemberUpdaterDelegate(Server server);
 
     /**
      * Creates a new webhook updater delegate.

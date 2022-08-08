@@ -1,14 +1,15 @@
 package org.javacord.core.event.user;
 
 import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.event.user.UserChangeAvatarEvent;
 import org.javacord.core.entity.user.UserImpl;
+import org.javacord.core.event.server.member.ServerMemberEventImpl;
 
 /**
  * The implementation of {@link UserChangeAvatarEvent}.
  */
-public class UserChangeAvatarEventImpl extends UserEventImpl implements UserChangeAvatarEvent {
+public class UserChangeAvatarEventImpl extends ServerMemberEventImpl implements UserChangeAvatarEvent {
 
     /**
      * The new avatar hash of the user.
@@ -21,21 +22,21 @@ public class UserChangeAvatarEventImpl extends UserEventImpl implements UserChan
     private final String oldAvatarHash;
 
     /**
-     * Creates a new user change avatar event.
+     * Creates a new member change avatar event.
      *
-     * @param user The user of the event.
-     * @param newAvatarHash The new avatar hash of the user.
-     * @param oldAvatarHash The old avatar hash of the user.
+     * @param member The member of the event.
+     * @param newAvatarHash The new avatar hash of the member.
+     * @param oldAvatarHash The old avatar hash of the member.
      */
-    public UserChangeAvatarEventImpl(User user, String newAvatarHash, String oldAvatarHash) {
-        super(user);
+    public UserChangeAvatarEventImpl(Member member, String newAvatarHash, String oldAvatarHash) {
+        super(member);
         this.newAvatarHash = newAvatarHash;
         this.oldAvatarHash = oldAvatarHash;
     }
 
     @Override
     public Icon getNewAvatar() {
-        return UserImpl.getAvatar(api, newAvatarHash, getUser().getDiscriminator(), getUser().getId());
+        return UserImpl.getAvatar(api, newAvatarHash, getMember().getUser().getDiscriminator(), getMember().getId());
     }
 
     @Override
@@ -45,7 +46,7 @@ public class UserChangeAvatarEventImpl extends UserEventImpl implements UserChan
 
     @Override
     public Icon getOldAvatar() {
-        return UserImpl.getAvatar(api, oldAvatarHash, getUser().getDiscriminator(), getUser().getId());
+        return UserImpl.getAvatar(api, oldAvatarHash, getMember().getUser().getDiscriminator(), getMember().getId());
     }
 
     @Override

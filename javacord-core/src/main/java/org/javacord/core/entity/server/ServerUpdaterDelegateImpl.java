@@ -1,9 +1,7 @@
 package org.javacord.core.entity.server;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -16,7 +14,6 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.user.User;
-import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -25,18 +22,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -53,36 +42,6 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
      * The reason for the update.
      */
     private String reason = null;
-
-    /**
-     * A map with all user roles to update.
-     */
-    private final Map<User, Collection<Role>> userRoles = new HashMap<>();
-
-    /**
-     * A map with all user nicknames to update.
-     */
-    private final Map<User, String> userNicknames = new HashMap<>();
-
-    /**
-     * A map with all user muted states to update.
-     */
-    private final Map<User, Boolean> userMuted = new HashMap<>();
-
-    /**
-     * A map with all user deafened states to update.
-     */
-    private final Map<User, Boolean> userDeafened = new HashMap<>();
-
-    /**
-     * A map with all channels to move users to.
-     */
-    private final Map<User, ServerVoiceChannel> userMoveTargets = new HashMap<>();
-
-    /**
-     * A map with all user timeouts to update.
-     */
-    private final Map<User, Instant> userTimeouts = new HashMap<>();
 
     /**
      * The new order of the roles.
@@ -485,148 +444,14 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
-    public void setNickname(User user, String nickname) {
-        userNicknames.put(user, nickname);
-    }
-
-    @Override
-    public void setUserTimeout(User user, Instant timeout) {
-        userTimeouts.put(user, timeout);
-    }
-
-    @Override
-    public void setMuted(User user, boolean muted) {
-        userMuted.put(user, muted);
-    }
-
-    @Override
-    public void setDeafened(User user, boolean deafened) {
-        userDeafened.put(user, deafened);
-    }
-
-    @Override
-    public void setVoiceChannel(User user, ServerVoiceChannel channel) {
-        userMoveTargets.put(user, channel);
-    }
-
-    @Override
     public void reorderRoles(List<Role> roles) {
         newRolesOrder = roles;
     }
 
     @Override
-    public void addRoleToUser(User user, Role role) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRoles(u)));
-        userRoles.add(role);
-    }
-
-    @Override
-    public void addRolesToUser(User user, Collection<Role> roles) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRoles(u)));
-        userRoles.addAll(roles);
-    }
-
-    @Override
-    public void removeRoleFromUser(User user, Role role) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRoles(u)));
-        userRoles.remove(role);
-    }
-
-    @Override
-    public void removeRolesFromUser(User user, Collection<Role> roles) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRoles(u)));
-        userRoles.removeAll(roles);
-    }
-
-    @Override
-    public void removeAllRolesFromUser(User user) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new ArrayList<>(server.getRoles(u)));
-        userRoles.clear();
-    }
-
-    @Override
     public CompletableFuture<Void> update() {
-        // All members that get updates
-        HashSet<User> members = new HashSet<>(userRoles.keySet());
-        members.addAll(userNicknames.keySet());
-        members.addAll(userMuted.keySet());
-        members.addAll(userDeafened.keySet());
-        members.addAll(userMoveTargets.keySet());
-        members.addAll(userTimeouts.keySet());
-
         // All tasks
         List<CompletableFuture<?>> tasks = new ArrayList<>();
-
-        members.forEach(member -> {
-            boolean patchMember = false;
-            ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
-
-            Collection<Role> roles = userRoles.get(member);
-            if (roles != null) {
-                ArrayNode rolesJson = updateNode.putArray("roles");
-                roles.stream()
-                        .map(DiscordEntity::getIdAsString)
-                        .forEach(rolesJson::add);
-                patchMember = true;
-            }
-
-            if (userNicknames.containsKey(member)) {
-                String nickname = userNicknames.get(member);
-                if (member.isYourself()) {
-                    tasks.add(
-                            new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.OWN_NICKNAME)
-                                    .setUrlParameters(server.getIdAsString())
-                                    .setBody(JsonNodeFactory.instance.objectNode().put("nick", nickname))
-                                    .setAuditLogReason(reason)
-                                    .execute(result -> null));
-                } else {
-                    updateNode.put("nick", (nickname == null) ? "" : nickname);
-                    patchMember = true;
-                }
-            }
-
-            if (userMuted.containsKey(member)) {
-                updateNode.put("mute", userMuted.get(member));
-                patchMember = true;
-            }
-
-            if (userDeafened.containsKey(member)) {
-                updateNode.put("deaf", userDeafened.get(member));
-                patchMember = true;
-            }
-
-            if (userMoveTargets.containsKey(member)) {
-                ServerVoiceChannel channel = userMoveTargets.get(member);
-                if (member.isYourself()) {
-                    ((DiscordApiImpl) server.getApi()).getWebSocketAdapter()
-                            .sendVoiceStateUpdate(server, channel, null, null);
-                } else if (channel != null) {
-                    updateNode.put("channel_id", channel.getId());
-                    patchMember = true;
-                } else {
-                    updateNode.putNull("channel_id");
-                    patchMember = true;
-                }
-            }
-
-            if (userTimeouts.containsKey(member)) {
-                updateNode.put("communication_disabled_until",
-                        userTimeouts.get(member).equals(Instant.MIN)
-                                ? null
-                                : DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC))
-                                .format(userTimeouts.get(member)));
-                patchMember = true;
-            }
-
-            if (patchMember) {
-                tasks.add(
-                        new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER_MEMBER)
-                                .setUrlParameters(server.getIdAsString(), member.getIdAsString())
-                                .setBody(updateNode)
-                                .setAuditLogReason(reason)
-                                .execute(result -> null));
-            }
-        });
 
         if (newRolesOrder != null) {
             tasks.add(server.reorderRoles(newRolesOrder, reason));

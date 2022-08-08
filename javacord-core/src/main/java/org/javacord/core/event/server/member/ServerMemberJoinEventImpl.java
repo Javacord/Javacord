@@ -1,7 +1,6 @@
 package org.javacord.core.event.server.member;
 
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.event.server.member.ServerMemberJoinEvent;
 
 /**
@@ -12,11 +11,10 @@ public class ServerMemberJoinEventImpl extends ServerMemberEventImpl implements 
     /**
      * Creates a new server member join event.
      *
-     * @param server The server of the event.
-     * @param user The user of the event.
+     * @param member The user of the event.
      */
-    public ServerMemberJoinEventImpl(Server server, User user) {
-        super(server, user);
+    public ServerMemberJoinEventImpl(Member member) {
+        super(member);
     }
 
 }

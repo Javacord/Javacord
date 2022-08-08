@@ -1,9 +1,8 @@
 package org.javacord.api.event.server.member;
 
-import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.event.server.ServerEvent;
-
-import java.util.Set;
+import java.util.List;
 
 /**
  * A server members chunk event.
@@ -11,9 +10,9 @@ import java.util.Set;
 public interface ServerMembersChunkEvent extends ServerEvent {
 
     /**
-     * Gets the users contained in this chunk.
+     * Gets the members contained in this chunk.
      *
-     * @return The users of this chunk.
+     * @return The members of this chunk.
      */
-    Set<User> getMembers();
+    List<Member> getMembers();
 }

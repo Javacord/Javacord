@@ -63,7 +63,7 @@ public class MessageUpdateHandler extends PacketHandler {
 
         Optional<TextChannel> optionalChannel = api.getTextChannelById(channelId);
         if (!optionalChannel.isPresent()) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
             return;
         }
 

@@ -3,6 +3,7 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 
@@ -100,6 +101,28 @@ public interface SlashCommandInteractionOption extends SlashCommandInteractionOp
      * @return The user value of this option.
      */
     Optional<CompletableFuture<User>> requestUserValue();
+
+    /**
+     * Gets the user value as a member of this option.
+     * Note: This method only respects cached members. To fetch the member from Discord if the member is not cached,
+     *     use {@link SlashCommandInteractionOption#requestMemberValue()} ()}.
+     *
+     * <p>If this option does not have a user value or the option itself is a subcommand or group,
+     *     the optional will be empty.
+     *
+     * @return The member value of this option.
+     */
+    Optional<Member> getMemberValue();
+
+    /**
+     * Gets the user value as a member of this option.
+     *
+     * <p>If this option does not have a member value or the option itself is a subcommand or group,
+     *     the optional will be empty.
+     *
+     * @return The member value of this option.
+     */
+    Optional<CompletableFuture<Member>> requestMemberValue();
 
     /**
      * Gets the channel value of this option.

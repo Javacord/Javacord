@@ -1,5 +1,6 @@
 package org.javacord.core.util.logging;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,11 +72,12 @@ public class LoggerUtil {
      *
      * @param logger The logger of the event.
      * @param channelId The id of the missing channel.
+     * @param data The json data of the event.
      */
-    public static void logMissingChannel(Logger logger, long channelId) {
+    public static void logMissingChannel(Logger logger, long channelId, JsonNode data) {
         logger.warn("Couldn't get the Channel with the id {} for a {}. Please update to the latest "
                 + "Javacord version or create an issue on the Javacord GitHub page if you are already "
-                + "on the latest version.", channelId, logger.getName());
+                + "on the latest version. Packet: {}", channelId, logger.getName(), data.toString());
     }
 
 }

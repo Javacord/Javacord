@@ -53,7 +53,7 @@ public class MessageReactionRemoveHandler extends PacketHandler {
         }
 
         if (channel == null) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
             return;
         }
 

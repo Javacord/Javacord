@@ -42,7 +42,7 @@ public class WebhooksUpdateHandler extends PacketHandler {
             api.getEventDispatcher().dispatchWebhooksUpdateEvent(
                     (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
         } else {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
         }
     }
 

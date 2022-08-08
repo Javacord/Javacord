@@ -27,6 +27,7 @@ buildscript {
 
 project(':javacord-core') {
     task generateEventDispatcher {
+        dependsOn(generateListenerManagers)
         ext.outputDirectory = "$buildDir/generated/event-dispatcher"
 
         def javacordApi = project(':javacord-api')

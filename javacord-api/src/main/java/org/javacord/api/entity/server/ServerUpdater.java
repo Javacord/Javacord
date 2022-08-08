@@ -8,14 +8,10 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.internal.DelegateFactory;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -570,88 +566,6 @@ public class ServerUpdater {
     }
 
     /**
-     * Queues a user's nickname to be updated.
-     *
-     * @param user The user whose nickname should be updated.
-     * @param nickname The new nickname of the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setNickname(User user, String nickname) {
-        delegate.setNickname(user, nickname);
-        return this;
-    }
-
-    /**
-     * Queues a user's timeout to be updated.
-     *
-     * @param user The user whose nickname should be updated.
-     * @param timeout The new timeout of the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setUserTimeout(User user, Instant timeout) {
-        delegate.setUserTimeout(user, timeout);
-        return this;
-    }
-
-    /**
-     * Queues a user's timeout to be updated.
-     *
-     * @param user The user whose nickname should be updated.
-     * @param duration The duration of the timeout.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setUserTimeout(User user, Duration duration) {
-        return setUserTimeout(user, Instant.now().plus(duration));
-    }
-
-    /**
-     * Queues a user's timeout to be updated.
-     *
-     * @param user The user whose nickname should be updated.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater removeUserTimeout(User user) {
-        delegate.setUserTimeout(user, Instant.MIN);
-        return this;
-    }
-
-    /**
-     * Queues a user's muted state to be updated.
-     *
-     * @param user The user whose muted state should be updated.
-     * @param muted The new muted state of the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setMuted(User user, boolean muted) {
-        delegate.setMuted(user, muted);
-        return this;
-    }
-
-    /**
-     * Queues a user's deafened state to be updated.
-     *
-     * @param user The user whose deafened state should be updated.
-     * @param deafened The new deafened state of the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setDeafened(User user, boolean deafened) {
-        delegate.setDeafened(user, deafened);
-        return this;
-    }
-
-    /**
-     * Queues a moving a user to a different voice channel.
-     *
-     * @param user The user who should be moved.
-     * @param channel The new voice channel of the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater setVoiceChannel(User user, ServerVoiceChannel channel) {
-        delegate.setVoiceChannel(user, channel);
-        return this;
-    }
-
-    /**
      * Sets the new order for the server's roles.
      *
      * @param roles An ordered list with the new role positions.
@@ -659,65 +573,6 @@ public class ServerUpdater {
      */
     public ServerUpdater reorderRoles(List<Role> roles) {
         delegate.reorderRoles(roles);
-        return this;
-    }
-
-    /**
-     * Queues a role to be assigned to the user.
-     *
-     * @param user The server member the role should be added to.
-     * @param role The role which should be added to the server member.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater addRoleToUser(User user, Role role) {
-        delegate.addRoleToUser(user, role);
-        return this;
-    }
-
-    /**
-     * Queues a collection of roles to be assigned to the user.
-     *
-     * @param user The server member the role should be added to.
-     * @param roles The roles which should be added to the server member.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater addRolesToUser(User user, Collection<Role> roles) {
-        delegate.addRolesToUser(user, roles);
-        return this;
-    }
-
-    /**
-     * Queues a role to be removed from the user.
-     *
-     * @param user The server member the role should be removed from.
-     * @param role The role which should be removed from the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater removeRoleFromUser(User user, Role role) {
-        delegate.removeRoleFromUser(user, role);
-        return this;
-    }
-
-    /**
-     * Queues a collection of roles to be removed from the user.
-     *
-     * @param user The server member the roles should be removed from.
-     * @param roles The roles which should be removed from the user.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater removeRolesFromUser(User user, Collection<Role> roles) {
-        delegate.removeRolesFromUser(user, roles);
-        return this;
-    }
-
-    /**
-     * Queues all roles to be removed from the user.
-     *
-     * @param user The server member the roles should be removed from.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerUpdater removeAllRolesFromUser(User user) {
-        delegate.removeAllRolesFromUser(user);
         return this;
     }
 

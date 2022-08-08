@@ -69,7 +69,7 @@ public class ApplicationCommandPermissionsImpl implements ApplicationCommandPerm
 
     @Override
     public Optional<User> getUser() {
-        return type == ApplicationCommandPermissionType.USER ? server.getMemberById(id) : Optional.empty();
+        return type == ApplicationCommandPermissionType.USER ? server.getApi().getCachedUserById(id) : Optional.empty();
     }
 
     @Override

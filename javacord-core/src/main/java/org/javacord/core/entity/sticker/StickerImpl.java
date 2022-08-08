@@ -9,14 +9,11 @@ import org.javacord.api.entity.sticker.StickerType;
 import org.javacord.api.entity.sticker.StickerUpdater;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.server.sticker.InternalStickerAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -53,8 +50,7 @@ public class StickerImpl implements Sticker, InternalStickerAttachableListenerMa
         this.formatType = StickerFormatType.fromId(data.get("format_type").asInt());
         this.available = data.has("available") ? data.get("available").asBoolean() : null;
         this.serverId = data.has("guild_id") ? data.get("guild_id").asLong() : null;
-        this.user = data.has("user") ? new UserImpl(api, data.get("user"), (MemberImpl) null,
-                (ServerImpl) getServer().get()) : null;
+        this.user = data.has("user") ? new UserImpl(api, data.get("user")) : null;
 
         this.sortValue = data.has("sort_value") ? data.get("sort_value").asInt() : null;
     }

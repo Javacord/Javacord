@@ -6,11 +6,10 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.Webhook;
-
-import java.awt.Color;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -41,10 +40,12 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
      * @return The display name of the author.
      */
     default String getDisplayName() {
-        Optional<Server> server = getMessage().getServer();
-        Optional<User> user = asUser();
-        if (user.isPresent()) {
-            return server.map(s -> user.get().getDisplayName(s)).orElseGet(() -> user.get().getName());
+        Optional<Server> serverOptional = getMessage().getServer();
+        Optional<User> userOptional = asUser();
+
+        if (userOptional.isPresent()) {
+            return serverOptional.flatMap(s -> s.getMemberById(userOptional.get().getId())).map(Member::getDisplayName)
+                    .orElseGet(() -> userOptional.get().getName());
         }
         return getName();
     }
@@ -148,192 +149,6 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     }
 
     /**
-     * Checks if the author can create new channels on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can create channels on the server or not.
-     */
-    default boolean canCreateChannelsOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canCreateChannels))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can view the audit log of the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can view the audit log of the server or not.
-     */
-    default boolean canViewAuditLogOfServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canViewAuditLog))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can change its own nickname in the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can change its own nickname in the server or not.
-     */
-    default boolean canChangeOwnNicknameOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canChangeOwnNickname))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can manage nicknames on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can manage nicknames on the server or not.
-     */
-    default boolean canManageNicknamesOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canManageNicknames))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can mute members on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can mute members on the server or not.
-     */
-    default boolean canMuteMembersOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canMuteMembers))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can deafen members on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can deafen members on the server or not.
-     */
-    default boolean canDeafenMembersOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canDeafenMembers))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can move members on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can move members on the server or not.
-     */
-    default boolean canMoveMembersOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canMoveMembers))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can manage emojis on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can manage emojis on the server or not.
-     */
-    default boolean canManageEmojisOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canManageEmojis))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can manage roles on the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can manage roles on the server or not.
-     */
-    default boolean canManageRolesOnServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canManageRoles))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can manage the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can manage the server or not.
-     */
-    default boolean canManageServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canManage))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can kick users from the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can kick users from the server or not.
-     */
-    default boolean canKickUsersFromServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canKickUsers))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can kick the user from the server where the message was sent.
-     * This method also considers the position of the user roles.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @param userToKick The user which should be kicked.
-     * @return Whether the author can kick the user from the server or not.
-     */
-    default boolean canKickUserFromServer(User userToKick) {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(user -> server.canKickUser(user, userToKick)))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can ban users from the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author can ban users from the server or not.
-     */
-    default boolean canBanUsersFromServer() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::canBanUsers))
-                .orElse(false);
-    }
-
-    /**
-     * Checks if the author can ban the user from the server where the message was sent.
-     * This method also considers the position of the user roles.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @param userToBan The user which should be banned.
-     * @return Whether the author can ban the user from the server or not.
-     */
-    default boolean canBanUserFromServer(User userToBan) {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(user -> server.canBanUser(user, userToBan)))
-                .orElse(false);
-    }
-
-    /**
      * Checks if the author can see the channel where the message was sent.
      * In private channels this always returns {@code true} if the user is part of the chat.
      * Always returns {@code false} if the author is not a user or the message was not sent on a server.
@@ -372,7 +187,7 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
         return getMessage()
                 .getChannel()
                 .asRegularServerChannel()
-                .flatMap(serverChannel -> asUser().map(serverChannel::canCreateInstantInvite))
+                .flatMap(serverChannel -> asMember().map(serverChannel::canCreateInstantInvite))
                 .orElse(false);
     }
 
@@ -531,13 +346,47 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     }
 
     /**
+     * Checks if the author can connect to the voice channel where the message was sent.
+     * In private channels this always returns {@code true} if the user is part of the chat.
+     * Always returns {@code false} if the author is not a user or if the channel is not a voice channel.
+     *
+     * @return Whether the author can connect to the voice channel or not.
+     * @deprecated Use {@link ServerVoiceChannel#canConnect(Member)} instead.
+     */
+    @Deprecated
+    default boolean canConnectToVoiceChannel() {
+        return getMessage()
+                .getChannel()
+                .asServerVoiceChannel()
+                .flatMap(voiceChannel -> asMember().map(voiceChannel::canConnect))
+                .orElse(false);
+    }
+
+    /**
+     * Checks if the author can mute other users in the voice channel where the message was sent.
+     * In private channels this always returns @{code false}.
+     * Always returns {@code false} if the author is not a user or if the channel is not a voice channel.
+     *
+     * @return Whether the author can mute other users in the voice channel or not.
+     * @deprecated Use {@link ServerVoiceChannel#canMuteUsers(Member)} instead.
+     */
+    @Deprecated
+    default boolean canMuteUsersInVoiceChannel() {
+        return getMessage()
+                .getChannel()
+                .asServerVoiceChannel()
+                .flatMap(voiceChannel -> asMember().map(voiceChannel::canMuteUsers))
+                .orElse(false);
+    }
+
+    /**
      * Checks if the author is allowed to add <b>new</b> reactions to the message.
      * Always returns {@code false} if the author is not a user.
      *
      * @return Whether the author is allowed to add <b>new</b> reactions to the message or not.
      */
     default boolean canAddNewReactionsToMessage() {
-        return asUser()
+        return asMember()
                 .map(getMessage()::canAddNewReactions)
                 .orElse(false);
     }
@@ -555,35 +404,18 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     }
 
     /**
-     * Gets the displayed color if the author was a User on a Server.
-     *
-     * @return The display color, if applicable.
-     */
-    default Optional<Color> getRoleColor() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().flatMap(server::getRoleColor));
-    }
-
-    /**
-     * Checks if the author is an administrator of the server where the message was sent.
-     * Always returns {@code false} if the author is not a user or the message was not sent on a server.
-     *
-     * @return Whether the author is an administrator of the server or not.
-     */
-    default boolean isServerAdmin() {
-        return getMessage()
-                .getServer()
-                .flatMap(server -> asUser().map(server::isAdmin))
-                .orElse(false);
-    }
-
-    /**
      * Gets the author as user.
      *
      * @return The author as user.
      */
     Optional<User> asUser();
+
+    /**
+     * Gets the author as member. Only present if the member cache is enabled.
+     *
+     * @return The author as member.
+     */
+    Optional<Member> asMember();
 
     /**
      * Checks if the author is a webhook.

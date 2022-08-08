@@ -10,6 +10,7 @@ public class MessageContextMenuInteractionImpl extends ApplicationCommandInterac
         implements MessageContextMenuInteraction {
 
     private final Message target;
+    private final long targetId;
 
     /**
      * Class constructor.
@@ -21,8 +22,13 @@ public class MessageContextMenuInteractionImpl extends ApplicationCommandInterac
     public MessageContextMenuInteractionImpl(DiscordApiImpl api, TextChannel channel, JsonNode jsonData) {
         super(api, channel, jsonData);
         JsonNode data = jsonData.get("data");
-        String targetId = data.get("target_id").asText();
-        target = api.getOrCreateMessage(channel, data.get("resolved").get("messages").get(targetId));
+        targetId = data.get("target_id").asLong();
+        target = api.getOrCreateMessage(channel, data.get("resolved").get("messages").get(String.valueOf(targetId)));
+    }
+
+    @Override
+    public long getTargetId() {
+        return targetId;
     }
 
     @Override

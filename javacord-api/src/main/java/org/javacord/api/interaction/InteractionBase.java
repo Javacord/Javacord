@@ -2,6 +2,7 @@ package org.javacord.api.interaction;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
@@ -115,6 +116,13 @@ public interface InteractionBase extends DiscordEntity {
      * @return The invoking user.
      */
     User getUser();
+
+    /**
+     * Gets the invoking member if in a server.
+     *
+     * @return The invoking member.
+     */
+    Optional<Member> getMember();
 
     /**
      * Gets the continuation token for responding to the interaction.

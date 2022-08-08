@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -23,7 +21,6 @@ public class MessageAuthorImpl implements MessageAuthor {
     private final Message message;
 
     private final UserImpl user;
-    private final MemberImpl member;
 
     private final Long webhookId;
 
@@ -35,8 +32,8 @@ public class MessageAuthorImpl implements MessageAuthor {
     /**
      * Creates a new message author.
      *
-     * @param message The message.
-     * @param webhookId The id of the webhook, if the author is a webhook.
+     * @param message     The message.
+     * @param webhookId   The id of the webhook, if the author is a webhook.
      * @param messageJson The json data of the author.
      */
     public MessageAuthorImpl(Message message, Long webhookId, JsonNode messageJson) {
@@ -49,19 +46,9 @@ public class MessageAuthorImpl implements MessageAuthor {
         avatarId = authorJson.has("avatar") && !authorJson.get("avatar").isNull()
                 ? authorJson.get("avatar").asText() : null;
 
-        if (webhookId == null) {
-            if (messageJson.hasNonNull("member")) {
-                user = new UserImpl((DiscordApiImpl) getApi(), authorJson, messageJson.get("member"),
-                        (ServerImpl) message.getServer().orElseThrow(AssertionError::new));
-                member = user.getMember().orElseThrow(AssertionError::new);
-            } else {
-                user = new UserImpl((DiscordApiImpl) getApi(), authorJson, (MemberImpl) null, null);
-                member = null;
-            }
-        } else {
-            user = null;
-            member = null;
-        }
+        user = webhookId == null
+                ? new UserImpl((DiscordApiImpl) getApi(), authorJson)
+                : null;
 
         this.webhookId = webhookId;
     }
@@ -117,6 +104,11 @@ public class MessageAuthorImpl implements MessageAuthor {
     }
 
     @Override
+    public Optional<Member> asMember() {
+        return getMessage().getServer().flatMap(server -> server.getMemberById(getId()));
+    }
+
+    @Override
     public boolean isWebhook() {
         return webhookId != null;
     }
@@ -124,9 +116,9 @@ public class MessageAuthorImpl implements MessageAuthor {
     @Override
     public boolean equals(Object o) {
         return (this == o)
-               || !((o == null)
-                    || (getClass() != o.getClass())
-                    || (getId() != ((DiscordEntity) o).getId()));
+                || !((o == null)
+                || (getClass() != o.getClass())
+                || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override

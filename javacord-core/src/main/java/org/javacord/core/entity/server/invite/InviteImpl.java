@@ -14,14 +14,13 @@ import org.javacord.api.entity.server.invite.TargetUserType;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -142,7 +141,7 @@ public class InviteImpl implements RichInvite {
     /**
      * Creates a new invite.
      *
-     * @param api The discord api instance.
+     * @param api  The discord api instance.
      * @param data The json data of the invite.
      */
     public InviteImpl(DiscordApi api, JsonNode data) {
@@ -197,10 +196,8 @@ public class InviteImpl implements RichInvite {
         this.approximatePresenceCount = (data.has("approximate_presence_count"))
                 ? data.get("approximate_presence_count").asInt()
                 : null;
-        MemberImpl targetMember = null;
         this.targetUser = data.has("target_user")
-                ? new UserImpl((DiscordApiImpl) api, data.get("inviter"), targetMember,
-                getServer().map(ServerImpl.class::cast).orElse(null))
+                ? new UserImpl((DiscordApiImpl) api, data.get("inviter"))
                 : null;
         this.targetUserType = data.has("target_user_type")
                 ? TargetUserType.fromId(data.get("target_user_type").asInt())
@@ -209,8 +206,7 @@ public class InviteImpl implements RichInvite {
         // Rich data (may not be present)
         MemberImpl member = null;
         this.inviter = data.has("inviter")
-                ? new UserImpl((DiscordApiImpl) api, data.get("inviter"), member,
-                getServer().map(ServerImpl.class::cast).orElse(null))
+                ? new UserImpl((DiscordApiImpl) api, data.get("inviter"))
                 : null;
         this.uses = data.has("uses") ? data.get("uses").asInt() : -1;
         this.maxUses = data.has("max_uses") ? data.get("max_uses").asInt() : -1;
@@ -259,7 +255,7 @@ public class InviteImpl implements RichInvite {
         try {
             return Optional.of(new IconImpl(
                     api, new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/icons/"
-                                 + Long.toUnsignedString(getServerId()) + "/" + serverIcon + ".png")));
+                    + Long.toUnsignedString(getServerId()) + "/" + serverIcon + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();
@@ -274,7 +270,7 @@ public class InviteImpl implements RichInvite {
         try {
             return Optional.of(new IconImpl(
                     api, new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/splashes/"
-                                 + Long.toUnsignedString(getServerId()) + "/" + serverSplash + ".png")));
+                    + Long.toUnsignedString(getServerId()) + "/" + serverSplash + ".png")));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the icon is malformed! Please contact the developer!", e);
             return Optional.empty();

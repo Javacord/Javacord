@@ -17,8 +17,8 @@ import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.connection.LostConnectionEvent;
 import org.javacord.api.event.connection.ReconnectEvent;
 import org.javacord.api.event.connection.ResumeEvent;
@@ -80,7 +80,6 @@ import org.javacord.core.util.logging.WebSocketLogger;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
@@ -616,7 +615,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                         || !api.isWaitingForUsersOnStartup()
                                         || api.getAllServers().stream()
                                         .map(ServerImpl.class::cast)
-                                        .noneMatch(server -> server.getMemberCount() != server.getRealMembers().size());
+                                        .allMatch(server -> server.getMemberCount() == server.getMembers().size());
                             }
                             if (sameUnavailableServerCounter > 1000
                                     && lastGuildMembersChunkReceived + 5000 < System.currentTimeMillis()) {
@@ -794,12 +793,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             }
             server = channel.getServer();
         }
-        User yourself = api.getYourself();
+        Member yourself = server.getMemberById(api.getClientId())
+                .orElseThrow(() -> new IllegalStateException("Bot member has not been cached"));
         updateVoiceStatePacket.putObject("d")
                 .put("guild_id", server.getIdAsString())
                 .put("channel_id", (channel == null) ? null : channel.getIdAsString())
-                .put("self_mute", (selfMuted == null) ? server.isSelfMuted(yourself) : selfMuted)
-                .put("self_deaf", (selfDeafened == null) ? server.isSelfDeafened(yourself) : selfDeafened);
+                .put("self_mute", (selfMuted == null) ? yourself.isSelfMuted() : selfMuted)
+                .put("self_deaf", (selfDeafened == null) ? yourself.isSelfDeafened() : selfDeafened);
         logger.debug("Sending VOICE_STATE_UPDATE packet for {} on {}", channel, server);
         sendTextFrame(updateVoiceStatePacket.toString());
     }
