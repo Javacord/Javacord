@@ -17,6 +17,11 @@ public class EventUpdater {
     public EventUpdater(Server server, ScheduledEvent event) {
         delegate = DelegateFactory.createEventUpdaterDelegate(server, event);
     }
+
+    public EventUpdater setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
     
     public EventUpdater setChannel(long channelId) {
         delegate.setChannel(channelId);
@@ -108,7 +113,7 @@ public class EventUpdater {
         return this;
     }
 
-    CompletableFuture<Void> update() {
+    CompletableFuture<ScheduledEvent> update() {
         return delegate.update();
     }
 }
