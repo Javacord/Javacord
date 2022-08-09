@@ -162,7 +162,7 @@ public enum Intent {
     DIRECT_MESSAGE_TYPING(14, false),
 
     /**
-     * This is required to receive non-empty values for content fields (content, attachments, embeds, and components).
+     * This is required to receive non-empty values for content fields (content, attachments, embeds and components).
      *
      * <p>This doesn't apply for DMs, messages your bot sends, or messages in which your bot is mentioned.
      *

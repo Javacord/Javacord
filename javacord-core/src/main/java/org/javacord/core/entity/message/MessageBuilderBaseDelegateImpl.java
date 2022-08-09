@@ -205,12 +205,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     public void setContent(String content, boolean keepAttachments) {
         strBuilder.setLength(0);
         strBuilder.append(content);
-        if (keepAttachments) {
-            contentChanged = true;
-        } else {
+        if (!keepAttachments) {
             attachments.clear();
             attachmentsChanged = true;
         }
+        contentChanged = true;
     }
 
     @Override
