@@ -45,7 +45,7 @@ public enum BotInviteScope {
     }
 
     /**
-     * Gets the query paramater value for this scope.
+     * Gets the query parameter value for this scope.
      *
      * @return The parameter for the query value of this scope.
      */
