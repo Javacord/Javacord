@@ -403,11 +403,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Updates the content of the message.
      *
      * @param content The new content of the message.
-     * @param attachmentToKeep The attachment to keep.
+     * @param attachment The attachment to keep or the new ones.
+     * @param newOrKeep weather you are adding new attachments
+     *                  or keeping attachment
      * @return A future to check if the update was successful.
      */
-    default CompletableFuture<Message> edit(String content, Collection<Attachment> attachmentToKeep) {
-        return new MessageUpdater(this).setContent(content, attachmentToKeep).applyChanges();
+    default CompletableFuture<Message> edit(String content, Collection<Attachment> attachment, boolean newOrKeep) {
+        return new MessageUpdater(this).setContent(content, attachment, newOrKeep).applyChanges();
     }
 
     /**
@@ -415,7 +417,7 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      *
      * @param content The new content of the message.
      * @param keepAttachments Used to tell discord if you want to keep
-     *                        the attachments in the messgae.
+     *                        the attachments in the message.
      *
      * @return A future to check if the update was successful.
      */

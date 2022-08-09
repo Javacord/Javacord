@@ -202,27 +202,48 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void setContent(String content, Collection<Attachment> attachmentsToKeep) {
+    public void setContent(String content, Collection<Attachment> attachments, boolean newOrKeep) {
         strBuilder.setLength(0);
         strBuilder.append(content);
 
-        for (Attachment attachment : attachmentsToKeep) {
-            try {
-                InputStream input = attachment.asInputStream();
+        if (newOrKeep == false) {
+            for (Attachment attachment : attachments) {
+                try {
+                    InputStream input = attachment.asInputStream();
 
-                if (input == null) {
-                    logger.warn("Attachment input stream is null");
-                    return;
+                    if (input == null) {
+                        logger.warn("Attachment input stream is null");
+                        return;
+                    }
+
+                    FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
+
+                    this.attachments.add(fileContainer);
+
+                    attachmentsChanged = true;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+            }
+        } else {
+            this.attachments.clear();
+            for (Attachment attachment : attachments) {
+                try {
+                    InputStream input = attachment.asInputStream();
 
-                FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
+                    if (input == null) {
+                        logger.warn("Attachment input stream is null");
+                        return;
+                    }
 
-                //TODO: attachments being stored is a known bug.
-                attachments.add(fileContainer);
+                    FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
 
-                attachmentsChanged = true;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                    this.attachments.add(fileContainer);
+
+                    attachmentsChanged = true;
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         contentChanged = true;

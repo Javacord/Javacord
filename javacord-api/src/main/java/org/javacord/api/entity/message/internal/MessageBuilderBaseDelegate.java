@@ -109,9 +109,11 @@ public interface MessageBuilderBaseDelegate {
      * used to choose the attachments to keep.
      *
      * @param content The new content of the message.
-     * @param attachmentToKeep The attachment to keep.
+     * @param attachment The attachment to keep or the new ones.
+     * @param newOrKeep weather you are adding new attachments
+     *                  or keeping attachment
      */
-    void setContent(String content, Collection<Attachment> attachmentToKeep);
+    void setContent(String content, Collection<Attachment> attachment, boolean newOrKeep);
 
     /**
      * Sets the content of the message and used to tell discord

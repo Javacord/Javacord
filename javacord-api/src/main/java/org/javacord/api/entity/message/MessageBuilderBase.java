@@ -176,11 +176,13 @@ abstract class MessageBuilderBase<T> {
      * used to choose which attachments to keep.
      *
      * @param content The new content of the message.
-     * @param attachmentToKeep The attachments to keep.
+     * @param attachment The attachment to keep or the new ones.
+     * @param newOrKeep weather you are adding new attachments
+     *                  or keeping attachment
      * @return The current instance in order to chain call methods.
      */
-    public T setContent(String content, Collection<Attachment> attachmentToKeep) {
-        delegate.setContent(content, attachmentToKeep);
+    public T setContent(String content, Collection<Attachment> attachment, boolean newOrKeep) {
+        delegate.setContent(content, attachment, newOrKeep);
         return myClass.cast(this);
     }
 
