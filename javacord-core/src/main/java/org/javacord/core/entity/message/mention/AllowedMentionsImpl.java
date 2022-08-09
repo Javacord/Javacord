@@ -18,19 +18,24 @@ public class AllowedMentionsImpl implements AllowedMentions {
 
     private final EnumSet<AllowedMentionType> allowedMentionTypes = EnumSet.noneOf(AllowedMentionType.class);
 
+    private final boolean mentionRepliedUser;
+
     /**
      * Creates a new mention.
      *
      * @param mentionAllRoles        Whether it mentions all roles.
      * @param mentionAllUsers        Whether it mentions all users.
      * @param mentionEveryoneAndHere Whether it mentions @everyone and @here.
+     * @param mentionRepliedUser     Whether it mentions the replied user.
      * @param allowedRoleMentions    Mentions added role ids.
      * @param allowedUserMentions    Mentions added user ids.
      */
     public AllowedMentionsImpl(boolean mentionAllRoles, boolean mentionAllUsers, boolean mentionEveryoneAndHere,
-                               HashSet<Long> allowedRoleMentions, HashSet<Long> allowedUserMentions) {
+                               boolean mentionRepliedUser, HashSet<Long> allowedRoleMentions,
+                               HashSet<Long> allowedUserMentions) {
         this.allowedRoleMentions = allowedRoleMentions;
         this.allowedUserMentions = allowedUserMentions;
+        this.mentionRepliedUser = mentionRepliedUser;
         if (mentionAllRoles) {
             allowedMentionTypes.add(AllowedMentionType.ROLES);
         }
@@ -55,6 +60,11 @@ public class AllowedMentionsImpl implements AllowedMentions {
     @Override
     public EnumSet<AllowedMentionType> getMentionTypes() {
         return allowedMentionTypes;
+    }
+
+    @Override
+    public boolean getMentionRepliedUser() {
+        return mentionRepliedUser;
     }
 
     /**
@@ -95,6 +105,8 @@ public class AllowedMentionsImpl implements AllowedMentions {
         if (allowedMentionTypes.contains(AllowedMentionType.EVERYONE)) {
             parse.add("everyone");
         }
+
+        object.put("replied_user", mentionRepliedUser);
 
         return object;
     }
