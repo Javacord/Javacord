@@ -171,8 +171,30 @@ abstract class MessageBuilderBase<T> {
         return myClass.cast(this);
     }
 
+    /**
+     * Sets the content of the message and
+     * used to choose which attachments to keep.
+     *
+     * @param content The new content of the message.
+     * @param attachmentToKeep The attachments to keep.
+     * @return The current instance in order to chain call methods.
+     */
     public T setContent(String content, Collection<Attachment> attachmentToKeep) {
         delegate.setContent(content, attachmentToKeep);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Sets the content of the message and
+     * used to remove all attachments.
+     *
+     * @param content The new content of the message.
+     * @param keepAttachments Whether to keep all attachments.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public T setContent(String content, boolean keepAttachments) {
+        delegate.setContent(content, keepAttachments);
         return myClass.cast(this);
     }
 

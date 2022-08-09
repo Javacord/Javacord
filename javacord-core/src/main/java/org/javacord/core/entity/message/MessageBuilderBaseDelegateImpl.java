@@ -205,8 +205,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     public void setContent(String content, Collection<Attachment> attachmentsToKeep) {
         strBuilder.setLength(0);
         strBuilder.append(content);
-        logger.debug("Current attachments: {}", this.attachments.size());
-        logger.debug("Attachments to keep: {}", attachmentsToKeep.size());
 
         for (Attachment attachment : attachmentsToKeep) {
             try {
@@ -228,6 +226,18 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
             }
         }
         contentChanged = true;
+    }
+
+    @Override
+    public void setContent(String content, boolean keepAttachments) {
+        strBuilder.setLength(0);
+        strBuilder.append(content);
+        if (keepAttachments) {
+            contentChanged = true;
+        } else {
+            attachments.clear();
+            attachmentsChanged = true;
+        }
     }
 
     @Override

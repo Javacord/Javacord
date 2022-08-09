@@ -411,6 +411,20 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Updates the content of the message.
+     *
+     * @param content The new content of the message.
+     * @param keepAttachments Used to tell discord if you want to keep
+     *                        the attachments in the messgae.
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(String content, boolean keepAttachments) {
+        return new MessageUpdater(this).setContent(content, keepAttachments).applyChanges();
+    }
+
+
+    /**
      * Updates the embed of the message.
      *
      * @param embeds An array of the new embeds of the message.
