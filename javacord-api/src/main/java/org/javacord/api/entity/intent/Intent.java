@@ -159,7 +159,19 @@ public enum Intent {
      *     <li>TYPING_START</li>
      * </ul>
      */
-    DIRECT_MESSAGE_TYPING(14, false);
+    DIRECT_MESSAGE_TYPING(14, false),
+
+    /**
+     * The following events are received.
+     * <ul>
+     *     <li>GUILD_SCHEDULED_EVENT_CREATE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_UPDATE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_DELETE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_ADD</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_REMOVE</li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENTS(16, false);
 
     private final int id;
 
