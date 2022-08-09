@@ -141,6 +141,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
+    private String resumeUrl = null;
 
     private volatile boolean reconnect;
 
@@ -372,7 +373,15 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private void connect() {
         try {
             WebSocketFactory factory = new WebSocketFactory();
-            String webSocketUri = getGateway(api) + "?encoding=json&v=" + Javacord.DISCORD_GATEWAY_VERSION;
+            String webSocketUri;
+
+            if (sessionId == null) {
+                webSocketUri = getGateway(api) + "?encoding=json&v="
+                        + Javacord.DISCORD_GATEWAY_VERSION;
+            } else {
+                webSocketUri = (resumeUrl != null ? resumeUrl : getGateway(api)) + "?encoding=json&v="
+                        + Javacord.DISCORD_GATEWAY_VERSION;
+            }
             Proxy proxy = api.getProxy().orElseGet(() -> {
                 List<Proxy> proxies = api.getProxySelector().orElseGet(ProxySelector::getDefault).select(URI.create(
                         webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
@@ -459,6 +468,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             }
             websocket.connect();
         } catch (Throwable t) {
+            resumeUrl = null;
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
                 reconnectingOrResumingLock.lock();
@@ -581,6 +591,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                         reconnectingOrResumingLock.unlock();
                     }
                     sessionId = packet.get("d").get("session_id").asText();
+                    resumeUrl = packet.get("d").hasNonNull("resume_gateway_url")
+                            ? packet.get("d").get("resume_gateway_url").asText() : null;
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("Startup Servers Wait Thread").submit(() -> {
                         boolean allUsersLoaded = false;
