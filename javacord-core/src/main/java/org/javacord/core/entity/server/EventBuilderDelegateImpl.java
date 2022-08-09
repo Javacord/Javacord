@@ -161,13 +161,15 @@ public class EventBuilderDelegateImpl implements EventBuilderDelegate {
                         + Base64.getEncoder().encodeToString(bytes);
                 body.put("image", base64Icon);
             }).thenCompose(aVoid -> new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.POST, RestEndpoint.EVENT)
+                    .setUrlParameters(String.valueOf(server.getId()))
                     .setBody(body)
                     .setAuditLogReason(reason)
-                    .execute(result -> new ScheduledEventImpl(server, result.getJsonBody())));
+                    .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody())));
         }
         return new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.POST, RestEndpoint.EVENT)
+                .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
                 .setAuditLogReason(reason)
-                .execute(result -> new ScheduledEventImpl(server, result.getJsonBody()));
+                .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody()));
     }
 }
