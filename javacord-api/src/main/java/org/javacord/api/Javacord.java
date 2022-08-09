@@ -90,7 +90,7 @@ public class Javacord {
      * A list with all gateway versions can be found
      * <a href="https://discord.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
      */
-    public static final String DISCORD_GATEWAY_VERSION = "9";
+    public static final String DISCORD_GATEWAY_VERSION = "10";
 
     /**
      * The voice gateway version from Discord which we are using.
@@ -104,7 +104,7 @@ public class Javacord {
      * A list with all API versions can be found
      * <a href="https://discord.com/developers/docs/reference#api-versioning-api-versions">here</a>.
      */
-    public static final String DISCORD_API_VERSION = "9";
+    public static final String DISCORD_API_VERSION = "10";
 
     private Javacord() {
         throw new UnsupportedOperationException();
