@@ -152,16 +152,32 @@ publishing {
 }
 
 subprojects {
-    tasks.register("configureJavadoc") {
-        doLast {
-            tasks.javadoc {
-                options.windowTitle = "Javacord $version (${project.ext.get("shortName")})"
-                title = options.windowTitle
+    tasks.withType<Javadoc>().configureEach {
+        options {
+            this as StandardJavadocDocletOptions
+            locale = "en"
+            encoding = "UTF-8"
+            docTitle = "Javacord ${project.version} (${project.property("shortName")})"
+            windowTitle = "$docTitle Documentation"
+            links("https://docs.oracle.com/javase/8/docs/api/")
+            isUse = true
+            isVersion = true
+            isAuthor = true
+            isSplitIndex = true
+
+            val toolchain = javadocTool
+                .map { JavaVersion.toVersion(it.metadata.languageVersion) }
+                .orElse(provider { JavaVersion.current() })
+                .get()
+            if (toolchain.isJava9Compatible) {
+                addBooleanOption("html5", true)
+                addStringOption("-release", java.targetCompatibility.majorVersion)
+                if (toolchain.isJava11Compatible) {
+                    addBooleanOption("-no-module-directories", true)
+                }
+            } else {
+                source = java.sourceCompatibility.toString()
             }
         }
-    }
-
-    tasks.javadoc {
-        dependsOn("configureJavadoc")
     }
 }
