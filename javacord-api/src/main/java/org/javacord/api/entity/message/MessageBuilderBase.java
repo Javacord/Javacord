@@ -172,23 +172,8 @@ abstract class MessageBuilderBase<T> {
     }
 
     /**
-     * Sets the content of the message and
-     * used to choose which attachments to keep.
-     *
-     * @param content The new content of the message.
-     * @param attachment The attachment to keep or the new ones.
-     * @param newOrKeep weather you are adding new attachments
-     *                  or keeping attachment
-     * @return The current instance in order to chain call methods.
-     */
-    public T setContent(String content, Collection<Attachment> attachment, boolean newOrKeep) {
-        delegate.setContent(content, attachment, newOrKeep);
-        return myClass.cast(this);
-    }
-
-    /**
-     * Sets the content of the message and
-     * used to remove all attachments.
+     * Sets the content of the message and used to remove all
+     * attachments.
      *
      * @param content The new content of the message.
      * @param keepAttachments Whether to keep all attachments.
@@ -197,6 +182,22 @@ abstract class MessageBuilderBase<T> {
      */
     public T setContent(String content, boolean keepAttachments) {
         delegate.setContent(content, keepAttachments);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Sets the content of the message and used to keep and
+     * add new attachments.
+     *
+     * @param content The new content of the message.
+     * @param keepAttachments Used to tell discord if you want to keep
+     *                        the attachments in the message.
+     * @param newAttachments New Attachments you want to add to the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public T setContent(String content, Collection<Attachment> keepAttachments, Collection<Attachment> newAttachments) {
+        delegate.setContent(content, keepAttachments, newAttachments);
         return myClass.cast(this);
     }
 

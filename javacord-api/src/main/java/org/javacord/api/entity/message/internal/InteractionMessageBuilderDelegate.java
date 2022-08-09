@@ -53,12 +53,32 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * Edit the message the component was attached to.
      *
      * @param interaction The interaction.
+     * @return The completable future to determine if the message was updated.
+     */
+    //TODO: implement this
+    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction);
+
+    /**
+     * Edit the message the component was attached to.
+     *
+     * @param interaction The interaction.
      * @param attachmentsToKeep used to keep specific attachments, and remove the others.
      * @param addNewAttachments used to add new attachments.
      * @return The completable future to determine if the message was updated.
      */
     CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachmentsToKeep,
                                                   List<Attachment> addNewAttachments);
+
+    /**
+     * Edit the message the component was attached to.
+     *
+     * @param interaction The interaction.
+     * @param keepAttachments Used to tell discord if you want to keep
+     *                        the attachments in the message.
+     * @return The completable future to determine if the message was updated.
+     */
+    //TODO: implement this method
+    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, boolean keepAttachments);
 
     /**
      * Delete a follow-up message.

@@ -202,54 +202,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void setContent(String content, Collection<Attachment> attachments, boolean newOrKeep) {
-        strBuilder.setLength(0);
-        strBuilder.append(content);
-
-        if (newOrKeep == false) {
-            for (Attachment attachment : attachments) {
-                try {
-                    InputStream input = attachment.asInputStream();
-
-                    if (input == null) {
-                        logger.warn("Attachment input stream is null");
-                        return;
-                    }
-
-                    FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
-
-                    this.attachments.add(fileContainer);
-
-                    attachmentsChanged = true;
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        } else {
-            this.attachments.clear();
-            for (Attachment attachment : attachments) {
-                try {
-                    InputStream input = attachment.asInputStream();
-
-                    if (input == null) {
-                        logger.warn("Attachment input stream is null");
-                        return;
-                    }
-
-                    FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
-
-                    this.attachments.add(fileContainer);
-
-                    attachmentsChanged = true;
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        contentChanged = true;
-    }
-
-    @Override
     public void setContent(String content, boolean keepAttachments) {
         strBuilder.setLength(0);
         strBuilder.append(content);
@@ -258,6 +210,50 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         } else {
             attachments.clear();
             attachmentsChanged = true;
+        }
+    }
+
+    @Override
+    public void setContent(String content, Collection<Attachment> keepAttachments,
+                           Collection<Attachment> newAttachments) {
+        strBuilder.setLength(0);
+        strBuilder.append(content);
+
+        if (keepAttachments != null) {
+            forAttachment(keepAttachments);
+        }
+
+        if (newAttachments != null) {
+            this.attachments.clear();
+            forAttachment(newAttachments);
+        }
+
+        contentChanged = true;
+    }
+
+    /**
+     * Used in setContent to avoid duplicated code.
+     *
+     * @param attachments The attachments to add or keep.
+     */
+    private void forAttachment(Collection<Attachment> attachments) {
+        for (Attachment attachment : attachments) {
+            try {
+                InputStream input = attachment.asInputStream();
+
+                if (input == null) {
+                    logger.warn("Attachment input stream is null");
+                    return;
+                }
+
+                FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
+
+                this.attachments.add(fileContainer);
+
+                attachmentsChanged = true;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

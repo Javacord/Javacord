@@ -86,6 +86,12 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     }
 
     @Override
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
+        //TODO: Implement this
+        return null;
+    }
+
+    @Override
     public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> keepAttachments,
                                                          List<Attachment> newAttachments) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
@@ -121,6 +127,12 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         }
 
         return request.execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, boolean keepAttachments) {
+        //TODO: Implement this
+        return null;
     }
 
     private void keepAttachments(List<FileContainer> tempAttachments, List<Attachment> attachmentsToKeep,

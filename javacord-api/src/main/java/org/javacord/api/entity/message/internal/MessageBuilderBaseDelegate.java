@@ -105,17 +105,6 @@ public interface MessageBuilderBaseDelegate {
     void setContent(String content);
 
     /**
-     * Sets the content of the message and
-     * used to choose the attachments to keep.
-     *
-     * @param content The new content of the message.
-     * @param attachment The attachment to keep or the new ones.
-     * @param newOrKeep weather you are adding new attachments
-     *                  or keeping attachment
-     */
-    void setContent(String content, Collection<Attachment> attachment, boolean newOrKeep);
-
-    /**
      * Sets the content of the message and used to tell discord
      * if you want to keep the attachments.
      *
@@ -123,6 +112,18 @@ public interface MessageBuilderBaseDelegate {
      * @param keepAttachments Whether to keep the attachments.
      */
     void setContent(String content, boolean keepAttachments);
+
+
+    /**
+     * Sets the content of the message and used to keep and
+     * add new attachments.
+     *
+     * @param content The new content of the message.
+     * @param keepAttachments Used to tell discord if you want to keep
+     *                        the attachments in the message.
+     * @param newAttachments New Attachments you want to add to the message.
+     */
+    void setContent(String content, Collection<Attachment> keepAttachments, Collection<Attachment> newAttachments);
 
     /**
      * Adds the embed to the message.
