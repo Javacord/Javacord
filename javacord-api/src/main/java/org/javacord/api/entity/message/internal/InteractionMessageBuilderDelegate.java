@@ -1,11 +1,9 @@
 package org.javacord.api.entity.message.internal;
 
-import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.interaction.InteractionBase;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDelegate {
@@ -45,7 +43,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * Sends the message as a followup message.
      *
      * @param interaction The interaction.
-     * @return The message that was sent.
+     * @return The sent message.
      */
     CompletableFuture<Message> sendFollowupMessage(InteractionBase interaction);
 
@@ -55,37 +53,15 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * @param interaction The interaction.
      * @return The completable future to determine if the message was updated.
      */
-    //TODO: implement this
     CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction);
 
-    /**
-     * Edit the message the component was attached to.
-     *
-     * @param interaction The interaction.
-     * @param attachmentsToKeep used to keep specific attachments, and remove the others.
-     * @param addNewAttachments used to add new attachments.
-     * @return The completable future to determine if the message was updated.
-     */
-    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> attachmentsToKeep,
-                                                  List<Attachment> addNewAttachments);
-
-    /**
-     * Edit the message the component was attached to.
-     *
-     * @param interaction The interaction.
-     * @param keepAttachments Used to tell discord if you want to keep
-     *                        the attachments in the message.
-     * @return The completable future to determine if the message was updated.
-     */
-    //TODO: implement this method
-    CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, boolean keepAttachments);
 
     /**
      * Delete a follow-up message.
      *
      * @param interaction The interaction.
      * @param messageId   The message id of the followup message which should be edited.
-     * @return The message that was sent.
+     * @return The sent message.
      */
     CompletableFuture<Void> deleteFollowupMessage(InteractionBase interaction, String messageId);
 
@@ -94,7 +70,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      *
      * @param interaction The interaction.
      * @param messageId   The message id of the followup message which should be edited.
-     * @return The message that was sent.
+     * @return The sent message.
      */
     CompletableFuture<Message> editFollowupMessage(InteractionBase interaction, String messageId);
 

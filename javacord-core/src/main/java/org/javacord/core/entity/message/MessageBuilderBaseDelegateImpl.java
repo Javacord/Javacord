@@ -28,6 +28,7 @@ import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.AttachmentImpl;
 import org.javacord.core.entity.message.component.ComponentImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
@@ -40,7 +41,6 @@ import org.javacord.core.util.rest.RestRequest;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -96,7 +96,17 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * All attachments which should be added to the message.
      */
-    protected final List<FileContainer> attachments = new ArrayList<>();
+    protected final List<FileContainer> newAttachments = new ArrayList<>();
+
+    /**
+     * The current attachments of the message.
+     */
+    protected boolean keepAttachments = true;
+
+    /**
+     * All the attachments that should be kept in the message.
+     */
+    protected final List<Attachment> attachmentsToKeep = new ArrayList<>();
 
     /**
      * True if the attachments have been changed by the user.
@@ -199,61 +209,19 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         strBuilder.setLength(0);
         strBuilder.append(content);
         contentChanged = true;
+        keepAttachments = true;
     }
 
     @Override
-    public void setContent(String content, boolean keepAttachments) {
-        strBuilder.setLength(0);
-        strBuilder.append(content);
-        if (!keepAttachments) {
-            attachments.clear();
-            attachmentsChanged = true;
-        }
-        contentChanged = true;
+    public void removeAllAttachments() {
+        keepAttachments = false;
     }
 
     @Override
-    public void setContent(String content, Collection<Attachment> keepAttachments,
-                           Collection<Attachment> newAttachments) {
-        strBuilder.setLength(0);
-        strBuilder.append(content);
-
-        if (keepAttachments != null) {
-            forAttachment(keepAttachments);
-        }
-
-        if (newAttachments != null) {
-            this.attachments.clear();
-            forAttachment(newAttachments);
-        }
-
-        contentChanged = true;
-    }
-
-    /**
-     * Used in setContent to avoid duplicated code.
-     *
-     * @param attachments The attachments to add or keep.
-     */
-    private void forAttachment(Collection<Attachment> attachments) {
-        for (Attachment attachment : attachments) {
-            try {
-                InputStream input = attachment.asInputStream();
-
-                if (input == null) {
-                    logger.warn("Attachment input stream is null");
-                    return;
-                }
-
-                FileContainer fileContainer = new FileContainer(input, attachment.getFileName());
-
-                this.attachments.add(fileContainer);
-
-                attachmentsChanged = true;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public void setAttachmentsToKeep(Collection<Attachment> keepAttachmentsCollection) {
+        //as in setContent we keep all attachments, were as here we only keep the ones that are in the list
+        attachmentsToKeep.addAll(keepAttachmentsCollection);
+        keepAttachments = true;
     }
 
     @Override
@@ -336,12 +304,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void removeAllAttachments() {
-        attachments.clear();
-        attachmentsChanged = true;
-    }
-
-    @Override
     public void setTts(boolean tts) {
         this.tts = tts;
     }
@@ -351,7 +313,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (image == null || fileName == null) {
             throw new IllegalArgumentException("image and fileName cannot be null!");
         }
-        attachments.add(new FileContainer(image, fileName));
+        newAttachments.add(new FileContainer(image, fileName));
         attachmentsChanged = true;
     }
 
@@ -360,7 +322,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        attachments.add(new FileContainer(file));
+        newAttachments.add(new FileContainer(file));
         attachmentsChanged = true;
     }
 
@@ -369,7 +331,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        attachments.add(new FileContainer(icon));
+        newAttachments.add(new FileContainer(icon));
         attachmentsChanged = true;
     }
 
@@ -378,7 +340,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        attachments.add(new FileContainer(url));
+        newAttachments.add(new FileContainer(url));
         attachmentsChanged = true;
     }
 
@@ -387,7 +349,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (bytes == null || fileName == null) {
             throw new IllegalArgumentException("bytes and fileName cannot be null!");
         }
-        attachments.add(new FileContainer(bytes, fileName));
+        newAttachments.add(new FileContainer(bytes, fileName));
         attachmentsChanged = true;
     }
 
@@ -396,7 +358,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (stream == null || fileName == null) {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
-        attachments.add(new FileContainer(stream, fileName));
+        newAttachments.add(new FileContainer(stream, fileName));
         attachmentsChanged = true;
     }
 
@@ -405,7 +367,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        attachments.add(new FileContainer(file, true));
+        newAttachments.add(new FileContainer(file, true));
         attachmentsChanged = true;
     }
 
@@ -414,7 +376,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        attachments.add(new FileContainer(icon, true));
+        newAttachments.add(new FileContainer(icon, true));
         attachmentsChanged = true;
     }
 
@@ -423,7 +385,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        attachments.add(new FileContainer(url, true));
+        newAttachments.add(new FileContainer(url, true));
         attachmentsChanged = true;
     }
 
@@ -562,11 +524,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                         .consumeGlobalRatelimit(false)
                         .includeAuthorizationHeader(false);
         CompletableFuture<Message> future = new CompletableFuture<>();
-        if (!attachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
+        if (!newAttachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             // We access files etc. so this should be async
             api.getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                     // Add the attachments required for the embeds
                     for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
@@ -637,6 +599,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
+        if (keepAttachments) {
+            prepareAttachments(message.getAttachments(), body);
+        } else {
+            body.set("attachments", JsonNodeFactory.instance.objectNode().arrayNode());
+        }
+
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(message.getChannel().getId()),
@@ -645,7 +613,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (updateAll || attachmentsChanged) {
             return checkForAttachmentsAndExecuteRequest(message.getChannel(), body, request, true);
         } else {
-            return executeRequestWithoutAttachments(message.getChannel(), body, request);
+            return executeRequestWithoutNewAttachments(message.getChannel(), body, request);
         }
     }
 
@@ -657,18 +625,18 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                                                                             ObjectNode body,
                                                                             RestRequest<Message> request,
                                                                             boolean clearAttachmentsIfAppropriate) {
-        if (attachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
-            if (clearAttachmentsIfAppropriate) {
+        if (newAttachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
+            if (attachmentsToKeep.isEmpty() && clearAttachmentsIfAppropriate) {
                 body.set("attachments", JsonNodeFactory.instance.objectNode().arrayNode());
             }
-            return executeRequestWithoutAttachments(channel, body, request);
+            return executeRequestWithoutNewAttachments(channel, body, request);
         }
 
         CompletableFuture<Message> future = new CompletableFuture<>();
         // We access files etc. so this should be async
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
-                List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                 // Add the attachments required for the embeds
                 for (EmbedBuilder embed : embeds) {
                     tempAttachments.addAll(
@@ -693,7 +661,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         return future;
     }
 
-    private CompletableFuture<Message> executeRequestWithoutAttachments(TextChannel channel,
+    private CompletableFuture<Message> executeRequestWithoutNewAttachments(TextChannel channel,
                                                                         ObjectNode body,
                                                                         RestRequest<Message> request) {
         request.setBody(body);
@@ -704,6 +672,26 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     private void prepareAllowedMentions(ObjectNode body) {
         if (allowedMentions != null) {
             ((AllowedMentionsImpl) allowedMentions).toJsonNode(body.putObject("allowed_mentions"));
+        }
+    }
+
+    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
+        ArrayNode attachments = body.putArray("attachments");
+
+        if (!attachmentsToKeep.isEmpty() && !attachmentsList.isEmpty()) {
+            for (Attachment attachment : attachmentsList) {
+                if (attachmentsList.contains(attachment.getId())) {
+                    attachments.add(((AttachmentImpl) attachment).toJsonNode());
+                }
+            }
+        } else if (!attachmentsList.isEmpty()) {
+            for (MessageAttachment attachment : attachmentsList) {
+                attachments.add(((AttachmentImpl) attachment).toJsonNode());
+            }
+        } else if (!attachmentsToKeep.isEmpty()) {
+            for (Attachment attachment : attachmentsToKeep) {
+                attachments.add(((AttachmentImpl) attachment).toJsonNode());
+            }
         }
     }
 

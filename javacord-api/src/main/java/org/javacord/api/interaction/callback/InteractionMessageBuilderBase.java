@@ -1,11 +1,14 @@
 package org.javacord.api.interaction.callback;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
+
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -70,6 +73,31 @@ public interface InteractionMessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     T setContent(String content);
+
+    /**
+     * Removes all attachments from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    T removeAllAttachments();
+
+    /**
+     * Used to specify which attachments should be kept
+     * when editing the message.
+     *
+     * @param attachments The attachments to keep.
+     * @return The current instance in order to chain call methods.
+     */
+    T setAttachmentsToKeep(Attachment... attachments);
+
+    /**
+     * Used to specify which attachments should be kept
+     * when editing the message.
+     *
+     * @param attachments The attachments to keep.
+     * @return The current instance in order to chain call methods.
+     */
+    T setAttachmentsToKeep(Collection<Attachment> attachments);
 
     /**
      * Adds the embed to the message.

@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -103,13 +104,10 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
      * Update the message the components were attached to.
      *
      * @param interaction The original interaction.
-     * @param keepAttachments used to keep specific attachments, and remove the others.
-     * @param newAttachments used to add new attachments.
      * @return The completable future to determine if the message was updated.
      */
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> keepAttachments,
-                                                         List<Attachment> newAttachments) {
-        return delegate.updateOriginalMessage(interaction, keepAttachments, newAttachments);
+    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
+        return delegate.updateOriginalMessage(interaction);
     }
 
     /**
@@ -172,6 +170,24 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     @Override
     public InteractionMessageBuilder setContent(String content) {
         delegate.setContent(content);
+        return this;
+    }
+
+    @Override
+    public InteractionMessageBuilder removeAllAttachments() {
+        delegate.removeAllAttachments();
+        return this;
+    }
+
+    @Override
+    public InteractionMessageBuilder setAttachmentsToKeep(Attachment... attachments) {
+        delegate.setAttachmentsToKeep(Arrays.asList(attachments));
+        return this;
+    }
+
+    @Override
+    public InteractionMessageBuilder setAttachmentsToKeep(Collection<Attachment> attachments) {
+        delegate.setAttachmentsToKeep(attachments);
         return this;
     }
 

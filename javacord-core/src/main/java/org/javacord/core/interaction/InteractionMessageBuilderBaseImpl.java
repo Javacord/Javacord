@@ -1,5 +1,6 @@
 package org.javacord.core.interaction;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
@@ -10,6 +11,7 @@ import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.interaction.callback.InteractionMessageBuilderBase;
 import org.javacord.api.util.internal.DelegateFactory;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -75,6 +77,24 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     @Override
     public T setContent(String content) {
         delegate.setContent(content);
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T removeAllAttachments() {
+        delegate.removeAllAttachments();
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T setAttachmentsToKeep(Attachment... attachments) {
+        delegate.setAttachmentsToKeep(Arrays.asList(attachments));
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T setAttachmentsToKeep(Collection<Attachment> attachments) {
+        delegate.setAttachmentsToKeep(attachments);
         return myClass.cast(this);
     }
 

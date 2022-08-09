@@ -2,7 +2,6 @@ package org.javacord.core.entity.message;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -15,9 +14,6 @@ import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -87,13 +83,6 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
 
     @Override
     public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
-        //TODO: Implement this
-        return null;
-    }
-
-    @Override
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, List<Attachment> keepAttachments,
-                                                         List<Attachment> newAttachments) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         ObjectNode data = JsonNodeFactory.instance.objectNode();
         prepareCommonWebhookMessageBodyParts(data);
@@ -101,67 +90,13 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         topBody.put("type", InteractionCallbackType.UPDATE_MESSAGE.getId());
         topBody.set("data", data);
 
-        RestRequest<Void> request = new RestRequest<Void>(interaction.getApi(),
+        return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
                 .consumeGlobalRatelimit(false)
                 .includeAuthorizationHeader(false)
-                .setBody(topBody);
-
-        List<FileContainer> tempAttachments = new ArrayList<>(attachments);
-
-        if (keepAttachments == null && newAttachments == null && !attachments.isEmpty()) {
-            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
-        } else if (keepAttachments != null && newAttachments != null) {
-            keepAttachments(tempAttachments, keepAttachments, null);
-            addNewAttachments(tempAttachments, newAttachments);
-            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
-        } else if (keepAttachments != null) {
-            keepAttachments(tempAttachments, keepAttachments, null);
-            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
-        } else if (newAttachments != null) {
-            addNewAttachments(tempAttachments, newAttachments);
-            addMultipartBodyToRequest(request, topBody, tempAttachments, request.getApi());
-        } else {
-            request.setBody(topBody);
-        }
-
-        return request.execute(result -> null);
-    }
-
-    @Override
-    public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction, boolean keepAttachments) {
-        //TODO: Implement this
-        return null;
-    }
-
-    private void keepAttachments(List<FileContainer> tempAttachments, List<Attachment> attachmentsToKeep,
-                                 InputStream stream) {
-        for (Attachment attachment : attachmentsToKeep) {
-            try {
-                stream = attachment.asInputStream();
-
-                FileContainer attachmentFile = new FileContainer(stream, attachment.getFileName());
-
-                //remove all the attachments that are not in the attachmentsToKeep list
-                tempAttachments.removeIf(fileContainer -> !fileContainer.equals(attachmentFile));
-                tempAttachments.add(attachmentFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void addNewAttachments(List<FileContainer> tempAttachments, List<Attachment> addNewAttachments) {
-        for (Attachment attachment : addNewAttachments) {
-            try {
-                InputStream stream = attachment.asInputStream();
-                FileContainer attachmentFile = new FileContainer(stream, attachment.getFileName());
-                tempAttachments.add(attachmentFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+                .setBody(topBody)
+                .execute(result -> null);
     }
 
     @Override
@@ -212,12 +147,12 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
 
     private CompletableFuture<Message> checkForAttachmentsAndExecuteRequest(RestRequest<Message> request,
                                                                             ObjectNode body) {
-        if (!attachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
+        if (!newAttachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
             request.getApi().getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                     // Add the attachments required for the embed
                     for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
@@ -227,9 +162,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                     addMultipartBodyToRequest(request, body, tempAttachments, request.getApi());
 
                     request.execute(result -> request.getApi().getOrCreateMessage(
-                            request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
-                                    .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
-                            result.getJsonBody()))
+                                    request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
+                                            .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
+                                    result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
                                 if (throwable != null) {
                                     future.completeExceptionally(throwable);

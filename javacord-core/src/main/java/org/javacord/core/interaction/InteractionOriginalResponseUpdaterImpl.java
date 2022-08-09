@@ -1,5 +1,6 @@
 package org.javacord.core.interaction;
 
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
@@ -92,6 +94,19 @@ public class InteractionOriginalResponseUpdaterImpl
         delegate.setContent(content);
         return this;
     }
+
+    @Override
+    public InteractionOriginalResponseUpdater removeAllAttachments() {
+        delegate.removeAllAttachments();
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater setAttachmentsToKeep(Collection<Attachment> attachments) {
+        delegate.setAttachmentsToKeep(attachments);
+        return this;
+    }
+
 
     @Override
     public InteractionOriginalResponseUpdater addEmbed(EmbedBuilder embed) {

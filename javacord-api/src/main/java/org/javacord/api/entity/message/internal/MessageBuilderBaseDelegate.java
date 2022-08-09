@@ -105,25 +105,17 @@ public interface MessageBuilderBaseDelegate {
     void setContent(String content);
 
     /**
-     * Sets the content of the message and used to tell discord
-     * if you want to keep the attachments.
-     *
-     * @param content The new content of the message.
-     * @param keepAttachments Whether to keep the attachments.
+     * Removes all attachments from the message.
      */
-    void setContent(String content, boolean keepAttachments);
-
+    void removeAllAttachments();
 
     /**
-     * Sets the content of the message and used to keep and
-     * add new attachments.
+     * Used to specify which attachments should be kept
+     * when editing the message.
      *
-     * @param content The new content of the message.
-     * @param keepAttachments Used to tell discord if you want to keep
-     *                        the attachments in the message.
-     * @param newAttachments New Attachments you want to add to the message.
+     * @param attachments The attachments to keep.
      */
-    void setContent(String content, Collection<Attachment> keepAttachments, Collection<Attachment> newAttachments);
+    void setAttachmentsToKeep(Collection<Attachment> attachments);
 
     /**
      * Adds the embed to the message.
@@ -176,11 +168,6 @@ public interface MessageBuilderBaseDelegate {
      * Remove all high-level components from the message.
      */
     void removeAllComponents();
-
-    /**
-     * Removes all the attachments from the message.
-     */
-    void removeAllAttachments();
 
     /**
      * Sets if the message should be text to speech.

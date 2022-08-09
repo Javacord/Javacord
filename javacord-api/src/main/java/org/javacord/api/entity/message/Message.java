@@ -2,7 +2,6 @@ package org.javacord.api.entity.message;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
-import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.channel.AutoArchiveDuration;
@@ -31,7 +30,6 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -399,34 +397,6 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     default CompletableFuture<Message> edit(String content) {
         return new MessageUpdater(this).setContent(content).applyChanges();
     }
-
-    /**
-     * Updates the content of the message.
-     *
-     * @param content The new content of the message.
-     * @param keepAttachments Used to tell discord if you want to keep
-     *                        the attachments in the message.
-     *
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Message> edit(String content, boolean keepAttachments) {
-        return new MessageUpdater(this).setContent(content, keepAttachments).applyChanges();
-    }
-
-    /**
-     * Updates the content of the message.
-     * @param content The new content of the message.
-     * @param keepAttachments Used to tell discord if you want to keep
-     *                        the attachments in the message.
-     * @param newAttachments New Attachments you want to add to the message.
-     *
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Message> edit(String content, Collection<Attachment> keepAttachments,
-                                            Collection<Attachment> newAttachments) {
-        return new MessageUpdater(this).setContent(content, keepAttachments, newAttachments).applyChanges();
-    }
-
 
     /**
      * Updates the embed of the message.
