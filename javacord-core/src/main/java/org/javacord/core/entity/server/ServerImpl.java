@@ -288,22 +288,22 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * The channel id that the widget will generate an invite to, or null if set to no invite.
      */
-    private volatile long widgetChannelId;
+    private volatile Long widgetChannelId;
     
     /**
      * The maximum number of presences for the guild (null is always returned, apart from the largest of guilds).
      */
-    private volatile int maxPresences;
+    private volatile Integer maxPresences;
     
     /**
      * The maximum number of members for the guild.
      */
-    private volatile int maxMembers;
+    private volatile Integer maxMembers;
     
     /**
      * The maximum amount of users in a video channel.
      */
-    private volatile int maxVideoChannelUsers;
+    private volatile Integer maxVideoChannelUsers;
     
     /**
      * The welcome screen of a community server, shown to new members.
@@ -554,6 +554,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         } else {
             this.welcomeScreen = null;
         }
+
         this.widgetEnabled = data.path("widget_enabled").asBoolean(false);
         this.widgetChannelId = data.hasNonNull("widget_channel_id") 
                             ? data.get("widget_channel_id").asLong() : null;
