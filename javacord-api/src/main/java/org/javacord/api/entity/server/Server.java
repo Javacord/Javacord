@@ -32,6 +32,7 @@ import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.server.invite.WelcomeScreen;
 import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -50,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -69,20 +71,6 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return The audio connection in this server.
      */
     Optional<AudioConnection> getAudioConnection();
-
-    /**
-     * Checks if the server has boost messages enabled.
-     *
-     * @return Whether the server has boost messages enabled or not.
-     */
-    boolean hasBoostMessagesEnabled();
-
-    /**
-     * Checks if the server has join messages enabled.
-     *
-     * @return Whether the server has join messages enabled or not.
-     */
-    boolean hasJoinMessagesEnabled();
 
     /**
      * Gets the features of the server.
@@ -3436,4 +3424,70 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
             throw new IllegalArgumentException("The ID must be a number.");
         }
     }
+
+    /**
+     * True if the server widget is enabled.
+     * 
+     * @return true if the server widget is enabled.
+     */
+    boolean isWidgetEnabled();
+
+    /**
+     * Gets the channel id that the widget will generate an invite to, or null if set to no invite.
+     * 
+     * @return the channel id that the widget will generate an invite to, or null if set to no invite.
+     */
+    Optional<Long> getWidgetChannelId();
+
+    /**
+     * Gets the maximum number of presences for the guild
+     * (null is always returned, apart from the largest of guilds).
+     * 
+     * @return the maximum number of presences for the guild.
+     */
+    Optional<Integer> getMaxPresences();
+
+    /**
+     * Gets the maximum number of members for the guild.
+     * 
+     * @return the maximum number of members for the guild.
+     */
+    Optional<Integer> getMaxMembers();
+
+    /**
+     * Gets the maximum amount of users in a video channel.
+     * 
+     * @return the maximum amount of users in a video channel.
+     */
+    Optional<Integer> getMaxVideoChannelUsers();
+
+    /**
+     * Gets the welcome screen of a Community server shown to new members.
+     * 
+     * @return the welcome screen of a Community server shown to new members.
+     */
+    Optional<WelcomeScreen> getWelcomeScreen();
+
+    /**
+     * True if the server's boost progress bar is enabled.
+     * 
+     * @return whether the server's boost progress bar is enabled or not.
+     */
+    boolean isPremiumProgressBarEnabled();
+
+    /**
+     * Gets regular server channel for widget.
+     * 
+     * @return the regular server channel for widget.
+     */
+    default Optional<RegularServerChannel> getWidgetChannel() {
+        return getWidgetChannelId().flatMap(this::getRegularChannelById);
+    }
+
+    /**
+     * Gets system channel flags for this server.
+     * 
+     * @return The system channel flags for this server.
+     */
+    public EnumSet<SystemChannelFlag> getSystemChannelFlags();
 }
