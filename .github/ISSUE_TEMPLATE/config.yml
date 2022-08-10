@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord Chat
+    url: https://discord.gg/javacord
+    about: Ask questions and chat with other Javacord users in real time.
+  - name: Javadoc
+    url: https://javadoc.io/doc/org.javacord/javacord-api
+    about: The Javadoc is the perfect place to retrieve information about our API.
+  - name: Wiki
+    url: https://javacord.org/wiki/
+    about: You can find various information on how to get started and additional information to the javadocs like code example in our wiki. Make sure to read the FAQ page!

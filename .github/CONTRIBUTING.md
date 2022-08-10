@@ -26,6 +26,15 @@ There are 2 easy ways to test your changes:
 
 ## Code Conventions
 
+### Programming practices
+When using collections, carefully decide which one is appropriate:
+- **Set:** If the collection can not contain duplicates
+- **List:** If the elements in the collection have an order (if they also can not contain duplicates, you still need to use a List).
+- **Collection:** Use when the collection can contain duplicates and the items do not have an order.
+
+Never return collections directly, instead create a copy of it with i.e. `Collections.unmodifiableList()`
+
+### Code Style
 Javacord follows the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) with a few exceptions:
 
 * Column limit: `120` (instead of `100`)
