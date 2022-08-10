@@ -1,0 +1,31 @@
+name: "\U0001F680 New feature proposal"
+description: Suggest an idea for this project
+labels: [":sparkles: feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before You Start...**
+
+        This form is only for submitting feature requests. If you have a usage question
+        or are unsure if the feature you propose does already exist, make sure to:
+
+        - Read the [docs](https://javadoc.io/doc/org.javacord/javacord-api)
+        - Visit the [wiki](https://javacord.org/wiki/)
+        - Ask on [Discord Chat](https://discord.gg/javacord)
+        
+         Also try to search for your issue - another user may have already requested something similar!
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: What feature are you proposing?
+      placeholder: Explain your feature if the title is not precise enough.
+    validations:
+      required: false
+  - type: textarea
+    id: feature-material
+    attributes:
+      label: Do you have any additional material for your feature proposal?
+      placeholder: Can be a link to the documentation, images or any other kind of media
+    validations:
+      required: false
