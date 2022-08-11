@@ -14,10 +14,6 @@ public enum ServerFeature {
      */
     BANNER,
     /**
-     * Server has access to use commerce features (i.e. create store channels).
-     */
-    COMMERCE,
-    /**
      * Server is a community server.
      */
     COMMUNITY,
@@ -78,19 +74,15 @@ public enum ServerFeature {
      */
     MORE_STICKERS,
     /**
-     * Server has access to the three day archive time for threads.
-     */
-    THREE_DAY_THREAD_ARCHIVE,
-    /**
-     * Server has access to the seven day archive time for threads.
-     */
-    SEVEN_DAY_THREAD_ARCHIVE,
-    /**
      * Server has access to create private threads.
      */
     PRIVATE_THREADS,
     /**
-     * Server was able to be discovered in the directory before.
+     * Server has access to set an animated guild banner image.
      */
-    ENABLED_DISCOVERABLE_BEFORE
+    ANIMATED_BANNER,
+    /**
+     * Server has set up auto moderation rules.
+     */
+    AUTO_MODERATION,
 }
