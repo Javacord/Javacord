@@ -77,7 +77,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private final Set<ThreadMember> members;
 
     /**
-     * The number of messages that are sent.
+     * The total number of messages that are sent.
      */
     private int totalNumberOfMessagesSent;
 
@@ -119,7 +119,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
 
-        totalNumberOfMessagesSent = data.path("total_message_count").asInt(0);
+        totalNumberOfMessagesSent = data.path("total_message_sent").asInt(0);
     }
 
     /**

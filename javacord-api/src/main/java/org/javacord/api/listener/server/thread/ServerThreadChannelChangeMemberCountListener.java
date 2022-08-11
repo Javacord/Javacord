@@ -11,8 +11,7 @@ import org.javacord.api.listener.server.ServerAttachableListener;
  */
 @FunctionalInterface
 public interface ServerThreadChannelChangeMemberCountListener extends ServerThreadChannelAttachableListener,
-        ServerAttachableListener,
-        GloballyAttachableListener, ObjectAttachableListener {
+        ServerAttachableListener, GloballyAttachableListener, ObjectAttachableListener {
 
     /**
      * This method is called every time a server thread's member count changes.
