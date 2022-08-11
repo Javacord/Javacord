@@ -27,6 +27,13 @@ public interface AllowedMentionsBuilderDelegate {
     void setMentionUsers(boolean value);
 
     /**
+     * Sets whether the replied user should be mentioned if the message is a reply.
+     *
+     * @param value Whether the message mentions the replied user.
+     */
+    void setMentionRepliedUser(boolean value);
+
+    /**
      * Adds a user to the mentions list which should be mentioned if mentioned.
      *
      * @param userId Whether the message mentions the mentioned user.
