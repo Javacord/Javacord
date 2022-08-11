@@ -6,12 +6,26 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
-import org.javacord.api.event.channel.server.thread.*;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchivedEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLockedEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMemberCountEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMembersEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMessageCountEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
-import org.javacord.core.event.channel.server.thread.*;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchivedEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLockedEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMemberCountEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMembersEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMessageCountEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -98,7 +112,7 @@ public class ThreadUpdateHandler extends PacketHandler {
 
             final ServerThreadChannelChangeMemberCountEvent event =
                     new ServerThreadChannelChangeMemberCountEventImpl(thread, newMemberCount, oldMemberCount);
-            
+
             api.getEventDispatcher().dispatchServerThreadChannelChangeMemberCountEvent(
                         (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
@@ -165,15 +179,12 @@ public class ThreadUpdateHandler extends PacketHandler {
 
         final Set<ThreadMember> oldMembers = thread.getMembers();
         final Set<ThreadMember> newMembers = new HashSet<>();
+
+        //id and userid are only omitted on GUILD_CREATE event
         if (jsonChannel.hasNonNull("member")) {
-            // If userId is not included, that means this came from a GUILD_CREATE event
-            // This means the userId is the bot's and the thread id is from this thread
-            // See https://github.com/Javacord/Javacord/issues/898
-            if (jsonChannel.get("member").hasNonNull("user_id")) {
-                newMembers.add(new ThreadMemberImpl(api, server, jsonChannel.get("member")));
-            } else {
-                newMembers.add(new ThreadMemberImpl(api, server, jsonChannel.get("member"),
-                        thread.getId(), api.getYourself().getId()));
+            for (final JsonNode jsonMember : jsonChannel.get("member")) {
+                final ThreadMember member = new ThreadMemberImpl(api, server, jsonMember);
+                newMembers.add(member);
             }
         }
 
@@ -181,7 +192,8 @@ public class ThreadUpdateHandler extends PacketHandler {
             thread.setMembers(newMembers);
 
             final ServerThreadChannelChangeMembersEvent event =
-                    new ServerThreadChannelChangeMembersEventImpl(thread, newMembers, oldMembers);
+                    new ServerThreadChannelChangeMembersEventImpl(thread, newMembers,
+                            oldMembers);
 
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeMembersEvent(
@@ -194,7 +206,8 @@ public class ThreadUpdateHandler extends PacketHandler {
             thread.setTotalNumberOfMessagesSent(newNumberOfMessages);
 
             final ServerThreadChannelChangeTotalMessageSentEvent event =
-                    new ServerThreadChannelChangeTotalMessageSentEventImpl(thread, newNumberOfMessages, oldNumberOfMessages);
+                    new ServerThreadChannelChangeTotalMessageSentEventImpl(thread, newNumberOfMessages,
+                            oldNumberOfMessages);
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeTotalMessageSentEvent(
                         (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);

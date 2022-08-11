@@ -22,8 +22,8 @@ public class ServerThreadChannelChangeTotalMessageSentEventImpl extends ServerTh
      * Creates a new instance of this class.
      *
      * @param channel The channel.
-     * @param newTotalMessageCount The new total message count.
-     * @param oldTotalMessageCount The old total message count.
+     * @param newTotalMessageSent The new total message count.
+     * @param oldTotalMessageSent The old total message count.
      */
     public ServerThreadChannelChangeTotalMessageSentEventImpl(ServerThreadChannelImpl channel,
                                                               int newTotalMessageSent, int oldTotalMessageSent) {
