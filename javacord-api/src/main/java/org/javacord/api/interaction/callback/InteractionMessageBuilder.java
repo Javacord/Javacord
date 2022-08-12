@@ -180,14 +180,14 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     }
 
     @Override
-    public InteractionMessageBuilder setAttachmentsToKeep(Attachment... attachments) {
-        delegate.setAttachmentsToKeep(Arrays.asList(attachments));
+    public InteractionMessageBuilder addAttachmentsToKeep(Attachment... attachments) {
+        delegate.addAttachmentsToKeep(Arrays.asList(attachments));
         return this;
     }
 
     @Override
-    public InteractionMessageBuilder setAttachmentsToKeep(Collection<Attachment> attachments) {
-        delegate.setAttachmentsToKeep(attachments);
+    public InteractionMessageBuilder addAttachmentsToKeep(Collection<Attachment> attachments) {
+        delegate.addAttachmentsToKeep(attachments);
         return this;
     }
 

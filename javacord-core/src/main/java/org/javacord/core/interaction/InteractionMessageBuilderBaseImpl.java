@@ -87,14 +87,14 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     }
 
     @Override
-    public T setAttachmentsToKeep(Attachment... attachments) {
-        delegate.setAttachmentsToKeep(Arrays.asList(attachments));
+    public T addAttachmentsToKeep(Attachment... attachments) {
+        delegate.addAttachmentsToKeep(Arrays.asList(attachments));
         return myClass.cast(this);
     }
 
     @Override
-    public T setAttachmentsToKeep(Collection<Attachment> attachments) {
-        delegate.setAttachmentsToKeep(attachments);
+    public T addAttachmentsToKeep(Collection<Attachment> attachments) {
+        delegate.addAttachmentsToKeep(attachments);
         return myClass.cast(this);
     }
 

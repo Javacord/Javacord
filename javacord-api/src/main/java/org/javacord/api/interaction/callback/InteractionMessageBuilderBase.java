@@ -88,7 +88,7 @@ public interface InteractionMessageBuilderBase<T> {
      * @param attachments The attachments to keep.
      * @return The current instance in order to chain call methods.
      */
-    T setAttachmentsToKeep(Attachment... attachments);
+    T addAttachmentsToKeep(Attachment... attachments);
 
     /**
      * Used to specify which attachments should be kept
@@ -97,7 +97,7 @@ public interface InteractionMessageBuilderBase<T> {
      * @param attachments The attachments to keep.
      * @return The current instance in order to chain call methods.
      */
-    T setAttachmentsToKeep(Collection<Attachment> attachments);
+    T addAttachmentsToKeep(Collection<Attachment> attachments);
 
     /**
      * Adds the embed to the message.

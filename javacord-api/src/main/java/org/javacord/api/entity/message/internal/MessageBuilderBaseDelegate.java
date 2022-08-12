@@ -115,7 +115,7 @@ public interface MessageBuilderBaseDelegate {
      *
      * @param attachments The attachments to keep.
      */
-    void setAttachmentsToKeep(Collection<Attachment> attachments);
+    void addAttachmentsToKeep(Collection<Attachment> attachments);
 
     /**
      * Adds the embed to the message.

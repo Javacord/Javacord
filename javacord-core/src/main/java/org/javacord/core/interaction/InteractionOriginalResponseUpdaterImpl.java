@@ -102,8 +102,8 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
-    public InteractionOriginalResponseUpdater setAttachmentsToKeep(Collection<Attachment> attachments) {
-        delegate.setAttachmentsToKeep(attachments);
+    public InteractionOriginalResponseUpdater addAttachmentsToKeep(Collection<Attachment> attachments) {
+        delegate.addAttachmentsToKeep(attachments);
         return this;
     }
 

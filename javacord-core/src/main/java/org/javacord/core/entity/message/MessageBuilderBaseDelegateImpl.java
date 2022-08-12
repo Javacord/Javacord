@@ -209,7 +209,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         strBuilder.setLength(0);
         strBuilder.append(content);
         contentChanged = true;
-        keepAttachments = true;
     }
 
     @Override
@@ -218,7 +217,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void setAttachmentsToKeep(Collection<Attachment> keepAttachmentsCollection) {
+    public void addAttachmentsToKeep(Collection<Attachment> keepAttachmentsCollection) {
         //as in setContent we keep all attachments, were as here we only keep the ones that are in the list
         attachmentsToKeep.addAll(keepAttachmentsCollection);
         keepAttachments = true;

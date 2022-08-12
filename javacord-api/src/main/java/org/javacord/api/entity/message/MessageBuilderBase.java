@@ -172,16 +172,6 @@ abstract class MessageBuilderBase<T> {
     }
 
 
-    public T setAttachmentsToKeep(Attachment... attachments) {
-        setAttachmentsToKeep(Arrays.asList(attachments));
-        return myClass.cast(this);
-    }
-
-    public T setAttachmentsToKeep(Collection<Attachment> attachments) {
-        delegate.setAttachmentsToKeep(attachments);
-        return myClass.cast(this);
-    }
-
     /**
      * Removes the content of the message.
      * This method overwrites all previous content changes
