@@ -81,8 +81,26 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     }
 
     @Override
-    public T removeAllAttachments() {
-        delegate.removeAllAttachments();
+    public T removeExistingAttachment(Attachment attachment) {
+        delegate.removeExistingAttachment(attachment);
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T removeExistingAttachments() {
+        delegate.removeExistingAttachments();
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T removeExistingAttachments(Attachment... attachments) {
+        delegate.removeExistingAttachments(attachments);
+        return myClass.cast(this);
+    }
+
+    @Override
+    public T removeExistingAttachments(Collection<Attachment> attachments) {
+        delegate.removeExistingAttachments(attachments);
         return myClass.cast(this);
     }
 

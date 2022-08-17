@@ -109,6 +109,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected final List<Attachment> attachmentsToKeep = new ArrayList<>();
 
     /**
+     * All the attachments that should be removed from the message.
+     */
+    protected final List<Attachment> attachmentsToRemove = new ArrayList<>();
+
+    /**
      * True if the attachments have been changed by the user.
      */
     protected boolean attachmentsChanged = false;
@@ -212,8 +217,26 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void removeAllAttachments() {
+    public void removeExistingAttachment(Attachment attachment) {
+        attachmentsToRemove.add(attachment);
         keepAttachments = false;
+    }
+
+    @Override
+    public void removeExistingAttachments() {
+        attachmentsToKeep.clear();
+        keepAttachments = false;
+    }
+
+    @Override
+    public void removeExistingAttachments(Attachment... attachments) {
+        removeExistingAttachments(Arrays.asList(attachments));
+        keepAttachments = false;
+    }
+
+    @Override
+    public void removeExistingAttachments(Collection<Attachment> attachments) {
+        attachmentsToRemove.addAll(attachments);
     }
 
     @Override
@@ -244,7 +267,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
-            this.addAttachment(attachment.getUrl());
+            if (attachment.getDescription().isPresent()) {
+                this.addAttachment(attachment.getUrl(), attachment.getDescription().get());
+            } else {
+                this.addAttachment(attachment.getUrl(), null);
+            }
         }
 
         for (HighLevelComponent component : message.getComponents()) {
@@ -317,7 +344,25 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void addAttachment(BufferedImage image, String fileName, String description) {
+        if (image == null || fileName == null) {
+            throw new IllegalArgumentException("image and fileName cannot be null!");
+        }
+        newAttachments.add(new FileContainer(image, fileName));
+        attachmentsChanged = true;
+    }
+
+    @Override
     public void addAttachment(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("file cannot be null!");
+        }
+        newAttachments.add(new FileContainer(file));
+        attachmentsChanged = true;
+    }
+
+    @Override
+    public void addAttachment(File file, String description) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
@@ -335,7 +380,25 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void addAttachment(Icon icon, String description) {
+        if (icon == null) {
+            throw new IllegalArgumentException("icon cannot be null!");
+        }
+        newAttachments.add(new FileContainer(icon));
+        attachmentsChanged = true;
+    }
+
+    @Override
     public void addAttachment(URL url) {
+        if (url == null) {
+            throw new IllegalArgumentException("url cannot be null!");
+        }
+        newAttachments.add(new FileContainer(url));
+        attachmentsChanged = true;
+    }
+
+    @Override
+    public void addAttachment(URL url, String description) {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
@@ -353,6 +416,15 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void addAttachment(byte[] bytes, String fileName, String description) {
+        if (bytes == null || fileName == null) {
+            throw new IllegalArgumentException("bytes and fileName cannot be null!");
+        }
+        newAttachments.add(new FileContainer(bytes, fileName));
+        attachmentsChanged = true;
+    }
+
+    @Override
     public void addAttachment(InputStream stream, String fileName) {
         if (stream == null || fileName == null) {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
@@ -362,7 +434,26 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void addAttachment(InputStream stream, String fileName, String description) {
+        if (stream == null || fileName == null) {
+            throw new IllegalArgumentException("stream and fileName cannot be null!");
+        }
+        newAttachments.add(new FileContainer(stream, fileName));
+        attachmentsChanged = true;
+    }
+
+    @Override
     public void addAttachmentAsSpoiler(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("file cannot be null!");
+        }
+        newAttachments.add(new FileContainer(file, true));
+        attachmentsChanged = true;
+    }
+
+
+    @Override
+    public void addAttachmentAsSpoiler(File file, String description) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
@@ -380,7 +471,25 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void addAttachmentAsSpoiler(Icon icon, String description) {
+        if (icon == null) {
+            throw new IllegalArgumentException("icon cannot be null!");
+        }
+        newAttachments.add(new FileContainer(icon, true));
+        attachmentsChanged = true;
+    }
+
+    @Override
     public void addAttachmentAsSpoiler(URL url) {
+        if (url == null) {
+            throw new IllegalArgumentException("url cannot be null!");
+        }
+        newAttachments.add(new FileContainer(url, true));
+        attachmentsChanged = true;
+    }
+
+    @Override
+    public void addAttachmentAsSpoiler(URL url, String description) {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
@@ -598,11 +707,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
-        if (keepAttachments) {
-            prepareAttachments(message.getAttachments(), body);
-        } else {
-            body.set("attachments", JsonNodeFactory.instance.objectNode().arrayNode());
-        }
+        prepareAttachments(message.getAttachments(), body);
 
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -677,19 +782,23 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
         ArrayNode attachments = body.putArray("attachments");
 
-        if (!attachmentsToKeep.isEmpty() && !attachmentsList.isEmpty()) {
-            for (Attachment attachment : attachmentsList) {
-                if (attachmentsList.contains(attachment.getId())) {
+        if (keepAttachments) {
+            if (!attachmentsToKeep.isEmpty()) {
+                for (Attachment attachment : attachmentsToKeep) {
+                    attachments.add(((AttachmentImpl) attachment).toJsonNode());
+                }
+            } else {
+                for (MessageAttachment attachment : attachmentsList) {
                     attachments.add(((AttachmentImpl) attachment).toJsonNode());
                 }
             }
-        } else if (!attachmentsList.isEmpty()) {
-            for (MessageAttachment attachment : attachmentsList) {
-                attachments.add(((AttachmentImpl) attachment).toJsonNode());
-            }
-        } else if (!attachmentsToKeep.isEmpty()) {
-            for (Attachment attachment : attachmentsToKeep) {
-                attachments.add(((AttachmentImpl) attachment).toJsonNode());
+        } else {
+            if (!attachmentsToRemove.isEmpty()) {
+                for (Attachment attachment : attachmentsList) {
+                    if (attachmentsToRemove.contains(attachment)) {
+                        attachments.add(((AttachmentImpl) attachment).toJsonNode());
+                    }
+                }
             }
         }
     }

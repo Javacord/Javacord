@@ -46,7 +46,11 @@ public class WebhookMessageBuilder {
         }
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
-            builder.addAttachment(attachment.getUrl());
+            if (attachment.getDescription().isPresent()) {
+                builder.addAttachment(attachment.getUrl(), attachment.getDescription().get());
+            } else {
+                builder.addAttachment(attachment.getUrl(), null);
+            }
         }
         return builder;
     }
@@ -241,6 +245,20 @@ public class WebhookMessageBuilder {
         return this;
     }
 
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @param description The description of the image.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachment(BufferedImage image, String fileName, String description) {
+        delegate.addAttachment(image, fileName,  description);
+        return this;
+    }
+
     /**
      * Adds an attachment to the message.
      *
@@ -251,6 +269,19 @@ public class WebhookMessageBuilder {
         delegate.addAttachment(file);
         return this;
     }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param file The file to add as an attachment.
+     * @param description The description of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachment(File file, String description) {
+        delegate.addAttachment(file, description);
+        return this;
+    }
+
 
     /**
      * Adds an attachment to the message.
@@ -266,11 +297,36 @@ public class WebhookMessageBuilder {
     /**
      * Adds an attachment to the message.
      *
+     * @param icon The icon to add as an attachment.
+     * @param description The description of the icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachment(Icon icon, String description) {
+        delegate.addAttachment(icon, description);
+        return this;
+    }
+
+
+    /**
+     * Adds an attachment to the message.
+     *
      * @param url The url of the attachment.
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(URL url) {
         delegate.addAttachment(url);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param url The url of the attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachment(URL url, String description) {
+        delegate.addAttachment(url, description);
         return this;
     }
 
@@ -289,12 +345,40 @@ public class WebhookMessageBuilder {
     /**
      * Adds an attachment to the message.
      *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachment(byte[] bytes, String fileName, String description) {
+        delegate.addAttachment(bytes, fileName, description);
+        return this;
+    }
+
+
+    /**
+     * Adds an attachment to the message.
+     *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(InputStream stream, String fileName) {
         delegate.addAttachment(stream, fileName);
+        return this;
+    }
+
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachment(InputStream stream, String fileName, String description) {
+        delegate.addAttachment(stream, fileName, description);
         return this;
     }
 
@@ -307,6 +391,20 @@ public class WebhookMessageBuilder {
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName) {
         delegate.addAttachment(image, "SPOILER_" + fileName);
+        return this;
+    }
+
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @param description The description of the image.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName, String description) {
+        delegate.addAttachment(image, "SPOILER_" + fileName, description);
         return this;
     }
 
@@ -324,6 +422,18 @@ public class WebhookMessageBuilder {
     /**
      * Adds an attachment to the message and marks it as spoiler.
      *
+     * @param file The file to add as an attachment.
+     * @param description The description of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachmentAsSpoiler(File file, String description) {
+        delegate.addAttachmentAsSpoiler(file, description);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
      * @param icon The icon to add as an attachment.
      * @return The current instance in order to chain call methods.
      */
@@ -335,11 +445,35 @@ public class WebhookMessageBuilder {
     /**
      * Adds an attachment to the message and marks it as spoiler.
      *
+     * @param icon The icon to add as an attachment.
+     * @param description The description of the icon.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachmentAsSpoiler(Icon icon, String description) {
+        delegate.addAttachmentAsSpoiler(icon, description);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
      * @param url The url of the attachment.
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(URL url) {
         delegate.addAttachmentAsSpoiler(url);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param url The url of the attachment.
+     * @param description The description of the
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachmentAsSpoiler(URL url, String description) {
+        delegate.addAttachmentAsSpoiler(url, description);
         return this;
     }
 
@@ -358,12 +492,39 @@ public class WebhookMessageBuilder {
     /**
      * Adds an attachment to the message and marks it as spoiler.
      *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName, String description) {
+        delegate.addAttachment(bytes, "SPOILER_" + fileName, description);
+        return this;
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
         delegate.addAttachment(stream, "SPOILER_" + fileName);
+        return this;
+    }
+
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the file.
+     * @return The current instance in order to chain call methods.
+     */
+    public WebhookMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName, String description) {
+        delegate.addAttachment(stream, "SPOILER_" + fileName, description);
         return this;
     }
 

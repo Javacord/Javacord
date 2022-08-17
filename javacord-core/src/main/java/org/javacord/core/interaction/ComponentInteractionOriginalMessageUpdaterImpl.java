@@ -5,7 +5,7 @@ import org.javacord.api.interaction.callback.ComponentInteractionOriginalMessage
 
 import java.util.concurrent.CompletableFuture;
 
-public class ComponentInteractionOriginalMessageUpdaterImpl
+public  class ComponentInteractionOriginalMessageUpdaterImpl
         extends ExtendedInteractionMessageBuilderBaseImpl<ComponentInteractionOriginalMessageUpdater>
         implements ComponentInteractionOriginalMessageUpdater {
     private final MessageComponentInteractionImpl interaction;

@@ -96,8 +96,32 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
-    public InteractionOriginalResponseUpdater removeAllAttachments() {
-        delegate.removeAllAttachments();
+    public InteractionOriginalResponseUpdater removeExistingAttachment(Attachment attachment) {
+        delegate.removeExistingAttachment(attachment);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater removeExistingAttachments() {
+        delegate.removeExistingAttachments();
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater removeExistingAttachments(Attachment... attachments) {
+        delegate.removeExistingAttachments(attachments);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater removeExistingAttachments(Collection<Attachment> attachments) {
+        delegate.removeExistingAttachments(attachments);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachmentsToKeep(Attachment... attachments) {
+        delegate.addAttachmentsToKeep(Arrays.asList(attachments));
         return this;
     }
 
@@ -106,7 +130,6 @@ public class InteractionOriginalResponseUpdaterImpl
         delegate.addAttachmentsToKeep(attachments);
         return this;
     }
-
 
     @Override
     public InteractionOriginalResponseUpdater addEmbed(EmbedBuilder embed) {
@@ -187,8 +210,20 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
+    public InteractionOriginalResponseUpdater addAttachment(BufferedImage image, String fileName, String description) {
+        delegate.addAttachment(image, fileName,  description);
+        return this;
+    }
+
+    @Override
     public InteractionOriginalResponseUpdater addAttachment(File file) {
         delegate.addAttachment(file);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachment(File file, String description) {
+        delegate.addAttachment(file, description);
         return this;
     }
 
@@ -199,8 +234,20 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
+    public InteractionOriginalResponseUpdater addAttachment(Icon icon, String description) {
+        delegate.addAttachment(icon, description);
+        return this;
+    }
+
+    @Override
     public InteractionOriginalResponseUpdater addAttachment(URL url) {
         delegate.addAttachment(url);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachment(URL url, String description) {
+        delegate.addAttachment(url, description);
         return this;
     }
 
@@ -211,8 +258,20 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
+    public InteractionOriginalResponseUpdater addAttachment(byte[] bytes, String fileName, String description) {
+        delegate.addAttachment(bytes, fileName, description);
+        return this;
+    }
+
+    @Override
     public InteractionOriginalResponseUpdater addAttachment(InputStream stream, String fileName) {
         delegate.addAttachment(stream, fileName);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachment(InputStream stream, String fileName, String description) {
+        delegate.addAttachment(stream, fileName, description);
         return this;
     }
 
@@ -223,8 +282,21 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
+    public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(BufferedImage image, String fileName,
+                                                                     String description) {
+        delegate.addAttachment(image, "SPOILER_" + fileName, description);
+        return this;
+    }
+
+    @Override
     public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(File file) {
         delegate.addAttachmentAsSpoiler(file);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(File file, String description) {
+        delegate.addAttachmentAsSpoiler(file, description);
         return this;
     }
 
@@ -235,8 +307,20 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
+    public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(Icon icon, String description) {
+        delegate.addAttachmentAsSpoiler(icon, description);
+        return this;
+    }
+
+    @Override
     public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(URL url) {
         delegate.addAttachmentAsSpoiler(url);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(URL url, String description) {
+        delegate.addAttachmentAsSpoiler(url, description);
         return this;
     }
 
@@ -246,9 +330,24 @@ public class InteractionOriginalResponseUpdaterImpl
         return this;
     }
 
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(byte[] bytes, String fileName,
+                                                                     String description) {
+        delegate.addAttachment(bytes, "SPOILER_" + fileName, description);
+        return this;
+    }
+
     @Override
     public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(InputStream stream, String fileName) {
         delegate.addAttachment(stream, "SPOILER_" + fileName);
+        return this;
+    }
+
+    @Override
+    public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(InputStream stream, String fileName,
+                                                                     String description) {
+        delegate.addAttachment(stream, "SPOILER_" + fileName, description);
         return this;
     }
 

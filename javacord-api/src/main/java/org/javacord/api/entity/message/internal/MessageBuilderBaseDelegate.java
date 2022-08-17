@@ -105,9 +105,30 @@ public interface MessageBuilderBaseDelegate {
     void setContent(String content);
 
     /**
-     * Removes all attachments from the message.
+     * Removes an attachment from the message.
+     *
+     * @param attachment The attachment to remove.
      */
-    void removeAllAttachments();
+    void removeExistingAttachment(Attachment attachment);
+
+    /**
+     * Removes all the attachments from the message.
+     */
+    void removeExistingAttachments();
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     */
+    void removeExistingAttachments(Attachment... attachments);
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     */
+    void removeExistingAttachments(Collection<Attachment> attachments);
 
     /**
      * Used to specify which attachments should be kept
@@ -176,6 +197,7 @@ public interface MessageBuilderBaseDelegate {
      */
     void setTts(boolean tts);
 
+
     /**
      * Adds an attachment to the message.
      *
@@ -187,9 +209,27 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds an attachment to the message.
      *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @param description The description of the image.
+     */
+    void addAttachment(BufferedImage image, String fileName, String description);
+
+    /**
+     * Adds an attachment to the message.
+     *
      * @param file The file to add as an attachment.
      */
     void addAttachment(File file);
+
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param file The file to add as an attachment.
+     * @param description The description of the file.
+     */
+    void addAttachment(File file, String description);
 
     /**
      * Adds an attachment to the message.
@@ -201,9 +241,25 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds an attachment to the message.
      *
+     * @param icon The icon to add as an attachment.
+     * @param description The description of the icon.
+     */
+    void addAttachment(Icon icon, String description);
+
+    /**
+     * Adds an attachment to the message.
+     *
      * @param url The url of the attachment.
      */
     void addAttachment(URL url);
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param url The url of the attachment.
+     * @param description The description of the attachment.
+     */
+    void addAttachment(URL url, String description);
 
     /**
      * Adds an attachment to the message.
@@ -216,10 +272,28 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds an attachment to the message.
      *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the file.
+     */
+    void addAttachment(byte[] bytes, String fileName, String description);
+
+    /**
+     * Adds an attachment to the message.
+     *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
      */
     void addAttachment(InputStream stream, String fileName);
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the file.
+     */
+    void addAttachment(InputStream stream, String fileName, String description);
 
     /**
      * Adds a spoiler attachment to the message.
@@ -231,6 +305,14 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds a spoiler attachment to the message.
      *
+     * @param file The file to add as an attachment.
+     * @param description The description of the file.
+     */
+    void addAttachmentAsSpoiler(File file, String description);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     *
      * @param icon The icon to add as an attachment.
      */
     void addAttachmentAsSpoiler(Icon icon);
@@ -238,9 +320,25 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds a spoiler attachment to the message.
      *
+     * @param icon The icon to add as an attachment.
+     * @param description The description of the icon.
+     */
+    void addAttachmentAsSpoiler(Icon icon, String description);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     *
      * @param url The url of the attachment.
      */
     void addAttachmentAsSpoiler(URL url);
+
+    /**
+     * Adds a spoiler attachment to the message.
+     *
+     * @param url The url of the attachment.
+     * @param description The description of the url.
+     */
+    void addAttachmentAsSpoiler(URL url, String description);
     
     /**
      * Controls the mention behavior.

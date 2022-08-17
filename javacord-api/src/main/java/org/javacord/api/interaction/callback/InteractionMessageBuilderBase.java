@@ -75,11 +75,34 @@ public interface InteractionMessageBuilderBase<T> {
     T setContent(String content);
 
     /**
-     * Removes all attachments from the message.
+     * Removes an attachment from the message.
      *
+     * @param attachment The attachment to remove.
      * @return The current instance in order to chain call methods.
      */
-    T removeAllAttachments();
+    T removeExistingAttachment(Attachment attachment);
+
+    /**
+     * Removes all the attachments from the message.
+     * @return The current instance in order to chain call methods.
+     */
+    T removeExistingAttachments();
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    T removeExistingAttachments(Attachment... attachments);
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    T removeExistingAttachments(Collection<Attachment> attachments);
 
     /**
      * Used to specify which attachments should be kept
