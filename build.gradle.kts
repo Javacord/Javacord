@@ -1,3 +1,7 @@
+import org.gradle.api.JavaVersion.VERSION_11
+import org.gradle.api.JavaVersion.VERSION_13
+import org.gradle.api.JavaVersion.VERSION_1_9
+
 plugins {
     `java-library`
     `maven-publish`
@@ -169,10 +173,10 @@ subprojects {
                 .map { JavaVersion.toVersion(it.metadata.languageVersion) }
                 .orElse(provider { JavaVersion.current() })
                 .get()
-            if (toolchain.isJava9Compatible) {
+            if (toolchain.isCompatibleWith(VERSION_1_9)) {
                 addBooleanOption("html5", true)
                 addStringOption("-release", java.targetCompatibility.majorVersion)
-                if (toolchain.isJava11Compatible) {
+                if (toolchain.isCompatibleWith(VERSION_11) && !toolchain.isCompatibleWith(VERSION_13)) {
                     addBooleanOption("-no-module-directories", true)
                 }
             } else {
