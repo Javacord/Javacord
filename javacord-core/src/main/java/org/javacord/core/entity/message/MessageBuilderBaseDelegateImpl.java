@@ -795,7 +795,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         } else {
             if (!attachmentsToRemove.isEmpty()) {
                 for (Attachment attachment : attachmentsList) {
-                    if (attachmentsToRemove.contains(attachment)) {
+                    if (!attachmentsToRemove.contains(attachment)) {
                         attachments.add(((AttachmentImpl) attachment).toJsonNode());
                     }
                 }
