@@ -348,7 +348,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (image == null || fileName == null) {
             throw new IllegalArgumentException("image and fileName cannot be null!");
         }
-        newAttachments.add(new FileContainer(image, fileName));
+        newAttachments.add(new FileContainer(image, fileName, description));
         attachmentsChanged = true;
     }
 
@@ -366,7 +366,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        newAttachments.add(new FileContainer(file));
+        newAttachments.add(new FileContainer(file, description));
         attachmentsChanged = true;
     }
 
@@ -384,7 +384,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        newAttachments.add(new FileContainer(icon));
+        newAttachments.add(new FileContainer(icon, description));
         attachmentsChanged = true;
     }
 
@@ -402,7 +402,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        newAttachments.add(new FileContainer(url));
+        newAttachments.add(new FileContainer(url, description));
         attachmentsChanged = true;
     }
 
@@ -420,7 +420,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (bytes == null || fileName == null) {
             throw new IllegalArgumentException("bytes and fileName cannot be null!");
         }
-        newAttachments.add(new FileContainer(bytes, fileName));
+        newAttachments.add(new FileContainer(bytes, fileName, description));
         attachmentsChanged = true;
     }
 
@@ -438,7 +438,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (stream == null || fileName == null) {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
-        newAttachments.add(new FileContainer(stream, fileName));
+        newAttachments.add(new FileContainer(stream, fileName, description));
         attachmentsChanged = true;
     }
 
@@ -457,7 +457,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        newAttachments.add(new FileContainer(file, true));
+        newAttachments.add(new FileContainer(file, true, description));
         attachmentsChanged = true;
     }
 
@@ -475,7 +475,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        newAttachments.add(new FileContainer(icon, true));
+        newAttachments.add(new FileContainer(icon, true, description));
         attachmentsChanged = true;
     }
 
@@ -493,7 +493,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        newAttachments.add(new FileContainer(url, true));
+        newAttachments.add(new FileContainer(url, true, description));
         attachmentsChanged = true;
     }
 
@@ -813,23 +813,28 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      */
     protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body,
                                              List<FileContainer> attachments, DiscordApi api) {
-        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("payload_json", body.toString());
-
+        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         Collections.reverse(attachments);
         for (int i = 0; i < attachments.size(); i++) {
-            byte[] bytes = attachments.get(i).asByteArray(api).join();
-
+            FileContainer fileContainer = attachments.get(i);
+            byte[] bytes = fileContainer.asByteArray(api).join();
             String mediaType = URLConnection
-                    .guessContentTypeFromName(attachments.get(i).getFileTypeOrName());
+                    .guessContentTypeFromName(fileContainer.getFileTypeOrName());
             if (mediaType == null) {
                 mediaType = "application/octet-stream";
             }
-            multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
+            multipartBodyBuilder.addFormDataPart("file" + i, fileContainer.getFileTypeOrName(),
                     RequestBody.create(bytes, MediaType.parse(mediaType)));
-        }
 
+            if (fileContainer.getDescription() != null) {
+                ArrayNode attachmentJson = body.withArray("attachments");
+                ObjectNode newFileAttachment = JsonNodeFactory.instance.objectNode();
+                newFileAttachment.put("id", i);
+                newFileAttachment.put("description", fileContainer.getDescription());
+                attachmentJson.add(newFileAttachment);
+            }
+        }
+        multipartBodyBuilder.addFormDataPart("payload_json", body.toString());
         request.setMultipartBody(multipartBodyBuilder.build());
     }
 
