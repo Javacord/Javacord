@@ -1,5 +1,9 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.entity.Attachment;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
@@ -37,5 +41,40 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      */
     public CompletableFuture<Message> replaceMessage() {
         return delegate.edit(message, true);
+    }
+
+
+    /**
+     * Removes an attachment from the message.
+     *
+     * @param attachment The attachment to remove.
+     */
+    public void removeExistingAttachment(Attachment attachment) {
+        delegate.removeExistingAttachment(attachment);
+    }
+
+    /**
+     * Removes all the attachments from the message.
+     */
+    public void removeExistingAttachments() {
+        delegate.removeExistingAttachments();
+    }
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     */
+    public void removeExistingAttachments(Attachment... attachments) {
+        removeExistingAttachments(Arrays.asList(attachments));
+    }
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     */
+    public void removeExistingAttachments(Collection<Attachment> attachments) {
+        delegate.removeExistingAttachments(attachments);
     }
 }

@@ -121,13 +121,6 @@ public interface MessageBuilderBaseDelegate {
      *
      * @param attachments The attachments to remove.
      */
-    void removeExistingAttachments(Attachment... attachments);
-
-    /**
-     * Removes multiple attachments from the message.
-     *
-     * @param attachments The attachments to remove.
-     */
     void removeExistingAttachments(Collection<Attachment> attachments);
 
     /**

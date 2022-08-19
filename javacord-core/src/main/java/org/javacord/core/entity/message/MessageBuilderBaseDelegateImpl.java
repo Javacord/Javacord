@@ -222,11 +222,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void removeExistingAttachments(Attachment... attachments) {
-        removeExistingAttachments(Arrays.asList(attachments));
-    }
-
-    @Override
     public void removeExistingAttachments(Collection<Attachment> attachments) {
         attachmentsToRemove.addAll(attachments);
     }
@@ -606,7 +601,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
-        prepareAttachments(message.getAttachments(), body);
+        prepareAttachments(message.getAttachments(), body, updateAll || removeAllAttachments);
 
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -678,10 +673,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
     }
 
-    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
+    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body,
+                                    boolean removeOrUpdateAll) {
         ArrayNode attachments = body.putArray("attachments");
 
-        if (removeAllAttachments) {
+        if (removeOrUpdateAll) {
             attachments.add(JsonNodeFactory.instance.objectNode());
         } else if (!attachmentsToRemove.isEmpty()) {
             for (Attachment attachment : attachmentsList) {
