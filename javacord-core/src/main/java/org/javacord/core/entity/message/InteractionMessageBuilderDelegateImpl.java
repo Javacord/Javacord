@@ -162,8 +162,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                     addMultipartBodyToRequest(request, body, tempAttachments, request.getApi());
 
                     request.execute(result -> request.getApi().getOrCreateMessage(
-                                    request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
-                                            .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
+                            request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
+                                    .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
                                     result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
                                 if (throwable != null) {
