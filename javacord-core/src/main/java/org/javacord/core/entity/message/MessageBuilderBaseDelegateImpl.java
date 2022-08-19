@@ -99,9 +99,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected final List<FileContainer> newAttachments = new ArrayList<>();
 
     /**
-     * The current attachments of the message.
+     * Used to indicate that all the attachments in the message should be removed.
      */
-    protected boolean removeAttachments = false;
+    protected boolean removeAllAttachments = false;
 
     /**
      * All the attachments that should be removed from the message.
@@ -214,24 +214,21 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     @Override
     public void removeExistingAttachment(Attachment attachment) {
         attachmentsToRemove.add(attachment);
-        removeAttachments = true;
     }
 
     @Override
     public void removeExistingAttachments() {
-        removeAttachments = true;
+        removeAllAttachments = true;
     }
 
     @Override
     public void removeExistingAttachments(Attachment... attachments) {
         removeExistingAttachments(Arrays.asList(attachments));
-        removeAttachments = true;
     }
 
     @Override
     public void removeExistingAttachments(Collection<Attachment> attachments) {
         attachmentsToRemove.addAll(attachments);
-        removeAttachments = true;
     }
 
     @Override
@@ -684,13 +681,17 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
         ArrayNode attachments = body.putArray("attachments");
 
-        if (removeAttachments) {
-            if (!attachmentsToRemove.isEmpty()) {
-                for (Attachment attachment : attachmentsList) {
-                    if (!attachmentsToRemove.contains(attachment)) {
-                        attachments.add(((AttachmentImpl) attachment).toJsonNode());
-                    }
+        if (removeAllAttachments) {
+            attachments.add(JsonNodeFactory.instance.objectNode());
+        } else if (!attachmentsToRemove.isEmpty()) {
+            for (Attachment attachment : attachmentsList) {
+                if (!attachmentsToRemove.contains(attachment)) {
+                    attachments.add(((AttachmentImpl) attachment).toJsonNode());
                 }
+            }
+        } else {
+            for (Attachment attachment : attachmentsList) {
+                attachments.add(((AttachmentImpl) attachment).toJsonNode());
             }
         }
     }

@@ -346,7 +346,7 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
 
     @Override
     public InteractionMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName, null);
         return this;
     }
 
@@ -394,7 +394,7 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
 
     @Override
     public InteractionMessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName, null);
         return this;
     }
 
@@ -406,7 +406,7 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
 
     @Override
     public InteractionMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName, null);
         return this;
     }
 

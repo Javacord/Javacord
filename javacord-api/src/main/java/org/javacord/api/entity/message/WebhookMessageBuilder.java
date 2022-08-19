@@ -46,11 +46,7 @@ public class WebhookMessageBuilder {
         }
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
-            if (attachment.getDescription().isPresent()) {
-                builder.addAttachment(attachment.getUrl(), attachment.getDescription().get());
-            } else {
-                builder.addAttachment(attachment.getUrl(), null);
-            }
+            builder.addAttachment(attachment.getUrl(), attachment.getDescription().get());
         }
         return builder;
     }
@@ -245,7 +241,6 @@ public class WebhookMessageBuilder {
         return this;
     }
 
-
     /**
      * Adds an attachment to the message.
      *
@@ -355,7 +350,6 @@ public class WebhookMessageBuilder {
         return this;
     }
 
-
     /**
      * Adds an attachment to the message.
      *
@@ -367,7 +361,6 @@ public class WebhookMessageBuilder {
         addAttachment(stream, fileName, null);
         return this;
     }
-
 
     /**
      * Adds an attachment to the message.
@@ -390,10 +383,9 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName, null);
         return this;
     }
-
 
     /**
      * Adds an attachment to the message and marks it as spoiler.
@@ -485,7 +477,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName, null);
         return this;
     }
 
@@ -510,10 +502,9 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName, null);
         return this;
     }
-
 
     /**
      * Adds an attachment to the message and marks it as spoiler.

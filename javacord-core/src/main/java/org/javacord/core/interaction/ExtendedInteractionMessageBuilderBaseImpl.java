@@ -169,7 +169,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName, null);
         return myClass.cast(this);
     }
 
@@ -181,7 +181,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName, null);
         return myClass.cast(this);
     }
 

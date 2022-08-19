@@ -239,7 +239,7 @@ public class InteractionOriginalResponseUpdaterImpl
 
     @Override
     public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName, null);
         return this;
     }
 
@@ -288,7 +288,7 @@ public class InteractionOriginalResponseUpdaterImpl
 
     @Override
     public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName, null);
         return this;
     }
 
@@ -302,7 +302,7 @@ public class InteractionOriginalResponseUpdaterImpl
 
     @Override
     public InteractionOriginalResponseUpdater addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName, null);
         return this;
     }
 

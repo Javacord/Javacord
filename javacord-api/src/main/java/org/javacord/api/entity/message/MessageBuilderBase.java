@@ -380,7 +380,7 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName, null);
         return myClass.cast(this);
     }
 
@@ -474,7 +474,7 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName, null);
         return myClass.cast(this);
     }
 
@@ -499,7 +499,7 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName, null);
         return myClass.cast(this);
     }
 
