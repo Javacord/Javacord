@@ -313,7 +313,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param user The user to which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(User user);
 
@@ -321,7 +321,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param channel The channel in which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(TextChannel channel);
 
@@ -329,7 +329,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param webhook The webhook from which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(IncomingWebhook webhook);
 
@@ -337,7 +337,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param messageable The receiver of the message.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(Messageable messageable);
 
@@ -357,7 +357,7 @@ public interface MessageBuilderBaseDelegate {
      * @param api The api instance needed to send and return the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken);
 }

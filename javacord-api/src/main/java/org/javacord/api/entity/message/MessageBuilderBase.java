@@ -181,7 +181,6 @@ abstract class MessageBuilderBase<T> {
         return myClass.cast(this);
     }
 
-
     /**
      * Sets the embed of the message (overrides all existing embeds).
      *
