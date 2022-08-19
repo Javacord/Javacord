@@ -624,9 +624,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                                                                             RestRequest<Message> request,
                                                                             boolean clearAttachmentsIfAppropriate) {
         if (newAttachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
-            if (attachmentsToRemove.isEmpty() && clearAttachmentsIfAppropriate) {
-                body.set("attachments", JsonNodeFactory.instance.objectNode().arrayNode());
-            }
             return executeRequestWithoutNewAttachments(channel, body, request);
         }
 

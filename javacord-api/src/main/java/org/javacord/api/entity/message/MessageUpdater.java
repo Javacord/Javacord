@@ -43,38 +43,46 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
         return delegate.edit(message, true);
     }
 
-
     /**
      * Removes an attachment from the message.
      *
      * @param attachment The attachment to remove.
+     * @return The updated message.
      */
-    public void removeExistingAttachment(Attachment attachment) {
+    public MessageUpdater removeExistingAttachment(Attachment attachment) {
         delegate.removeExistingAttachment(attachment);
+        return this;
     }
 
     /**
      * Removes all the attachments from the message.
+     *
+     * @return The updated message.
      */
-    public void removeExistingAttachments() {
+    public MessageUpdater removeExistingAttachments() {
         delegate.removeExistingAttachments();
+        return this;
     }
 
     /**
      * Removes multiple attachments from the message.
      *
      * @param attachments The attachments to remove.
+     * @return The updated message.
      */
-    public void removeExistingAttachments(Attachment... attachments) {
+    public MessageUpdater removeExistingAttachments(Attachment... attachments) {
         removeExistingAttachments(Arrays.asList(attachments));
+        return this;
     }
 
     /**
      * Removes multiple attachments from the message.
      *
      * @param attachments The attachments to remove.
+     * @return The updated message.
      */
-    public void removeExistingAttachments(Collection<Attachment> attachments) {
+    public MessageUpdater removeExistingAttachments(Collection<Attachment> attachments) {
         delegate.removeExistingAttachments(attachments);
+        return this;
     }
 }

@@ -46,7 +46,8 @@ public class WebhookMessageBuilder {
         }
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
-            builder.addAttachment(attachment.getUrl(), attachment.getDescription().get());
+            builder.addAttachment(attachment.getUrl(), attachment.getDescription()
+                    .orElse(null));
         }
         return builder;
     }
@@ -276,7 +277,6 @@ public class WebhookMessageBuilder {
         delegate.addAttachment(file, description);
         return this;
     }
-
 
     /**
      * Adds an attachment to the message.
