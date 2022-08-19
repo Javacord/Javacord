@@ -1,6 +1,5 @@
 package org.javacord.core.interaction;
 
-import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
@@ -10,8 +9,8 @@ import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegat
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.interaction.callback.InteractionMessageBuilderBase;
 import org.javacord.api.util.internal.DelegateFactory;
+
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -77,42 +76,6 @@ public abstract class InteractionMessageBuilderBaseImpl<T> implements Interactio
     @Override
     public T setContent(String content) {
         delegate.setContent(content);
-        return myClass.cast(this);
-    }
-
-    @Override
-    public T removeExistingAttachment(Attachment attachment) {
-        delegate.removeExistingAttachment(attachment);
-        return myClass.cast(this);
-    }
-
-    @Override
-    public T removeExistingAttachments() {
-        delegate.removeExistingAttachments();
-        return myClass.cast(this);
-    }
-
-    @Override
-    public T removeExistingAttachments(Attachment... attachments) {
-        delegate.removeExistingAttachments(attachments);
-        return myClass.cast(this);
-    }
-
-    @Override
-    public T removeExistingAttachments(Collection<Attachment> attachments) {
-        delegate.removeExistingAttachments(attachments);
-        return myClass.cast(this);
-    }
-
-    @Override
-    public T addAttachmentsToKeep(Attachment... attachments) {
-        delegate.addAttachmentsToKeep(Arrays.asList(attachments));
-        return myClass.cast(this);
-    }
-
-    @Override
-    public T addAttachmentsToKeep(Collection<Attachment> attachments) {
-        delegate.addAttachmentsToKeep(attachments);
         return myClass.cast(this);
     }
 

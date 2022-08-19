@@ -241,7 +241,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(BufferedImage image, String fileName) {
-        delegate.addAttachment(image, fileName);
+        addAttachment(image, fileName, null);
         return this;
     }
 
@@ -266,7 +266,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(File file) {
-        delegate.addAttachment(file);
+        addAttachment(file, null);
         return this;
     }
 
@@ -290,7 +290,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(Icon icon) {
-        delegate.addAttachment(icon);
+        addAttachment(icon, null);
         return this;
     }
 
@@ -314,7 +314,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(URL url) {
-        delegate.addAttachment(url);
+        addAttachment(url, null);
         return this;
     }
 
@@ -338,7 +338,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(byte[] bytes, String fileName) {
-        delegate.addAttachment(bytes, fileName);
+        addAttachment(bytes, fileName, null);
         return this;
     }
 
@@ -364,7 +364,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachment(InputStream stream, String fileName) {
-        delegate.addAttachment(stream, fileName);
+        addAttachment(stream, fileName, null);
         return this;
     }
 
@@ -390,7 +390,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        delegate.addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName);
         return this;
     }
 
@@ -415,7 +415,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(File file) {
-        delegate.addAttachmentAsSpoiler(file);
+        addAttachmentAsSpoiler(file, null);
         return this;
     }
 
@@ -438,7 +438,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(Icon icon) {
-        delegate.addAttachmentAsSpoiler(icon);
+        addAttachmentAsSpoiler(icon, null);
         return this;
     }
 
@@ -461,7 +461,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(URL url) {
-        delegate.addAttachmentAsSpoiler(url);
+        addAttachmentAsSpoiler(url, null);
         return this;
     }
 
@@ -485,7 +485,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        delegate.addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName);
         return this;
     }
 
@@ -510,7 +510,7 @@ public class WebhookMessageBuilder {
      * @return The current instance in order to chain call methods.
      */
     public WebhookMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        delegate.addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName);
         return this;
     }
 

@@ -131,14 +131,6 @@ public interface MessageBuilderBaseDelegate {
     void removeExistingAttachments(Collection<Attachment> attachments);
 
     /**
-     * Used to specify which attachments should be kept
-     * when editing the message.
-     *
-     * @param attachments The attachments to keep.
-     */
-    void addAttachmentsToKeep(Collection<Attachment> attachments);
-
-    /**
      * Adds the embed to the message.
      *
      * @param embed The embed to add.
@@ -197,15 +189,6 @@ public interface MessageBuilderBaseDelegate {
      */
     void setTts(boolean tts);
 
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param image The image to add as an attachment.
-     * @param fileName The file name of the image.
-     */
-    void addAttachment(BufferedImage image, String fileName);
-
     /**
      * Adds an attachment to the message.
      *
@@ -219,24 +202,9 @@ public interface MessageBuilderBaseDelegate {
      * Adds an attachment to the message.
      *
      * @param file The file to add as an attachment.
-     */
-    void addAttachment(File file);
-
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param file The file to add as an attachment.
      * @param description The description of the file.
      */
     void addAttachment(File file, String description);
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param icon The icon to add as an attachment.
-     */
-    void addAttachment(Icon icon);
 
     /**
      * Adds an attachment to the message.
@@ -250,24 +218,9 @@ public interface MessageBuilderBaseDelegate {
      * Adds an attachment to the message.
      *
      * @param url The url of the attachment.
-     */
-    void addAttachment(URL url);
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param url The url of the attachment.
      * @param description The description of the attachment.
      */
     void addAttachment(URL url, String description);
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param bytes The bytes of the file.
-     * @param fileName The name of the file.
-     */
-    void addAttachment(byte[] bytes, String fileName);
 
     /**
      * Adds an attachment to the message.
@@ -283,24 +236,9 @@ public interface MessageBuilderBaseDelegate {
      *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
-     */
-    void addAttachment(InputStream stream, String fileName);
-
-    /**
-     * Adds an attachment to the message.
-     *
-     * @param stream The stream of the file.
-     * @param fileName The name of the file.
      * @param description The description of the file.
      */
     void addAttachment(InputStream stream, String fileName, String description);
-
-    /**
-     * Adds a spoiler attachment to the message.
-     *
-     * @param file The file to add as an attachment.
-     */
-    void addAttachmentAsSpoiler(File file);
 
     /**
      * Adds a spoiler attachment to the message.
@@ -314,23 +252,9 @@ public interface MessageBuilderBaseDelegate {
      * Adds a spoiler attachment to the message.
      *
      * @param icon The icon to add as an attachment.
-     */
-    void addAttachmentAsSpoiler(Icon icon);
-
-    /**
-     * Adds a spoiler attachment to the message.
-     *
-     * @param icon The icon to add as an attachment.
      * @param description The description of the icon.
      */
     void addAttachmentAsSpoiler(Icon icon, String description);
-
-    /**
-     * Adds a spoiler attachment to the message.
-     *
-     * @param url The url of the attachment.
-     */
-    void addAttachmentAsSpoiler(URL url);
 
     /**
      * Adds a spoiler attachment to the message.

@@ -49,7 +49,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachment(BufferedImage image, String fileName) {
-        delegate.addAttachment(image, fileName);
+        addAttachment(image, fileName, null);
         return myClass.cast(this);
     }
 
@@ -61,7 +61,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachment(File file) {
-        delegate.addAttachment(file);
+        addAttachment(file, null);
         return myClass.cast(this);
     }
 
@@ -73,7 +73,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachment(Icon icon) {
-        delegate.addAttachment(icon);
+        addAttachment(icon, null);
         return myClass.cast(this);
     }
 
@@ -85,7 +85,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachment(URL url) {
-        delegate.addAttachment(url);
+        addAttachment(url, null);
         return myClass.cast(this);
     }
 
@@ -97,7 +97,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachment(byte[] bytes, String fileName) {
-        delegate.addAttachment(bytes, fileName);
+        addAttachment(bytes, fileName, null);
         return myClass.cast(this);
     }
 
@@ -109,7 +109,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachment(InputStream stream, String fileName) {
-        delegate.addAttachment(stream, fileName);
+        addAttachment(stream, fileName, null);
         return myClass.cast(this);
     }
 
@@ -121,7 +121,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        delegate.addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName, null);
         return myClass.cast(this);
     }
 
@@ -133,7 +133,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(File file) {
-        delegate.addAttachmentAsSpoiler(file);
+        addAttachmentAsSpoiler(file, null);
         return myClass.cast(this);
     }
 
@@ -145,7 +145,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(Icon icon) {
-        delegate.addAttachmentAsSpoiler(icon);
+        addAttachmentAsSpoiler(icon, null);
         return myClass.cast(this);
     }
 
@@ -157,7 +157,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(URL url) {
-        delegate.addAttachmentAsSpoiler(url);
+        addAttachmentAsSpoiler(url, null);
         return myClass.cast(this);
     }
 
@@ -169,7 +169,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        delegate.addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName);
         return myClass.cast(this);
     }
 
@@ -181,7 +181,7 @@ public abstract class ExtendedInteractionMessageBuilderBaseImpl<T>
 
     @Override
     public T addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        delegate.addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName);
         return myClass.cast(this);
     }
 

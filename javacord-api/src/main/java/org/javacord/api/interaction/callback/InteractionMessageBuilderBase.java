@@ -1,6 +1,5 @@
 package org.javacord.api.interaction.callback;
 
-import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.MessageFlag;
@@ -8,7 +7,6 @@ import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -73,54 +71,6 @@ public interface InteractionMessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     T setContent(String content);
-
-    /**
-     * Removes an attachment from the message.
-     *
-     * @param attachment The attachment to remove.
-     * @return The current instance in order to chain call methods.
-     */
-    T removeExistingAttachment(Attachment attachment);
-
-    /**
-     * Removes all the attachments from the message.
-     * @return The current instance in order to chain call methods.
-     */
-    T removeExistingAttachments();
-
-    /**
-     * Removes multiple attachments from the message.
-     *
-     * @param attachments The attachments to remove.
-     * @return The current instance in order to chain call methods.
-     */
-    T removeExistingAttachments(Attachment... attachments);
-
-    /**
-     * Removes multiple attachments from the message.
-     *
-     * @param attachments The attachments to remove.
-     * @return The current instance in order to chain call methods.
-     */
-    T removeExistingAttachments(Collection<Attachment> attachments);
-
-    /**
-     * Used to specify which attachments should be kept
-     * when editing the message.
-     *
-     * @param attachments The attachments to keep.
-     * @return The current instance in order to chain call methods.
-     */
-    T addAttachmentsToKeep(Attachment... attachments);
-
-    /**
-     * Used to specify which attachments should be kept
-     * when editing the message.
-     *
-     * @param attachments The attachments to keep.
-     * @return The current instance in order to chain call methods.
-     */
-    T addAttachmentsToKeep(Collection<Attachment> attachments);
 
     /**
      * Adds the embed to the message.

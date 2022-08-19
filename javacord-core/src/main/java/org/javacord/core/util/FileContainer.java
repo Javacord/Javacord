@@ -168,7 +168,6 @@ public class FileContainer {
         this(file, isSpoiler, null);
     }
 
-
     /**
      * Creates a new file container with an icon.
      *
@@ -214,7 +213,6 @@ public class FileContainer {
     public FileContainer(URL file, String description) {
         this(file, false, description);
     }
-
 
     /**
      * Creates a new file container with an url.
