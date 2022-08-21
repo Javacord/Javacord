@@ -47,7 +47,7 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      * Removes an attachment from the message.
      *
      * @param attachment The attachment to remove.
-     * @return The updated message.
+     * @return The current instance in order to chain call methods.
      */
     public MessageUpdater removeExistingAttachment(Attachment attachment) {
         delegate.removeExistingAttachment(attachment);
@@ -57,7 +57,7 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
     /**
      * Removes all the attachments from the message.
      *
-     * @return The updated message.
+     * @return The current instance in order to chain call methods.
      */
     public MessageUpdater removeExistingAttachments() {
         delegate.removeExistingAttachments();
@@ -68,7 +68,7 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      * Removes multiple attachments from the message.
      *
      * @param attachments The attachments to remove.
-     * @return The updated message.
+     * @return The current instance in order to chain call methods.
      */
     public MessageUpdater removeExistingAttachments(Attachment... attachments) {
         removeExistingAttachments(Arrays.asList(attachments));
@@ -79,7 +79,7 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      * Removes multiple attachments from the message.
      *
      * @param attachments The attachments to remove.
-     * @return The updated message.
+     * @return The current instance in order to chain call methods.
      */
     public MessageUpdater removeExistingAttachments(Collection<Attachment> attachments) {
         delegate.removeExistingAttachments(attachments);

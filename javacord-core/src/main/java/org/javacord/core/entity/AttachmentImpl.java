@@ -171,7 +171,7 @@ public class AttachmentImpl implements Attachment {
     }
 
     /**
-     * Creates a new attachment object from the given data.
+     * Creates the json structure of this attachment.
      *
      * @return The object node with the json data.
      */

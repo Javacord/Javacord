@@ -225,7 +225,7 @@ public class FileContainer {
     }
 
     /**
-     * Creates a new file container with an url.
+     * Creates a new file container with a byte array.
      *
      * @param file The file as an url.
      * @param isSpoiler Whether the file is to be marked as spoiler.
@@ -253,7 +253,7 @@ public class FileContainer {
     }
 
     /**
-     * Creates a new file container with an url.
+     * Creates a new file container with a byte array.
      *
      * @param file The file as a byte array.
      * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
@@ -271,7 +271,7 @@ public class FileContainer {
     }
 
     /**
-     * Creates a new file container with an url.
+     * Creates a new file container with an input stream.
      *
      * @param file The file as an input stream.
      * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
