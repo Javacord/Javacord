@@ -79,7 +79,7 @@ public class AttachmentImpl implements Attachment {
     /**
      * Creates a new attachment.
      *
-     * @param api The discord api instance.
+     * @param api  The discord api instance.
      * @param data The data of the attachment.
      */
     public AttachmentImpl(DiscordApi api, final JsonNode data) {
@@ -171,9 +171,9 @@ public class AttachmentImpl implements Attachment {
     }
 
     /**
-     * Adds the json data to the given object node.
+     * Creates a new attachment object from the given data.
      *
-     * @return The provided object with the data of the embed.
+     * @return The object node with the json data.
      */
     public ObjectNode toJsonNode() {
         ObjectNode attachments = JsonNodeFactory.instance.objectNode();

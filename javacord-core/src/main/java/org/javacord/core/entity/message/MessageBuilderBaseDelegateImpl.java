@@ -493,12 +493,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * Send a message to an incoming webhook.
      *
-     * @param webhookId The id of the webhook to send the message to
+     * @param webhookId    The id of the webhook to send the message to
      * @param webhookToken The token of the webhook to send the message to
-     * @param displayName The display name the webhook should use
-     * @param avatarUrl The avatar the webhook should use
-     * @param wait If the completable future will be completed
-     * @param api The api instance needed to send and return the message
+     * @param displayName  The display name the webhook should use
+     * @param avatarUrl    The avatar the webhook should use
+     * @param wait         If the completable future will be completed
+     * @param api          The api instance needed to send and return the message
      * @return The sent message
      */
     protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
@@ -560,9 +560,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      * Method which executes the webhook rest request.
      *
      * @param request The rest request to execute
-     * @param wait If discord sends us a response
-     * @param future The future to complete
-     * @param api The api instance needed to create the message
+     * @param wait    If discord sends us a response
+     * @param future  The future to complete
+     * @param api     The api instance needed to create the message
      */
     private static void executeWebhookRest(RestRequest<Message> request, boolean wait,
                                            CompletableFuture<Message> future, DiscordApi api) {
@@ -657,8 +657,8 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     private CompletableFuture<Message> executeRequestWithoutNewAttachments(TextChannel channel,
-                                                                        ObjectNode body,
-                                                                        RestRequest<Message> request) {
+                                                                           ObjectNode body,
+                                                                           RestRequest<Message> request) {
         request.setBody(body);
         return request.execute(
                 result -> ((DiscordApiImpl) channel.getApi()).getOrCreateMessage(channel, result.getJsonBody()));
@@ -692,10 +692,10 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * Method which creates and adds a MultipartBody to a RestRequest.
      *
-     * @param request The RestRequest to add the MultipartBody to
-     * @param body The body to use as base for the MultipartBody
+     * @param request     The RestRequest to add the MultipartBody to
+     * @param body        The body to use as base for the MultipartBody
      * @param attachments The List of FileContainers to add as attachments
-     * @param api The api instance needed to add the attachments
+     * @param api         The api instance needed to add the attachments
      */
     protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body,
                                              List<FileContainer> attachments, DiscordApi api) {
@@ -709,7 +709,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
             if (mediaType == null) {
                 mediaType = "application/octet-stream";
             }
-            multipartBodyBuilder.addFormDataPart("file" + i, fileContainer.getFileTypeOrName(),
+            multipartBodyBuilder.addFormDataPart("files[" + i + "]", fileContainer.getFileTypeOrName(),
                     RequestBody.create(bytes, MediaType.parse(mediaType)));
 
             if (fileContainer.getDescription() != null) {

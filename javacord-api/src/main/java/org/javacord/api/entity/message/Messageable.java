@@ -2,6 +2,7 @@ package org.javacord.api.entity.message;
 
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -33,24 +34,24 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param content  The content of the message.
-     * @param embed    The embed which should be displayed.
-     * @param tts      Whether the message should be "text to speech" or not.
-     * @param nonce    The nonce of the message.
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param content         The content of the message.
+     * @param embed           The embed which should be displayed.
+     * @param tts             Whether the message should be "text to speech" or not.
+     * @param nonce           The nonce of the message.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(
             String content, EmbedBuilder embed, boolean tts, String nonce, InputStream stream, String fileName,
-            String description) {
+            String fileDescription) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
                 .setTts(tts)
                 .setNonce(nonce)
-                .addAttachment(stream, fileName, description)
+                .addAttachment(stream, fileName, fileDescription)
                 .send(this);
     }
 
@@ -99,7 +100,7 @@ public interface Messageable {
      * Sends a message.
      *
      * @param content The content of the message.
-     * @param embed  The embed of the message.
+     * @param embed   The embed of the message.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed) {
@@ -138,8 +139,8 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param content    The content of the message.
-     * @param embeds     A list of embeds which should be displayed.
+     * @param content The content of the message.
+     * @param embeds  A list of embeds which should be displayed.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(String content, List<EmbedBuilder> embeds) {
@@ -269,14 +270,14 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
-    default CompletableFuture<Message> sendMessage(InputStream stream, String fileName, String description) {
+    default CompletableFuture<Message> sendMessage(InputStream stream, String fileName, String fileDescription) {
         return new MessageBuilder()
-                .addAttachment(stream, fileName, description)
+                .addAttachment(stream, fileName, fileDescription)
                 .send(this);
     }
 
@@ -295,17 +296,17 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param content  The content of the message.
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param content         The content of the message.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(String content, InputStream stream, String fileName,
-                                                   String description) {
+                                                   String fileDescription) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
-                .addAttachment(stream, fileName, description)
+                .addAttachment(stream, fileName, fileDescription)
                 .send(this);
     }
 
@@ -326,19 +327,19 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param content  The content of the message.
-     * @param embed    The embed which should be displayed.
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param content         The content of the message.
+     * @param embed           The embed which should be displayed.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(String content, EmbedBuilder embed, InputStream stream,
-                                                   String fileName, String description) {
+                                                   String fileName, String fileDescription) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbed(embed)
-                .addAttachment(stream, fileName, description)
+                .addAttachment(stream, fileName, fileDescription)
                 .send(this);
     }
 
@@ -359,19 +360,19 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param content  The content of the message.
-     * @param embeds   A list of embeds which should be displayed.
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param content         The content of the message.
+     * @param embeds          A list of embeds which should be displayed.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(String content, List<EmbedBuilder> embeds, InputStream stream,
-                                                   String fileName, String description) {
+                                                   String fileName, String fileDescription) {
         return new MessageBuilder()
                 .append(content == null ? "" : content)
                 .setEmbeds(embeds)
-                .addAttachment(stream, fileName, description)
+                .addAttachment(stream, fileName, fileDescription)
                 .send(this);
     }
 
@@ -432,15 +433,15 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param embed    The embed which should be displayed.
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param embed           The embed which should be displayed.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(EmbedBuilder embed, InputStream stream, String fileName,
-                                                   String description) {
-        return sendMessage(Collections.singletonList(embed), stream, fileName, description);
+                                                   String fileDescription) {
+        return sendMessage(Collections.singletonList(embed), stream, fileName, fileDescription);
     }
 
     /**
@@ -503,17 +504,17 @@ public interface Messageable {
     /**
      * Sends a message.
      *
-     * @param embeds   A list of embeds which should be displayed.
-     * @param stream   The stream for the file to send.
-     * @param fileName The name of the file.
-     * @param description The description of the file.
+     * @param embeds          A list of embeds which should be displayed.
+     * @param stream          The stream for the file to send.
+     * @param fileName        The name of the file.
+     * @param fileDescription The description of the file.
      * @return The message that has been sent.
      */
     default CompletableFuture<Message> sendMessage(List<EmbedBuilder> embeds, InputStream stream, String fileName,
-                                                   String description) {
+                                                   String fileDescription) {
         return new MessageBuilder()
                 .setEmbeds(embeds)
-                .addAttachment(stream, fileName, description)
+                .addAttachment(stream, fileName, fileDescription)
                 .send(this);
     }
 }
