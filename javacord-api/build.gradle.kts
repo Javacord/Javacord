@@ -48,3 +48,36 @@ tasks.jar {
         )
     }
 }
+
+tasks.javadoc {
+    options {
+        this as StandardJavadocDocletOptions
+        group("Public API", "*")
+        group(
+            "Internal Helpers",
+            this@javadoc
+                .source
+                .files
+                .asSequence()
+                .map { "${it.toURI()}" }
+                .filter { it.contains("/internal/") }
+                .map { uri ->
+                    sourceSets
+                        .main
+                        .get()
+                        .java
+                        .srcDirs
+                        .joinToString(
+                            separator = "|",
+                            prefix = "^(?:",
+                            postfix = """)(?:(?<!/)/)?|/[^/]*\.java$"""
+                        ) { """\Q${it.toURI()}\E""" }
+                        .toRegex()
+                        .replace(uri, "")
+                }
+                .map { it.replace("/", ".") }
+                .distinct()
+                .toList()
+        )
+    }
+}

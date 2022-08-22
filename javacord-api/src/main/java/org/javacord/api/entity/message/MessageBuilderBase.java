@@ -181,7 +181,6 @@ abstract class MessageBuilderBase<T> {
         return myClass.cast(this);
     }
 
-
     /**
      * Sets the embed of the message (overrides all existing embeds).
      *
@@ -237,7 +236,20 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachment(BufferedImage image, String fileName) {
-        delegate.addAttachment(image, fileName);
+        addAttachment(image, fileName, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachment(BufferedImage image, String fileName, String description) {
+        delegate.addAttachment(image, fileName, description);
         return myClass.cast(this);
     }
 
@@ -248,7 +260,19 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachment(File file) {
-        delegate.addAttachment(file);
+        addAttachment(file, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param file The file to add as an attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachment(File file, String description) {
+        delegate.addAttachment(file, description);
         return myClass.cast(this);
     }
 
@@ -259,7 +283,19 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachment(Icon icon) {
-        delegate.addAttachment(icon);
+        addAttachment(icon, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param icon The icon to add as an attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachment(Icon icon, String description) {
+        delegate.addAttachment(icon, description);
         return myClass.cast(this);
     }
 
@@ -270,7 +306,19 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachment(URL url) {
-        delegate.addAttachment(url);
+        addAttachment(url, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param url The url of the attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachment(URL url, String description) {
+        delegate.addAttachment(url, description);
         return myClass.cast(this);
     }
 
@@ -282,7 +330,20 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachment(byte[] bytes, String fileName) {
-        delegate.addAttachment(bytes, fileName);
+        addAttachment(bytes, fileName, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachment(byte[] bytes, String fileName, String description) {
+        delegate.addAttachment(bytes, fileName, description);
         return myClass.cast(this);
     }
 
@@ -294,7 +355,20 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachment(InputStream stream, String fileName) {
-        delegate.addAttachment(stream, fileName);
+        addAttachment(stream, fileName, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachment(InputStream stream, String fileName, String description) {
+        delegate.addAttachment(stream, fileName, description);
         return myClass.cast(this);
     }
 
@@ -306,7 +380,20 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        delegate.addAttachment(image, "SPOILER_" + fileName);
+        addAttachment(image, "SPOILER_" + fileName, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param image The image to add as an attachment.
+     * @param fileName The file name of the image.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachmentAsSpoiler(BufferedImage image, String fileName, String description) {
+        delegate.addAttachment(image, "SPOILER_" + fileName, description);
         return myClass.cast(this);
     }
 
@@ -317,7 +404,19 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(File file) {
-        delegate.addAttachmentAsSpoiler(file);
+        addAttachmentAsSpoiler(file, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param file The file to add as an attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachmentAsSpoiler(File file, String description) {
+        delegate.addAttachmentAsSpoiler(file, description);
         return myClass.cast(this);
     }
 
@@ -328,7 +427,19 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(Icon icon) {
-        delegate.addAttachmentAsSpoiler(icon);
+        addAttachmentAsSpoiler(icon, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param icon The icon to add as an attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachmentAsSpoiler(Icon icon, String description) {
+        delegate.addAttachmentAsSpoiler(icon, description);
         return myClass.cast(this);
     }
 
@@ -339,7 +450,19 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(URL url) {
-        delegate.addAttachmentAsSpoiler(url);
+        addAttachmentAsSpoiler(url, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param url The url of the attachment.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachmentAsSpoiler(URL url, String description) {
+        delegate.addAttachmentAsSpoiler(url, description);
         return myClass.cast(this);
     }
 
@@ -351,7 +474,20 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        delegate.addAttachment(bytes, "SPOILER_" + fileName);
+        addAttachment(bytes, "SPOILER_" + fileName, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param bytes The bytes of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachmentAsSpoiler(byte[] bytes, String fileName, String description) {
+        delegate.addAttachment(bytes, "SPOILER_" + fileName, description);
         return myClass.cast(this);
     }
 
@@ -363,7 +499,20 @@ abstract class MessageBuilderBase<T> {
      * @return The current instance in order to chain call methods.
      */
     public T addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        delegate.addAttachment(stream, "SPOILER_" + fileName);
+        addAttachment(stream, "SPOILER_" + fileName, null);
+        return myClass.cast(this);
+    }
+
+    /**
+     * Adds an attachment to the message and marks it as spoiler.
+     *
+     * @param stream The stream of the file.
+     * @param fileName The name of the file.
+     * @param description The description of the attachment.
+     * @return The current instance in order to chain call methods.
+     */
+    public T addAttachmentAsSpoiler(InputStream stream, String fileName, String description) {
+        delegate.addAttachment(stream, "SPOILER_" + fileName, description);
         return myClass.cast(this);
     }
 
