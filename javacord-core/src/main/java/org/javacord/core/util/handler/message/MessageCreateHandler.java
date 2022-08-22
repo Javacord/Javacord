@@ -87,11 +87,11 @@ public class MessageCreateHandler extends PacketHandler {
         Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
         MessageAuthor author = message.getAuthor();
 
-       if (message.isThreadMessage()) {
-           ServerThreadChannelImpl threadChannel = (ServerThreadChannelImpl) channel;
-           int totalNumberOfMessagesSent = threadChannel.getTotalNumberOfMessagesSent();
-           threadChannel.setTotalNumberOfMessagesSent(totalNumberOfMessagesSent + 1);
-       }
+        if (message.isThreadMessage()) {
+            ServerThreadChannelImpl threadChannel = (ServerThreadChannelImpl) channel;
+            int totalNumberOfMessagesSent = threadChannel.getTotalNumberOfMessagesSent();
+            threadChannel.setTotalNumberOfMessagesSent(totalNumberOfMessagesSent + 1);
+        }
 
         api.getEventDispatcher().dispatchMessageCreateEvent(
                 optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),

@@ -994,12 +994,14 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
-     * Checks if the message was sent in a {@link ChannelType#SERVER_PRIVATE_THREAD private thread} or {@link ChannelType#SERVER_PUBLIC_THREAD public thread} channel.
+     * Checks if the message was sent in a {@link ChannelType#SERVER_PRIVATE_THREAD private thread}
+     * or {@link ChannelType#SERVER_PUBLIC_THREAD public thread} channel.
      *
      * @return Whether the message was sent in a thread channel.
      */
     default boolean isThreadMessage() {
-        return getChannel().getType() == ChannelType.SERVER_PRIVATE_THREAD || getChannel().getType() == ChannelType.SERVER_PUBLIC_THREAD;
+        return getChannel().getType() == ChannelType.SERVER_PRIVATE_THREAD
+                || getChannel().getType() == ChannelType.SERVER_PUBLIC_THREAD;
     }
 
     /**
