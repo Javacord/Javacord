@@ -373,9 +373,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
     private void connect() {
         try {
             WebSocketFactory factory = new WebSocketFactory();
-            String webSocketUri;
 
-            webSocketUri = (resumeUrl != null ? resumeUrl : getGateway(api)) + "?encoding=json&v="
+            String webSocketUri = (resumeUrl != null ? resumeUrl : getGateway(api)) + "?encoding=json&v="
                     + Javacord.DISCORD_GATEWAY_VERSION;
 
             Proxy proxy = api.getProxy().orElseGet(() -> {
@@ -465,6 +464,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             websocket.connect();
         } catch (Throwable t) {
             resumeUrl = null;
+            sessionId = null;
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
                 reconnectingOrResumingLock.lock();
