@@ -375,13 +375,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             WebSocketFactory factory = new WebSocketFactory();
             String webSocketUri;
 
-            if (sessionId == null) {
-                webSocketUri = getGateway(api) + "?encoding=json&v="
-                        + Javacord.DISCORD_GATEWAY_VERSION;
-            } else {
-                webSocketUri = (resumeUrl != null ? resumeUrl : getGateway(api)) + "?encoding=json&v="
-                        + Javacord.DISCORD_GATEWAY_VERSION;
-            }
+            webSocketUri = (resumeUrl != null ? resumeUrl : getGateway(api)) + "?encoding=json&v="
+                    + Javacord.DISCORD_GATEWAY_VERSION;
+
             Proxy proxy = api.getProxy().orElseGet(() -> {
                 List<Proxy> proxies = api.getProxySelector().orElseGet(ProxySelector::getDefault).select(URI.create(
                         webSocketUri.replace("wss://", "https://").replace("ws://", "http://")));
