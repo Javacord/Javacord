@@ -653,8 +653,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                         return;
                     }
                 }
-                api.getGatewayIdentifyRatelimiter().requestQuota();
-                sendIdentify(websocket);
+                if (packet.get("d").asBoolean()) {
+                    api.getGatewayIdentifyRatelimiter().requestQuota();
+                    sendIdentify(websocket);
+                } else {
+                    sessionId = null;
+                    resumeUrl = null;
+                }
                 break;
             case HELLO:
                 logger.debug("Received HELLO packet");
