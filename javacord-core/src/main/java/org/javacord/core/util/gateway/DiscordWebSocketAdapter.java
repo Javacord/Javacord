@@ -464,7 +464,6 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             websocket.connect();
         } catch (Throwable t) {
             resumeUrl = null;
-            sessionId = null;
             logger.warn("An error occurred while connecting to websocket", t);
             if (reconnect) {
                 reconnectingOrResumingLock.lock();
