@@ -2,6 +2,7 @@ package org.javacord.api.entity.server.internal;
 
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.server.PrivacyLevel;
+import org.javacord.api.entity.server.ScheduledEvent;
 import org.javacord.api.entity.server.ScheduledEventType;
 
 import java.awt.image.BufferedImage;
@@ -12,6 +13,8 @@ import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
 public interface EventBuilderDelegate {
+    void setAuditLogReason(String reason);
+
     void setChannel(long channelId);
 
     void setChannel(Channel channel);
@@ -92,5 +95,5 @@ public interface EventBuilderDelegate {
      */
     void setImage(InputStream image, String fileType);
 
-    CompletableFuture<Long> create();
+    CompletableFuture<ScheduledEvent> create();
 }

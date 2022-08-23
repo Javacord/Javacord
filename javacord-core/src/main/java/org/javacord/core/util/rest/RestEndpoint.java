@@ -49,6 +49,9 @@ public enum RestEndpoint {
     STICKER("/stickers"),
     STICKER_PACK("/sticker-packs"),
     SERVER_STICKER("/guilds/%s/stickers", 0),
+    EVENT("/guilds/%s/scheduled-events", 0),
+    EVENT_UPDATE("/guilds/%s/scheduled-events/%s", 0),
+    EVENT_USERS("/guilds/%s/scheduled-events/%s/users", 0),
     // interactions
     INTERACTION_RESPONSE("/interactions/%s/%s/callback"),
     ORIGINAL_INTERACTION_RESPONSE("/webhooks/%s/%s/messages/@original"),

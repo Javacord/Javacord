@@ -18,6 +18,11 @@ public class EventBuilder {
         delegate = DelegateFactory.createEventBuilderDelegate(server);
     }
 
+    public EventBuilder setAuditLogReason(String reason) {
+        delegate.setAuditLogReason(reason);
+        return this;
+    }
+
     public EventBuilder setChannel(long channelId) {
         delegate.setChannel(channelId);
         return this;
@@ -103,7 +108,7 @@ public class EventBuilder {
         return this;
     }
 
-    public CompletableFuture<Long> create() {
+    public CompletableFuture<ScheduledEvent> create() {
         return delegate.create();
     }
 }
