@@ -31,17 +31,7 @@ import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.server.ActiveThreads;
-import org.javacord.api.entity.server.Ban;
-import org.javacord.api.entity.server.BoostLevel;
-import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
-import org.javacord.api.entity.server.ExplicitContentFilterLevel;
-import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
-import org.javacord.api.entity.server.NsfwLevel;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.server.ServerFeature;
-import org.javacord.api.entity.server.SystemChannelFlag;
-import org.javacord.api.entity.server.VerificationLevel;
+import org.javacord.api.entity.server.*;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.server.invite.WelcomeScreen;
 import org.javacord.api.entity.sticker.Sticker;
@@ -101,6 +91,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -796,6 +787,23 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 this.roles.put(role.getId(), role);
                 return role;
             });
+        }
+    }
+
+    /**
+     * Gets a new scheduled event.
+     *
+     * @param data The json data of the scheduled event.
+     * @return The scheduled event.
+     */
+    public ScheduledEvent getOrCreateScheduledEvent(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        synchronized (this) {
+            try {
+                return getScheduledEventById(id).get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -2052,5 +2060,25 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public EnumSet<SystemChannelFlag> getSystemChannelFlags() {
         return EnumSet.copyOf(systemChannelFlags);
+    }
+
+    @Override
+    public CompletableFuture<List<ScheduledEvent>> getScheduledEvents() {
+        return new RestRequest<List<ScheduledEvent>>(api, RestMethod.GET, RestEndpoint.EVENT)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    List<ScheduledEvent> events = new ArrayList<>();
+                    for (JsonNode eventJson : result.getJsonBody()) {
+                        events.add(new ScheduledEventImpl(api, this, eventJson));
+                    }
+                    return events;
+                });
+    }
+
+    @Override
+    public CompletableFuture<ScheduledEvent> getScheduledEventById(long id) {
+        return new RestRequest<ScheduledEvent>(api, RestMethod.GET, RestEndpoint.EVENT_UPDATE)
+                .setUrlParameters(getIdAsString(), String.valueOf(id))
+                .execute(result -> new ScheduledEventImpl(api, this, result.getJsonBody()));
     }
 }

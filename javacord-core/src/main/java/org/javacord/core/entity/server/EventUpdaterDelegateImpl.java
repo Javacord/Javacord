@@ -171,15 +171,15 @@ public class EventUpdaterDelegateImpl implements EventUpdaterDelegate {
                         + Base64.getEncoder().encodeToString(bytes);
                 body.put("image", base64Icon);
             }).thenCompose(aVoid -> new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.PATCH, RestEndpoint.EVENT_UPDATE)
-                    .setUrlParameters(String.valueOf(event.getServerId()), String.valueOf(event.getServerId()))
+                    .setUrlParameters(String.valueOf(event.getServer().getId()), String.valueOf(event.getServer().getId()))
                     .setBody(body)
                     .setAuditLogReason(reason)
-                    .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody())));
+                    .execute(result -> new ScheduledEventImpl(server.getApi(), (ServerImpl) server, result.getJsonBody())));
         }
         return new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.PATCH, RestEndpoint.EVENT_UPDATE)
-                .setUrlParameters(String.valueOf(event.getServerId()), String.valueOf(event.getServerId()))
+                .setUrlParameters(String.valueOf(event.getServer().getId()), String.valueOf(event.getServer().getId()))
                 .setBody(body)
                 .setAuditLogReason(reason)
-                .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody()));
+                .execute(result -> new ScheduledEventImpl(server.getApi(), (ServerImpl) server, result.getJsonBody()));
     }
 }

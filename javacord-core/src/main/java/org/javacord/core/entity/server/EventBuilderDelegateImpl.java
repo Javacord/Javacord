@@ -164,12 +164,12 @@ public class EventBuilderDelegateImpl implements EventBuilderDelegate {
                     .setUrlParameters(String.valueOf(server.getId()))
                     .setBody(body)
                     .setAuditLogReason(reason)
-                    .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody())));
+                    .execute(result -> new ScheduledEventImpl(server.getApi(), server, result.getJsonBody())));
         }
         return new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.POST, RestEndpoint.EVENT)
                 .setUrlParameters(String.valueOf(server.getId()))
                 .setBody(body)
                 .setAuditLogReason(reason)
-                .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody()));
+                .execute(result -> new ScheduledEventImpl(server.getApi(), server, result.getJsonBody()));
     }
 }

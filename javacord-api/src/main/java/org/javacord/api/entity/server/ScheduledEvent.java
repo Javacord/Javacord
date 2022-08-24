@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ScheduledEvent extends DiscordEntity, Nameable {
     // TODO: add javadoc
 
-    Long getServerId();
+    Server getServer();
 
     Optional<Long> getChannelId();
 

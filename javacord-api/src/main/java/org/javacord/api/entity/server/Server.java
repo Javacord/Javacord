@@ -3490,4 +3490,16 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return The system channel flags for this server.
      */
     public EnumSet<SystemChannelFlag> getSystemChannelFlags();
+
+    CompletableFuture<List<ScheduledEvent>> getScheduledEvents();
+
+    CompletableFuture<ScheduledEvent> getScheduledEventById(long id);
+
+    default CompletableFuture<ScheduledEvent> getScheduledEventById(String id) {
+        try {
+            return getScheduledEventById(Long.parseLong(id));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("The ID must be a number.");
+        }
+    }
 }
