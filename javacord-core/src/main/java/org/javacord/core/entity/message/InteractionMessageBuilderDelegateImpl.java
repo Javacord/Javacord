@@ -147,12 +147,12 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
 
     private CompletableFuture<Message> checkForAttachmentsAndExecuteRequest(RestRequest<Message> request,
                                                                             ObjectNode body) {
-        if (!attachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
+        if (!newAttachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
             request.getApi().getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                     // Add the attachments required for the embed
                     for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
@@ -164,7 +164,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
                     request.execute(result -> request.getApi().getOrCreateMessage(
                             request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
                                     .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
-                            result.getJsonBody()))
+                                    result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
                                 if (throwable != null) {
                                     future.completeExceptionally(throwable);

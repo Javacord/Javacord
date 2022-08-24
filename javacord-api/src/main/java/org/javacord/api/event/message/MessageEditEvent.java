@@ -1,41 +1,34 @@
 package org.javacord.api.event.message;
 
-import org.javacord.api.entity.message.embed.Embed;
-
-import java.util.List;
+import org.javacord.api.entity.message.Message;
 import java.util.Optional;
 
 /**
  * A message delete event.
  */
-public interface MessageEditEvent extends RequestableMessageEvent {
+public interface MessageEditEvent extends CertainMessageEvent {
 
     /**
-     * Gets the new content of the message.
+     * Gets the updated message.
      *
-     * @return The new content of the message.
+     * @return The updated message.
      */
-    String getNewContent();
+    @Override
+    Message getMessage();
 
     /**
-     * Gets the old content of the message. It will only be present, if the message is in the cache.
+     * Gets the old message with its old content. It will only be present if the message
+     * was in the cache before this event.
      *
-     * @return The old content of the message.
+     * @return The old message.
      */
-    Optional<String> getOldContent();
+    Optional<Message> getOldMessage();
 
     /**
-     * Gets the new embeds of the message.
+     * Whether this event represents a real change of the contents of this message.
      *
-     * @return The new embeds of the message.
+     * @return true if the original author updated the contents of this message; false otherwise
      */
-    List<Embed> getNewEmbeds();
-
-    /**
-     * Gets the old embeds of the message. It will only be present, if the message is in the cache.
-     *
-     * @return The old embeds of the message.
-     */
-    Optional<List<Embed>> getOldEmbeds();
+    boolean isActualEdit();
 
 }

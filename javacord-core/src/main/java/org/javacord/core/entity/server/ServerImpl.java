@@ -40,8 +40,10 @@ import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
 import org.javacord.api.entity.server.NsfwLevel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerFeature;
+import org.javacord.api.entity.server.SystemChannelFlag;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.server.invite.WelcomeScreen;
 import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
@@ -65,6 +67,7 @@ import org.javacord.core.entity.channel.UnknownRegularServerChannelImpl;
 import org.javacord.core.entity.channel.UnknownServerChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.server.invite.WelcomeScreenImpl;
 import org.javacord.core.entity.sticker.StickerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
@@ -87,6 +90,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -277,15 +281,47 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private volatile String discoverySplash;
 
     /**
-     * Whether the server has join messages enabled.
+     * True if the server widget is enabled.
      */
-    private volatile boolean hasJoinMessagesEnabled = true;
+    private volatile boolean widgetEnabled;
+    
+    /**
+     * The channel id that the widget will generate an invite to, or null if set to no invite.
+     */
+    private volatile Long widgetChannelId;
+    
+    /**
+     * The maximum number of presences for the guild (null is always returned, apart from the largest of guilds).
+     */
+    private volatile Integer maxPresences;
+    
+    /**
+     * The maximum number of members for the guild.
+     */
+    private volatile Integer maxMembers;
+    
+    /**
+     * The maximum amount of users in a video channel.
+     */
+    private volatile Integer maxVideoChannelUsers;
+    
+    /**
+     * The welcome screen of a community server, shown to new members.
+     */
+    private volatile WelcomeScreen welcomeScreen;
+    
+    /**
+     * Whether the server's boost progress bar is enabled or not.
+     */
+    private volatile boolean premiumProgressBarEnabled;
 
     /**
-     * Whether the server has boost messages enabled.
+     * The enum set of all server system channel flags.
      */
-    private volatile boolean hasBoostMessagesEnabled = true;
-
+    private final EnumSet<SystemChannelFlag> systemChannelFlags = 
+            EnumSet.noneOf(SystemChannelFlag.class);
+    
+    
     /**
      * Creates a new server object.
      *
@@ -350,7 +386,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             vanityUrlCode = new VanityUrlCodeImpl(data.get("vanity_url_code").asText());
         }
         if (data.hasNonNull("system_channel_flags")) {
-            setSystemChannelFlag(data.get("system_channel_flags").asInt());
+            int systemChannelFlag = data.get("system_channel_flags").asInt();
+            setSystemChannelFlag(systemChannelFlag);
         }
 
         if (data.has("channels")) {
@@ -512,6 +549,23 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             }
         }
 
+        if (data.has("welcome_screen")) {
+            this.welcomeScreen = new WelcomeScreenImpl(data.get("welcome_screen"));
+        } else {
+            this.welcomeScreen = null;
+        }
+
+        this.widgetEnabled = data.path("widget_enabled").asBoolean(false);
+        this.widgetChannelId = data.hasNonNull("widget_channel_id") 
+                            ? data.get("widget_channel_id").asLong() : null;
+        this.maxPresences = data.hasNonNull("max_presences") 
+                            ? data.get("max_presences").asInt() : null;
+        this.maxMembers = data.hasNonNull("max_members") 
+                            ? data.get("max_members").asInt() : null;
+        this.maxVideoChannelUsers = data.hasNonNull("max_video_channel_users") 
+                            ? data.get("max_video_channel_users").asInt() : null;
+        this.premiumProgressBarEnabled = data.path("premium_progress_bar_enabled").asBoolean(false);
+        
         api.addServerToCache(this);
     }
 
@@ -524,11 +578,14 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * Sets the system channel flags.
      *
-     * @param value The system channel flag.
+     * @param systemChannelFlag The system channel flag.
      */
-    public void setSystemChannelFlag(int value) {
-        hasJoinMessagesEnabled = (value & (1)) != (1);
-        hasBoostMessagesEnabled = (value & (1 << 1)) != (1 << 1);
+    public void setSystemChannelFlag(int systemChannelFlag) {
+        for (SystemChannelFlag flag : SystemChannelFlag.values()) {
+            if ((flag.asInt() & systemChannelFlag) == flag.asInt()) {
+                systemChannelFlags.add(flag);
+            }
+        }
     }
 
     /**
@@ -1142,16 +1199,6 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public boolean hasBoostMessagesEnabled() {
-        return hasBoostMessagesEnabled;
-    }
-
-    @Override
-    public boolean hasJoinMessagesEnabled() {
-        return hasJoinMessagesEnabled;
-    }
-
-    @Override
     public Set<ServerFeature> getFeatures() {
         return Collections.unmodifiableSet(new HashSet<>(serverFeatures));
     }
@@ -1475,6 +1522,41 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public boolean isWidgetEnabled() {
+        return widgetEnabled;
+    }
+
+    @Override
+    public Optional<Long> getWidgetChannelId() {
+        return Optional.ofNullable(widgetChannelId);
+    }
+
+    @Override
+    public Optional<Integer> getMaxPresences() {
+        return Optional.ofNullable(maxPresences);
+    }
+
+    @Override
+    public Optional<Integer> getMaxMembers() {
+        return Optional.ofNullable(maxMembers);
+    }
+
+    @Override
+    public Optional<Integer> getMaxVideoChannelUsers() {
+        return Optional.ofNullable(maxVideoChannelUsers);
+    }
+
+    @Override
+    public Optional<WelcomeScreen> getWelcomeScreen() {
+        return Optional.ofNullable(welcomeScreen);
+    }
+
+    @Override
+    public boolean isPremiumProgressBarEnabled() {
+        return premiumProgressBarEnabled;
+    }
+
+    @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
     }
@@ -1568,11 +1650,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), userId)
-                .addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
+                .setUrlParameters(getIdAsString(), userId);
+
+        if (deleteMessageDays > 0) {
+            request.addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
+        }
+
         if (reason != null) {
             request.addQueryParameter("reason", reason);
         }
+
         return request.execute(result -> null);
     }
 
@@ -1961,5 +2048,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public String toString() {
         return String.format("Server (id: %s, name: %s)", getIdAsString(), getName());
     }
-
+    
+    @Override
+    public EnumSet<SystemChannelFlag> getSystemChannelFlags() {
+        return EnumSet.copyOf(systemChannelFlags);
+    }
 }
