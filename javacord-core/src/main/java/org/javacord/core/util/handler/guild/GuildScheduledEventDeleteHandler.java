@@ -2,6 +2,7 @@ package org.javacord.core.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
 public class GuildScheduledEventDeleteHandler extends PacketHandler {
@@ -16,6 +17,9 @@ public class GuildScheduledEventDeleteHandler extends PacketHandler {
 
     @Override
     protected void handle(JsonNode packet) {
-
+        long serverId = Long.parseLong(packet.get("guild_id").asText());
+        api.getPossiblyUnreadyServerById(serverId).map(server -> ((ServerImpl) server)).ifPresent(server -> {
+           long scheduledEventId = Long.parseLong(packet.get("id").asText());
+        });
     }
 }
