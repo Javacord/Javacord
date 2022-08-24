@@ -141,7 +141,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
     private volatile int lastSeq = -1;
     private volatile String sessionId = null;
-    private String resumeUrl = null;
+    private volatile String resumeUrl = null;
 
     private volatile boolean reconnect;
 
