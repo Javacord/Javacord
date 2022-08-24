@@ -22,6 +22,7 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
 
@@ -31,6 +32,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -814,6 +816,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     Optional<MessageActivity> getActivity();
 
     /**
+     * Gets the flags of the message.
+     *
+     * @return The flags of the message.
+     */
+    EnumSet<MessageFlag> getFlags();
+
+    /**
      * Checks if the message is pinned.
      *
      * @return Whether the message is pinned or not.
@@ -906,6 +915,13 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * @return All reactions of the message.
      */
     List<Reaction> getReactions();
+
+    /**
+     * Gets the Message Interaction Object if the message is a response to an Interaction without an existing message.
+     *
+     * @return The Message Interaction Object.
+     */
+    Optional<MessageInteraction> getMessageInteraction();
 
     /**
      * Gets all components of the message.
