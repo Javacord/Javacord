@@ -101,6 +101,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -1648,16 +1649,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
+    public CompletableFuture<Void> banUser(String userId, int deleteMessageDuration, TimeUnit unit) {
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), userId);
 
-        if (deleteMessageDays > 0) {
-            request.addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
-        }
-
-        if (reason != null) {
-            request.addQueryParameter("reason", reason);
+        if (deleteMessageDuration > 0) {
+            request.addQueryParameter("delete_message_seconds", String.valueOf(unit.toSeconds(deleteMessageDuration)));
         }
 
         return request.execute(result -> null);

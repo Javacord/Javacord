@@ -58,6 +58,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -2009,12 +2010,12 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param user              The user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration. (0-7)
+     * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
-    default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
-        return banUser(user.getId(), deleteMessageDays, reason);
+    default CompletableFuture<Void> banUser(User user, int deleteMessageDuration, TimeUnit unit) {
+        return banUser(user.getId(), deleteMessageDuration, unit);
     }
 
     /**
@@ -2063,22 +2064,22 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration. (0-7)
+     * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
-    CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason);
+    CompletableFuture<Void> banUser(String userId, int deleteMessageDuration, TimeUnit unit);
 
     /**
      * Bans the given user from the server.
      *
      * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration. (0-7)
+     * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
-    default CompletableFuture<Void> banUser(long userId, int deleteMessageDays, String reason) {
-        return banUser(Long.toUnsignedString(userId), deleteMessageDays, reason);
+    default CompletableFuture<Void> banUser(long userId, int deleteMessageDuration, TimeUnit unit) {
+        return banUser(Long.toUnsignedString(userId), deleteMessageDuration, unit);
     }
 
     /**
