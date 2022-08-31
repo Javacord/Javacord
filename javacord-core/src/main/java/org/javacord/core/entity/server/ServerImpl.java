@@ -85,6 +85,7 @@ import org.javacord.core.util.rest.RestRequestResult;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1649,12 +1650,43 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Void> banUser(String userId, int deleteMessageDuration, TimeUnit unit) {
+    public CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), userId);
+        if (deleteMessageDays > 0) {
+            request.addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
+        }
+        if (reason != null) {
+            request.addQueryParameter("reason", reason);
+        }
+        return request.execute(result -> null);
+    }
 
+    @Override
+    public CompletableFuture<Void> banUser(String userId, int deleteMessageDuration, TimeUnit unit, String reason) {
+        RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), userId);
         if (deleteMessageDuration > 0) {
             request.addQueryParameter("delete_message_seconds", String.valueOf(unit.toSeconds(deleteMessageDuration)));
+        }
+
+        if (reason != null) {
+            request.addQueryParameter("reason", reason);
+        }
+
+        return request.execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> banUser(String userId, Duration duration, String reason) {
+        RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), userId);
+        if (duration != null) {
+            request.addQueryParameter("delete_message_seconds", String.valueOf(duration.getSeconds()));
+        }
+
+        if (reason != null) {
+            request.addQueryParameter("reason", reason);
         }
 
         return request.execute(result -> null);
