@@ -183,7 +183,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @param user The user to check.
      * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
-     * if user is currently not timed out.
+     *         if user is currently not timed out.
      */
     Optional<Instant> getTimeout(User user);
 
@@ -2026,7 +2026,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param user                  The user to ban.
-     * @param deleteMessageDuration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
      * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
@@ -2038,7 +2039,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param user                  The user to ban.
-     * @param deleteMessageDuration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
      * @param unit                  The unit of time for the duration.
      * @param reason                The reason for the ban.
      * @return A future to check if the ban was successful.
@@ -2097,7 +2099,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
      * @deprecated Use {@link #banUser(String, int, TimeUnit)} instead as
-     * deleteMessageDays is deprecated by discord.
+     *             deleteMessageDays is deprecated by discord.
      */
     @Deprecated
     default CompletableFuture<Void> banUser(String userId, int deleteMessageDays) {
@@ -2111,7 +2113,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
      * @deprecated Use {@link #banUser(long, int, TimeUnit)} instead as
-     * deleteMessageDays is deprecated by discord.
+     *              deleteMessageDays is deprecated by discord.
      */
     @Deprecated
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays) {
@@ -2122,7 +2124,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param userId                The id of the user to ban.
-     * @param deleteMessageDuration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
      * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
@@ -2134,7 +2137,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param userId                The id of the user to ban.
-     * @param deleteMessageDuration The number of messages to delete within the duration. Between 0 and 604800 seconds (7 days))
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              Between 0 and 604800 seconds (7 days))
      * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
@@ -2172,7 +2176,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
      * @deprecated Use {@link #banUser(String, int, TimeUnit, String)} instead as
-     * deleteMessageDays is deprecated by discord.
+     *             deleteMessageDays is deprecated by discord.
      */
     @Deprecated
     CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason);
@@ -2185,7 +2189,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
      * @deprecated Use {@link #banUser(String, int, TimeUnit, String)} instead as
-     * deleteMessageDays is deprecated by discord.
+     *             deleteMessageDays is deprecated by discord.
      */
     @Deprecated
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays, String reason) {
@@ -2196,7 +2200,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param userId                The id of the user to ban.
-     * @param deleteMessageDuration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
      * @param unit                  The unit of time for the duration.
      * @param reason                The reason for the ban.
      * @return A future to check if the ban was successful.
@@ -2207,7 +2212,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Bans the given user from the server.
      *
      * @param userId                The id of the user to ban.
-     * @param deleteMessageDuration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
      * @param unit                  The unit of time for the duration.
      * @param reason                The reason for the ban.
      * @return A future to check if the ban was successful.

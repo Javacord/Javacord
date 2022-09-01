@@ -1657,7 +1657,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             request.addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
         }
         if (reason != null) {
-            request.addQueryParameter("reason", reason);
+            request.setAuditLogReason(reason);
         }
         return request.execute(result -> null);
     }
@@ -1671,7 +1671,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         if (reason != null) {
-            request.addQueryParameter("reason", reason);
+            request.setAuditLogReason(reason);
         }
 
         return request.execute(result -> null);
@@ -1686,7 +1686,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         if (reason != null) {
-            request.addQueryParameter("reason", reason);
+            request.setAuditLogReason(reason);
         }
 
         return request.execute(result -> null);
