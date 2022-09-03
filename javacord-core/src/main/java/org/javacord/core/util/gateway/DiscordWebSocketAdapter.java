@@ -640,24 +640,27 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 if (lastSentFrameWasIdentify.isMarked()) {
                     logger.info("Hit identifying rate limit. Retrying in 5 seconds...");
                 } else {
-                    // Invalid session :(
-                    int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
-                    logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
-                            () -> oneToFiveSeconds / 1000,
-                            () -> oneToFiveSeconds / 100 % 10);
-                    try {
-                        Thread.sleep(oneToFiveSeconds);
-                    } catch (InterruptedException e) {
-                        logger.error("Interrupted while delaying reconnect!");
-                        return;
-                    }
-                }
-                if (packet.get("d").asBoolean()) {
-                    api.getGatewayIdentifyRatelimiter().requestQuota();
-                    sendIdentify(websocket);
-                } else {
                     sessionId = null;
                     resumeUrl = null;
+                    if (packet.get("d").asBoolean()) {
+                        // Invalid session :(
+                        int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
+                        logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
+                                () -> oneToFiveSeconds / 1000,
+                                () -> oneToFiveSeconds / 100 % 10);
+                        try {
+                            Thread.sleep(oneToFiveSeconds);
+                        } catch (InterruptedException e) {
+                            logger.error("Interrupted while delaying reconnect!");
+                            return;
+                        }
+                        sendCloseFrame(websocket,
+                                WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
+                                WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
+                    } else {
+                        api.getGatewayIdentifyRatelimiter().requestQuota();
+                        sendIdentify(websocket);
+                    }
                 }
                 break;
             case HELLO:
