@@ -6,20 +6,19 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
-import org.javacord.api.event.channel.server.thread.*;
 import org.javacord.api.event.channel.server.thread.ServerPrivateThreadJoinEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchivedEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLockedEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMemberCountEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMessageCountEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchivedEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLockedEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMemberCountEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerPrivateThreadJoinEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMessageCountEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEventImpl;
+import org.javacord.core.event.channel.server.thread.*;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -110,7 +109,8 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final int oldAutoArchiveDuration = thread.getAutoArchiveDuration();
-        final int newAutoArchiveDuration = jsonChannel.get("auto_archive_duration").asInt();
+        final int newAutoArchiveDuration = jsonChannel.get("thread_metadata").get("auto_archive_duration")
+                .asInt();
         if (oldAutoArchiveDuration != newAutoArchiveDuration) {
             thread.setAutoArchiveDuration(newAutoArchiveDuration);
 
@@ -124,7 +124,7 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final boolean wasArchived = thread.isArchived();
-        final boolean isArchived = jsonChannel.get("archived").asBoolean();
+        final boolean isArchived = jsonChannel.get("thread_metadata").get("archived").asBoolean();
 
         if (wasArchived != isArchived) {
             thread.setArchived(isArchived);
@@ -137,7 +137,7 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final boolean wasLocked = thread.isLocked();
-        final boolean isLocked = jsonChannel.get("locked").asBoolean();
+        final boolean isLocked = jsonChannel.get("thread_metadata").get("locked").asBoolean();
 
         if (wasLocked != isLocked) {
             thread.setLocked(isLocked);
@@ -150,8 +150,8 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final Instant oldArchiveTimestamp = thread.getArchiveTimestamp();
-        final Instant newArchiveTimestamp = OffsetDateTime.parse(jsonChannel.get("archive_timestamp").asText())
-                .toInstant();
+        final Instant newArchiveTimestamp = OffsetDateTime.parse(jsonChannel.get("thread_metadata")
+                .get("archive_timestamp").asText()).toInstant();
 
         if (!Objects.deepEquals(oldArchiveTimestamp, newArchiveTimestamp)) {
             thread.setArchiveTimestamp(newArchiveTimestamp);
