@@ -89,7 +89,7 @@ public class ThreadUpdateHandler extends PacketHandler {
 
 
             api.getEventDispatcher().dispatchServerChannelChangeNameEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final int oldMessageCount = thread.getMessageCount();
@@ -100,9 +100,8 @@ public class ThreadUpdateHandler extends PacketHandler {
             final ServerThreadChannelChangeMessageCountEvent event =
                     new ServerThreadChannelChangeMessageCountEventImpl(thread, newMessageCount, oldMessageCount);
 
-
             api.getEventDispatcher().dispatchServerThreadChannelChangeMessageCountEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final int oldMemberCount = thread.getMemberCount();
@@ -114,7 +113,7 @@ public class ThreadUpdateHandler extends PacketHandler {
                     new ServerThreadChannelChangeMemberCountEventImpl(thread, newMemberCount, oldMemberCount);
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeMemberCountEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final int oldAutoArchiveDuration = thread.getAutoArchiveDuration();
@@ -142,9 +141,8 @@ public class ThreadUpdateHandler extends PacketHandler {
                     new ServerThreadChannelChangeArchivedEventImpl(thread, isArchived, wasArchived);
 
 
-
             api.getEventDispatcher().dispatchServerThreadChannelChangeArchivedEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final boolean wasLocked = thread.isLocked();
@@ -158,7 +156,7 @@ public class ThreadUpdateHandler extends PacketHandler {
 
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeLockedEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final Instant oldArchiveTimestamp = thread.getArchiveTimestamp();
@@ -174,13 +172,12 @@ public class ThreadUpdateHandler extends PacketHandler {
 
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeArchiveTimestampEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final Set<ThreadMember> oldMembers = thread.getMembers();
         final Set<ThreadMember> newMembers = new HashSet<>();
 
-        //id and userid are only omitted on GUILD_CREATE event
         if (jsonChannel.hasNonNull("member")) {
             for (final JsonNode jsonMember : jsonChannel.get("member")) {
                 final ThreadMember member = new ThreadMemberImpl(api, server, jsonMember);
@@ -197,7 +194,7 @@ public class ThreadUpdateHandler extends PacketHandler {
 
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeMembersEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
         final int oldNumberOfMessages = thread.getTotalNumberOfMessagesSent();
@@ -210,7 +207,7 @@ public class ThreadUpdateHandler extends PacketHandler {
                             oldNumberOfMessages);
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeTotalMessageSentEvent(
-                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
     }
 }

@@ -13,6 +13,7 @@ import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -98,7 +99,9 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
 
         members = new HashSet<>();
         if (data.hasNonNull("member")) {
-            //id and userid are only omitted on GUILD_CREATE event
+            // If userId is not included, that means this came from a GUILD_CREATE event
+            // This means the userId is the bot's and the thread id is from this thread
+            // See https://github.com/Javacord/Javacord/issues/898
             if (data.get("member").hasNonNull("user_id")) {
                 members.add(new ThreadMemberImpl(api, server, data.get("member")));
             } else {
