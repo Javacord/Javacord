@@ -38,6 +38,7 @@ import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
 import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
 import org.javacord.api.entity.server.NsfwLevel;
+import org.javacord.api.entity.server.ScheduledEvent;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerFeature;
 import org.javacord.api.entity.server.VerificationLevel;
@@ -216,6 +217,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * All roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
+
+    /**
+     * All events on the server.
+     */
+    private final ConcurrentHashMap<Long, ScheduledEvent> events = new ConcurrentHashMap<>();
 
     /**
      * All custom emojis from this server.
@@ -708,6 +714,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
+     * Removes an event from the cache.
+     *
+     * @param eventId The id of the event to remove.
+     */
+    public void removeEvent(long eventId) {
+        events.remove(eventId);
+    }
+
+    /**
      * Adds a custom emoji.
      *
      * @param emoji The emoji to add.
@@ -738,6 +753,24 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 Role role = new RoleImpl(api, this, data);
                 this.roles.put(role.getId(), role);
                 return role;
+            });
+        }
+    }
+
+    /**
+     * Gets or create a new role.
+     *
+     * @param data The json data of the role.
+     * @return The role.
+     */
+    public ScheduledEvent getOrCreateEvent(JsonNode data) {
+        // TODO: call this from event pipeline
+        long id = Long.parseLong(data.get("id").asText());
+        synchronized (this) {
+            return getEventById(id).orElseGet(() -> {
+                ScheduledEvent event = new ScheduledEventImpl(api, data);
+                this.events.put(event.getId(), event);
+                return event;
             });
         }
     }
@@ -1477,6 +1510,18 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
+    }
+
+    @Override
+    public List<ScheduledEvent> getEvents() {
+        return Collections.unmodifiableList(events.values().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Optional<ScheduledEvent> getEventById(long id) {
+        return Optional.ofNullable(events.get(id));
     }
 
     @Override
