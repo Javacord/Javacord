@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
+import org.javacord.api.entity.channel.thread.ThreadMetadata;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.channel.thread.ThreadMetadataImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.text.InternalServerTextChannelAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
@@ -48,34 +50,19 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private int memberCount;
 
     /**
-     * The auto archive duration.
-     */
-    private int autoArchiveDuration;
-
-    /**
-     * Whether the thread is archived.
-     */
-    private boolean isArchived;
-
-    /**
-     * Whether the thread is locked.
-     */
-    private boolean isLocked;
-
-    /**
      * The id of the creator of the channel.
      */
     private final long ownerId;
 
     /**
-     * The timestamp when the thread's archive status was last changed.
-     */
-    private Instant archiveTimestamp;
-
-    /**
      * The thread's users.
      */
     private final Set<ThreadMember> members;
+
+    /**
+     * The thread's metadata.
+     */
+    private final ThreadMetadata metadata;
 
     /**
      * The total number of messages that are sent.
@@ -110,11 +97,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
             }
         }
 
-        final JsonNode threadMetadata = data.get("thread_metadata");
-        autoArchiveDuration = threadMetadata.get("auto_archive_duration").asInt();
-        isArchived = threadMetadata.get("archived").asBoolean();
-        isLocked = threadMetadata.get("locked").asBoolean();
-        archiveTimestamp = OffsetDateTime.parse(threadMetadata.get("archive_timestamp").asText()).toInstant();
+        this.metadata = new ThreadMetadataImpl(data.get("thread_metadata"));
 
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
@@ -203,28 +186,13 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
-    public int getAutoArchiveDuration() {
-        return autoArchiveDuration;
-    }
-
-    @Override
-    public boolean isArchived() {
-        return isArchived;
-    }
-
-    @Override
-    public boolean isLocked() {
-        return isLocked;
+    public ThreadMetadata getMetadata() {
+        return metadata;
     }
 
     @Override
     public long getOwnerId() {
         return ownerId;
-    }
-
-    @Override
-    public Instant getArchiveTimestamp() {
-        return archiveTimestamp;
     }
 
     @Override
