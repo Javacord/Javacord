@@ -87,7 +87,6 @@ public class ThreadUpdateHandler extends PacketHandler {
             final ServerChannelChangeNameEvent event =
                     new ServerChannelChangeNameEventImpl(thread, newName, oldName);
 
-
             api.getEventDispatcher().dispatchServerChannelChangeNameEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
@@ -125,7 +124,6 @@ public class ThreadUpdateHandler extends PacketHandler {
                     new ServerThreadChannelChangeAutoArchiveDurationEventImpl(thread,
                             newAutoArchiveDuration, oldAutoArchiveDuration);
 
-
             api.getEventDispatcher()
                     .dispatchServerThreadChannelChangeAutoArchiveDurationEvent(
                             (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
@@ -140,7 +138,6 @@ public class ThreadUpdateHandler extends PacketHandler {
             final ServerThreadChannelChangeArchivedEvent event =
                     new ServerThreadChannelChangeArchivedEventImpl(thread, isArchived, wasArchived);
 
-
             api.getEventDispatcher().dispatchServerThreadChannelChangeArchivedEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
@@ -153,7 +150,6 @@ public class ThreadUpdateHandler extends PacketHandler {
 
             final ServerThreadChannelChangeLockedEvent event =
                     new ServerThreadChannelChangeLockedEventImpl(thread, isLocked, wasLocked);
-
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeLockedEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
@@ -169,7 +165,6 @@ public class ThreadUpdateHandler extends PacketHandler {
             final ServerThreadChannelChangeArchiveTimestampEvent event =
                     new ServerThreadChannelChangeArchiveTimestampEventImpl(thread,
                             newArchiveTimestamp, oldArchiveTimestamp);
-
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeArchiveTimestampEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
@@ -191,7 +186,6 @@ public class ThreadUpdateHandler extends PacketHandler {
             final ServerThreadChannelChangeMembersEvent event =
                     new ServerThreadChannelChangeMembersEventImpl(thread, newMembers,
                             oldMembers);
-
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeMembersEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
