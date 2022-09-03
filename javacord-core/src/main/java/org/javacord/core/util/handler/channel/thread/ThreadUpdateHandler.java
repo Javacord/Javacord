@@ -16,6 +16,7 @@ import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMes
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
+import org.javacord.core.entity.channel.thread.ThreadMetadataImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerPrivateThreadJoinEventImpl;
@@ -103,6 +104,62 @@ public class ThreadUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
+        final ThreadMetadataImpl metadata = (ThreadMetadataImpl) thread.getMetadata();
+
+        final int oldAutoArchiveDuration = metadata.getAutoArchiveDuration();
+        final int newAutoArchiveDuration = jsonChannel.get("thread_metadata").get("auto_archive_duration")
+                .asInt();
+
+        if (oldAutoArchiveDuration != newAutoArchiveDuration) {
+            metadata.setAutoArchiveDuration(newAutoArchiveDuration);
+
+            final ServerThreadChannelChangeAutoArchiveDurationEvent event =
+                    new ServerThreadChannelChangeAutoArchiveDurationEventImpl(thread, newAutoArchiveDuration,
+                            oldAutoArchiveDuration);
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeAutoArchiveDurationEvent(
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final boolean wasArchived = metadata.isArchived();
+        final boolean isArchived = jsonChannel.get("thread_metadata").get("archived").asBoolean();
+        if (wasArchived != isArchived) {
+            metadata.setArchived(isArchived);
+
+            final ServerThreadChannelChangeArchivedEvent event =
+                    new ServerThreadChannelChangeArchivedEventImpl(thread, isArchived, wasArchived);
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeArchivedEvent(
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final boolean wasLocked = metadata.isLocked();
+        final boolean isLocked = jsonChannel.get("thread_metadata").get("locked").asBoolean();
+        if (wasLocked != isLocked) {
+            metadata.setLocked(isLocked);
+
+            final ServerThreadChannelChangeLockedEvent event =
+                    new ServerThreadChannelChangeLockedEventImpl(thread, isLocked, wasLocked);
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeLockedEvent(
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final Instant oldArchiveTimestamp = metadata.getArchiveTimestamp();
+        final Instant newArchiveTimestamp = OffsetDateTime.parse(jsonChannel.get("thread_metadata")
+                .get("archive_timestamp").asText()).toInstant();
+
+        if (!Objects.deepEquals(oldArchiveTimestamp, newArchiveTimestamp)) {
+            metadata.setArchiveTimestamp(newArchiveTimestamp);
+
+            final ServerThreadChannelChangeArchiveTimestampEvent event =
+                    new ServerThreadChannelChangeArchiveTimestampEventImpl(thread,
+                            newArchiveTimestamp, oldArchiveTimestamp);
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeArchiveTimestampEvent(
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
         final int oldMemberCount = thread.getMemberCount();
         final int newMemberCount = jsonChannel.get("member_count").asInt();
         if (oldMemberCount != newMemberCount) {
@@ -112,62 +169,6 @@ public class ThreadUpdateHandler extends PacketHandler {
                     new ServerThreadChannelChangeMemberCountEventImpl(thread, newMemberCount, oldMemberCount);
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeMemberCountEvent(
-                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
-        }
-
-        final int oldAutoArchiveDuration = thread.getAutoArchiveDuration();
-        final int newAutoArchiveDuration = jsonChannel.get("thread_metadata").get("auto_archive_duration")
-                .asInt();
-        if (oldAutoArchiveDuration != newAutoArchiveDuration) {
-            thread.setAutoArchiveDuration(newAutoArchiveDuration);
-
-            final ServerThreadChannelChangeAutoArchiveDurationEvent event =
-                    new ServerThreadChannelChangeAutoArchiveDurationEventImpl(thread,
-                            newAutoArchiveDuration, oldAutoArchiveDuration);
-
-            api.getEventDispatcher()
-                    .dispatchServerThreadChannelChangeAutoArchiveDurationEvent(
-                            (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
-        }
-
-        final boolean wasArchived = thread.isArchived();
-        final boolean isArchived = jsonChannel.get("thread_metadata").get("archived").asBoolean();
-
-        if (wasArchived != isArchived) {
-            thread.setArchived(isArchived);
-
-            final ServerThreadChannelChangeArchivedEvent event =
-                    new ServerThreadChannelChangeArchivedEventImpl(thread, isArchived, wasArchived);
-
-            api.getEventDispatcher().dispatchServerThreadChannelChangeArchivedEvent(
-                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
-        }
-
-        final boolean wasLocked = thread.isLocked();
-        final boolean isLocked = jsonChannel.get("thread_metadata").get("locked").asBoolean();
-
-        if (wasLocked != isLocked) {
-            thread.setLocked(isLocked);
-
-            final ServerThreadChannelChangeLockedEvent event =
-                    new ServerThreadChannelChangeLockedEventImpl(thread, isLocked, wasLocked);
-
-            api.getEventDispatcher().dispatchServerThreadChannelChangeLockedEvent(
-                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
-        }
-
-        final Instant oldArchiveTimestamp = thread.getArchiveTimestamp();
-        final Instant newArchiveTimestamp = OffsetDateTime.parse(jsonChannel.get("thread_metadata")
-                .get("archive_timestamp").asText()).toInstant();
-
-        if (!Objects.deepEquals(oldArchiveTimestamp, newArchiveTimestamp)) {
-            thread.setArchiveTimestamp(newArchiveTimestamp);
-
-            final ServerThreadChannelChangeArchiveTimestampEvent event =
-                    new ServerThreadChannelChangeArchiveTimestampEventImpl(thread,
-                            newArchiveTimestamp, oldArchiveTimestamp);
-
-            api.getEventDispatcher().dispatchServerThreadChannelChangeArchiveTimestampEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 

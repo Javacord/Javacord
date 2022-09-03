@@ -16,8 +16,6 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -122,42 +120,6 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
      */
     public void setMemberCount(int memberCount) {
         this.memberCount = memberCount;
-    }
-
-    /**
-     * Used to set a new auto archive duration.
-     *
-     * @param autoArchiveDuration The new auto archive duration.
-     */
-    public void setAutoArchiveDuration(int autoArchiveDuration) {
-        this.autoArchiveDuration = autoArchiveDuration;
-    }
-
-    /**
-     * Used to set a new archive timestamp.
-     *
-     * @param archived The new archive timestamp.
-     */
-    public void setArchived(boolean archived) {
-        isArchived = archived;
-    }
-
-    /**
-     * Used to set a new locked status.
-     *
-     * @param locked The new locked status.
-     */
-    public void setLocked(boolean locked) {
-        isLocked = locked;
-    }
-
-    /**
-     * Used to set a new archive timestamp.
-     *
-     * @param archiveTimestamp The new archive timestamp.
-     */
-    public void setArchiveTimestamp(Instant archiveTimestamp) {
-        this.archiveTimestamp = archiveTimestamp;
     }
 
     /**
