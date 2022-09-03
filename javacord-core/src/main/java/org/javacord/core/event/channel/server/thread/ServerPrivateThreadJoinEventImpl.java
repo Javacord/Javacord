@@ -1,16 +1,16 @@
 package org.javacord.core.event.channel.server.thread;
 
 import org.javacord.api.entity.channel.ThreadMember;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMembersEvent;
+import org.javacord.api.event.channel.server.thread.ServerPrivateThreadJoinEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 
 import java.util.Set;
 
 /**
- * The implementation of {@link ServerThreadChannelChangeMembersEvent}.
+ * The implementation of {@link ServerPrivateThreadJoinEvent}.
  */
-public class ServerThreadChannelChangeMembersEventImpl extends ServerThreadChannelEventImpl
-        implements ServerThreadChannelChangeMembersEvent {
+public class ServerPrivateThreadJoinEventImpl extends ServerThreadChannelEventImpl
+        implements ServerPrivateThreadJoinEvent {
     /**
      * The new members.
      */
@@ -28,8 +28,8 @@ public class ServerThreadChannelChangeMembersEventImpl extends ServerThreadChann
      * @param newMembers The new members.
      * @param oldMembers The old members.
      */
-    public ServerThreadChannelChangeMembersEventImpl(ServerThreadChannelImpl channel,
-                                                     Set<ThreadMember> newMembers, Set<ThreadMember> oldMembers) {
+    public ServerPrivateThreadJoinEventImpl(ServerThreadChannelImpl channel,
+                                            Set<ThreadMember> newMembers, Set<ThreadMember> oldMembers) {
         super(channel);
         this.newMembers = newMembers;
         this.oldMembers = oldMembers;

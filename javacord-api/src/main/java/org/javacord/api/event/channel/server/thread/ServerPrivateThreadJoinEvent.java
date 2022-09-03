@@ -4,7 +4,7 @@ import org.javacord.api.entity.channel.ThreadMember;
 
 import java.util.Set;
 
-public interface ServerThreadChannelChangeMembersEvent extends ServerThreadChannelEvent {
+public interface ServerPrivateThreadJoinEvent extends ServerThreadChannelEvent {
 
     /**
      * Gets the new member count.

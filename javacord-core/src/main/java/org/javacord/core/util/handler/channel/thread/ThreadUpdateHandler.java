@@ -6,14 +6,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchivedEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLockedEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMemberCountEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMembersEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMessageCountEvent;
-import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEvent;
+import org.javacord.api.event.channel.server.thread.*;
+import org.javacord.api.event.channel.server.thread.ServerPrivateThreadJoinEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ThreadMemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -23,7 +17,7 @@ import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAr
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLockedEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMemberCountEventImpl;
-import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMembersEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerPrivateThreadJoinEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMessageCountEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeTotalMessageSentEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
@@ -183,11 +177,11 @@ public class ThreadUpdateHandler extends PacketHandler {
         if (!Objects.deepEquals(oldMembers, newMembers)) {
             thread.setMembers(newMembers);
 
-            final ServerThreadChannelChangeMembersEvent event =
-                    new ServerThreadChannelChangeMembersEventImpl(thread, newMembers,
+            final ServerPrivateThreadJoinEvent event =
+                    new ServerPrivateThreadJoinEventImpl(thread, newMembers,
                             oldMembers);
 
-            api.getEventDispatcher().dispatchServerThreadChannelChangeMembersEvent(
+            api.getEventDispatcher().dispatchServerPrivateThreadJoinEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 

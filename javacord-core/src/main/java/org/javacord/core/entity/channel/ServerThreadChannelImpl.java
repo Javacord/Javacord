@@ -124,7 +124,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     /**
-     * Used to set a new owner id.
+     * Used to set a new message count.
      *
      * @param messageCount The new message count.
      */
