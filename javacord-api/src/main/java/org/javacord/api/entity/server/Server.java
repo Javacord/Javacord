@@ -2384,6 +2384,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         return new RoleBuilder(this);
     }
 
+    default EventBuilder createEventBuilder() {
+        return new EventBuilder(this);
+    }
+
     /**
      * Gets a sorted list (by position) with all channels of the server.
      *

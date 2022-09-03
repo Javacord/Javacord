@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 public class EventUpdater {
     private final EventUpdaterDelegate delegate;
 
-    public EventUpdater(Server server, ScheduledEvent event) {
-        delegate = DelegateFactory.createEventUpdaterDelegate(server, event);
+    public EventUpdater(ScheduledEvent event) {
+        delegate = DelegateFactory.createEventUpdaterDelegate(event);
     }
 
     public EventUpdater setAuditLogReason(String reason) {

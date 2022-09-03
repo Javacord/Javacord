@@ -163,4 +163,9 @@ public class ScheduledEventImpl implements ScheduledEvent {
     public Optional<String> getCoverImageHash() {
         return Optional.ofNullable(imageHash);
     }
+
+    @Override
+    public EventUpdater createUpdater() {
+        return new EventUpdater(this);
+    }
 }

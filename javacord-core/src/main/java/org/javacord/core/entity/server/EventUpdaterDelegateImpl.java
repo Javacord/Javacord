@@ -20,7 +20,6 @@ import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 public class EventUpdaterDelegateImpl implements EventUpdaterDelegate {
-    private final Server server;
     private final ScheduledEvent event;
 
     private Long channelId;
@@ -35,8 +34,7 @@ public class EventUpdaterDelegateImpl implements EventUpdaterDelegate {
     private ScheduledEventStatus status;
     private String reason;
 
-    public EventUpdaterDelegateImpl(ServerImpl server, ScheduledEvent event) {
-        this.server = server;
+    public EventUpdaterDelegateImpl(ScheduledEvent event) {
         this.event = event;
     }
 
@@ -166,20 +164,20 @@ public class EventUpdaterDelegateImpl implements EventUpdaterDelegate {
             body.put("status", status.getId());
         }
         if (image != null) {
-            return image.asByteArray(server.getApi()).thenAccept(bytes -> {
+            return image.asByteArray(event.getApi()).thenAccept(bytes -> {
                 String base64Icon = "data:image/" + image.getFileType() + ";base64,"
                         + Base64.getEncoder().encodeToString(bytes);
                 body.put("image", base64Icon);
-            }).thenCompose(aVoid -> new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.PATCH, RestEndpoint.EVENT_UPDATE)
+            }).thenCompose(aVoid -> new RestRequest<ScheduledEvent>(event.getApi(), RestMethod.PATCH, RestEndpoint.EVENT_UPDATE)
                     .setUrlParameters(String.valueOf(event.getServerId()), String.valueOf(event.getServerId()))
                     .setBody(body)
                     .setAuditLogReason(reason)
-                    .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody())));
+                    .execute(result -> new ScheduledEventImpl(event.getApi(), result.getJsonBody())));
         }
-        return new RestRequest<ScheduledEvent>(server.getApi(), RestMethod.PATCH, RestEndpoint.EVENT_UPDATE)
+        return new RestRequest<ScheduledEvent>(event.getApi(), RestMethod.PATCH, RestEndpoint.EVENT_UPDATE)
                 .setUrlParameters(String.valueOf(event.getServerId()), String.valueOf(event.getServerId()))
                 .setBody(body)
                 .setAuditLogReason(reason)
-                .execute(result -> new ScheduledEventImpl(server.getApi(), result.getJsonBody()));
+                .execute(result -> new ScheduledEventImpl(event.getApi(), result.getJsonBody()));
     }
 }

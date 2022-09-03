@@ -306,8 +306,8 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
-    public EventUpdaterDelegate createEventUpdaterDelegate(Server server, ScheduledEvent event) {
-        return new EventUpdaterDelegateImpl((ServerImpl) server, event);
+    public EventUpdaterDelegate createEventUpdaterDelegate(ScheduledEvent event) {
+        return new EventUpdaterDelegateImpl(event);
     }
 
     @Override
