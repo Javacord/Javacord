@@ -159,7 +159,30 @@ public enum Intent {
      *     <li>TYPING_START</li>
      * </ul>
      */
-    DIRECT_MESSAGE_TYPING(14, false);
+    DIRECT_MESSAGE_TYPING(14, false),
+    
+    /**
+     * This is required to receive non-empty values for content fields (content, attachments, embeds and components).
+     *
+     * <p>This doesn't apply for DMs, messages your bot sends, or messages in which your bot is mentioned.
+     *
+     * <p>Note: This is a privileged intent which must be enabled in the bots application page in the Developer portal
+     *
+     * @see <a href="https://discordapp.com/developers/applications">Discord developer portal</a>
+     */
+    MESSAGE_CONTENT(15, true),
+    
+    /**
+     * The following events are received.
+     * <ul>
+     *     <li>GUILD_SCHEDULED_EVENT_CREATE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_UPDATE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_DELETE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_ADD</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_REMOVE</li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENTS(16, false);
 
     private final int id;
 

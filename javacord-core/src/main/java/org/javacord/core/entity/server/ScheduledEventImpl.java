@@ -20,7 +20,7 @@ import java.util.Optional;
 public class ScheduledEventImpl implements ScheduledEvent {
     private final DiscordApi api;
     private final Long id;
-    private final Long serverId;
+    private final Server server;
     private final Long channelId;
     private final Long creatorId;
     private final String name;
@@ -36,11 +36,11 @@ public class ScheduledEventImpl implements ScheduledEvent {
     private final Integer userCount;
     private final String imageHash;
 
-    public ScheduledEventImpl(DiscordApi api, JsonNode jsonBody) {
+    public ScheduledEventImpl(DiscordApi api, ServerImpl server, JsonNode jsonBody) {
         this.api = api;
+        this.server = server;
 
         this.id = jsonBody.get("id").asLong();
-        this.serverId = jsonBody.get("guild_id").asLong();
 
         this.channelId = jsonBody.hasNonNull("channel_id") ? jsonBody.get("channel_id").asLong() : null;
         this.creatorId = jsonBody.hasNonNull("creator_id") ? jsonBody.get("creator_id").asLong() : null;
@@ -79,8 +79,8 @@ public class ScheduledEventImpl implements ScheduledEvent {
     }
 
     @Override
-    public Long getServerId() {
-        return serverId;
+    public Server getServer() {
+        return server;
     }
 
     @Override

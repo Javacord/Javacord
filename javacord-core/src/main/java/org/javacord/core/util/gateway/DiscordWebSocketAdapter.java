@@ -55,6 +55,11 @@ import org.javacord.core.util.handler.guild.GuildMemberAddHandler;
 import org.javacord.core.util.handler.guild.GuildMemberRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildMemberUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildMembersChunkHandler;
+import org.javacord.core.util.handler.guild.GuildScheduledEventCreateHandler;
+import org.javacord.core.util.handler.guild.GuildScheduledEventDeleteHandler;
+import org.javacord.core.util.handler.guild.GuildScheduledEventUpdateHandler;
+import org.javacord.core.util.handler.guild.GuildScheduledEventUserAddHandler;
+import org.javacord.core.util.handler.guild.GuildScheduledEventUserRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildStickersUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildUpdateHandler;
 import org.javacord.core.util.handler.guild.VoiceServerUpdateHandler;
@@ -716,11 +721,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("compress", true)
                 .put("large_threshold", 250)
                 .putObject("properties")
-                .put("$os", System.getProperty("os.name"))
-                .put("$browser", "Javacord")
-                .put("$device", "Javacord")
-                .put("$referrer", "")
-                .put("$referring_domain", "");
+                .put("os", System.getProperty("os.name"))
+                .put("browser", "Javacord")
+                .put("device", "Javacord");
 
         data.put("intents", Intent.calculateBitmask(api.getIntents().toArray(new Intent[0])));
 
@@ -806,6 +809,11 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         addHandler(new VoiceServerUpdateHandler(api));
         addHandler(new VoiceStateUpdateHandler(api));
         addHandler(new ApplicationCommandPermissionsUpdateHandler(api));
+        addHandler(new GuildScheduledEventCreateHandler(api));
+        addHandler(new GuildScheduledEventUpdateHandler(api));
+        addHandler(new GuildScheduledEventDeleteHandler(api));
+        addHandler(new GuildScheduledEventUserAddHandler(api));
+        addHandler(new GuildScheduledEventUserRemoveHandler(api));
 
         // role
         addHandler(new GuildRoleCreateHandler(api));

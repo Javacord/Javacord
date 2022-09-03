@@ -17,7 +17,7 @@ public class ServerChannelUpdater<T extends ServerChannelUpdater<T>> {
     /**
      * Creates a new server channel updater.
      *
-     * @param serverChannelUpdaterDelegate A subtype of a ServerChannelUpdaterDelegate.
+     * @param serverChannelUpdaterDelegate The server channel delegate used by this instance.
      */
     protected ServerChannelUpdater(ServerChannelUpdaterDelegate serverChannelUpdaterDelegate) {
         this.serverChannelUpdaterDelegate = serverChannelUpdaterDelegate;

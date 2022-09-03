@@ -3,17 +3,15 @@ package org.javacord.api.entity.server;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Nameable;
-import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.user.User;
 
-import java.awt.*;
 import java.time.Instant;
 import java.util.Optional;
 
 public interface ScheduledEvent extends DiscordEntity, Nameable {
     // TODO: add javadoc
 
-    Long getServerId();
+    Server getServer();
 
     Optional<Long> getChannelId();
 
