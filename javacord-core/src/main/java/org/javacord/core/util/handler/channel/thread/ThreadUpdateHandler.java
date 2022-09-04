@@ -10,6 +10,7 @@ import org.javacord.api.event.channel.server.thread.ServerPrivateThreadJoinEvent
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchivedEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeInvitableEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLastMessageIdEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLockedEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeMemberCountEvent;
@@ -25,6 +26,7 @@ import org.javacord.core.event.channel.server.thread.ServerPrivateThreadJoinEven
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchivedEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeInvitableEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLastMessageIdEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLockedEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeMemberCountEventImpl;
@@ -39,6 +41,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class ThreadUpdateHandler extends PacketHandler {
@@ -120,26 +123,6 @@ public class ThreadUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
-        final Set<ThreadMember> oldMembers = thread.getMembers();
-        final Set<ThreadMember> newMembers = new HashSet<>();
-        if (jsonChannel.hasNonNull("member")) {
-            for (final JsonNode jsonMember : jsonChannel.get("member")) {
-                final ThreadMember member = new ThreadMemberImpl(api, server, jsonMember);
-                newMembers.add(member);
-            }
-        }
-
-        if (!Objects.deepEquals(oldMembers, newMembers)) {
-            thread.setMembers(newMembers);
-
-            final ServerPrivateThreadJoinEvent event =
-                    new ServerPrivateThreadJoinEventImpl(thread, newMembers,
-                            oldMembers);
-
-            api.getEventDispatcher().dispatchServerPrivateThreadJoinEvent(
-                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
-        }
-
         final int oldNumberOfMessages = thread.getTotalNumberOfMessagesSent();
         final int newNumberOfMessages = jsonChannel.get("total_message_sent").asInt(0);
         if (oldNumberOfMessages != newNumberOfMessages) {
@@ -179,9 +162,10 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final ThreadMetadataImpl metadata = (ThreadMetadataImpl) thread.getMetadata();
+        final JsonNode metadataJson = jsonChannel.get("thread_metadata");
+
         final int oldAutoArchiveDuration = metadata.getAutoArchiveDuration();
-        final int newAutoArchiveDuration = jsonChannel.get("thread_metadata").get("auto_archive_duration")
-                .asInt();
+        final int newAutoArchiveDuration = metadataJson.get("auto_archive_duration").asInt();
         if (oldAutoArchiveDuration != newAutoArchiveDuration) {
             metadata.setAutoArchiveDuration(newAutoArchiveDuration);
 
@@ -194,7 +178,7 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final boolean wasArchived = metadata.isArchived();
-        final boolean isArchived = jsonChannel.get("thread_metadata").get("archived").asBoolean();
+        final boolean isArchived = metadataJson.get("archived").asBoolean();
         if (wasArchived != isArchived) {
             metadata.setArchived(isArchived);
 
@@ -206,7 +190,7 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final boolean wasLocked = metadata.isLocked();
-        final boolean isLocked = jsonChannel.get("thread_metadata").get("locked").asBoolean();
+        final boolean isLocked = metadataJson.get("locked").asBoolean();
         if (wasLocked != isLocked) {
             metadata.setLocked(isLocked);
 
@@ -218,8 +202,8 @@ public class ThreadUpdateHandler extends PacketHandler {
         }
 
         final Instant oldArchiveTimestamp = metadata.getArchiveTimestamp();
-        final Instant newArchiveTimestamp = OffsetDateTime.parse(jsonChannel.get("thread_metadata")
-                .get("archive_timestamp").asText()).toInstant();
+        final Instant newArchiveTimestamp = OffsetDateTime.parse(metadataJson.get("archive_timestamp")
+                .asText()).toInstant();
         if (!Objects.deepEquals(oldArchiveTimestamp, newArchiveTimestamp)) {
             metadata.setArchiveTimestamp(newArchiveTimestamp);
 
@@ -228,6 +212,34 @@ public class ThreadUpdateHandler extends PacketHandler {
                             newArchiveTimestamp, oldArchiveTimestamp);
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeArchiveTimestampEvent(
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final Optional<Boolean> wasInvitable = metadata.isInvitable();
+        final Optional<Boolean> isInvitable = Optional.ofNullable(metadataJson.hasNonNull("invitable")
+                ? metadataJson.get("invitable").asBoolean() : null);
+
+        if (isInvitable.isPresent() && wasInvitable.isPresent()) {
+            metadata.setInvitable(isInvitable.get());
+
+            final ServerThreadChannelChangeInvitableEvent event =
+                    new ServerThreadChannelChangeInvitableEventImpl(thread, isInvitable.get(), wasInvitable.get());
+
+            api.getEventDispatcher().dispatchServerThreadChannelChangeInvitableEvent(
+                    (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+        }
+
+        final Set<ThreadMember> oldMembers = thread.getMembers();
+        final Set<ThreadMember> newMembers = new HashSet<>();
+        if (jsonChannel.hasNonNull("member")) {
+            final Set<ThreadMember> members = thread.getMembers();
+            final ThreadMember member = new ThreadMemberImpl(api, server, jsonChannel.get("member"));
+            members.add(member);
+            thread.setMembers(newMembers);
+            final ServerPrivateThreadJoinEvent event =
+                    new ServerPrivateThreadJoinEventImpl(thread, newMembers,
+                            oldMembers);
+            api.getEventDispatcher().dispatchServerPrivateThreadJoinEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
     }
