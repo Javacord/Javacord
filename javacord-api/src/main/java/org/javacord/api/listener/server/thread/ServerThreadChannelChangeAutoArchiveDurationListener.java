@@ -7,7 +7,7 @@ import org.javacord.api.listener.channel.ServerThreadChannelAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 
 /**
- * his listener listens to server thread channel auto archive duration change events.
+ * This listener listens to server thread channel auto archive duration change events.
  */
 @FunctionalInterface
 public interface ServerThreadChannelChangeAutoArchiveDurationListener extends ServerThreadChannelAttachableListener,

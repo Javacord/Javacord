@@ -48,6 +48,16 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private int memberCount;
 
     /**
+     * The id of the last message sent in the thread.
+     */
+    private long lastMessageId;
+
+    /**
+     * The rate limit per user.
+     */
+    private int rateLimitPerUser;
+
+    /**
      * The id of the creator of the channel.
      */
     private final long ownerId;
@@ -81,6 +91,8 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         ownerId = data.get("owner_id").asLong();
         messageCount = data.get("message_count").asInt(0);
         memberCount = data.get("member_count").asInt(0);
+        lastMessageId = data.hasNonNull("last_message_id") ? data.get("last_message_id").asLong() : 0;
+        rateLimitPerUser = data.get("rate_limit_per_user").asInt(0);
 
         members = new HashSet<>();
         if (data.hasNonNull("member")) {
@@ -123,6 +135,24 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     /**
+     * Used to set a new last message id.
+     *
+     * @param lastMessageId The new last message id.
+     */
+    public void setLastMessageId(long lastMessageId) {
+        this.lastMessageId = lastMessageId;
+    }
+
+    /**
+     * Used to set a new rate limit per user.
+     *
+     * @param rateLimitPerUser The new rate limit per user.
+     */
+    public void setRateLimitPerUser(int rateLimitPerUser) {
+        this.rateLimitPerUser = rateLimitPerUser;
+    }
+
+    /**
      * Used to set a new total for the number of messages sent.
      *
      * @param totalNumberOfMessagesSent The new total for the number of messages sent.
@@ -145,6 +175,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     @Override
     public int getMemberCount() {
         return memberCount;
+    }
+
+    @Override
+    public long getLastMessageId() {
+        return lastMessageId;
     }
 
     @Override
@@ -200,6 +235,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     @Override
     public int getTotalNumberOfMessagesSent() {
         return totalNumberOfMessagesSent;
+    }
+
+    @Override
+    public int getRateLimitPerUser() {
+        return rateLimitPerUser;
     }
 
     /**
