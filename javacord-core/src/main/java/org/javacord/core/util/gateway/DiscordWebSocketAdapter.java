@@ -152,7 +152,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             new AtomicMarkableReference<>(null, false);
     private final AtomicReference<WebSocketFrame> nextHeartbeatFrame = new AtomicReference<>(null);
     private final List<WebSocketListener> identifyFrameListeners = Collections.synchronizedList(new ArrayList<>());
-
+    private final AtomicMarkableReference<WebSocketFrame> triedToResume =
+            new AtomicMarkableReference<>(null, false);
     private volatile long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
     // A reconnect attempt counter
@@ -642,7 +643,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 } else {
                     sessionId = null;
                     resumeUrl = null;
-                    if (packet.get("d").asBoolean()) {
+
+                    if (triedToResume.isMarked()) {
                         // Invalid session :(
                         int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
                         logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
@@ -654,13 +656,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             logger.error("Interrupted while delaying reconnect!");
                             return;
                         }
-                        sendCloseFrame(websocket,
-                                WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
-                                WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
-                    } else {
-                        api.getGatewayIdentifyRatelimiter().requestQuota();
-                        sendIdentify(websocket);
                     }
+                    api.getGatewayIdentifyRatelimiter().requestQuota();
+                    sendIdentify(websocket);
+                    sendCloseFrame(websocket,
+                            WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
+                            WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
                 }
                 break;
             case HELLO:
