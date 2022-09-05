@@ -196,6 +196,18 @@ public interface Messageable {
     /**
      * Sends a message.
      *
+     * @param components High level components to add to the message, most probably of type ActionRow.
+     * @return The sent message.
+     */
+    default CompletableFuture<Message> sendMessage(HighLevelComponent... components) {
+        return new MessageBuilder()
+                .addComponents(components)
+                .send(this);
+    }
+
+    /**
+     * Sends a message.
+     *
      * @param content    The content of the message.
      * @param components High level components to add to the message, most probably of type ActionRow.
      * @return The sent message.
