@@ -9,6 +9,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -27,6 +28,7 @@ import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.AttachmentImpl;
 import org.javacord.core.entity.message.component.ComponentImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.message.mention.AllowedMentionsImpl;
@@ -94,7 +96,17 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * All attachments which should be added to the message.
      */
-    protected final List<FileContainer> attachments = new ArrayList<>();
+    protected final List<FileContainer> newAttachments = new ArrayList<>();
+
+    /**
+     * Used to indicate that all the attachments in the message should be removed.
+     */
+    protected boolean removeAllAttachments = false;
+
+    /**
+     * All the attachments that should be removed from the message.
+     */
+    protected final List<Attachment> attachmentsToRemove = new ArrayList<>();
 
     /**
      * True if the attachments have been changed by the user.
@@ -200,6 +212,21 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
+    public void removeExistingAttachment(Attachment attachment) {
+        attachmentsToRemove.add(attachment);
+    }
+
+    @Override
+    public void removeExistingAttachments() {
+        removeAllAttachments = true;
+    }
+
+    @Override
+    public void removeExistingAttachments(Collection<Attachment> attachments) {
+        attachmentsToRemove.addAll(attachments);
+    }
+
+    @Override
     public void addEmbed(EmbedBuilder embed) {
         if (embed != null) {
             embeds.add(embed);
@@ -220,7 +247,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
-            this.addAttachment(attachment.getUrl());
+            this.addAttachment(attachment.getUrl(), attachment.getDescription().orElse(null));
         }
 
         for (HighLevelComponent component : message.getComponents()) {
@@ -284,83 +311,83 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void addAttachment(BufferedImage image, String fileName) {
+    public void addAttachment(BufferedImage image, String fileName, String description) {
         if (image == null || fileName == null) {
             throw new IllegalArgumentException("image and fileName cannot be null!");
         }
-        attachments.add(new FileContainer(image, fileName));
+        newAttachments.add(new FileContainer(image, fileName, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(File file) {
+    public void addAttachment(File file, String description) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        attachments.add(new FileContainer(file));
+        newAttachments.add(new FileContainer(file, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(Icon icon) {
+    public void addAttachment(Icon icon, String description) {
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        attachments.add(new FileContainer(icon));
+        newAttachments.add(new FileContainer(icon, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(URL url) {
+    public void addAttachment(URL url, String description) {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        attachments.add(new FileContainer(url));
+        newAttachments.add(new FileContainer(url, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(byte[] bytes, String fileName) {
+    public void addAttachment(byte[] bytes, String fileName, String description) {
         if (bytes == null || fileName == null) {
             throw new IllegalArgumentException("bytes and fileName cannot be null!");
         }
-        attachments.add(new FileContainer(bytes, fileName));
+        newAttachments.add(new FileContainer(bytes, fileName, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(InputStream stream, String fileName) {
+    public void addAttachment(InputStream stream, String fileName, String description) {
         if (stream == null || fileName == null) {
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
-        attachments.add(new FileContainer(stream, fileName));
+        newAttachments.add(new FileContainer(stream, fileName, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachmentAsSpoiler(File file) {
+    public void addAttachmentAsSpoiler(File file, String description) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        attachments.add(new FileContainer(file, true));
+        newAttachments.add(new FileContainer(file, true, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachmentAsSpoiler(Icon icon) {
+    public void addAttachmentAsSpoiler(Icon icon, String description) {
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        attachments.add(new FileContainer(icon, true));
+        newAttachments.add(new FileContainer(icon, true, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachmentAsSpoiler(URL url) {
+    public void addAttachmentAsSpoiler(URL url, String description) {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        attachments.add(new FileContainer(url, true));
+        newAttachments.add(new FileContainer(url, true, description));
         attachmentsChanged = true;
     }
 
@@ -466,12 +493,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     /**
      * Send a message to an incoming webhook.
      *
-     * @param webhookId The id of the webhook to send the message to
+     * @param webhookId    The id of the webhook to send the message to
      * @param webhookToken The token of the webhook to send the message to
-     * @param displayName The display name the webhook should use
-     * @param avatarUrl The avatar the webhook should use
-     * @param wait If the completable future will be completed
-     * @param api The api instance needed to send and return the message
+     * @param displayName  The display name the webhook should use
+     * @param avatarUrl    The avatar the webhook should use
+     * @param wait         If the completable future will be completed
+     * @param api          The api instance needed to send and return the message
      * @return The sent message
      */
     protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
@@ -499,11 +526,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                         .consumeGlobalRatelimit(false)
                         .includeAuthorizationHeader(false);
         CompletableFuture<Message> future = new CompletableFuture<>();
-        if (!attachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
+        if (!newAttachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             // We access files etc. so this should be async
             api.getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                     // Add the attachments required for the embeds
                     for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
@@ -533,9 +560,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      * Method which executes the webhook rest request.
      *
      * @param request The rest request to execute
-     * @param wait If discord sends us a response
-     * @param future The future to complete
-     * @param api The api instance needed to create the message
+     * @param wait    If discord sends us a response
+     * @param future  The future to complete
+     * @param api     The api instance needed to create the message
      */
     private static void executeWebhookRest(RestRequest<Message> request, boolean wait,
                                            CompletableFuture<Message> future, DiscordApi api) {
@@ -574,6 +601,8 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
+        prepareAttachments(message.getAttachments(), body, updateAll || removeAllAttachments);
+
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(message.getChannel().getId()),
@@ -582,7 +611,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         if (updateAll || attachmentsChanged) {
             return checkForAttachmentsAndExecuteRequest(message.getChannel(), body, request, true);
         } else {
-            return executeRequestWithoutAttachments(message.getChannel(), body, request);
+            return executeRequestWithoutNewAttachments(message.getChannel(), body, request);
         }
     }
 
@@ -594,18 +623,15 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                                                                             ObjectNode body,
                                                                             RestRequest<Message> request,
                                                                             boolean clearAttachmentsIfAppropriate) {
-        if (attachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
-            if (clearAttachmentsIfAppropriate) {
-                body.set("attachments", JsonNodeFactory.instance.objectNode().arrayNode());
-            }
-            return executeRequestWithoutAttachments(channel, body, request);
+        if (newAttachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
+            return executeRequestWithoutNewAttachments(channel, body, request);
         }
 
         CompletableFuture<Message> future = new CompletableFuture<>();
         // We access files etc. so this should be async
         channel.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
-                List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                 // Add the attachments required for the embeds
                 for (EmbedBuilder embed : embeds) {
                     tempAttachments.addAll(
@@ -630,9 +656,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         return future;
     }
 
-    private CompletableFuture<Message> executeRequestWithoutAttachments(TextChannel channel,
-                                                                        ObjectNode body,
-                                                                        RestRequest<Message> request) {
+    private CompletableFuture<Message> executeRequestWithoutNewAttachments(TextChannel channel,
+                                                                           ObjectNode body,
+                                                                           RestRequest<Message> request) {
         request.setBody(body);
         return request.execute(
                 result -> ((DiscordApiImpl) channel.getApi()).getOrCreateMessage(channel, result.getJsonBody()));
@@ -644,33 +670,57 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
     }
 
+    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body,
+                                    boolean removeOrUpdateAll) {
+        ArrayNode attachments = body.putArray("attachments");
+
+        if (removeOrUpdateAll) {
+            attachments.add(JsonNodeFactory.instance.objectNode());
+        } else if (!attachmentsToRemove.isEmpty()) {
+            for (Attachment attachment : attachmentsList) {
+                if (!attachmentsToRemove.contains(attachment)) {
+                    attachments.add(((AttachmentImpl) attachment).toJsonNode());
+                }
+            }
+        } else {
+            for (Attachment attachment : attachmentsList) {
+                attachments.add(((AttachmentImpl) attachment).toJsonNode());
+            }
+        }
+    }
+
     /**
      * Method which creates and adds a MultipartBody to a RestRequest.
      *
-     * @param request The RestRequest to add the MultipartBody to
-     * @param body The body to use as base for the MultipartBody
+     * @param request     The RestRequest to add the MultipartBody to
+     * @param body        The body to use as base for the MultipartBody
      * @param attachments The List of FileContainers to add as attachments
-     * @param api The api instance needed to add the attachments
+     * @param api         The api instance needed to add the attachments
      */
     protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body,
                                              List<FileContainer> attachments, DiscordApi api) {
-        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("payload_json", body.toString());
-
+        MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         Collections.reverse(attachments);
         for (int i = 0; i < attachments.size(); i++) {
-            byte[] bytes = attachments.get(i).asByteArray(api).join();
-
+            FileContainer fileContainer = attachments.get(i);
+            byte[] bytes = fileContainer.asByteArray(api).join();
             String mediaType = URLConnection
-                    .guessContentTypeFromName(attachments.get(i).getFileTypeOrName());
+                    .guessContentTypeFromName(fileContainer.getFileTypeOrName());
             if (mediaType == null) {
                 mediaType = "application/octet-stream";
             }
-            multipartBodyBuilder.addFormDataPart("file" + i, attachments.get(i).getFileTypeOrName(),
-                    RequestBody.create(MediaType.parse(mediaType), bytes));
-        }
+            multipartBodyBuilder.addFormDataPart("files[" + i + "]", fileContainer.getFileTypeOrName(),
+                    RequestBody.create(bytes, MediaType.parse(mediaType)));
 
+            if (fileContainer.getDescription() != null) {
+                ArrayNode attachmentJson = body.withArray("attachments");
+                ObjectNode newFileAttachment = JsonNodeFactory.instance.objectNode();
+                newFileAttachment.put("id", i);
+                newFileAttachment.put("description", fileContainer.getDescription());
+                attachmentJson.add(newFileAttachment);
+            }
+        }
+        multipartBodyBuilder.addFormDataPart("payload_json", body.toString());
         request.setMultipartBody(multipartBodyBuilder.build());
     }
 

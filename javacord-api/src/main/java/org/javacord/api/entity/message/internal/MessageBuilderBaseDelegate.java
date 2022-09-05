@@ -1,6 +1,7 @@
 package org.javacord.api.entity.message.internal;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
@@ -104,6 +105,25 @@ public interface MessageBuilderBaseDelegate {
     void setContent(String content);
 
     /**
+     * Removes an attachment from the message.
+     *
+     * @param attachment The attachment to remove.
+     */
+    void removeExistingAttachment(Attachment attachment);
+
+    /**
+     * Removes all the attachments from the message.
+     */
+    void removeExistingAttachments();
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     */
+    void removeExistingAttachments(Collection<Attachment> attachments);
+
+    /**
      * Adds the embed to the message.
      *
      * @param embed The embed to add.
@@ -167,67 +187,76 @@ public interface MessageBuilderBaseDelegate {
      *
      * @param image The image to add as an attachment.
      * @param fileName The file name of the image.
+     * @param description The description of the image.
      */
-    void addAttachment(BufferedImage image, String fileName);
+    void addAttachment(BufferedImage image, String fileName, String description);
 
     /**
      * Adds an attachment to the message.
      *
      * @param file The file to add as an attachment.
+     * @param description The description of the file.
      */
-    void addAttachment(File file);
+    void addAttachment(File file, String description);
 
     /**
      * Adds an attachment to the message.
      *
      * @param icon The icon to add as an attachment.
+     * @param description The description of the icon.
      */
-    void addAttachment(Icon icon);
+    void addAttachment(Icon icon, String description);
 
     /**
      * Adds an attachment to the message.
      *
      * @param url The url of the attachment.
+     * @param description The description of the attachment.
      */
-    void addAttachment(URL url);
+    void addAttachment(URL url, String description);
 
     /**
      * Adds an attachment to the message.
      *
      * @param bytes The bytes of the file.
      * @param fileName The name of the file.
+     * @param description The description of the file.
      */
-    void addAttachment(byte[] bytes, String fileName);
+    void addAttachment(byte[] bytes, String fileName, String description);
 
     /**
      * Adds an attachment to the message.
      *
      * @param stream The stream of the file.
      * @param fileName The name of the file.
+     * @param description The description of the file.
      */
-    void addAttachment(InputStream stream, String fileName);
+    void addAttachment(InputStream stream, String fileName, String description);
 
     /**
      * Adds a spoiler attachment to the message.
      *
      * @param file The file to add as an attachment.
+     * @param description The description of the file.
      */
-    void addAttachmentAsSpoiler(File file);
+    void addAttachmentAsSpoiler(File file, String description);
 
     /**
      * Adds a spoiler attachment to the message.
      *
      * @param icon The icon to add as an attachment.
+     * @param description The description of the icon.
      */
-    void addAttachmentAsSpoiler(Icon icon);
+    void addAttachmentAsSpoiler(Icon icon, String description);
 
     /**
      * Adds a spoiler attachment to the message.
      *
      * @param url The url of the attachment.
+     * @param description The description of the url.
      */
-    void addAttachmentAsSpoiler(URL url);
-
+    void addAttachmentAsSpoiler(URL url, String description);
+    
     /**
      * Controls the mention behavior.
      *
@@ -277,7 +306,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param user The user to which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(User user);
 
@@ -285,7 +314,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param channel The channel in which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(TextChannel channel);
 
@@ -293,7 +322,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param webhook The webhook from which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(IncomingWebhook webhook);
 
@@ -301,7 +330,7 @@ public interface MessageBuilderBaseDelegate {
      * Sends the message.
      *
      * @param messageable The receiver of the message.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> send(Messageable messageable);
 
@@ -321,7 +350,7 @@ public interface MessageBuilderBaseDelegate {
      * @param api The api instance needed to send and return the message.
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
-     * @return The sent message.
+     * @return The message that has been sent.
      */
     CompletableFuture<Message> sendWithWebhook(DiscordApi api, String webhookId, String webhookToken);
 }

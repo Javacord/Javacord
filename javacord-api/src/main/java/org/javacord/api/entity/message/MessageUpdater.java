@@ -1,5 +1,9 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.entity.Attachment;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
@@ -37,5 +41,48 @@ public class MessageUpdater extends MessageBuilderBase<MessageUpdater> {
      */
     public CompletableFuture<Message> replaceMessage() {
         return delegate.edit(message, true);
+    }
+
+    /**
+     * Removes an attachment from the message.
+     *
+     * @param attachment The attachment to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageUpdater removeExistingAttachment(Attachment attachment) {
+        delegate.removeExistingAttachment(attachment);
+        return this;
+    }
+
+    /**
+     * Removes all the attachments from the message.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageUpdater removeExistingAttachments() {
+        delegate.removeExistingAttachments();
+        return this;
+    }
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageUpdater removeExistingAttachments(Attachment... attachments) {
+        removeExistingAttachments(Arrays.asList(attachments));
+        return this;
+    }
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     * @return The current instance in order to chain call methods.
+     */
+    public MessageUpdater removeExistingAttachments(Collection<Attachment> attachments) {
+        delegate.removeExistingAttachments(attachments);
+        return this;
     }
 }
