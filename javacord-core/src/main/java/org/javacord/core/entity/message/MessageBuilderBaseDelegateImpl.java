@@ -601,7 +601,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
-        prepareAttachments(message.getAttachments(), body, updateAll || removeAllAttachments);
+        prepareAttachments(message.getAttachments(), body);
 
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -670,13 +670,13 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
     }
 
-    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body,
-                                    boolean removeOrUpdateAll) {
+    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
         ArrayNode attachments = body.putArray("attachments");
 
-        if (removeOrUpdateAll) {
-            attachments.add(JsonNodeFactory.instance.objectNode());
-        } else if (!attachmentsToRemove.isEmpty()) {
+        if (removeAllAttachments) {
+            return;
+        }
+        if (!attachmentsToRemove.isEmpty()) {
             for (Attachment attachment : attachmentsList) {
                 if (!attachmentsToRemove.contains(attachment)) {
                     attachments.add(((AttachmentImpl) attachment).toJsonNode());
