@@ -19,6 +19,7 @@ import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
@@ -28,6 +29,7 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.sticker.StickerItemImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
+import org.javacord.core.interaction.MessageInteractionImpl;
 import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
 import org.javacord.core.util.cache.MessageCacheImpl;
 
@@ -73,6 +75,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * The components of the message.
      */
     private final List<HighLevelComponent> components = new ArrayList<>();
+
+    /**
+     * The Message Interaction Object of the message.
+     */
+    private final MessageInteraction messageInteraction;
 
     /**
      * The type of the message.
@@ -198,6 +205,10 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                 ? new MessageReferenceImpl(api, referencedMessage, data.get("message_reference"))
                 : null;
 
+        messageInteraction = data.hasNonNull("interaction")
+            ? new MessageInteractionImpl(this, data.get("interaction"))
+            : null;
+
         setUpdatableFields(data);
 
         MessageCacheImpl cache = (MessageCacheImpl) channel.getMessageCache();
@@ -217,6 +228,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * @param nonce             The nonce of the message.
      * @param referencedMessage The message referenced via message reply.
      * @param messageReference  The message reference.
+     * @param messageInteraction The reference to the interaction that the message responds to.
      * @param pinned            The pinned flag of the message.
      * @param tts               The text-to-speech flag of the message.
      * @param mentionsEveryone  If the message mentions everyone or not.
@@ -236,7 +248,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                         Instant lastEditTime, List<HighLevelComponent> components,
                         List<Embed> embeds, List<Reaction> reactions,
                         List<MessageAttachment> attachments, List<User> mentions,
-                        List<Role> roleMentions, Set<StickerItem> stickerItems) {
+                        List<Role> roleMentions, Set<StickerItem> stickerItems, MessageInteraction messageInteraction) {
         this.api = api;
         this.channel = channel;
         this.id = id;
@@ -247,6 +259,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         this.nonce = nonce;
         this.referencedMessage = referencedMessage;
         this.messageReference = messageReference;
+        this.messageInteraction = messageInteraction;
         this.pinned = pinned;
         this.tts = tts;
         this.mentionsEveryone = mentionsEveryone;
@@ -268,7 +281,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public MessageImpl copyMessage() {
         return new MessageImpl(api, channel, id, type, author, activity, content, nonce, referencedMessage,
                 messageReference, pinned, tts, mentionsEveryone, lastEditTime, components,
-                embeds, reactions, attachments, mentions, roleMentions, stickerItems);
+                embeds, reactions, attachments, mentions, roleMentions, stickerItems, messageInteraction);
     }
 
     /**
@@ -364,7 +377,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                 }
             });
         }
-
+        
         if (data.has("sticker_items")) {
             stickerItems.clear();
             for (JsonNode stickerItemJson : data.get("sticker_items")) {
@@ -441,7 +454,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
             String name = customEmoji.group("name");
             boolean animated = customEmoji.group(0).charAt(1) == 'a';
             // TODO Maybe it would be better to cache the custom emoji objects inside the message object
-            CustomEmoji emoji = ((DiscordApiImpl) getApi()).getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
+            CustomEmoji emoji = getApi().getKnownCustomEmojiOrCreateCustomEmoji(id, name, animated);
             emojis.add(emoji);
         }
         return Collections.unmodifiableList(emojis);
@@ -527,6 +540,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     @Override
     public List<Reaction> getReactions() {
         return Collections.unmodifiableList(new ArrayList<>(reactions));
+    }
+
+    @Override
+    public Optional<MessageInteraction> getMessageInteraction() {
+        return Optional.ofNullable(messageInteraction);
     }
 
     @Override

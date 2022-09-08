@@ -69,12 +69,28 @@ public class FileContainer {
     private String fileTypeOrName;
 
     /**
+     * The description of the file.
+     */
+    private String fileDescription;
+
+    /**
      * Creates a new file container with a buffered image.
      *
      * @param file The file as a buffered image.
      * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
     public FileContainer(BufferedImage file, String type) {
+        this(file, type, null);
+    }
+
+    /**
+     * Creates a new file container with a buffered image.
+     *
+     * @param file The file as a buffered image.
+     * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
+     * @param description The description of the file.
+     */
+    public FileContainer(BufferedImage file, String type, String description) {
         fileAsBufferedImage = file;
         fileAsFile = null;
         fileAsIcon = null;
@@ -82,6 +98,7 @@ public class FileContainer {
         fileAsByteArray = null;
         fileAsInputStream = null;
         setFileTypeOrName(type);
+        fileDescription = description;
     }
 
     /**
@@ -90,8 +107,9 @@ public class FileContainer {
      * @param file The file as a file.
      */
     public FileContainer(File file) {
-        this(file, false);
+        this(file, false, null);
     }
+
 
     /**
      * Creates a new file container with a file.
@@ -100,6 +118,27 @@ public class FileContainer {
      * @param isSpoiler Whether the file is to be marked as spoiler.
      */
     public FileContainer(File file, boolean isSpoiler) {
+        this(file, isSpoiler, null);
+    }
+
+    /**
+     * Creates a new file container with a file.
+     *
+     * @param file The file as a file.
+     * @param description The description of the file.
+     */
+    public FileContainer(File file, String description) {
+        this(file, false, description);
+    }
+
+    /**
+     * Creates a new file container with a file.
+     *
+     * @param file The file as a file.
+     * @param isSpoiler Whether the file is to be marked as spoiler.
+     * @param description The description of the file.
+     */
+    public FileContainer(File file, boolean isSpoiler, String description) {
         fileAsBufferedImage = null;
         fileAsFile = file;
         fileAsIcon = null;
@@ -107,6 +146,7 @@ public class FileContainer {
         fileAsByteArray = null;
         fileAsInputStream = null;
         fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + file.getName();
+        fileDescription = description;
     }
 
     /**
@@ -125,6 +165,27 @@ public class FileContainer {
      * @param isSpoiler Whether the icon is marked as a spoiler.
      */
     public FileContainer(Icon file, boolean isSpoiler) {
+        this(file, isSpoiler, null);
+    }
+
+    /**
+     * Creates a new file container with an icon.
+     *
+     * @param file The file as an icon.
+     * @param description The description of the icon.
+     */
+    public FileContainer(Icon file, String description) {
+        this(file, false, description);
+    }
+
+    /**
+     * Creates a new file container with an icon.
+     *
+     * @param file The file as an icon.
+     * @param isSpoiler Whether the icon is marked as a spoiler.
+     * @param description The description of the icon.
+     */
+    public FileContainer(Icon file, boolean isSpoiler, String description) {
         fileAsBufferedImage = null;
         fileAsFile = null;
         fileAsIcon = file;
@@ -147,9 +208,30 @@ public class FileContainer {
      * Creates a new file container with an url.
      *
      * @param file The file as an url.
+     * @param description The description of the url.
+     */
+    public FileContainer(URL file, String description) {
+        this(file, false, description);
+    }
+
+    /**
+     * Creates a new file container with an url.
+     *
+     * @param file The file as an url.
      * @param isSpoiler Whether the file is to be marked as spoiler.
      */
     public FileContainer(URL file, boolean isSpoiler) {
+        this(file, isSpoiler, null);
+    }
+
+    /**
+     * Creates a new file container with a byte array.
+     *
+     * @param file The file as an url.
+     * @param isSpoiler Whether the file is to be marked as spoiler.
+     * @param description The description of the url.
+     */
+    public FileContainer(URL file, boolean isSpoiler, String description) {
         fileAsBufferedImage = null;
         fileAsFile = null;
         fileAsIcon = null;
@@ -157,6 +239,7 @@ public class FileContainer {
         fileAsByteArray = null;
         fileAsInputStream = null;
         fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + new File(file.getFile()).getName();
+        fileDescription = description;
     }
 
     /**
@@ -166,6 +249,17 @@ public class FileContainer {
      * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
     public FileContainer(byte[] file, String type) {
+        this(file, type, null);
+    }
+
+    /**
+     * Creates a new file container with a byte array.
+     *
+     * @param file The file as a byte array.
+     * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
+     * @param description The description of the file.
+     */
+    public FileContainer(byte[] file, String type, String description) {
         fileAsBufferedImage = null;
         fileAsFile = null;
         fileAsIcon = null;
@@ -173,6 +267,7 @@ public class FileContainer {
         fileAsByteArray = file;
         fileAsInputStream = null;
         fileTypeOrName = type;
+        fileDescription = description;
     }
 
     /**
@@ -182,6 +277,17 @@ public class FileContainer {
      * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
      */
     public FileContainer(InputStream file, String type) {
+        this(file, type, null);
+    }
+
+    /**
+     * Creates a new file container with an input stream.
+     *
+     * @param file The file as an input stream.
+     * @param type The type ("png", "txt", ...) or name ("image.png", "readme.txt", ...) of the file.
+     * @param description The description of the file.
+     */
+    public FileContainer(InputStream file, String type, String description) {
         fileAsBufferedImage = null;
         fileAsFile = null;
         fileAsIcon = null;
@@ -189,6 +295,7 @@ public class FileContainer {
         fileAsByteArray = null;
         fileAsInputStream = file;
         fileTypeOrName = type;
+        fileDescription = description;
     }
 
     /**
@@ -223,6 +330,15 @@ public class FileContainer {
      */
     public String getFileTypeOrName() {
         return fileTypeOrName;
+    }
+
+    /**
+     * Gets the description of the file.
+     *
+     * @return The description of the file.
+     */
+    public String getDescription() {
+        return fileDescription;
     }
 
     /**
@@ -325,5 +441,4 @@ public class FileContainer {
                     }
                 });
     }
-
 }

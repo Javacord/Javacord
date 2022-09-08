@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
+import org.javacord.api.entity.channel.thread.ThreadMetadata;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.channel.thread.ThreadMetadataImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.text.InternalServerTextChannelAttachableListenerManager;
 import org.javacord.core.util.Cleanupable;
@@ -13,8 +15,6 @@ import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,34 +47,19 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private final int memberCount;
 
     /**
-     * The auto archive duration.
-     */
-    private final int autoArchiveDuration;
-
-    /**
-     * Whether the thread is archived.
-     */
-    private final boolean isArchived;
-
-    /**
-     * Whether the thread is locked.
-     */
-    private final boolean isLocked;
-
-    /**
      * The id of the creator of the channel.
      */
     private final long ownerId;
 
     /**
-     * The timestamp when the thread's archive status was last changed.
-     */
-    private final Instant archiveTimestamp;
-
-    /**
      * The thread's users.
      */
     private final Set<ThreadMember> members;
+
+    /**
+     * The thread's metadata.
+     */
+    private final ThreadMetadata metadata;
 
     /**
      * Creates a new server text channel object.
@@ -104,11 +89,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
             }
         }
 
-        final JsonNode threadMetadata = data.get("thread_metadata");
-        autoArchiveDuration = threadMetadata.get("auto_archive_duration").asInt();
-        isArchived = threadMetadata.get("archived").asBoolean();
-        isLocked = threadMetadata.get("locked").asBoolean();
-        archiveTimestamp = OffsetDateTime.parse(threadMetadata.get("archive_timestamp").asText()).toInstant();
+        this.metadata = new ThreadMetadataImpl(data.get("thread_metadata"));
 
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
@@ -132,28 +113,13 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
-    public int getAutoArchiveDuration() {
-        return autoArchiveDuration;
-    }
-
-    @Override
-    public boolean isArchived() {
-        return isArchived;
-    }
-
-    @Override
-    public boolean isLocked() {
-        return isLocked;
+    public ThreadMetadata getMetadata() {
+        return metadata;
     }
 
     @Override
     public long getOwnerId() {
         return ownerId;
-    }
-
-    @Override
-    public Instant getArchiveTimestamp() {
-        return archiveTimestamp;
     }
 
     @Override
