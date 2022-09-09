@@ -183,7 +183,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @param user The user to check.
      * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
-     * if user is currently not timed out.
+     *         if user is currently not timed out.
      */
     Optional<Instant> getTimeout(User user);
 
