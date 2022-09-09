@@ -8,6 +8,8 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 
+import java.util.Optional;
+
 /**
  * The implementation of {@link Ban}.
  */
@@ -24,6 +26,11 @@ public class BanImpl implements Ban {
     private final User user;
 
     /**
+     * The reason for the ban.
+     */
+    private final String reason;
+
+    /**
      * Creates a new ban.
      *
      * @param server The server of the ban.
@@ -32,6 +39,7 @@ public class BanImpl implements Ban {
     public BanImpl(Server server, JsonNode data) {
         this.server = server;
         user = new UserImpl((DiscordApiImpl) server.getApi(), data.get("user"), (MemberImpl) null, (ServerImpl) server);
+        reason = data.has("reason") ? data.get("reason").asText() : null;
     }
 
     @Override
@@ -42,5 +50,10 @@ public class BanImpl implements Ban {
     @Override
     public User getUser() {
         return user;
+    }
+
+    @Override
+    public Optional<String> getReason() {
+        return Optional.ofNullable(reason);
     }
 }
