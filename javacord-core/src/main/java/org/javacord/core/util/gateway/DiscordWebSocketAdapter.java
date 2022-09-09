@@ -716,6 +716,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("seq", lastSeq);
         logger.debug("Sending resume packet");
         sendLifecycleTextFrame(websocket, resumePacket.toString());
+        WebSocketFrame resumeFrame = WebSocketFrame.createTextFrame(resumePacket.toString());
+        triedToResume.set(resumeFrame, false);
     }
 
     /**
