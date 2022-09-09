@@ -2055,6 +2055,17 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @param user     The user to ban.
      * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, Duration duration) {
+        return banUser(user.getId(), duration, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user     The user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
      * @param reason   The reason for the ban.
      * @return A future to check if the ban was successful.
      */
@@ -2166,7 +2177,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
      */
     @Deprecated
-    CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason);
+    default CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
+        return banUser(userId, deleteMessageDays, TimeUnit.DAYS, reason);
+    }
 
     /**
      * Bans the given user from the server.
@@ -2206,17 +2219,6 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default CompletableFuture<Void> banUser(long userId, long deleteMessageDuration, TimeUnit unit, String reason) {
         return banUser(Long.toUnsignedString(userId), deleteMessageDuration, unit, reason);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
-     * @param user     The user to ban.
-     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
-     * @return A future to check if the ban was successful.
-     */
-    default CompletableFuture<Void> banUser(User user, Duration duration) {
-        return banUser(user.getId(), duration, null);
     }
 
     /**
