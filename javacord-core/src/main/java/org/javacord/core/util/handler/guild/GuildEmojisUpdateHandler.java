@@ -93,10 +93,10 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
                     .collect(Collectors.toSet());
             emojiToDelete.forEach(emoji -> {
                 api.removeCustomEmoji(emoji);
+                server.removeCustomEmoji(emoji);
                 KnownCustomEmojiDeleteEvent event = new KnownCustomEmojiDeleteEventImpl(emoji);
                 api.getEventDispatcher().dispatchKnownCustomEmojiDeleteEvent(server, emoji, server, event);
             });
-            server.getCustomEmojis().removeAll(emojiToDelete);
         });
     }
 
