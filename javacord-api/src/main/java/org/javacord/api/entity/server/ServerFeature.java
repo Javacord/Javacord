@@ -85,4 +85,9 @@ public enum ServerFeature {
      * Server has set up auto moderation rules.
      */
     AUTO_MODERATION,
+
+    /**
+     * Server has paused invites, preventing new users from joining.
+     */
+    INVITES_DISABLED,
 }

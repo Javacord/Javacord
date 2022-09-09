@@ -1,9 +1,9 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.channel.thread.ThreadMetadata;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.ServerThreadChannelAttachableListenerManager;
-import java.time.Instant;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -37,29 +37,12 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
      */
     int getMemberCount();
 
-
     /**
-     * Gets the duration for newly created threads, in minutes, to automatically
-     * archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080.
+     * Gets the extra data about this thread.
      *
-     * @return The duration for newly created threads.
+     * @return The extra data about this thread.
      */
-    int getAutoArchiveDuration();
-
-    /**
-     * Whether this thread is archived.
-     *
-     * @return Whether this thread is archived.
-     */
-    boolean isArchived();
-
-    /**
-     * Whether this thread is locked.
-     * When a thread is locked, only users with MANAGE_THREADS can unarchive it.
-     *
-     * @return Whether this thread is locked.
-     */
-    boolean isLocked();
+    ThreadMetadata getMetadata();
 
     /**
      * Whether this thread is private.
@@ -98,13 +81,6 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     default CompletableFuture<User> requestOwner() {
         return getApi().getUserById(getOwnerId());
     }
-
-    /**
-     * Gets the timestamp when the thread's archive status was last changed, used for calculating recent activity.
-     *
-     * @return The timestamp when the thread's archive status was last changed.
-     */
-    Instant getArchiveTimestamp();
 
     /**
      * Gets all members of the thread.
@@ -201,5 +177,4 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     default ServerThreadChannelUpdater createUpdater() {
         return new ServerThreadChannelUpdater(this);
     }
-
 }
