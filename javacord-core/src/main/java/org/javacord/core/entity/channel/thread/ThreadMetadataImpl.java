@@ -12,19 +12,19 @@ public class ThreadMetadataImpl implements ThreadMetadata {
     /**
      * Whether the thread is archived.
      */
-    private final boolean isArchived;
+    private boolean isArchived;
     /**
      * The auto archive duration.
      */
-    private final int autoArchiveDuration;
+    private int autoArchiveDuration;
     /**
      * Whether the thread is locked.
      */
-    private final boolean isLocked;
+    private boolean isLocked;
     /**
      * The timestamp when the thread's archive status was last changed.
      */
-    private final Instant archiveTimestamp;
+    private Instant archiveTimestamp;
     /**
      * The timestamp of when the thread was created.
      */
@@ -32,7 +32,7 @@ public class ThreadMetadataImpl implements ThreadMetadata {
     /**
      * Informs you weather someone who is not a moderator can add non-moderator users to the thread.
      */
-    private final Boolean isInvitable;
+    private Boolean isInvitable;
 
     /**
      * Creates a new thread metadata instance.
@@ -77,5 +77,50 @@ public class ThreadMetadataImpl implements ThreadMetadata {
     @Override
     public Optional<Instant> getCreationTimestamp() {
         return Optional.ofNullable(creationTimestamp);
+    }
+
+    /**
+     * Sets the archived status of the thread.
+     *
+     * @param archived The new archived status.
+     */
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+    /**
+     * Sets the auto archive duration of the thread.
+     *
+     * @param autoArchiveDuration The new auto archive duration.
+     */
+    public void setAutoArchiveDuration(int autoArchiveDuration) {
+        this.autoArchiveDuration = autoArchiveDuration;
+    }
+
+    /**
+     * Sets the locked status of the thread.
+     *
+     * @param locked The new locked status.
+     */
+    public void setLocked(boolean locked) {
+        isLocked = locked;
+    }
+
+    /**
+     * Sets the archive timestamp of the thread.
+     *
+     * @param archiveTimestamp The new archive timestamp.
+     */
+    public void setArchiveTimestamp(Instant archiveTimestamp) {
+        this.archiveTimestamp = archiveTimestamp;
+    }
+
+    /**
+     * Sets the invitable status of the thread.
+     *
+     * @param invitable The new invitable status.
+     */
+    public void setInvitable(Boolean invitable) {
+        isInvitable = invitable;
     }
 }
