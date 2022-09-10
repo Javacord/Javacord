@@ -14,34 +14,21 @@ public class ServerPrivateThreadJoinEventImpl extends ServerThreadChannelEventIm
     /**
      * The new members.
      */
-    private final Set<ThreadMember> newMembers;
-
-    /**
-     * The old members.
-     */
-    private final Set<ThreadMember> oldMembers;
+    private final ThreadMember threadMember;
 
     /**
      * Creates a new instance of this class.
      *
      * @param channel The channel.
-     * @param newMembers The new members.
-     * @param oldMembers The old members.
+     * @param threadMember The new members.
      */
-    public ServerPrivateThreadJoinEventImpl(ServerThreadChannelImpl channel,
-                                            Set<ThreadMember> newMembers, Set<ThreadMember> oldMembers) {
+    public ServerPrivateThreadJoinEventImpl(ServerThreadChannelImpl channel, ThreadMember threadMember) {
         super(channel);
-        this.newMembers = newMembers;
-        this.oldMembers = oldMembers;
+        this.threadMember = threadMember;
     }
 
     @Override
-    public Set<ThreadMember> getNewMembers() {
-        return newMembers;
-    }
-
-    @Override
-    public Set<ThreadMember> getOldMembers() {
-        return oldMembers;
+    public ThreadMember getThreadMember() {
+        return threadMember;
     }
 }

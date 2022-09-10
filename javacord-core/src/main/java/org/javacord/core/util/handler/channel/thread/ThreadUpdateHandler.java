@@ -215,30 +215,29 @@ public class ThreadUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
-        final Optional<Boolean> wasInvitable = metadata.isInvitable();
-        final Optional<Boolean> isInvitable = Optional.ofNullable(metadataJson.hasNonNull("invitable")
-                ? metadataJson.get("invitable").asBoolean() : null);
+        final Boolean wasInvitable = metadata.isInvitable().orElse(null);
+        final Boolean isInvitable = metadataJson.hasNonNull("invitable")
+                ? metadataJson.get("invitable").asBoolean() : null;
 
-        if (isInvitable.isPresent() && wasInvitable.isPresent()) {
-            metadata.setInvitable(isInvitable.get());
+        if (wasInvitable != isInvitable) {
+            metadata.setInvitable(isInvitable);
 
             final ServerThreadChannelChangeInvitableEvent event =
-                    new ServerThreadChannelChangeInvitableEventImpl(thread, isInvitable.get(), wasInvitable.get());
+                    new ServerThreadChannelChangeInvitableEventImpl(thread, isInvitable, wasInvitable);
 
             api.getEventDispatcher().dispatchServerThreadChannelChangeInvitableEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
 
-        final Set<ThreadMember> oldMembers = thread.getMembers();
-        final Set<ThreadMember> newMembers = new HashSet<>();
         if (jsonChannel.hasNonNull("member")) {
-            final Set<ThreadMember> members = thread.getMembers();
+            final Set<ThreadMember> members = new HashSet<>(thread.getMembers());
             final ThreadMember member = new ThreadMemberImpl(api, server, jsonChannel.get("member"));
             members.add(member);
-            thread.setMembers(newMembers);
+            thread.setMembers(members);
+
             final ServerPrivateThreadJoinEvent event =
-                    new ServerPrivateThreadJoinEventImpl(thread, newMembers,
-                            oldMembers);
+                    new ServerPrivateThreadJoinEventImpl(thread, member);
+
             api.getEventDispatcher().dispatchServerPrivateThreadJoinEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }

@@ -2,21 +2,11 @@ package org.javacord.api.event.channel.server.thread;
 
 import org.javacord.api.entity.channel.ThreadMember;
 
-import java.util.Set;
-
 public interface ServerPrivateThreadJoinEvent extends ServerThreadChannelEvent {
-
     /**
-     * Gets the new member count.
+     * Gets the thread members that joined the thread.
      *
-     * @return The new member count.
+     * @return The thread members that joined the thread.
      */
-    Set<ThreadMember> getNewMembers();
-
-    /**
-     * Gets the old member count.
-     *
-     * @return The old member count.
-     */
-    Set<ThreadMember> getOldMembers();
+    ThreadMember getThreadMember();
 }
