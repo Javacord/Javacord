@@ -34,7 +34,7 @@ public class BanImpl implements Ban {
      * Creates a new ban.
      *
      * @param server The server of the ban.
-     * @param data The json data of the ban.
+     * @param data   The json data of the ban.
      */
     public BanImpl(Server server, JsonNode data) {
         this.server = server;
