@@ -38,6 +38,28 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     int getMemberCount();
 
     /**
+     * Gets the id of the last message sent in this thread.
+     *
+     * @return The id of the last message sent in this thread.
+     */
+    long getLastMessageId();
+
+    /**
+     * Gets the total number of messages ever sent in this thread.
+     * Similar to {@link #getMessageCount()} but will not decrease when messages are deleted.
+     *
+     * @return The total number of messages sent in this thread.
+     */
+    int getTotalNumberOfMessagesSent();
+
+    /**
+     * Gets the amount of seconds a user has to wait before sending another message (0-21600).
+     *
+     * @return The amount of seconds a user has to wait before sending another message.
+     */
+    int getRateLimitPerUser();
+
+    /**
      * Gets the extra data about this thread.
      *
      * @return The extra data about this thread.

@@ -994,6 +994,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     }
 
     /**
+     * Checks if the message was sent in a thread channel.
+     *
+     * @return Whether the message was sent in a thread channel.
+     */
+    default boolean isThreadMessage() {
+        return getChannel().getType() == ChannelType.SERVER_PRIVATE_THREAD
+                || getChannel().getType() == ChannelType.SERVER_PUBLIC_THREAD
+                || getChannel().getType() == ChannelType.SERVER_NEWS_THREAD;
+    }
+
+    /**
      * Gets a reaction by its emoji.
      *
      * @param emoji The emoji of the reaction.

@@ -15,6 +15,7 @@ import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -39,12 +40,22 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     /**
      * The count of messages in the thread.
      */
-    private final int messageCount;
+    private int messageCount;
 
     /**
      * The count of members in the thread.
      */
-    private final int memberCount;
+    private int memberCount;
+
+    /**
+     * The id of the last message sent in the thread.
+     */
+    private long lastMessageId;
+
+    /**
+     * The rate limit per user.
+     */
+    private int rateLimitPerUser;
 
     /**
      * The id of the creator of the channel.
@@ -62,6 +73,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private final ThreadMetadata metadata;
 
     /**
+     * The total number of messages that are sent.
+     */
+    private int totalNumberOfMessagesSent;
+
+    /**
      * Creates a new server text channel object.
      *
      * @param api    The discord api instance.
@@ -75,6 +91,8 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         ownerId = data.get("owner_id").asLong();
         messageCount = data.get("message_count").asInt(0);
         memberCount = data.get("member_count").asInt(0);
+        lastMessageId = data.hasNonNull("last_message_id") ? data.get("last_message_id").asLong() : 0;
+        rateLimitPerUser = data.get("rate_limit_per_user").asInt(0);
 
         members = new HashSet<>();
         if (data.hasNonNull("member")) {
@@ -94,6 +112,53 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         messageCache = new MessageCacheImpl(
                 api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
+
+        totalNumberOfMessagesSent = data.path("total_message_sent").asInt(0);
+    }
+
+    /**
+     * Used to set a new message count.
+     *
+     * @param messageCount The new message count.
+     */
+    public void setMessageCount(int messageCount) {
+        this.messageCount = messageCount;
+    }
+
+    /**
+     * Used to set a new member count.
+     *
+     * @param memberCount The new member count.
+     */
+    public void setMemberCount(int memberCount) {
+        this.memberCount = memberCount;
+    }
+
+    /**
+     * Used to set a new last message id.
+     *
+     * @param lastMessageId The new last message id.
+     */
+    public void setLastMessageId(long lastMessageId) {
+        this.lastMessageId = lastMessageId;
+    }
+
+    /**
+     * Used to set a new rate limit per user.
+     *
+     * @param rateLimitPerUser The new rate limit per user.
+     */
+    public void setRateLimitPerUser(int rateLimitPerUser) {
+        this.rateLimitPerUser = rateLimitPerUser;
+    }
+
+    /**
+     * Used to set a new total for the number of messages sent.
+     *
+     * @param totalNumberOfMessagesSent The new total for the number of messages sent.
+     */
+    public void setTotalNumberOfMessagesSent(int totalNumberOfMessagesSent) {
+        this.totalNumberOfMessagesSent = totalNumberOfMessagesSent;
     }
 
     @Override
@@ -113,6 +178,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
+    public long getLastMessageId() {
+        return lastMessageId;
+    }
+
+    @Override
     public ThreadMetadata getMetadata() {
         return metadata;
     }
@@ -124,7 +194,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
 
     @Override
     public Set<ThreadMember> getMembers() {
-        return members;
+        return Collections.unmodifiableSet(members);
     }
 
     @Override
@@ -160,6 +230,16 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
                     }
                     return Collections.unmodifiableSet(threadMembers);
                 });
+    }
+
+    @Override
+    public int getTotalNumberOfMessagesSent() {
+        return totalNumberOfMessagesSent;
+    }
+
+    @Override
+    public int getRateLimitPerUser() {
+        return rateLimitPerUser;
     }
 
     /**
