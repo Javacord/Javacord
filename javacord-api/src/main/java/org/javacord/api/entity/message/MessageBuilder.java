@@ -119,8 +119,7 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder replyTo(Message message) {
-        replyTo(message, true);
-        return this;
+        return replyTo(message, true);
     }
 
     /**
@@ -130,8 +129,7 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder replyTo(long messageId) {
-        replyTo(messageId, true);
-        return this;
+        return replyTo(messageId, true);
     }
 
     /**
@@ -142,8 +140,7 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
      * @return The current instance in order to chain call methods.
      */
     public MessageBuilder replyTo(Message message, boolean assertReferenceExists) {
-        delegate.replyTo(message.getId(), assertReferenceExists);
-        return this;
+        return replyTo(message.getId(), assertReferenceExists);
     }
 
     /**

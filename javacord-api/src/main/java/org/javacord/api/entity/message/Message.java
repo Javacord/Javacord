@@ -1554,9 +1554,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Replies to this message with the given text.
      *
      * @param messageContent The text to reply with.
-     * @param assertReferenceExists If true, tells discord to throw an error if the message reference does not exist,
-     *                             if false, then leaves out the message reference,
-     *                             if it does not exist but still sends the message.
+     * @param assertReferenceExists If true, throw an error if the message you are replying to does not exist otherwise,
+     *                              if false send the message regardless without a reference to a message.
      * @return The message that was sent.
      */
     default CompletableFuture<Message> reply(String messageContent, boolean assertReferenceExists) {
@@ -1578,9 +1577,8 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Replies to this message with the given embed.
      *
      * @param embed The EmbedBuilder to reply with.
-     * @param assertReferenceExists If true, tells discord to throw an error if the message reference does not exist,
-     *                             if false, then leaves out the message reference,
-     *                             if it does not exist but still sends the message.
+     * @param assertReferenceExists If true, throw an error if the message you are replying to does not exist otherwise,
+     *                              if false send the message regardless without a reference to a message.
      * @return The message that was sent.
      */
     default CompletableFuture<Message> reply(EmbedBuilder embed, boolean assertReferenceExists) {

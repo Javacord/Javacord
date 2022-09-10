@@ -75,11 +75,4 @@ public interface MessageReference {
 
         return getMessageId().flatMap(messageId -> getChannel().map(channel -> channel.getMessageById(messageId)));
     }
-
-    /**
-     * Gets whether the message reference is valid.
-     *
-     * @return {@code true} if the message reference is valid, {@code false} otherwise.
-     */
-    boolean doesMessageReferenceExist();
 }

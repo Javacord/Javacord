@@ -36,11 +36,6 @@ public class MessageReferenceImpl implements MessageReference {
     private final Message message;
 
     /**
-     * If the reference message exists.
-     */
-    private final boolean failIfNotExists;
-
-    /**
      * Creates a new message reference object.
      *
      * @param api The discord api instance.
@@ -63,7 +58,6 @@ public class MessageReferenceImpl implements MessageReference {
         }
 
         this.message = message;
-        this.failIfNotExists = data.get("fail_if_not_exists").asBoolean(true);
     }
 
     @Override
@@ -89,10 +83,5 @@ public class MessageReferenceImpl implements MessageReference {
     @Override
     public Optional<Message> getMessage() {
         return Optional.ofNullable(message);
-    }
-
-    @Override
-    public boolean doesMessageReferenceExist() {
-        return failIfNotExists;
     }
 }
