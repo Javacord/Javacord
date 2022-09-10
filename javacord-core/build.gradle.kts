@@ -72,3 +72,14 @@ tasks.jar {
         )
     }
 }
+
+tasks.javadoc {
+    dependsOn(project(":javacord-api").tasks.javadoc)
+    options {
+        this as StandardJavadocDocletOptions
+        val releaseVersion: Boolean by rootProject.extra
+        val apiJavadocs = "${project(":javacord-api").tasks.javadoc.get().destinationDir!!.toURI()}"
+        val releasedApiJavadocs = "https://docs.javacord.org/api/v/$version"
+        linksOffline(if (releaseVersion) releasedApiJavadocs else apiJavadocs, apiJavadocs)
+    }
+}

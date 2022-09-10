@@ -1,9 +1,9 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.channel.thread.ThreadMetadata;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.ServerThreadChannelAttachableListenerManager;
-import java.time.Instant;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -37,29 +37,34 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
      */
     int getMemberCount();
 
+    /**
+     * Gets the id of the last message sent in this thread.
+     *
+     * @return The id of the last message sent in this thread.
+     */
+    long getLastMessageId();
 
     /**
-     * Gets the duration for newly created threads, in minutes, to automatically
-     * archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080.
+     * Gets the total number of messages ever sent in this thread.
+     * Similar to {@link #getMessageCount()} but will not decrease when messages are deleted.
      *
-     * @return The duration for newly created threads.
+     * @return The total number of messages sent in this thread.
      */
-    int getAutoArchiveDuration();
+    int getTotalNumberOfMessagesSent();
 
     /**
-     * Whether this thread is archived.
+     * Gets the amount of seconds a user has to wait before sending another message (0-21600).
      *
-     * @return Whether this thread is archived.
+     * @return The amount of seconds a user has to wait before sending another message.
      */
-    boolean isArchived();
+    int getRateLimitPerUser();
 
     /**
-     * Whether this thread is locked.
-     * When a thread is locked, only users with MANAGE_THREADS can unarchive it.
+     * Gets the extra data about this thread.
      *
-     * @return Whether this thread is locked.
+     * @return The extra data about this thread.
      */
-    boolean isLocked();
+    ThreadMetadata getMetadata();
 
     /**
      * Whether this thread is private.
@@ -98,13 +103,6 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     default CompletableFuture<User> requestOwner() {
         return getApi().getUserById(getOwnerId());
     }
-
-    /**
-     * Gets the timestamp when the thread's archive status was last changed, used for calculating recent activity.
-     *
-     * @return The timestamp when the thread's archive status was last changed.
-     */
-    Instant getArchiveTimestamp();
 
     /**
      * Gets all members of the thread.
@@ -201,5 +199,4 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     default ServerThreadChannelUpdater createUpdater() {
         return new ServerThreadChannelUpdater(this);
     }
-
 }

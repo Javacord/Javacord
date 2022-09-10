@@ -13,6 +13,7 @@ import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
+import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.message.MessageCreateEventImpl;
@@ -85,6 +86,11 @@ public class MessageCreateHandler extends PacketHandler {
 
         Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
         MessageAuthor author = message.getAuthor();
+
+        message.getServerThreadChannel().ifPresent(stc -> {
+            ((ServerThreadChannelImpl) stc).setTotalNumberOfMessagesSent(stc.getTotalNumberOfMessagesSent() + 1);
+        });
+
         api.getEventDispatcher().dispatchMessageCreateEvent(
                 optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                 optionalServer.orElse(null),

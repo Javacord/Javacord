@@ -23,6 +23,8 @@ public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilde
 
     private boolean mentionEveryoneAndHere = false;
 
+    private boolean mentionRepliedUser = false;
+
 
     @Override
     public void setMentionEveryoneAndHere(boolean value) {
@@ -37,6 +39,11 @@ public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilde
     @Override
     public void setMentionUsers(boolean value) {
         this.mentionAllUsers = value;
+    }
+
+    @Override
+    public void setMentionRepliedUser(boolean value) {
+        this.mentionRepliedUser = value;
     }
 
     @Override
@@ -102,6 +109,6 @@ public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilde
     @Override
     public AllowedMentions build() {
         return new AllowedMentionsImpl(mentionAllRoles, mentionAllUsers, mentionEveryoneAndHere,
-                allowedRoleMentions, allowedUserMentions);
+                mentionRepliedUser, allowedRoleMentions, allowedUserMentions);
     }
 }

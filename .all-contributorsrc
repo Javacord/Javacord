@@ -118,6 +118,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "RealYusufIsmail",
+      "name": "Yusuf Arfan Ismail",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67903886?v=4",
+      "profile": "http://realyusufismail-github-io.vercel.app",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
