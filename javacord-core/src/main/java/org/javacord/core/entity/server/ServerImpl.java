@@ -1649,7 +1649,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Void> banUser(String userId, int deleteMessageDuration, TimeUnit unit, String reason) {
+    public CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit, String reason) {
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), userId);
         if (deleteMessageDuration > 0) {
