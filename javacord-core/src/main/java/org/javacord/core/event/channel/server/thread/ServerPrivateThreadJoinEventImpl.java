@@ -4,8 +4,6 @@ import org.javacord.api.entity.channel.ThreadMember;
 import org.javacord.api.event.channel.server.thread.ServerPrivateThreadJoinEvent;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 
-import java.util.Set;
-
 /**
  * The implementation of {@link ServerPrivateThreadJoinEvent}.
  */
