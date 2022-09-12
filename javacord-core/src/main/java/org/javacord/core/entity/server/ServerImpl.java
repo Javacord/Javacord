@@ -2041,6 +2041,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
         getMembers().forEach(user -> removeMember(user.getId()));
         stickers.values().forEach(api::removeSticker);
+        getAudioConnection().ifPresent(this::removeAudioConnection);
     }
 
     @Override
