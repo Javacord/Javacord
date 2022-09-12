@@ -134,6 +134,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected Long replyingTo = null;
 
     /**
+     * Used to tell discord to check if the reference message exists.
+     */
+    private boolean assertReferenceExists;
+
+    /**
      * The stickers attached to the message.
      */
     protected Set<Long> stickerIds = new HashSet<>();
@@ -400,8 +405,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void replyTo(long messageId) {
+    public void replyTo(long messageId, boolean assertReferenceExists) {
         replyingTo = messageId;
+        this.assertReferenceExists = assertReferenceExists;
     }
 
     @Override
@@ -476,7 +482,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
 
         if (replyingTo != null) {
-            body.putObject("message_reference").put("message_id", replyingTo);
+            body.putObject("message_reference")
+                    .put("message_id", replyingTo)
+                    .put("fail_if_not_exists", assertReferenceExists);
         }
 
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
