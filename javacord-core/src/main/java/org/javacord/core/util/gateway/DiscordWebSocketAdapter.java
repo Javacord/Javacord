@@ -152,8 +152,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
             new AtomicMarkableReference<>(null, false);
     private final AtomicReference<WebSocketFrame> nextHeartbeatFrame = new AtomicReference<>(null);
     private final List<WebSocketListener> identifyFrameListeners = Collections.synchronizedList(new ArrayList<>());
-    private final AtomicMarkableReference<WebSocketFrame> triedToResume =
-            new AtomicMarkableReference<>(null, false);
+    private volatile boolean triedToResume = false;
+
     private volatile long lastGuildMembersChunkReceived = System.currentTimeMillis();
 
     // A reconnect attempt counter
@@ -589,6 +589,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sessionId = packet.get("d").get("session_id").asText();
                     resumeUrl = packet.get("d").hasNonNull("resume_gateway_url")
                             ? packet.get("d").get("resume_gateway_url").asText() : null;
+                    triedToResume = false;
                     // Discord sends us GUILD_CREATE packets after logging in. We will wait for them.
                     api.getThreadPool().getSingleThreadExecutorService("Startup Servers Wait Thread").submit(() -> {
                         boolean allUsersLoaded = false;
@@ -638,13 +639,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                                WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
                 break;
             case INVALID_SESSION:
+                sessionId = null;
+                resumeUrl = null;
                 if (lastSentFrameWasIdentify.isMarked()) {
-                    logger.info("Hit identifying rate limit. Retrying in 5 seconds...");
+                    logger.info("Reconnecting ...");
                 } else {
-                    sessionId = null;
-                    resumeUrl = null;
-
-                    if (triedToResume.isMarked()) {
+                    if (triedToResume) {
                         // Invalid session :(
                         int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
                         logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
@@ -656,12 +656,14 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             logger.error("Interrupted while delaying reconnect!");
                             return;
                         }
+                    } else {
+                        sendIdentify(websocket);
+
                     }
                     api.getGatewayIdentifyRatelimiter().requestQuota();
-                    sendIdentify(websocket);
                     sendCloseFrame(websocket,
-                            WebSocketCloseReason.COMMANDED_RECONNECT.getNumericCloseCode(),
-                            WebSocketCloseReason.COMMANDED_RECONNECT.getCloseReason());
+                            WebSocketCloseReason.DISCONNECT.getNumericCloseCode(),
+                            WebSocketCloseReason.DISCONNECT.getCloseReason());
                 }
                 break;
             case HELLO:
@@ -716,8 +718,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("seq", lastSeq);
         logger.debug("Sending resume packet");
         sendLifecycleTextFrame(websocket, resumePacket.toString());
-        WebSocketFrame resumeFrame = WebSocketFrame.createTextFrame(resumePacket.toString());
-        triedToResume.set(resumeFrame, false);
+        triedToResume = true;
     }
 
     /**
@@ -771,6 +772,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         logger.debug("Sending identify packet");
         sendLifecycleFrame(websocket, identifyFrame);
+        triedToResume = false;
     }
 
     /**
