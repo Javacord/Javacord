@@ -959,6 +959,16 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     Set<StickerItem> getStickerItems();
 
     /**
+     * A generally increasing integer (there may be gaps or duplicates)
+     * that represents the approximate position of the message in a thread,
+     * it can be used to estimate the relative position of the message in a thread
+     * in company with {@link ServerThreadChannel#getTotalNumberOfMessagesSent()} on parent thread.
+     *
+     * @return The approximate position of the message in a thread.
+     */
+    Optional<Integer> getPosition();
+
+    /**
      * Gets all channels mentioned in this message.
      *
      * @return All channels mentioned in this message.
