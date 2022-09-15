@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Handles the guild update packet.
@@ -87,16 +88,15 @@ public class GuildEmojisUpdateHandler extends PacketHandler {
             });
 
             Set<Long> emojiIds = emojis.keySet();
-            server.getCustomEmojis().stream()
+            Set<KnownCustomEmoji> emojiToDelete = server.getCustomEmojis().stream()
                     .filter(emoji -> !emojiIds.contains(emoji.getId()))
-                    .forEach(emoji -> {
-                        api.removeCustomEmoji(emoji);
-                        server.removeCustomEmoji(emoji);
-
-                        KnownCustomEmojiDeleteEvent event = new KnownCustomEmojiDeleteEventImpl(emoji);
-
-                        api.getEventDispatcher().dispatchKnownCustomEmojiDeleteEvent(server, emoji, server, event);
-                    });
+                    .collect(Collectors.toSet());
+            emojiToDelete.forEach(emoji -> {
+                api.removeCustomEmoji(emoji);
+                server.removeCustomEmoji(emoji);
+                KnownCustomEmojiDeleteEvent event = new KnownCustomEmojiDeleteEventImpl(emoji);
+                api.getEventDispatcher().dispatchKnownCustomEmojiDeleteEvent(server, emoji, server, event);
+            });
         });
     }
 

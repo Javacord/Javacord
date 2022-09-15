@@ -2,7 +2,6 @@ package org.javacord.api.event.server.member;
 
 import org.javacord.api.entity.server.Ban;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -16,14 +15,4 @@ public interface ServerMemberBanEvent extends ServerMemberEvent {
      * @return The ban object.
      */
     CompletableFuture<Ban> requestBan();
-
-    /**
-     * Requests the reason of the ban.
-     *
-     * @return The reason of the ban.
-     */
-    default CompletableFuture<Optional<String>> requestReason() {
-        return requestBan().thenApply(Ban::getReason);
-    }
-
 }

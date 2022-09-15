@@ -170,6 +170,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * The sticker items in this message.
      */
     private final Set<StickerItem> stickerItems = new HashSet<>();
+        
+    /**
+     * The approximate position of the message in a thread.
+     */
+    private final Integer position;
 
     /**
      * Creates a new message object.
@@ -208,6 +213,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         messageInteraction = data.hasNonNull("interaction")
             ? new MessageInteractionImpl(this, data.get("interaction"))
             : null;
+        
+        position = data.hasNonNull("position") ? data.get("position").asInt() : null;
 
         setUpdatableFields(data);
 
@@ -240,6 +247,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * @param mentions          The users mentioned in this message.
      * @param roleMentions      The roles mentioned in this message.
      * @param stickerItems      The sticker items in this message.
+     * @param position          The position in this message
      */
     private MessageImpl(DiscordApiImpl api, TextChannel channel, long id, MessageType type,
                         MessageAuthor author, MessageActivityImpl activity, String content,
@@ -248,7 +256,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                         Instant lastEditTime, List<HighLevelComponent> components,
                         List<Embed> embeds, List<Reaction> reactions,
                         List<MessageAttachment> attachments, List<User> mentions,
-                        List<Role> roleMentions, Set<StickerItem> stickerItems, MessageInteraction messageInteraction) {
+                        List<Role> roleMentions, Set<StickerItem> stickerItems, MessageInteraction messageInteraction,
+                        int position) {
         this.api = api;
         this.channel = channel;
         this.id = id;
@@ -271,6 +280,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         this.mentions.addAll(mentions);
         this.roleMentions.addAll(roleMentions);
         this.stickerItems.addAll(stickerItems);
+        this.position = position;
     }
 
     /**
@@ -281,7 +291,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public MessageImpl copyMessage() {
         return new MessageImpl(api, channel, id, type, author, activity, content, nonce, referencedMessage,
                 messageReference, pinned, tts, mentionsEveryone, lastEditTime, components,
-                embeds, reactions, attachments, mentions, roleMentions, stickerItems, messageInteraction);
+                embeds, reactions, attachments, mentions, roleMentions, stickerItems, messageInteraction, position);
     }
 
     /**
@@ -608,6 +618,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
         return removeOwnReactionsByEmoji(
                 Arrays.stream(unicodeEmojis).map(UnicodeEmojiImpl::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public Optional<Integer> getPosition() {
+        return Optional.ofNullable(position);
     }
 
     @Override

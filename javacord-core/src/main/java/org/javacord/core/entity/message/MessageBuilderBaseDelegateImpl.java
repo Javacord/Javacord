@@ -134,6 +134,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected Long replyingTo = null;
 
     /**
+     * Used to tell discord to check if the reference message exists.
+     */
+    private boolean assertReferenceExists;
+
+    /**
      * The stickers attached to the message.
      */
     protected Set<Long> stickerIds = new HashSet<>();
@@ -400,8 +405,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void replyTo(long messageId) {
+    public void replyTo(long messageId, boolean assertReferenceExists) {
         replyingTo = messageId;
+        this.assertReferenceExists = assertReferenceExists;
     }
 
     @Override
@@ -476,7 +482,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
 
         if (replyingTo != null) {
-            body.putObject("message_reference").put("message_id", replyingTo);
+            body.putObject("message_reference")
+                    .put("message_id", replyingTo)
+                    .put("fail_if_not_exists", assertReferenceExists);
         }
 
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
@@ -601,7 +609,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
-        prepareAttachments(message.getAttachments(), body, updateAll || removeAllAttachments);
+        prepareAttachments(message.getAttachments(), body);
 
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -670,13 +678,13 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
     }
 
-    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body,
-                                    boolean removeOrUpdateAll) {
+    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
         ArrayNode attachments = body.putArray("attachments");
 
-        if (removeOrUpdateAll) {
-            attachments.add(JsonNodeFactory.instance.objectNode());
-        } else if (!attachmentsToRemove.isEmpty()) {
+        if (removeAllAttachments) {
+            return;
+        }
+        if (!attachmentsToRemove.isEmpty()) {
             for (Attachment attachment : attachmentsList) {
                 if (!attachmentsToRemove.contains(attachment)) {
                     attachments.add(((AttachmentImpl) attachment).toJsonNode());

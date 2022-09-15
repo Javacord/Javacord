@@ -40,6 +40,7 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -58,6 +59,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -175,6 +177,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<String> getNickname(User user);
 
     /**
+     * Gets the timestamp of when this member started boosting the server.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this member started boosting the server.
+     */
+    Optional<Instant> getServerBoostingSinceTimestamp(User user);
+
+    /**
      * Gets the timestamp of when the user's timeout will expire
      * and the user will be able to communicate in the server again.
      * The returned Instant may be in the past which indicates that the user is not timed out.
@@ -197,6 +207,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default Optional<Instant> getActiveTimeout(User user) {
         return getTimeout(user).filter(Instant.now()::isBefore);
     }
+
+    /**
+     * Gets the user's server specific avatar hash.
+     *
+     * @param user The user.
+     * @return The user's server specific avatar hash.
+     */
+    Optional<String> getUserServerAvatarHash(User user);
 
     /**
      * Gets the user's server specific avatar.
@@ -1571,7 +1589,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user    The user.
+     * @param user     The user.
      * @param duration The duration of the timeout.
      * @return A future to check if the update was successful.
      */
@@ -1585,9 +1603,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user    The user.
+     * @param user     The user.
      * @param duration The duration of the timeout.
-     * @param reason  The audit log reason for this update.
+     * @param reason   The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> timeoutUser(User user, Duration duration, String reason) {
@@ -1991,7 +2009,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user) {
-        return banUser(user.getId(), 0, null);
+        return banUser(user.getId(), 0, TimeUnit.SECONDS, null);
     }
 
     /**
@@ -2000,9 +2018,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user              The user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(User, long, TimeUnit, String)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays) {
-        return banUser(user.getId(), deleteMessageDays, null);
+        return banUser(user.getId(), deleteMessageDays);
     }
 
     /**
@@ -2012,9 +2032,61 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(User, long, TimeUnit, String)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
         return banUser(user.getId(), deleteMessageDays, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user                  The user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, long deleteMessageDuration, TimeUnit unit) {
+        return banUser(user.getId(), deleteMessageDuration, unit);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user                  The user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, long deleteMessageDuration, TimeUnit unit, String reason) {
+        return banUser(user.getId(), deleteMessageDuration, unit, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user     The user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, Duration duration) {
+        return banUser(user.getId(), duration, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user     The user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param reason   The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, Duration duration, String reason) {
+        return banUser(user.getId(), duration, reason);
     }
 
     /**
@@ -2024,7 +2096,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(String userId) {
-        return banUser(userId, 0, null);
+        return banUser(userId, null);
     }
 
     /**
@@ -2043,9 +2115,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(String userId, int deleteMessageDays) {
-        return banUser(userId, deleteMessageDays, null);
+        return banUser(userId, deleteMessageDays, TimeUnit.DAYS);
     }
 
     /**
@@ -2054,7 +2128,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays) {
         return banUser(Long.toUnsignedString(userId), deleteMessageDays);
     }
@@ -2062,12 +2138,50 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
-    CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason);
+    default CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit) {
+        return banUser(userId, deleteMessageDuration, unit, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, long deleteMessageDuration, TimeUnit unit) {
+        return banUser(Long.toUnsignedString(userId), deleteMessageDuration, unit);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(String userId, Duration duration) {
+        return banUser(userId, duration, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, Duration duration) {
+        return banUser(Long.toUnsignedString(userId), duration);
+    }
 
     /**
      * Bans the given user from the server.
@@ -2076,9 +2190,75 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
      */
+    @Deprecated
+    default CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
+        return banUser(userId, deleteMessageDays, TimeUnit.DAYS, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId            The id of the user to ban.
+     * @param deleteMessageDays The number of days to delete messages for (0-7).
+     * @param reason            The reason for the ban.
+     * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
+     */
+    @Deprecated
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays, String reason) {
         return banUser(Long.toUnsignedString(userId), deleteMessageDays, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit, String reason);
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, long deleteMessageDuration, TimeUnit unit, String reason) {
+        return banUser(Long.toUnsignedString(userId), deleteMessageDuration, unit, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param reason   The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(String userId, Duration duration, String reason) {
+        return banUser(userId, duration.getSeconds(), TimeUnit.SECONDS, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param reason   The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, Duration duration, String reason) {
+        return banUser(Long.toUnsignedString(userId), duration, reason);
     }
 
     /**
@@ -3427,14 +3607,14 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * True if the server widget is enabled.
-     * 
+     *
      * @return true if the server widget is enabled.
      */
     boolean isWidgetEnabled();
 
     /**
      * Gets the channel id that the widget will generate an invite to, or null if set to no invite.
-     * 
+     *
      * @return the channel id that the widget will generate an invite to, or null if set to no invite.
      */
     Optional<Long> getWidgetChannelId();
@@ -3442,42 +3622,42 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Gets the maximum number of presences for the guild
      * (null is always returned, apart from the largest of guilds).
-     * 
+     *
      * @return the maximum number of presences for the guild.
      */
     Optional<Integer> getMaxPresences();
 
     /**
      * Gets the maximum number of members for the guild.
-     * 
+     *
      * @return the maximum number of members for the guild.
      */
     Optional<Integer> getMaxMembers();
 
     /**
      * Gets the maximum amount of users in a video channel.
-     * 
+     *
      * @return the maximum amount of users in a video channel.
      */
     Optional<Integer> getMaxVideoChannelUsers();
 
     /**
      * Gets the welcome screen of a Community server shown to new members.
-     * 
+     *
      * @return the welcome screen of a Community server shown to new members.
      */
     Optional<WelcomeScreen> getWelcomeScreen();
 
     /**
      * True if the server's boost progress bar is enabled.
-     * 
+     *
      * @return whether the server's boost progress bar is enabled or not.
      */
     boolean isPremiumProgressBarEnabled();
 
     /**
      * Gets regular server channel for widget.
-     * 
+     *
      * @return the regular server channel for widget.
      */
     default Optional<RegularServerChannel> getWidgetChannel() {
@@ -3486,8 +3666,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets system channel flags for this server.
-     * 
+     *
      * @return The system channel flags for this server.
      */
-    public EnumSet<SystemChannelFlag> getSystemChannelFlags();
+    EnumSet<SystemChannelFlag> getSystemChannelFlags();
 }

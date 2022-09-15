@@ -101,6 +101,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -1270,9 +1271,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Optional<Instant> getServerBoostingSinceTimestamp(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerBoostingSinceTimestamp);
+    }
+
+    @Override
     public Optional<Instant> getTimeout(User user) {
         return getRealMemberById(user.getId())
                 .flatMap(Member::getTimeout);
+    }
+
+    @Override
+    public Optional<String> getUserServerAvatarHash(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerAvatarHash);
     }
 
     @Override
@@ -1648,16 +1661,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
+    public CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit, String reason) {
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), userId);
-
-        if (deleteMessageDays > 0) {
-            request.addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
+        if (deleteMessageDuration > 0) {
+            request.addQueryParameter("delete_message_seconds", String.valueOf(unit.toSeconds(deleteMessageDuration)));
         }
 
         if (reason != null) {
-            request.addQueryParameter("reason", reason);
+            request.setAuditLogReason(reason);
         }
 
         return request.execute(result -> null);
@@ -1937,7 +1949,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .map(Channel::asServerThreadChannel)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .sorted(Comparator.comparing(ServerThreadChannel::getArchiveTimestamp))
+                .sorted(Comparator.comparing(channel -> channel.getMetadata().getArchiveTimestamp()))
                 .collect(Collectors.toList()));
     }
 
@@ -2029,6 +2041,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
         getMembers().forEach(user -> removeMember(user.getId()));
         stickers.values().forEach(api::removeSticker);
+        getAudioConnection().ifPresent(this::removeAudioConnection);
     }
 
     @Override

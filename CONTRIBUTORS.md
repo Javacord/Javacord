@@ -19,6 +19,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/Joshix-1"><img src="https://avatars.githubusercontent.com/u/57299889?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joshix-1</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=Joshix-1" title="Code">💻</a></td>
     <td align="center"><a href="http://shubhja.in"><img src="https://avatars.githubusercontent.com/u/23444368?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Shubham Jain</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=shubhwip" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/AhmedA1559"><img src="https://avatars.githubusercontent.com/u/95593064?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ahmed A</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=AhmedA1559" title="Code">💻</a></td>
+    <td align="center"><a href="http://realyusufismail-github-io.vercel.app"><img src="https://avatars.githubusercontent.com/u/67903886?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yusuf Arfan Ismail</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=RealYusufIsmail" title="Code">💻</a></td>
   </tr>
 </table>
 

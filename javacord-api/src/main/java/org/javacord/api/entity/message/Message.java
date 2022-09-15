@@ -959,6 +959,16 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
     Set<StickerItem> getStickerItems();
 
     /**
+     * A generally increasing integer (there may be gaps or duplicates)
+     * that represents the approximate position of the message in a thread,
+     * it can be used to estimate the relative position of the message in a thread
+     * in company with {@link ServerThreadChannel#getTotalNumberOfMessagesSent()} on parent thread.
+     *
+     * @return The approximate position of the message in a thread.
+     */
+    Optional<Integer> getPosition();
+
+    /**
      * Gets all channels mentioned in this message.
      *
      * @return All channels mentioned in this message.
@@ -991,6 +1001,17 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      */
     default boolean isServerMessage() {
         return getChannel().getType() == ChannelType.SERVER_TEXT_CHANNEL;
+    }
+
+    /**
+     * Checks if the message was sent in a thread channel.
+     *
+     * @return Whether the message was sent in a thread channel.
+     */
+    default boolean isThreadMessage() {
+        return getChannel().getType() == ChannelType.SERVER_PRIVATE_THREAD
+                || getChannel().getType() == ChannelType.SERVER_PUBLIC_THREAD
+                || getChannel().getType() == ChannelType.SERVER_NEWS_THREAD;
     }
 
     /**
@@ -1533,20 +1554,45 @@ public interface Message extends DiscordEntity, Comparable<Message>, UpdatableFr
      * Replies to this message with the given text.
      *
      * @param messageContent The text to reply with.
-     * @return The sent message.
+     * @return The message that was sent.
      */
     default CompletableFuture<Message> reply(String messageContent) {
-        return new MessageBuilder().replyTo(getId()).setContent(messageContent).send(getChannel());
+        return reply(messageContent, true);
+    }
+
+    /**
+     * Replies to this message with the given text.
+     *
+     * @param messageContent The text to reply with.
+     * @param assertReferenceExists If true, throw an error if the message you are replying to does not exist otherwise,
+     *                              if false send the message regardless without a reference to a message.
+     * @return The message that was sent.
+     */
+    default CompletableFuture<Message> reply(String messageContent, boolean assertReferenceExists) {
+        return new MessageBuilder().replyTo(getId(), assertReferenceExists).setContent(messageContent)
+                .send(getChannel());
     }
 
     /**
      * Replies to this message with the given embed.
      *
      * @param embed The EmbedBuilder to reply with.
-     * @return The sent message.
+     * @return The message that was sent.
      */
     default CompletableFuture<Message> reply(EmbedBuilder embed) {
-        return new MessageBuilder().replyTo(getId()).setEmbed(embed).send(getChannel());
+        return reply(embed, true);
+    }
+
+    /**
+     * Replies to this message with the given embed.
+     *
+     * @param embed The EmbedBuilder to reply with.
+     * @param assertReferenceExists If true, throw an error if the message you are replying to does not exist otherwise,
+     *                              if false send the message regardless without a reference to a message.
+     * @return The message that was sent.
+     */
+    default CompletableFuture<Message> reply(EmbedBuilder embed, boolean assertReferenceExists) {
+        return new MessageBuilder().replyTo(getId(), assertReferenceExists).setEmbed(embed).send(getChannel());
     }
 
     /**

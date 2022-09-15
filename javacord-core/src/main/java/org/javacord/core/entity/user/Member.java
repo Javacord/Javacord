@@ -107,7 +107,7 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     /**
      * Gets the timestamp of when this member started boosting the server.
      *
-     * @return The timestamp of when this member started boosting joined the server.
+     * @return The timestamp of when this member started boosting the server.
      */
     Optional<Instant> getServerBoostingSinceTimestamp();
 
