@@ -25,6 +25,7 @@ import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmod
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeBitrateEvent;
+import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeNsfwEvent;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEvent;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.RegularServerChannelImpl;
@@ -44,6 +45,7 @@ import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmo
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerStageVoiceChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeBitrateEventImpl;
+import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeNsfwEventImpl;
 import org.javacord.core.event.channel.server.voice.ServerVoiceChannelChangeUserLimitEventImpl;
 import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
@@ -458,6 +460,15 @@ public class ChannelUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
         }
 
+        boolean oldNsfwFlag = channel.isNsfw();
+        boolean newNsfwFlag = jsonChannel.has("nsfw") && jsonChannel.get("nsfw").asBoolean();
+        if (oldNsfwFlag != newNsfwFlag) {
+            channel.setNsfw(newNsfwFlag);
+            ServerVoiceChannelChangeNsfwEvent event =
+                    new ServerVoiceChannelChangeNsfwEventImpl(channel, newNsfwFlag, oldNsfwFlag);
+            api.getEventDispatcher().dispatchServerVoiceChannelChangeNsfwEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
     }
 
     /**
