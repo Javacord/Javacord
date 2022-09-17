@@ -656,11 +656,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             logger.error("Interrupted while delaying reconnect!");
                             return;
                         }
-                    } else {
-                        sendIdentify(websocket);
-
                     }
-                    api.getGatewayIdentifyRatelimiter().requestQuota();
                     sendCloseFrame(websocket,
                             WebSocketCloseReason.DISCONNECT.getNumericCloseCode(),
                             WebSocketCloseReason.DISCONNECT.getCloseReason());
