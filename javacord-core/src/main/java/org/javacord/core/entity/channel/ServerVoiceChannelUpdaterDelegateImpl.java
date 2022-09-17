@@ -32,6 +32,11 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
     protected boolean modifyCategory = false;
 
     /**
+     * Whether the vc is nsfw or not.
+     */
+    protected Boolean nsfw = null;
+
+    /**
      * Creates a new server voice channel updater.
      *
      * @param channel The channel to update.
@@ -67,6 +72,11 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
     }
 
     @Override
+    public void setNsfw(boolean nsfw) {
+        this.nsfw = nsfw;
+    }
+
+    @Override
     protected boolean prepareUpdateBody(ObjectNode body) {
         boolean patchChannel = super.prepareUpdateBody(body);
         if (bitrate != null) {
@@ -79,6 +89,10 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
         }
         if (modifyCategory) {
             body.put("parent_id", category == null ? null : category.getIdAsString());
+            patchChannel = true;
+        }
+        if (nsfw != null) {
+            body.put("nsfw", nsfw);
             patchChannel = true;
         }
         return patchChannel;

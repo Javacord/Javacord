@@ -46,6 +46,11 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     private final Set<Long> connectedUsers = new HashSet<>();
 
     /**
+     * Whether the channel is nsfw or not.
+     */
+    private volatile boolean nsfw;
+
+    /**
      * Creates a new server voice channel object.
      *
      * @param api The discord api instance.
@@ -57,6 +62,7 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
         bitrate = data.get("bitrate").asInt();
         userLimit = data.get("user_limit").asInt();
         parentId = Long.parseLong(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
+        nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
     }
 
     /**
@@ -104,6 +110,15 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
         connectedUsers.remove(userId);
     }
 
+    /**
+     * Sets the nsfw flag of the channel.
+     *
+     * @param nsfw The new nsfw flag of the channel.
+     */
+    public void setNsfw(boolean nsfw) {
+        this.nsfw = nsfw;
+    }
+
     @Override
     public Optional<ChannelCategory> getCategory() {
         return getServer().getChannelCategoryById(parentId);
@@ -125,6 +140,11 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
                     ((ServerImpl) getServer()).setAudioConnection((AudioConnectionImpl) conn);
                     return conn;
                 });
+    }
+
+    @Override
+    public boolean isNsfw() {
+        return nsfw;
     }
 
     @Override

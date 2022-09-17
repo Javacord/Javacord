@@ -40,4 +40,11 @@ public interface ServerVoiceChannelUpdaterDelegate extends RegularServerChannelU
      */
     void removeCategory();
 
+    /**
+     * Queues the nsfw flag to be updated.
+     *
+     * @param nsfw Whether the channel should be marked as 'not safe for work'
+     *             or not.
+     */
+    void setNsfw(boolean nsfw);
 }
