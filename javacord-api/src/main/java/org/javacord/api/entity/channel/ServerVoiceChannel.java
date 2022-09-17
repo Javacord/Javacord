@@ -48,6 +48,13 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
     }
 
     /**
+     * Checks is the channel is "not safe for work".
+     *
+     * @return Whether the channel is "not safe for work" or not.
+     */
+    boolean isNsfw();
+
+    /**
      * Gets the bitrate (int bits) of the channel.
      *
      * @return The bitrate of the channel.
@@ -325,4 +332,16 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
         }
     }
 
+    /**
+     * Updates the nsfw flag of the vc.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param nsfw The new nsfw flag of the channel.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateNsfwFlag(boolean nsfw) {
+        return createUpdater().setNsfw(nsfw).update();
+    }
 }

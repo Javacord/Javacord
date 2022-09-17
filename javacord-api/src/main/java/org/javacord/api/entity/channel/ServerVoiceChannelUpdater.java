@@ -77,9 +77,20 @@ public class ServerVoiceChannelUpdater extends RegularServerChannelUpdater<Serve
         return this;
     }
 
+    /**
+     * Queues the nsfw flag to be updated.
+     *
+     * @param nsfw Whether the channel should be marked as 'not safe for work'
+     *             or not.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerVoiceChannelUpdater setNsfw(boolean nsfw) {
+        delegate.setNsfw(nsfw);
+        return this;
+    }
+
     @Override
     public CompletableFuture<Void> update() {
         return delegate.update();
     }
-
 }
