@@ -42,8 +42,8 @@ jobs:
           git add gradle.properties
           git commit -am "Increment patch version and append -SNAPSHOT suffix"
           git push
-
       - name: Create Release Pull Request
+        if: ${{ !endsWith(steps.read-version.outputs.version, 'SNAPSHOT') }}
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
