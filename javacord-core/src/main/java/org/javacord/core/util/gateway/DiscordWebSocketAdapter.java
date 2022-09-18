@@ -644,18 +644,18 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 if (lastSentFrameWasIdentify.isMarked()) {
                     logger.info("Reconnecting ...");
                 } else if (triedToResume) {
-                        // Invalid session :(
-                        int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
-                        logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
-                                () -> oneToFiveSeconds / 1000,
-                                () -> oneToFiveSeconds / 100 % 10);
-                        try {
-                            Thread.sleep(oneToFiveSeconds);
-                        } catch (InterruptedException e) {
-                            logger.error("Interrupted while delaying reconnect!");
-                            return;
-                        }
+                    // Invalid session :(
+                    int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
+                    logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
+                            () -> oneToFiveSeconds / 1000,
+                            () -> oneToFiveSeconds / 100 % 10);
+                    try {
+                        Thread.sleep(oneToFiveSeconds);
+                    } catch (InterruptedException e) {
+                        logger.error("Interrupted while delaying reconnect!");
+                        return;
                     }
+                }
 
                 sendCloseFrame(websocket,
                         WebSocketCloseReason.DISCONNECT.getNumericCloseCode(),
