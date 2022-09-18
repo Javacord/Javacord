@@ -643,8 +643,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 resumeUrl = null;
                 if (lastSentFrameWasIdentify.isMarked()) {
                     logger.info("Reconnecting ...");
-                } else {
-                    if (triedToResume) {
+                } else if (triedToResume) {
                         // Invalid session :(
                         int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
                         logger.info("Could not resume session. Reconnecting in {}.{} seconds...",
@@ -657,10 +656,10 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                             return;
                         }
                     }
-                    sendCloseFrame(websocket,
-                            WebSocketCloseReason.DISCONNECT.getNumericCloseCode(),
-                            WebSocketCloseReason.DISCONNECT.getCloseReason());
-                }
+
+                sendCloseFrame(websocket,
+                        WebSocketCloseReason.DISCONNECT.getNumericCloseCode(),
+                        WebSocketCloseReason.DISCONNECT.getCloseReason());
                 break;
             case HELLO:
                 logger.debug("Received HELLO packet");
