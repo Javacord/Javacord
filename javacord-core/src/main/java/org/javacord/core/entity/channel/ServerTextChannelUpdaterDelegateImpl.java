@@ -8,7 +8,7 @@ import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate
 /**
  * The implementation of {@link ServerTextChannelUpdaterDelegate}.
  */
-public class ServerTextChannelUpdaterDelegateImpl extends ServerChannelUpdaterDelegateImpl
+public class ServerTextChannelUpdaterDelegateImpl extends RegularServerChannelUpdaterDelegateImpl
         implements ServerTextChannelUpdaterDelegate {
 
     /**

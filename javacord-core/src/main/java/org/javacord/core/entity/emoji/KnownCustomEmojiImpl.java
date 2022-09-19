@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,7 +33,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     private final Server server;
 
     /**
-     * A list with all whitelisted roles.
+     * All whitelisted roles.
      * Might be <code>null</code>!
      */
     private volatile Collection<Role> whitelist;
@@ -48,7 +49,7 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     private final boolean managed;
 
     /**
-     * Id of the user who created the emoji. 0 if no user was given.
+     * The id of the user who created the emoji. 0 if no user was given.
      */
     private volatile long creatorId;
 
@@ -105,10 +106,10 @@ public class KnownCustomEmojiImpl extends CustomEmojiImpl
     }
 
     @Override
-    public Optional<Collection<Role>> getWhitelistedRoles() {
+    public Optional<Set<Role>> getWhitelistedRoles() {
         return whitelist == null || whitelist.isEmpty()
                 ? Optional.empty()
-                : Optional.of(Collections.unmodifiableCollection(new HashSet<>(whitelist)));
+                : Optional.of(Collections.unmodifiableSet(new HashSet<>(whitelist)));
     }
 
     @Override

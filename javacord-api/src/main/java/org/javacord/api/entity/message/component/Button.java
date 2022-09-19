@@ -37,9 +37,9 @@ public interface Button extends LowLevelComponent {
     Optional<String> getUrl();
 
     /**
-     * Get whether or not the button is disabled.
+     * Get whether the button is disabled.
      *
-     * @return Whether or not the button is disabled.
+     * @return Whether the button is disabled.
      */
     Optional<Boolean> isDisabled();
 
@@ -55,11 +55,11 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button danger(String customId, String label) {
-        return create(customId, ButtonStyle.DANGER, label, (Emoji) null);
+        return create(customId, ButtonStyle.DANGER, label, (Emoji) null, false);
     }
 
     /**
@@ -67,12 +67,25 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
-     * @param emoji The emoji for this button.
+     * @param label    The label for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button danger(String customId, String label, boolean disabled) {
+        return create(customId, ButtonStyle.DANGER, label, (Emoji) null, disabled);
+    }
+
+    /**
+     * Create a new button with the red danger style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button danger(String customId, String label, Emoji emoji) {
-        return create(customId, ButtonStyle.DANGER, label, emoji);
+        return create(customId, ButtonStyle.DANGER, label, emoji, false);
     }
 
     /**
@@ -80,26 +93,69 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button danger(String customId, String label, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.DANGER, label, emoji, disabled);
+    }
+
+    /**
+     * Create a new button with the red danger style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
      * @param unicodeEmoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button danger(String customId, String label, String unicodeEmoji) {
-        return create(customId, ButtonStyle.DANGER, label, unicodeEmoji);
+        return create(customId, ButtonStyle.DANGER, label, unicodeEmoji, false);
+    }
+
+    /**
+     * Create a new button with the red danger style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
+     * @param unicodeEmoji The emoji for this button.
+     * @param disabled     Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button danger(String customId, String label, String unicodeEmoji, boolean disabled) {
+        return create(customId, ButtonStyle.DANGER, label, unicodeEmoji, disabled);
     }
 
     /**
      * Create a new button with the red danger style and the given emoji.
-     * If you want to use an unicode emoji, use {@link Button#danger(String, String, String)} instead
+     * If you want to use a unicode emoji, use {@link Button#danger(String, String, String)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param emoji The emoji for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button danger(String customId, Emoji emoji) {
-        return create(customId, ButtonStyle.DANGER, null, emoji);
+        return create(customId, ButtonStyle.DANGER, null, emoji, false);
+    }
+
+    /**
+     * Create a new button with the red danger style and the given emoji.
+     * If you want to use a unicode emoji, use {@link Button#danger(String, String, String, boolean)} instead
+     * and pass {@code null} as your label.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button danger(String customId, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.DANGER, null, emoji, disabled);
     }
 
     /**
@@ -107,11 +163,11 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button primary(String customId, String label) {
-        return create(customId, ButtonStyle.PRIMARY, label, (Emoji) null);
+        return create(customId, ButtonStyle.PRIMARY, label, (Emoji) null, false);
     }
 
     /**
@@ -119,12 +175,25 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
-     * @param emoji The emoji for this button.
+     * @param label    The label for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button primary(String customId, String label, boolean disabled) {
+        return create(customId, ButtonStyle.PRIMARY, label, (Emoji) null, disabled);
+    }
+
+    /**
+     * Create a new button with the blurple primary style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button primary(String customId, String label, Emoji emoji) {
-        return create(customId, ButtonStyle.PRIMARY, label, emoji);
+        return create(customId, ButtonStyle.PRIMARY, label, emoji, false);
     }
 
     /**
@@ -132,26 +201,69 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button primary(String customId, String label, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.PRIMARY, label, emoji, disabled);
+    }
+
+    /**
+     * Create a new button with the blurple primary style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
      * @param unicodeEmoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button primary(String customId, String label, String unicodeEmoji) {
-        return create(customId, ButtonStyle.PRIMARY, label, unicodeEmoji);
+        return create(customId, ButtonStyle.PRIMARY, label, unicodeEmoji, false);
+    }
+
+    /**
+     * Create a new button with the blurple primary style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
+     * @param unicodeEmoji The emoji for this button.
+     * @param disabled     Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button primary(String customId, String label, String unicodeEmoji, boolean disabled) {
+        return create(customId, ButtonStyle.PRIMARY, label, unicodeEmoji, disabled);
     }
 
     /**
      * Create a new button with the blurple primary style and the given emoji.
-     * If you want to use an unicode emoji, use {@link Button#primary(String, String, String)} instead
+     * If you want to use a unicode emoji, use {@link Button#primary(String, String, String)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param emoji The emoji for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button primary(String customId, Emoji emoji) {
-        return create(customId, ButtonStyle.PRIMARY, null, emoji);
+        return create(customId, ButtonStyle.PRIMARY, null, emoji, false);
+    }
+
+    /**
+     * Create a new button with the blurple primary style and the given emoji.
+     * If you want to use a unicode emoji, use {@link Button#primary(String, String, String, boolean)} instead
+     * and pass {@code null} as your label.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button primary(String customId, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.PRIMARY, null, emoji, disabled);
     }
 
     /**
@@ -159,11 +271,11 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button secondary(String customId, String label) {
-        return create(customId, ButtonStyle.SECONDARY, label, (Emoji) null);
+        return create(customId, ButtonStyle.SECONDARY, label, (Emoji) null, false);
     }
 
     /**
@@ -171,12 +283,25 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
-     * @param emoji The emoji for this button.
+     * @param label    The label for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button secondary(String customId, String label, boolean disabled) {
+        return create(customId, ButtonStyle.SECONDARY, label, (Emoji) null, disabled);
+    }
+
+    /**
+     * Create a new button with the grey secondary style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button secondary(String customId, String label, Emoji emoji) {
-        return create(customId, ButtonStyle.SECONDARY, label, emoji);
+        return create(customId, ButtonStyle.SECONDARY, label, emoji, false);
     }
 
     /**
@@ -184,26 +309,69 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button secondary(String customId, String label, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.SECONDARY, label, emoji, disabled);
+    }
+
+    /**
+     * Create a new button with the grey secondary style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
      * @param unicodeEmoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button secondary(String customId, String label, String unicodeEmoji) {
-        return create(customId, ButtonStyle.SECONDARY, label, unicodeEmoji);
+        return create(customId, ButtonStyle.SECONDARY, label, unicodeEmoji, false);
+    }
+
+    /**
+     * Create a new button with the grey secondary style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
+     * @param unicodeEmoji The emoji for this button.
+     * @param disabled     Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button secondary(String customId, String label, String unicodeEmoji, boolean disabled) {
+        return create(customId, ButtonStyle.SECONDARY, label, unicodeEmoji, disabled);
     }
 
     /**
      * Create a new button with the grey secondary style and the given emoji.
-     * If you only want to use an unicode emoji, use {@link Button#secondary(String, String, String)} instead
+     * If you only want to use a unicode emoji, use {@link Button#secondary(String, String, String)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param emoji The emoji for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button secondary(String customId, Emoji emoji) {
-        return create(customId, ButtonStyle.SECONDARY, null, emoji);
+        return create(customId, ButtonStyle.SECONDARY, null, emoji, false);
+    }
+
+    /**
+     * Create a new button with the grey secondary style and the given emoji.
+     * If you only want to use a unicode emoji, use {@link Button#secondary(String, String, String, boolean)} instead
+     * and pass {@code null} as your label.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button secondary(String customId, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.SECONDARY, null, emoji, disabled);
     }
 
     /**
@@ -211,11 +379,11 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button success(String customId, String label) {
-        return create(customId, ButtonStyle.SUCCESS, label, (Emoji) null);
+        return create(customId, ButtonStyle.SUCCESS, label, (Emoji) null, false);
     }
 
     /**
@@ -223,12 +391,25 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
-     * @param emoji The emoji for this button.
+     * @param label    The label for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button success(String customId, String label, boolean disabled) {
+        return create(customId, ButtonStyle.SUCCESS, label, (Emoji) null, disabled);
+    }
+
+    /**
+     * Create a new button with the green success style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button success(String customId, String label, Emoji emoji) {
-        return create(customId, ButtonStyle.SUCCESS, label, emoji);
+        return create(customId, ButtonStyle.SUCCESS, label, emoji, false);
     }
 
     /**
@@ -236,96 +417,199 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param label The label for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button success(String customId, String label, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.SUCCESS, label, emoji, disabled);
+    }
+
+    /**
+     * Create a new button with the green success style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
      * @param unicodeEmoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button success(String customId, String label, String unicodeEmoji) {
-        return create(customId, ButtonStyle.SUCCESS, label, unicodeEmoji);
+        return create(customId, ButtonStyle.SUCCESS, label, unicodeEmoji, false);
+    }
+
+    /**
+     * Create a new button with the green success style and the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param label        The label for this button.
+     * @param unicodeEmoji The emoji for this button.
+     * @param disabled     Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button success(String customId, String label, String unicodeEmoji, boolean disabled) {
+        return create(customId, ButtonStyle.SUCCESS, label, unicodeEmoji, disabled);
     }
 
     /**
      * Create a new button with the green success style and the given emoji.
-     * If you only want to use an unicode emoji, use {@link Button#success(String, String, String)} instead
+     * If you only want to use a unicode emoji, use {@link Button#success(String, String, String)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param emoji The emoji for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button success(String customId, Emoji emoji) {
-        return create(customId, ButtonStyle.SUCCESS, null, emoji);
+        return create(customId, ButtonStyle.SUCCESS, null, emoji, false);
+    }
+
+    /**
+     * Create a new button with the green success style and the given emoji.
+     * If you only want to use a unicode emoji, use {@link Button#success(String, String, String, boolean)} instead
+     * and pass {@code null} as your label.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button success(String customId, Emoji emoji, boolean disabled) {
+        return create(customId, ButtonStyle.SUCCESS, null, emoji, disabled);
     }
 
     /**
      * Create a new button for a link button.
      * This is a convenience shorthand method.
      *
-     * @param url The url for this link button.
+     * @param url   The url for this link button.
      * @param label The label for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button link(String url, String label) {
-        return new ButtonBuilder()
-            .setStyle(ButtonStyle.LINK)
-            .setUrl(url)
-            .setLabel(label)
-            .build();
+        return link(url, label, false);
     }
 
     /**
      * Create a new button for a link button.
      * This is a convenience shorthand method.
      *
-     * @param url The url for this link button.
+     * @param url      The url for this link button.
+     * @param label    The label for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button link(String url, String label, boolean disabled) {
+        return new ButtonBuilder()
+                .setStyle(ButtonStyle.LINK)
+                .setUrl(url)
+                .setLabel(label)
+                .setDisabled(disabled)
+                .build();
+    }
+
+    /**
+     * Create a new button for a link button.
+     * This is a convenience shorthand method.
+     *
+     * @param url   The url for this link button.
      * @param label The label for this button.
      * @param emoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button link(String url, String label, Emoji emoji) {
-        return new ButtonBuilder()
-            .setStyle(ButtonStyle.LINK)
-            .setUrl(url)
-            .setLabel(label)
-            .setEmoji(emoji)
-            .build();
+        return link(url, label, emoji, false);
     }
 
     /**
      * Create a new button for a link button.
      * This is a convenience shorthand method.
      *
-     * @param url The url for this link button.
-     * @param label The label for this button.
+     * @param url      The url for this link button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button link(String url, String label, Emoji emoji, boolean disabled) {
+        return new ButtonBuilder()
+                .setStyle(ButtonStyle.LINK)
+                .setUrl(url)
+                .setLabel(label)
+                .setEmoji(emoji)
+                .setDisabled(disabled)
+                .build();
+    }
+
+    /**
+     * Create a new button for a link button.
+     * This is a convenience shorthand method.
+     *
+     * @param url          The url for this link button.
+     * @param label        The label for this button.
      * @param unicodeEmoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button link(String url, String label, String unicodeEmoji) {
-        return new ButtonBuilder()
-            .setStyle(ButtonStyle.LINK)
-            .setUrl(url)
-            .setLabel(label)
-            .setEmoji(unicodeEmoji)
-            .build();
+        return link(url, label, unicodeEmoji, false);
     }
 
     /**
      * Create a new button for a link button.
-     * If you only want to use an unicode emoji, use {@link Button#link(String, String, String)} instead
+     * This is a convenience shorthand method.
+     *
+     * @param url          The url for this link button.
+     * @param label        The label for this button.
+     * @param unicodeEmoji The emoji for this button.
+     * @param disabled     Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button link(String url, String label, String unicodeEmoji, boolean disabled) {
+        return new ButtonBuilder()
+                .setStyle(ButtonStyle.LINK)
+                .setUrl(url)
+                .setLabel(label)
+                .setEmoji(unicodeEmoji)
+                .setDisabled(disabled)
+                .build();
+    }
+
+    /**
+     * Create a new button for a link button.
+     * If you only want to use a unicode emoji, use {@link Button#link(String, String, String)} instead
      * and pass {@code null} as your label.
      * This is a convenience shorthand method.
      *
-     * @param url The url for this link button.
+     * @param url   The url for this link button.
      * @param emoji The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button link(String url, Emoji emoji) {
+        return link(url, emoji, false);
+    }
+
+    /**
+     * Create a new button for a link button.
+     * If you only want to use a unicode emoji, use {@link Button#link(String, String, String, boolean)} instead
+     * and pass {@code null} as your label.
+     * This is a convenience shorthand method.
+     *
+     * @param url      The url for this link button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button link(String url, Emoji emoji, boolean disabled) {
         return new ButtonBuilder()
-            .setStyle(ButtonStyle.LINK)
-            .setUrl(url)
-            .setEmoji(emoji)
-            .build();
+                .setStyle(ButtonStyle.LINK)
+                .setUrl(url)
+                .setEmoji(emoji)
+                .setDisabled(disabled)
+                .build();
     }
 
     /**
@@ -333,12 +617,12 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param style The button style for this button.
-     * @param label The label for this button.
+     * @param style    The button style for this button.
+     * @param label    The label for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button create(String customId, ButtonStyle style, String label) {
-        return create(customId, style, label, (Emoji) null);
+        return create(customId, style, label, (Emoji) null, false);
     }
 
     /**
@@ -346,23 +630,27 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param style The button style for this button.
-     * @param label The label for this button.
-     * @param emoji The emoji for this button.
+     * @param style    The button style for this button.
+     * @param label    The label for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button create(String customId, ButtonStyle style, String label, boolean disabled) {
+        return create(customId, style, label, (Emoji) null, disabled);
+    }
+
+    /**
+     * Create a new button with the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId The custom id for this button.
+     * @param style    The button style for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button create(String customId, ButtonStyle style, String label, Emoji emoji) {
-        if (style == ButtonStyle.LINK) {
-            throw new IllegalArgumentException("You can not use the link style with this method."
-                + "Please use Button#link() instead or create a custom ButtonBuilder by "
-                + "calling 'new ButtonBuilder()'.");
-        }
-        return new ButtonBuilder()
-            .setCustomId(customId)
-            .setStyle(style)
-            .setLabel(label)
-            .setEmoji(emoji)
-            .build();
+        return create(customId, style, label, emoji, false);
     }
 
     /**
@@ -370,23 +658,65 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param style The button style for this button.
-     * @param label The label for this button.
+     * @param style    The button style for this button.
+     * @param label    The label for this button.
+     * @param emoji    The emoji for this button.
+     * @param disabled Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button create(String customId, ButtonStyle style, String label, Emoji emoji, boolean disabled) {
+        if (style == ButtonStyle.LINK) {
+            throw new IllegalArgumentException("You can not use the link style with this method."
+                    + "Please use Button#link() instead or create a custom ButtonBuilder by "
+                    + "calling 'new ButtonBuilder()'.");
+        }
+        return new ButtonBuilder()
+                .setCustomId(customId)
+                .setStyle(style)
+                .setLabel(label)
+                .setEmoji(emoji)
+                .setDisabled(disabled)
+                .build();
+    }
+
+    /**
+     * Create a new button with the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param style        The button style for this button.
+     * @param label        The label for this button.
      * @param unicodeEmoji The unicode emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button create(String customId, ButtonStyle style, String label, String unicodeEmoji) {
+        return create(customId, style, label, unicodeEmoji, false);
+    }
+
+    /**
+     * Create a new button with the given properties.
+     * This is a convenience shorthand method.
+     *
+     * @param customId     The custom id for this button.
+     * @param style        The button style for this button.
+     * @param label        The label for this button.
+     * @param unicodeEmoji The unicode emoji for this button.
+     * @param disabled     Whether the button is disabled.
+     * @return the new button to be used with an ActionRow or a message
+     */
+    static Button create(String customId, ButtonStyle style, String label, String unicodeEmoji, boolean disabled) {
         if (style == ButtonStyle.LINK) {
             throw new IllegalArgumentException("You can not use the link style with this method."
-                + "Please use Button#link() instead or create a custom ButtonBuilder by "
-                + "calling 'new ButtonBuilder()'.");
+                    + "Please use Button#link() instead or create a custom ButtonBuilder by "
+                    + "calling 'new ButtonBuilder()'.");
         }
         return new ButtonBuilder()
-            .setCustomId(customId)
-            .setStyle(style)
-            .setLabel(label)
-            .setEmoji(unicodeEmoji)
-            .build();
+                .setCustomId(customId)
+                .setStyle(style)
+                .setLabel(label)
+                .setEmoji(unicodeEmoji)
+                .setDisabled(disabled)
+                .build();
     }
 
     /**
@@ -394,11 +724,11 @@ public interface Button extends LowLevelComponent {
      * This is a convenience shorthand method.
      *
      * @param customId The custom id for this button.
-     * @param style The button style for this button.
-     * @param emoji The emoji for this button.
+     * @param style    The button style for this button.
+     * @param emoji    The emoji for this button.
      * @return the new button to be used with an ActionRow or a message
      */
     static Button create(String customId, ButtonStyle style, Emoji emoji) {
-        return create(customId, style, null, emoji);
+        return create(customId, style, null, emoji, false);
     }
 }

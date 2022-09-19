@@ -7,6 +7,8 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.TextChannelEvent;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -53,21 +55,42 @@ public interface MessageEvent extends TextChannelEvent {
     CompletableFuture<Message> editMessage(String content);
 
     /**
-     * Updates the embed of the message involved in the event.
+     * Updates the embeds of the message involved in the event.
      *
-     * @param embed The new embed of the message.
+     * @param embeds An array of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Message> editMessage(EmbedBuilder embed);
+    default CompletableFuture<Message> editMessage(EmbedBuilder... embeds) {
+        return editMessage(Arrays.asList(embeds));
+    }
 
     /**
-     * Updates the content and the embed of the message involved in the event.
+     * Updates the embeds of the message involved in the event.
      *
-     * @param content The new content of the message.
-     * @param embed The new embed of the message.
+     * @param embeds A list of the new embeds of the message.
      * @return A future to check if the update was successful.
      */
-    CompletableFuture<Message> editMessage(String content, EmbedBuilder embed);
+    CompletableFuture<Message> editMessage(List<EmbedBuilder> embeds);
+
+    /**
+     * Updates the content and the embeds of the message involved in the event.
+     *
+     * @param content The new content of the message.
+     * @param embeds  An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> editMessage(String content, EmbedBuilder... embeds) {
+        return editMessage(content, Arrays.asList(embeds));
+    }
+
+    /**
+     * Updates the content and the embeds of the message involved in the event.
+     *
+     * @param content The new content of the message.
+     * @param embeds  An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> editMessage(String content, List<EmbedBuilder> embeds);
 
     /**
      * Adds a unicode reaction to the message involved in the event.
@@ -111,7 +134,7 @@ public interface MessageEvent extends TextChannelEvent {
     /**
      * Removes a user from the list of reactors of a given emoji reaction from the message.
      *
-     * @param user The user to remove.
+     * @param user  The user to remove.
      * @param emoji The emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
@@ -120,7 +143,7 @@ public interface MessageEvent extends TextChannelEvent {
     /**
      * Removes a user from the list of reactors of a given unicode emoji reaction from the message.
      *
-     * @param user The user to remove.
+     * @param user         The user to remove.
      * @param unicodeEmoji The unicode emoji of the reaction.
      * @return A future to tell us if the deletion was successful.
      */
@@ -145,7 +168,7 @@ public interface MessageEvent extends TextChannelEvent {
     /**
      * Removes a user from the list of reactors of the given emoji reactions from the message.
      *
-     * @param user The user to remove.
+     * @param user   The user to remove.
      * @param emojis The emojis of the reactions.
      * @return A future to tell us if the deletion was successful.
      */
@@ -155,7 +178,7 @@ public interface MessageEvent extends TextChannelEvent {
      * Removes a user from the list of reactors of the given unicode emoji reactions from the message.
      *
      * @param unicodeEmojis The unicode emojis of the reactions.
-     * @param user The user to remove.
+     * @param user          The user to remove.
      * @return A future to tell us if the deletion was successful.
      */
     CompletableFuture<Void> removeReactionsByEmojiFromMessage(User user, String... unicodeEmojis);

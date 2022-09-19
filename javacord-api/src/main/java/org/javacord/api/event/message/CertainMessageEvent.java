@@ -23,7 +23,7 @@ public interface CertainMessageEvent extends MessageEvent {
     /**
      * Checks if the event's message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
      *
-     * @return Whether or not the event's message was sent in a private channel.
+     * @return Whether the event's message was sent in a private channel.
      * @see Message#isPrivateMessage()
      */
     default boolean isPrivateMessage() {
@@ -33,21 +33,11 @@ public interface CertainMessageEvent extends MessageEvent {
     /**
      * Checks if the event's message was sent in a {@link ChannelType#SERVER_TEXT_CHANNEL server channel}.
      *
-     * @return Whether or not the event's message was sent in a server channel.
+     * @return Whether the event's message was sent in a server channel.
      * @see Message#isServerMessage()
      */
     default boolean isServerMessage() {
         return getMessage().isServerMessage();
-    }
-
-    /**
-     * Checks if the event's message was sent in a {@link ChannelType#GROUP_CHANNEL group channel}.
-     *
-     * @return Whether or not the event's message was sent in a group channel.
-     * @see Message#isPrivateMessage()
-     */
-    default boolean isGroupMessage() {
-        return getMessage().isGroupMessage();
     }
 
     /**
@@ -61,9 +51,9 @@ public interface CertainMessageEvent extends MessageEvent {
     }
 
     /**
-     * Gets a list with all attachments of the event's message.
+     * Gets all attachments of the event's message.
      *
-     * @return A list with all attachments of the event's message.
+     * @return All attachments of the event's message.
      * @see Message#getAttachments()
      */
     default List<MessageAttachment> getMessageAttachments() {

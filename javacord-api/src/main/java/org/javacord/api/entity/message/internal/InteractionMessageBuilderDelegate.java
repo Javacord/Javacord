@@ -3,16 +3,15 @@ package org.javacord.api.entity.message.internal;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.interaction.InteractionBase;
-
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
-public interface InteractionMessageBuilderDelegate extends MessageBuilderDelegate {
+public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDelegate {
 
     /**
-     * Sets the message flags of the message.
+     * Sets the interaction message flags of the message.
      *
-     * @param messageFlags The message flag of the message.
+     * @param messageFlags The message flags of the message.
      */
     void setFlags(EnumSet<MessageFlag> messageFlags);
 
@@ -58,7 +57,7 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderDelegat
 
 
     /**
-     * Delete a follow up message.
+     * Delete a follow-up message.
      *
      * @param interaction The interaction.
      * @param messageId   The message id of the followup message which should be edited.

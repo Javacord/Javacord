@@ -108,11 +108,7 @@ public class ButtonImpl extends ComponentImpl implements Button {
         return Optional.ofNullable(emoji);
     }
 
-    /**
-     * Gets the button as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The button as a ObjectNode.
-     */
+    @Override
     public ObjectNode toJsonNode() {
         ObjectNode object = JsonNodeFactory.instance.objectNode();
         return toJsonNode(object);
@@ -147,7 +143,7 @@ public class ButtonImpl extends ComponentImpl implements Button {
             object.put("custom_id", customId);
         }
 
-        // 3. Link buttons must have a url, and cannot have a custom_id
+        // 3. Link buttons must have an url, and cannot have a custom_id
         if (style == ButtonStyle.LINK) {
             if (url == null || url.equals("")) {
                 throw new IllegalStateException("Button link is missing a URL.");

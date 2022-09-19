@@ -19,6 +19,7 @@ import org.javacord.core.event.server.role.RoleChangeMentionableEventImpl;
 import org.javacord.core.event.server.role.RoleChangeNameEventImpl;
 import org.javacord.core.event.server.role.RoleChangePermissionsEventImpl;
 import org.javacord.core.event.server.role.RoleChangePositionEventImpl;
+import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 
@@ -105,12 +106,15 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 // If bot is affected remove messages from cache that are no longer visible
                 if (role.getUsers().stream().anyMatch(User::isYourself)) {
                     Set<Long> unreadableChannels = role.getServer().getTextChannels().stream()
-                            .filter(((Predicate<ServerTextChannel>)ServerTextChannel::canYouSee).negate())
+                            .filter(((Predicate<ServerTextChannel>) ServerTextChannel::canYouSee).negate())
                             .map(ServerTextChannel::getId)
                             .collect(Collectors.toSet());
                     api.forEachCachedMessageWhere(
                             msg -> unreadableChannels.contains(msg.getChannel().getId()),
-                            msg -> api.removeMessageFromCache(msg.getId())
+                            msg -> {
+                                api.removeMessageFromCache(msg.getId());
+                                ((MessageCacheImpl) msg.getChannel().getMessageCache()).removeMessage(msg);
+                            }
                     );
                 }
             }
@@ -122,7 +126,7 @@ public class GuildRoleUpdateHandler extends PacketHandler {
                 role.setRawPosition(newRawPosition);
                 int newPosition = role.getPosition();
                 RoleChangePositionEvent event = new RoleChangePositionEventImpl(role, newRawPosition, oldRawPosition,
-                                                                                            newPosition, oldPosition);
+                        newPosition, oldPosition);
 
                 api.getEventDispatcher().dispatchRoleChangePositionEvent(
                         (DispatchQueueSelector) role.getServer(), role, role.getServer(), event);

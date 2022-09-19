@@ -13,6 +13,8 @@ import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 import org.javacord.api.event.user.UserChangePendingEvent;
+import org.javacord.api.event.user.UserChangeServerAvatarEvent;
+import org.javacord.api.event.user.UserChangeTimeoutEvent;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
@@ -24,6 +26,9 @@ import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
 import org.javacord.core.event.user.UserChangePendingEventImpl;
+import org.javacord.core.event.user.UserChangeServerAvatarEventImpl;
+import org.javacord.core.event.user.UserChangeTimeoutEventImpl;
+import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -57,8 +62,15 @@ public class GuildMemberUpdateHandler extends PacketHandler {
     public void handle(JsonNode packet) {
         api.getPossiblyUnreadyServerById(packet.get("guild_id").asLong()).map(server -> (ServerImpl) server)
                 .ifPresent(server -> {
-                    MemberImpl newMember = new MemberImpl(api, server, packet, null);
-                    Member oldMember = server.getRealMemberById(newMember.getId()).orElse(null);
+                    long userId = packet.get("user").get("id").asLong();
+                    boolean selfMuted = server.isSelfMuted(userId);
+                    boolean selfDeafened = server.isSelfDeafened(userId);
+                    // GUILD_MEMBER_UPDATE doesn't contain self voice states, so we either pass the old or set to false.
+                    // https://discord.com/developers/docs/topics/gateway#guild-member-update
+                    MemberImpl newMember = new MemberImpl(api, server, packet, null)
+                            .setSelfMuted(selfMuted)
+                            .setSelfDeafened(selfDeafened);
+                    Member oldMember = server.getRealMemberById(userId).orElse(null);
 
                     api.addMemberToCacheOrReplaceExisting(newMember);
 
@@ -72,6 +84,22 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 new UserChangeNicknameEventImpl(newMember, oldMember);
 
                         api.getEventDispatcher().dispatchUserChangeNicknameEvent(
+                                server, server, newMember.getUser(), event);
+                    }
+
+                    if (!newMember.getTimeout().equals(oldMember.getTimeout())) {
+                        UserChangeTimeoutEvent event =
+                                new UserChangeTimeoutEventImpl(newMember, oldMember);
+
+                        api.getEventDispatcher().dispatchUserChangeTimeoutEvent(
+                                server, server, newMember.getUser(), event);
+                    }
+
+                    if (!newMember.getServerAvatarHash().equals(oldMember.getServerAvatarHash())) {
+                        UserChangeServerAvatarEvent event =
+                                new UserChangeServerAvatarEventImpl(newMember, oldMember);
+
+                        api.getEventDispatcher().dispatchUserChangeServerAvatarEvent(
                                 server, server, newMember.getUser(), event);
                     }
 
@@ -133,7 +161,10 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 .collect(Collectors.toSet());
                         api.forEachCachedMessageWhere(
                                 msg -> unreadableChannels.contains(msg.getChannel().getId()),
-                                msg -> api.removeMessageFromCache(msg.getId())
+                                msg -> {
+                                    api.removeMessageFromCache(msg.getId());
+                                    ((MessageCacheImpl) msg.getChannel().getMessageCache()).removeMessage(msg);
+                                }
                         );
                     }
 
@@ -164,7 +195,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                         }
                         if (packet.get("user").has("avatar")) {
                             String newAvatarHash = packet.get("user").get("avatar").asText(null);
-                            String oldAvatarHash = oldUser.getAvatarHash();
+                            String oldAvatarHash = oldUser.getAvatarHash().orElse(null);
                             if (!Objects.deepEquals(newAvatarHash, oldAvatarHash)) {
                                 dispatchUserChangeAvatarEvent(updatedUser, newAvatarHash, oldAvatarHash);
                                 userChanged = true;

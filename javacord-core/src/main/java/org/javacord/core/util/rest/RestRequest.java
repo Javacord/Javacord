@@ -15,8 +15,11 @@ import org.javacord.api.util.rest.RestRequestResponseInformation;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +41,7 @@ public class RestRequest<T> {
     private final RestEndpoint endpoint;
 
     private volatile boolean includeAuthorizationHeader = true;
+    private volatile boolean consumeGlobalRatelimit = true;
     private volatile String[] urlParameters = new String[0];
     private final Map<String, String> queryParameters = new HashMap<>();
     private final Map<String, String> headers = new HashMap<>();
@@ -122,7 +126,7 @@ public class RestRequest<T> {
 
     /**
      * Gets the major url parameter of this request.
-     * If an request has a major parameter, it means that the ratelimits for this request are based on this parameter.
+     * If a request has a major parameter, it means that the ratelimits for this request are based on this parameter.
      *
      * @return The major url parameter used for ratelimits.
      */
@@ -181,7 +185,12 @@ public class RestRequest<T> {
      */
     public RestRequest<T> setAuditLogReason(String reason) {
         if (reason != null) {
-            addHeader("X-Audit-Log-Reason", reason);
+            try {
+                addHeader("X-Audit-Log-Reason",
+                        URLEncoder.encode(reason, StandardCharsets.UTF_8.name()).replace("+", " "));
+            } catch (UnsupportedEncodingException e) {
+                throw new AssertionError(e); // UTF-8 is always available
+            }
         }
         return this;
     }
@@ -253,6 +262,17 @@ public class RestRequest<T> {
     }
 
     /**
+     * Sets if this request should respect the global ratelimit.
+     *
+     * @param consumeGlobalRatelimit Whether the request should respect the global ratelimit.
+     * @return The current instance in order to chain call methods.
+     */
+    public RestRequest<T> consumeGlobalRatelimit(boolean consumeGlobalRatelimit) {
+        this.consumeGlobalRatelimit = consumeGlobalRatelimit;
+        return this;
+    }
+
+    /**
      * Executes the request. This will automatically retry if we hit a ratelimit.
      *
      * @param function A function which processes the rest response to the requested object.
@@ -305,13 +325,15 @@ public class RestRequest<T> {
      * @throws Exception If something went wrong while executing the request.
      */
     public RestRequestResult executeBlocking() throws Exception {
-        api.getGlobalRatelimiter().ifPresent(ratelimiter -> {
-            try {
-                ratelimiter.requestQuota();
-            } catch (InterruptedException e) {
-                logger.warn("Encountered unexpected ratelimiter interrupt", e);
-            }
-        });
+        if (consumeGlobalRatelimit) {
+            api.getGlobalRatelimiter().ifPresent(ratelimiter -> {
+                try {
+                    ratelimiter.requestQuota();
+                } catch (InterruptedException e) {
+                    logger.warn("Encountered unexpected ratelimiter interrupt", e);
+                }
+            });
+        }
         Request.Builder requestBuilder = new Request.Builder();
         HttpUrl.Builder httpUrlBuilder = endpoint.getOkHttpUrl(urlParameters).newBuilder();
         queryParameters.forEach(httpUrlBuilder::addQueryParameter);

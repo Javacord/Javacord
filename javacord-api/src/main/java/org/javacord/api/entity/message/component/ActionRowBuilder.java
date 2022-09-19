@@ -77,7 +77,7 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
     /**
      * Get the low-level components of this action row.
      *
-     * @return A list of components.
+     * @return The components.
      */
     public List<LowLevelComponent> getComponents() {
         return delegate.getComponents();

@@ -7,7 +7,7 @@ import org.javacord.api.entity.channel.ServerVoiceChannelUpdater;
  * This class is internally used by the {@link ServerVoiceChannelUpdater} to update server voice channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerVoiceChannelUpdaterDelegate extends ServerChannelUpdaterDelegate {
+public interface ServerVoiceChannelUpdaterDelegate extends RegularServerChannelUpdaterDelegate {
 
     /**
      * Queues the bitrate to be updated.

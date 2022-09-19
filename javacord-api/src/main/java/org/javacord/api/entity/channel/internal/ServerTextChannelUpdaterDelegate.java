@@ -7,7 +7,7 @@ import org.javacord.api.entity.channel.ServerTextChannelUpdater;
  * This class is internally used by the {@link ServerTextChannelUpdater} to update server text channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerTextChannelUpdaterDelegate extends ServerChannelUpdaterDelegate {
+public interface ServerTextChannelUpdaterDelegate extends RegularServerChannelUpdaterDelegate {
 
     /**
      * Queues the topic to be updated.

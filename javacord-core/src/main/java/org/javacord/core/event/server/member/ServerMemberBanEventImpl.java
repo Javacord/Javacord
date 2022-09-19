@@ -6,7 +6,6 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.server.member.ServerMemberBanEvent;
 import org.javacord.core.event.server.ServerEventImpl;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -28,11 +27,8 @@ public class ServerMemberBanEventImpl extends ServerEventImpl implements ServerM
     }
 
     @Override
-    public CompletableFuture<Optional<Ban>> requestBan() {
-        return getServer().getBans()
-                .thenApply(bans -> bans.stream()
-                        .filter(ban -> ban.getUser().equals(getUser()))
-                        .findAny());
+    public CompletableFuture<Ban> requestBan() {
+        return getServer().requestBan(getUser());
     }
 
     @Override

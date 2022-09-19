@@ -77,6 +77,11 @@ public class MessageAuthorImpl implements MessageAuthor {
     }
 
     @Override
+    public Optional<Long> getWebhookId() {
+        return Optional.ofNullable(webhookId);
+    }
+
+    @Override
     public Message getMessage() {
         return message;
     }
@@ -94,6 +99,11 @@ public class MessageAuthorImpl implements MessageAuthor {
     @Override
     public Icon getAvatar() {
         return UserImpl.getAvatar(message.getApi(), avatarId, discriminator, id);
+    }
+
+    @Override
+    public Icon getAvatar(int size) {
+        return UserImpl.getAvatar(message.getApi(), avatarId, discriminator, id, size);
     }
 
     @Override

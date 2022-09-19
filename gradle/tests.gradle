@@ -3,22 +3,15 @@ subprojects {
     apply plugin: 'groovy'
 
     dependencies {
-        testImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
-        // make the tests compilable on Java 11, can be removed when updating to Spock 1.3
-        testImplementation 'org.codehaus.groovy:groovy:2.5.4'
+        testImplementation 'org.spockframework:spock-core:1.3-groovy-2.5'
 
-        testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0'
-        testRuntimeOnly 'net.bytebuddy:byte-buddy:1.8.17'
-        testRuntimeOnly 'org.objenesis:objenesis'
+        testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
+        testRuntimeOnly 'net.bytebuddy:byte-buddy:1.12.1'
+        testRuntimeOnly 'org.objenesis:objenesis:3.2'
     }
 
     jacoco {
-        toolVersion '0.8.2'
-    }
-
-    // we don't need aggregation from multiple runs and it prevents caching of the task
-    tasks.withType(Test) {
-        jacoco.append false
+        toolVersion '0.8.8'
     }
 
     test.finalizedBy jacocoTestReport
@@ -26,32 +19,11 @@ subprojects {
 
 project(':javacord-core') {
     dependencies {
-        testImplementation 'org.apache.logging.log4j:log4j-core:2.11.0'
-        testImplementation 'org.apache.logging.log4j:log4j-core:2.11.0:tests'
-        testImplementation 'org.mock-server:mockserver-netty:5.5.0'
+        testImplementation 'org.apache.logging.log4j:log4j-core:2.17.2'
+        testImplementation 'org.apache.logging.log4j:log4j-core:2.17.2:tests'
+        testImplementation 'org.mock-server:mockserver-netty:5.10.0'
         testImplementation 'io.netty:netty-codec-http'
 
-        testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
-    }
-
-    // Log4J Core has some annotation processor
-    // This suppresses a build warning regarding the processor
-    // With Gradle 5.0 the processor is ignored anyway so then the line can be removed
-    compileTestGroovy.options.compilerArgs << '-proc:none'
-}
-
-if (project.hasProperty('teamcity')) {
-    afterEvaluate {
-        def dataPaths = subprojects.tasks*.withType(Test).flatten()
-                .extensions*.findByType(JacocoTaskExtension)
-                .destinationFile.absolutePath
-        def rootProjectDirUri = rootProject.projectDir.toURI()
-        def classpaths = subprojects.sourceSets*.findAll { !it.name.toLowerCase().contains('test') }.flatten()
-                .java.outputDir.collect { it.toURI() }
-                .collect { rootProjectDirUri.relativize it }
-                .collect { "+:$it**" }
-        println "##teamcity[jacocoReport " +
-                "dataPath='${dataPaths.join ' '}' " +
-                "classpath='${classpaths.join ' '}']"
+        testRuntimeOnly 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.2'
     }
 }

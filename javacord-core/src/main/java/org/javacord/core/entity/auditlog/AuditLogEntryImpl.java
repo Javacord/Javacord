@@ -20,6 +20,7 @@ import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.permission.PermissionsImpl;
+import org.javacord.core.interaction.ApplicationCommandPermissionsImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.awt.Color;
@@ -72,7 +73,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
     private final AuditLogEntryTarget target;
 
     /**
-     * A list with all changes.
+     * All changes.
      */
     private final List<AuditLogChange<?>> changes = new ArrayList<>();
 
@@ -226,6 +227,16 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         change = new AuditLogChangeImpl<>(type, oldValue, newValue);
                         break;
                     default:
+                        //For APPLICATION_COMMAND_PERMISSION_UPDATE, the key is the snowflake of the affected object
+                        if (actionType == AuditLogActionType.APPLICATION_COMMAND_PERMISSION_UPDATE) {
+                            ApplicationCommandPermissionsImpl oldPermissionsValue = oldValue != null
+                                    ? new ApplicationCommandPermissionsImpl(auditLog.getServer(), oldValue) : null;
+                            ApplicationCommandPermissionsImpl newPermissionsValue = oldValue != null
+                                    ? new ApplicationCommandPermissionsImpl(auditLog.getServer(), newValue) : null;
+
+                            change = new AuditLogChangeImpl<>(type, oldPermissionsValue, newPermissionsValue);
+                            break;
+                        }
                         change = new AuditLogChangeImpl<>(type, oldValue, newValue);
                         break;
                 }

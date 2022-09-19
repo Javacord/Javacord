@@ -14,9 +14,10 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The implementation of {@link AuditLog}.
@@ -34,17 +35,17 @@ public class AuditLogImpl implements AuditLog {
     private final Server server;
 
     /**
-     * A collection with all involved webhooks.
+     * All involved webhooks.
      */
-    private final Collection<Webhook> involvedWebhooks = new ArrayList<>();
+    private final Set<Webhook> involvedWebhooks = new HashSet<>();
 
     /**
-     * A collection with all involved users.
+     * All involved users.
      */
-    private final Collection<User> involvedUsers = new ArrayList<>();
+    private final Set<User> involvedUsers = new HashSet<>();
 
     /**
-     * A list with all entries.
+     * All entries.
      */
     private final List<AuditLogEntry> entries = new ArrayList<>();
 
@@ -94,13 +95,13 @@ public class AuditLogImpl implements AuditLog {
     }
 
     @Override
-    public Collection<Webhook> getInvolvedWebhooks() {
-        return Collections.unmodifiableCollection(involvedWebhooks);
+    public Set<Webhook> getInvolvedWebhooks() {
+        return Collections.unmodifiableSet(involvedWebhooks);
     }
 
     @Override
-    public Collection<User> getInvolvedUsers() {
-        return Collections.unmodifiableCollection(involvedUsers);
+    public Set<User> getInvolvedUsers() {
+        return Collections.unmodifiableSet(involvedUsers);
     }
 
     @Override

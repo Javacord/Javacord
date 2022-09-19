@@ -22,7 +22,7 @@ public enum UserStatus {
 
     /**
      * The user is invisible. You cannot tell if a user is offline or invisible!
-     * This is only used to change your own status, but you will never see an other user marked as invisible.
+     * This is only used to change your own status, but you will never see another user marked as invisible.
      */
     INVISIBLE("invisible"),
 

@@ -2,8 +2,8 @@ package org.javacord.api.event.server.emoji;
 
 import org.javacord.api.entity.permission.Role;
 
-import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A custom emoji change whitelisted roles event.
@@ -11,17 +11,17 @@ import java.util.Optional;
 public interface KnownCustomEmojiChangeWhitelistedRolesEvent extends KnownCustomEmojiEvent {
 
     /**
-     * Gets a list with the old whitelisted roles.
+     * Gets the old whitelisted roles.
      *
-     * @return A list with the old whitelisted roles.
+     * @return The old whitelisted roles.
      */
-    Optional<Collection<Role>> getOldWhitelistedRoles();
+    Optional<Set<Role>> getOldWhitelistedRoles();
 
     /**
-     * Gets a list with the new whitelisted roles.
+     * Gets the new whitelisted roles.
      *
-     * @return A list with the new whitelisted roles.
+     * @return The new whitelisted roles.
      */
-    Optional<Collection<Role>> getNewWhitelistedRoles();
+    Optional<Set<Role>> getNewWhitelistedRoles();
 
 }

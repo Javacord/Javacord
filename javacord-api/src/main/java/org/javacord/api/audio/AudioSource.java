@@ -32,9 +32,9 @@ public interface AudioSource extends AudioSourceAttachableListenerManager, Speci
     boolean removeTransformer(AudioTransformer transformer);
 
     /**
-     * Gets a list of all transformers of this audio source.
+     * Gets all transformers of this audio source.
      *
-     * @return A list with all transformers.
+     * @return All transformers.
      */
     List<AudioTransformer> getTransformers();
 
@@ -56,7 +56,7 @@ public interface AudioSource extends AudioSourceAttachableListenerManager, Speci
      * <p>If there is no frame available, but the source has not been finished, it will
      * play a silent sound instead.
      *
-     * @return Whether or not there is a frame available to be polled.
+     * @return Whether there is a frame available to be polled.
      */
     boolean hasNextFrame();
 

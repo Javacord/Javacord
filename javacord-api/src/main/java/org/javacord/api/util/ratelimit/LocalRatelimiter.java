@@ -27,7 +27,7 @@ import java.time.Duration;
  * <li>{@code 25} request per {@code 1 sec}
  *     ({@code amount = 25} and {@code bucketDuration = Duration.ofMillis((long) Math.ceil(25000D / 25D))}).
  * </ul>
- * Choosing a lower {@code amount} increases the maximum throughput but can limits your ability to perform actions
+ * Choosing a lower {@code amount} increases the maximum throughput but can limit your ability to perform actions
  * in bulk.
  *
  * @see <a href="https://javacord.org/wiki/advanced-topics/ratelimits.html">Related wiki article</a>
@@ -40,19 +40,6 @@ public class LocalRatelimiter implements Ratelimiter {
 
     private final int amount;
     private final Duration bucketDuration;
-
-    /**
-     * Creates a new local ratelimiter.
-     *
-     * @param amount The amount available per reset interval.
-     * @param seconds The time to wait until the available quota resets.
-     * @deprecated Use {@link #LocalRatelimiter(int, Duration)} instead.
-     */
-    @Deprecated
-    public LocalRatelimiter(int amount, int seconds) {
-        this.amount = amount;
-        bucketDuration = Duration.ofSeconds(seconds);
-    }
 
     /**
      * Creates a new local ratelimiter.
@@ -81,17 +68,6 @@ public class LocalRatelimiter implements Ratelimiter {
      */
     public Duration getBucketDuration() {
         return bucketDuration;
-    }
-
-    /**
-     * Gets the time to wait until the available quota resets in seconds.
-     *
-     * @return The time to wait until the available quota resets.
-     * @deprecated Use {@link #getBucketDuration()} instead.
-     */
-    @Deprecated
-    public int getSeconds() {
-        return (int) bucketDuration.getSeconds();
     }
 
     /**

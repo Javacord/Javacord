@@ -22,7 +22,7 @@ public interface RoleBuilderDelegate {
 
     /**
      * Sets the name of the role.
-     * By default it's <code>"new role"</code>.
+     * By default, it's <code>"new role"</code>.
      *
      * @param name The name of the role.
      */
@@ -30,7 +30,7 @@ public interface RoleBuilderDelegate {
 
     /**
      * Sets the permissions of the role.
-     * By default it uses the permissions of the @everyone role.
+     * By default, it uses the permissions of the @everyone role.
      *
      * @param permissions The permissions to set.
      */
@@ -45,7 +45,7 @@ public interface RoleBuilderDelegate {
 
     /**
      * Sets if the role is mentionable or not.
-     * By default it's set to <code>false</code>.
+     * By default, it's set to <code>false</code>.
      *
      * @param mentionable Whether the role should be mentionable or not.
      */

@@ -11,18 +11,18 @@ import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.voice.InternalServerVoiceChannelAttachableListenerManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ServerVoiceChannelImpl extends ServerChannelImpl
+public class ServerVoiceChannelImpl extends RegularServerChannelImpl
         implements ServerVoiceChannel, InternalServerVoiceChannelAttachableListenerManager {
 
     /**
@@ -43,7 +43,7 @@ public class ServerVoiceChannelImpl extends ServerChannelImpl
     /**
      * The ids of the connected users of this server voice channel.
      */
-    private final Collection<Long> connectedUsers = new ArrayList<>();
+    private final Set<Long> connectedUsers = new HashSet<>();
 
     /**
      * Creates a new server voice channel object.
@@ -110,14 +110,14 @@ public class ServerVoiceChannelImpl extends ServerChannelImpl
     }
 
     @Override
-    public CompletableFuture<AudioConnection> connect() {
+    public CompletableFuture<AudioConnection> connect(boolean muted, boolean deafened) {
         return getServer()
                 .getAudioConnection()
                 .map(AudioConnection::close)
                 .orElseGet(() -> CompletableFuture.completedFuture(null))
                 .thenCompose(closedAudioConnection -> {
                     CompletableFuture<AudioConnection> future = new CompletableFuture<>();
-                    AudioConnectionImpl connection = new AudioConnectionImpl(this, future);
+                    AudioConnectionImpl connection = new AudioConnectionImpl(this, future, muted, deafened);
                     ((ServerImpl) getServer()).setPendingAudioConnection(connection);
                     return future;
                 })
@@ -138,17 +138,17 @@ public class ServerVoiceChannelImpl extends ServerChannelImpl
     }
 
     @Override
-    public Collection<Long> getConnectedUserIds() {
-        return Collections.unmodifiableCollection(connectedUsers);
+    public Set<Long> getConnectedUserIds() {
+        return Collections.unmodifiableSet(connectedUsers);
     }
 
     @Override
-    public Collection<User> getConnectedUsers() {
-        return Collections.unmodifiableCollection(
+    public Set<User> getConnectedUsers() {
+        return Collections.unmodifiableSet(
                 connectedUsers.stream()
                         .map(getApi()::getCachedUserById)
                         .map(optionalUser -> optionalUser.orElseThrow(AssertionError::new))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     @Override

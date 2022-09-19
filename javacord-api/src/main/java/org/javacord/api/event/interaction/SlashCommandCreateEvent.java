@@ -1,21 +1,12 @@
 package org.javacord.api.event.interaction;
 
-import org.javacord.api.event.Event;
-import org.javacord.api.interaction.Interaction;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import java.util.Optional;
 
 /**
- * An slash command create event.
+ * A slash command create event.
  */
-public interface SlashCommandCreateEvent extends Event {
-
-    /**
-     * Gets the created interaction.
-     *
-     * @return The interaction.
-     */
-    Interaction getInteraction();
+public interface SlashCommandCreateEvent extends ApplicationCommandEvent {
 
     /**
      * Gets the created interaction as SlashCommandInteraction, if the interaction is of this type.

@@ -1,6 +1,7 @@
 package org.javacord.api.entity.permission;
 
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.Permissionable;
@@ -11,8 +12,8 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.server.role.RoleAttachableListenerManager;
 
 import java.awt.Color;
-import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -64,6 +65,35 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     Optional<Color> getColor();
 
     /**
+     * Gets the hash of the role's icon.
+     *
+     * @return The hash of the role's icon.
+     */
+    Optional<String> getIconHash();
+
+    /**
+     * Gets the Icon of the role.
+     *
+     * @return The role's icon.
+     */
+    Optional<Icon> getIcon();
+
+    /**
+     * Gets the Icon of the role.
+     *
+     * @param size The size of the image, must be a power of 2 between 16 and 4096.
+     * @return The role's icon in the given size.
+     */
+    Optional<Icon> getIcon(int size);
+
+    /**
+     * Gets the unicode emoji role icon.
+     *
+     * @return The unicode emoji role icon.
+     */
+    Optional<String> getUnicodeEmojiIcon();
+
+    /**
      * Check if this role is mentionable.
      *
      * @return Whether this role is mentionable or not.
@@ -78,14 +108,14 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     boolean isDisplayedSeparately();
 
     /**
-     * Gets a collection with all users who have this role.
+     * Gets all users who have this role.
      *
-     * @return A collection with all users who have this role.
+     * @return All users who have this role.
      */
-    Collection<User> getUsers();
+    Set<User> getUsers();
 
     /**
-     * Checks whether the specified users has this role.
+     * Checks whether the specified user has this role.
      *
      * @param user the user to check
      * @return true if the user has this role; false otherwise
@@ -259,7 +289,7 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
      *
      * @return The allowed permissions of the role.
      */
-    default Collection<PermissionType> getAllowedPermissions() {
+    default Set<PermissionType> getAllowedPermissions() {
         return getPermissions().getAllowedPermission();
     }
 
@@ -268,7 +298,7 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
      *
      * @return The unset permissions of the role.
      */
-    default Collection<PermissionType> getUnsetPermissions() {
+    default Set<PermissionType> getUnsetPermissions() {
         return getPermissions().getUnsetPermissions();
     }
 

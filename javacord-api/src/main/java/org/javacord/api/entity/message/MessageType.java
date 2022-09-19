@@ -30,8 +30,12 @@ public enum MessageType {
     SERVER_DISCOVERY_REQUALIFIED(15),
     SERVER_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING(16),
     SERVER_DISCOVERY_GRACE_PERIOD_FINAL_WARNING(17),
+    THREAD_CREATED(18),
     REPLY(19),
     SLASH_COMMAND(20),
+    THREAD_STARTER_MESSAGE(21),
+    GUILD_INVITE_REMINDER(22),
+    CONTEXT_MENU_COMMAND(23),
 
     /**
      * An unknown message type.
@@ -41,7 +45,7 @@ public enum MessageType {
     /**
      * The int representing the type.
      */
-    final int type;
+    private final int type;
 
     /**
      * Creates a new message type.
@@ -55,7 +59,7 @@ public enum MessageType {
     /**
      * Gets the type by its int representation.
      *
-     * @param type The int representation.
+     * @param type    The int representation.
      * @param webhook Whether the message was sent by a webhook or not.
      * @return The message type.
      */

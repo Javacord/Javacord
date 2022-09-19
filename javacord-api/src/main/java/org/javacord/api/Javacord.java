@@ -56,47 +56,27 @@ public class Javacord {
 
     static {
         Properties versionProperties = new Properties();
-        try (InputStream versionPropertiesStream = Javacord.class.getResourceAsStream("/version.properties")) {
+        try (InputStream versionPropertiesStream = Javacord.class.getResourceAsStream("/git.properties")) {
             versionProperties.load(versionPropertiesStream);
         } catch (IOException ignored) { }
 
-        String version = versionProperties.getProperty("version", "$version");
-        switch (version) {
-            case "$version":
-                VERSION = "<unknown>";
-                break;
+        VERSION = versionProperties.getProperty("version", "<unknown>");
+        COMMIT_ID = versionProperties.getProperty("git.commit.id.abbrev", "<unknown>");
 
-            default:
-                VERSION = version;
+        String buildTimestamp = versionProperties.getProperty("buildTimestamp", null);
+        if (buildTimestamp == null) {
+            BUILD_TIMESTAMP = null;
+        } else {
+            BUILD_TIMESTAMP = Instant.parse(buildTimestamp);
         }
 
-        String commitId = versionProperties.getProperty("commitId", "$commitId");
-        switch (commitId) {
-            case "$commitId":
-                COMMIT_ID = "<unknown>";
-                break;
-
-            default:
-                COMMIT_ID = commitId;
-        }
-
-        String buildTimestamp = versionProperties.getProperty("buildTimestamp", "$buildTimestamp");
-        switch (buildTimestamp) {
-            case "$buildTimestamp":
-                BUILD_TIMESTAMP = null;
-                break;
-
-            default:
-                BUILD_TIMESTAMP = Instant.parse(buildTimestamp);
-        }
-
-        DISPLAY_VERSION = version.endsWith("-SNAPSHOT")
-                ? String.format("%s [%s | %s]", VERSION, COMMIT_ID, BUILD_TIMESTAMP)
+        DISPLAY_VERSION = VERSION.endsWith("-SNAPSHOT")
+                ? String.format("%s [%s]", VERSION, BUILD_TIMESTAMP)
                 : VERSION;
     }
 
     /**
-     * The github url of javacord.
+     * The GitHub url of javacord.
      */
     public static final String GITHUB_URL = "https://github.com/Javacord/Javacord";
 
@@ -110,7 +90,7 @@ public class Javacord {
      * A list with all gateway versions can be found
      * <a href="https://discord.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
      */
-    public static final String DISCORD_GATEWAY_VERSION = "8";
+    public static final String DISCORD_GATEWAY_VERSION = "10";
 
     /**
      * The voice gateway version from Discord which we are using.
@@ -124,7 +104,7 @@ public class Javacord {
      * A list with all API versions can be found
      * <a href="https://discord.com/developers/docs/reference#api-versioning-api-versions">here</a>.
      */
-    public static final String DISCORD_API_VERSION = "8";
+    public static final String DISCORD_API_VERSION = "10";
 
     private Javacord() {
         throw new UnsupportedOperationException();

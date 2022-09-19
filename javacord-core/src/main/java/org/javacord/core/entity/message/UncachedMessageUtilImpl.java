@@ -26,8 +26,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -54,9 +56,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     public CompletableFuture<Message> crossPost(String channelId, String messageId) {
         return new RestRequest<Message>(api, RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channelId, messageId, "crosspost")
-                .execute(result ->
-                        new MessageImpl(api, api.getTextChannelById(channelId).orElseThrow(() ->
-                                new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
+                .execute(result -> api.getOrCreateMessage(api.getTextChannelById(channelId).orElseThrow(() ->
+                        new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
     }
 
     @Override
@@ -159,66 +160,64 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
 
     @Override
     public CompletableFuture<Message> edit(long channelId, long messageId, String content) {
-        return edit(channelId, messageId, content, true, null, false);
+        return edit(channelId, messageId, content, true, Collections.emptyList(), false);
     }
 
     @Override
     public CompletableFuture<Message> edit(String channelId, String messageId, String content) {
-        return edit(channelId, messageId, content, true, null, false);
+        return edit(channelId, messageId, content, true, Collections.emptyList(), false);
     }
 
     @Override
-    public CompletableFuture<Message> edit(long channelId, long messageId, EmbedBuilder embed) {
-        return edit(channelId, messageId, null, false, embed, true);
+    public CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds) {
+        return edit(channelId, messageId, null, false, embeds, true);
     }
 
     @Override
-    public CompletableFuture<Message> edit(String channelId, String messageId, EmbedBuilder embed) {
-        return edit(channelId, messageId, null, false, embed, true);
-    }
-
-    @Override
-    public CompletableFuture<Message> edit(
-            long channelId, long messageId, String content, EmbedBuilder embed) {
-        return edit(channelId, messageId, content, true, embed, true);
+    public CompletableFuture<Message> edit(String channelId, String messageId, List<EmbedBuilder> embeds) {
+        return edit(channelId, messageId, null, false, embeds, true);
     }
 
     @Override
     public CompletableFuture<Message> edit(
-            String channelId, String messageId, String content, EmbedBuilder embed) {
-        return edit(channelId, messageId, content, true, embed, true);
+            long channelId, long messageId, String content, List<EmbedBuilder> embeds) {
+        return edit(channelId, messageId, content, true, embeds, true);
+    }
+
+    @Override
+    public CompletableFuture<Message> edit(
+            String channelId, String messageId, String content, List<EmbedBuilder> embeds) {
+        return edit(channelId, messageId, content, true, embeds, true);
     }
 
     @Override
     public CompletableFuture<Message> edit(long channelId, long messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+                                           boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         if (updateContent) {
-            if (content == null) {
+            if (content == null || content.isEmpty()) {
                 body.putNull("content");
             } else {
                 body.put("content", content);
             }
         }
         if (updateEmbed) {
-            if (embed == null) {
-                body.putNull("embed");
-            } else {
-                ((EmbedBuilderDelegateImpl) embed.getDelegate()).toJsonNode(body.putObject("embed"));
-            }
+            ArrayNode embedArray = body.putArray("embeds");
+            embeds.stream().map(embedBuilder -> ((EmbedBuilderDelegateImpl) embedBuilder.getDelegate()).toJsonNode())
+                    .forEach(embedArray::add);
         }
         return new RestRequest<Message>(api, RestMethod.PATCH, RestEndpoint.MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(channelId), Long.toUnsignedString(messageId))
                 .setBody(body)
                 .execute(result -> new MessageImpl(api, api.getTextChannelById(channelId).orElseThrow(() ->
-                                new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
+                        new IllegalStateException("TextChannel is missing.")), result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<Message> edit(String channelId, String messageId, String content,
-                                        boolean updateContent, EmbedBuilder embed, boolean updateEmbed) {
+                                           boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed) {
         try {
-            return edit(Long.parseLong(channelId), Long.parseLong(messageId), content, true, embed, true);
+            return edit(Long.parseLong(channelId), Long.parseLong(messageId), content, true, embeds, true);
         } catch (NumberFormatException e) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             future.completeExceptionally(e);
@@ -248,32 +247,32 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
 
     @Override
     public CompletableFuture<Message> removeContent(long channelId, long messageId) {
-        return edit(channelId, messageId, null, true, null, false);
+        return edit(channelId, messageId, "");
     }
 
     @Override
     public CompletableFuture<Message> removeContent(String channelId, String messageId) {
-        return edit(channelId, messageId, null, true, null, false);
+        return edit(channelId, messageId, null, true, Collections.emptyList(), false);
     }
 
     @Override
     public CompletableFuture<Message> removeEmbed(long channelId, long messageId) {
-        return edit(channelId, messageId, null, false, null, true);
+        return edit(channelId, messageId, null, false, Collections.emptyList(), true);
     }
 
     @Override
     public CompletableFuture<Message> removeEmbed(String channelId, String messageId) {
-        return edit(channelId, messageId, null, false, null, true);
+        return edit(channelId, messageId, null, false, Collections.emptyList(), true);
     }
 
     @Override
     public CompletableFuture<Message> removeContentAndEmbed(long channelId, long messageId) {
-        return edit(channelId, messageId, null, true, null, true);
+        return edit(channelId, messageId, null, true, Collections.emptyList(), true);
     }
 
     @Override
     public CompletableFuture<Message> removeContentAndEmbed(String channelId, String messageId) {
-        return edit(channelId, messageId, null, true, null, true);
+        return edit(channelId, messageId, null, true, Collections.emptyList(), true);
     }
 
     @Override
@@ -374,8 +373,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji) {
-        CompletableFuture<List<User>> future = new CompletableFuture<>();
+    public CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(long channelId, long messageId, Emoji emoji) {
+        CompletableFuture<Set<User>> future = new CompletableFuture<>();
         api.getThreadPool().getExecutorService().submit(() -> {
             try {
                 final String value = emoji.asUnicodeEmoji().orElseGet(() -> emoji.asCustomEmoji()
@@ -401,7 +400,7 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
                     users.addAll(incompleteUsers);
                     requestMore = incompleteUsers.size() >= 100;
                 }
-                future.complete(Collections.unmodifiableList(users));
+                future.complete(Collections.unmodifiableSet(new HashSet<>(users)));
             } catch (Throwable t) {
                 future.completeExceptionally(t);
             }
@@ -410,11 +409,11 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
-    public CompletableFuture<List<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji) {
+    public CompletableFuture<Set<User>> getUsersWhoReactedWithEmoji(String channelId, String messageId, Emoji emoji) {
         try {
             return getUsersWhoReactedWithEmoji(Long.parseLong(channelId), Long.parseLong(messageId), emoji);
         } catch (NumberFormatException e) {
-            CompletableFuture<List<User>> future = new CompletableFuture<>();
+            CompletableFuture<Set<User>> future = new CompletableFuture<>();
             future.completeExceptionally(e);
             return future;
         }

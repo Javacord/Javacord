@@ -63,10 +63,10 @@ import org.javacord.core.event.server.ServerChangeVerificationLevelEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Handles the guild update packet.
@@ -333,8 +333,8 @@ public class GuildUpdateHandler extends PacketHandler {
                 api.getEventDispatcher().dispatchServerChangeVanityUrlCodeEvent(server, server, event);
             }
 
-            Collection<ServerFeature> oldServerFeature = server.getFeatures();
-            Collection<ServerFeature> newServerFeature = new ArrayList<>();
+            Set<ServerFeature> oldServerFeature = server.getFeatures();
+            Set<ServerFeature> newServerFeature = new HashSet<>();
             if (packet.has("features")) {
                 packet.get("features").forEach(jsonNode -> {
                     try {

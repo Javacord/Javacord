@@ -15,7 +15,7 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      * The channel must be in the same server as the current connection.
      *
      * @param destChannel The channel to move to.
-     * @return A CompletableFuture indicating whether or not the move was successful.
+     * @return A CompletableFuture indicating whether the move was successful.
      */
     CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel);
 
@@ -24,9 +24,9 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      * The channel must be in the same server as the current connection.
      *
      * @param destChannel The channel to move to.
-     * @param selfMute    Whether or not to be self-muted on join.
-     * @param selfDeafen  Whether or not to be self-deafened on join.
-     * @return A CompletableFuture indicating whether or not the move was successful.
+     * @param selfMute    Whether to be self-muted on join.
+     * @param selfDeafen  Whether to be self-deafened on join.
+     * @return A CompletableFuture indicating whether the move was successful.
      */
     CompletableFuture<Void> moveTo(ServerVoiceChannel destChannel, boolean selfMute, boolean selfDeafen);
 
@@ -70,7 +70,7 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      *
      * <p>This is solely visual. A muted bot can still play audio.
      *
-     * @return Whether or not the connection is self-muted.
+     * @return Whether the connection is self-muted.
      */
     boolean isSelfMuted();
 
@@ -79,7 +79,7 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      *
      * <p>This is solely visual. A muted bot can still play audio.
      *
-     * @param muted Whether or not to self-mute this connection.
+     * @param muted Whether to self-mute this connection.
      */
     void setSelfMuted(boolean muted);
 
@@ -88,7 +88,7 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      *
      * <p>This is solely visual. A deafened bot can still receive audio.
      *
-     * @return Whether or not the connection is self-deafened.
+     * @return Whether the connection is self-deafened.
      */
     boolean isSelfDeafened();
 
@@ -97,21 +97,21 @@ public interface AudioConnection extends AudioConnectionAttachableListenerManage
      *
      * <p>This is solely visual. A deafened bot can still receive audio.
      *
-     * @param deafened Whether or not to self-deafen this connection.
+     * @param deafened Whether to self-deafen this connection.
      */
     void setSelfDeafened(boolean deafened);
 
     /**
      * Gets the priority speaker status of this connection.
      *
-     * @return Whether or not the connection is priority speaking.
+     * @return Whether the connection is priority speaking.
      */
     boolean isPrioritySpeaking();
 
     /**
      * Sets the priority speaker status of this connection.
      *
-     * @param prioritySpeaking Whether or not to become a priority speaker.
+     * @param prioritySpeaking Whether to become a priority speaker.
      */
     void setPrioritySpeaking(boolean prioritySpeaking);
 

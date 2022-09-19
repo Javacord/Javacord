@@ -71,9 +71,9 @@ public interface ButtonBuilderDelegate extends ComponentBuilderDelegate {
     String getUrl();
 
     /**
-     * Get whether or not the button is disabled.
+     * Get whether the button is disabled.
      *
-     * @return Whether or not the button is disabled.
+     * @return Whether the button is disabled.
      */
     Boolean isDisabled();
 

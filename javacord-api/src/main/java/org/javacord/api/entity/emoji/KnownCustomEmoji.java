@@ -8,6 +8,7 @@ import org.javacord.api.listener.server.emoji.KnownCustomEmojiAttachableListener
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -50,11 +51,11 @@ public interface KnownCustomEmoji extends CustomEmoji, UpdatableFromCache<KnownC
     }
 
     /**
-     * Gets a list with all whitelisted roles.
+     * Gets all whitelisted roles.
      *
-     * @return A list with all whitelisted roles.
+     * @return All whitelisted roles.
      */
-    Optional<Collection<Role>> getWhitelistedRoles();
+    Optional<Set<Role>> getWhitelistedRoles();
 
     /**
      * Checks if this emoji must be wrapped in colons.

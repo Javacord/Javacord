@@ -9,7 +9,8 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link ChannelCategoryBuilder} to create channel categories.
  * You usually don't want to interact with this object.
  */
-public interface ChannelCategoryBuilderDelegate extends ServerChannelBuilderDelegate {
+public interface ChannelCategoryBuilderDelegate extends
+        RegularServerChannelBuilderDelegate {
 
     /**
      * Creates the channel category.

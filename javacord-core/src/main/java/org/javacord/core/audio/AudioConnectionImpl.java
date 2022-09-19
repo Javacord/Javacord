@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.audio.SpeakingFlag;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -12,7 +13,6 @@ import org.javacord.core.listener.audio.InternalAudioConnectionAttachableListene
 import org.javacord.core.util.concurrent.BlockingReference;
 import org.javacord.core.util.gateway.AudioWebSocketAdapter;
 import org.javacord.core.util.logging.LoggerUtil;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -109,18 +109,21 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     private volatile boolean deafened;
 
     /**
-     * Creates a new audi connection.
+     * Creates a new audio connection.
      *
-     * @param channel The channel of the audio connection.
+     * @param channel     The channel of the audio connection.
      * @param readyFuture An uncompleted future that gets completed when the connection is fully established.
+     * @param muted       Whether to connect self-muted.
+     * @param deafened    Whether to connect self-deafened.
      */
-    public AudioConnectionImpl(ServerVoiceChannel channel, CompletableFuture<AudioConnection> readyFuture) {
+    public AudioConnectionImpl(ServerVoiceChannel channel, CompletableFuture<AudioConnection> readyFuture,
+                               boolean muted, boolean deafened) {
         this.channel = channel;
         this.readyFuture = readyFuture;
         id = idCounter.getAndIncrement();
         api = (DiscordApiImpl) channel.getApi();
         api.getWebSocketAdapter()
-                .sendVoiceStateUpdate(channel.getServer(), getChannel(), false, false);
+                .sendVoiceStateUpdate(channel.getServer(), getChannel(), muted, deafened);
     }
 
     /**
@@ -231,7 +234,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
     /**
      * Sets whether the connection is priority speaking.
      *
-     * @param prioritySpeaking Whether or not to speak with priority.
+     * @param prioritySpeaking Whether to speak with priority.
      */
     public void setPrioritySpeaking(boolean prioritySpeaking) {
         EnumSet<SpeakingFlag> newSpeakingFlags = speakingFlags.clone();
@@ -252,7 +255,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         return Collections.unmodifiableSet(speakingFlags);
     }
 
-    /**M
+    /**
      * Sets the current speaking flags and sends a speaking packet if they have changed.
      *
      * @param speakingFlags The new speaking flags to set.
@@ -280,7 +283,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
         connectingOrConnected = true;
         logger.debug("Received all information required to connect to voice channel {}", getChannel());
         websocketAdapter = new AudioWebSocketAdapter(this);
-        channel = channel.getCurrentCachedInstance().orElse(channel);
+        channel = channel.getCurrentCachedInstance().flatMap(Channel::asServerVoiceChannel).orElse(channel);
         return true;
     }
 
@@ -383,7 +386,7 @@ public class AudioConnectionImpl implements AudioConnection, InternalAudioConnec
 
     @Override
     public ServerVoiceChannel getChannel() {
-        return channel.getCurrentCachedInstance().orElse(channel);
+        return channel.getCurrentCachedInstance().flatMap(Channel::asServerVoiceChannel).orElse(channel);
     }
 
     @Override

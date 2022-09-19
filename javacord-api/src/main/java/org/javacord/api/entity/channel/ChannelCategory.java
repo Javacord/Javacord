@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a channel category.
  */
-public interface ChannelCategory extends ServerChannel, ChannelCategoryAttachableListenerManager {
+public interface ChannelCategory extends RegularServerChannel, ChannelCategoryAttachableListenerManager {
 
     @Override
     default ChannelType getType() {
@@ -21,11 +21,11 @@ public interface ChannelCategory extends ServerChannel, ChannelCategoryAttachabl
     }
 
     /**
-     * Gets a list with all channels which this category contains.
+     * Gets a sorted (by position) list with all channels which this category contains.
      *
-     * @return A list with all channels which this category contains.
+     * @return All channels which this category contains.
      */
-    List<ServerChannel> getChannels();
+    List<RegularServerChannel> getChannels();
 
     /**
      * Gets a sorted (by position) list with all channels in this category the given user can see.

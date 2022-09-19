@@ -4,26 +4,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.ApplicationInfo;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
@@ -35,15 +36,19 @@ import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
+import org.javacord.api.entity.sticker.Sticker;
+import org.javacord.api.entity.sticker.StickerPack;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.interaction.ServerSlashCommandPermissions;
-import org.javacord.api.interaction.ServerSlashCommandPermissionsBuilder;
+import org.javacord.api.interaction.ApplicationCommand;
+import org.javacord.api.interaction.ApplicationCommandBuilder;
+import org.javacord.api.interaction.ApplicationCommandType;
+import org.javacord.api.interaction.MessageContextMenu;
+import org.javacord.api.interaction.ServerApplicationCommandPermissions;
 import org.javacord.api.interaction.SlashCommand;
-import org.javacord.api.interaction.SlashCommandBuilder;
-import org.javacord.api.interaction.SlashCommandPermissions;
+import org.javacord.api.interaction.UserContextMenu;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -61,16 +66,20 @@ import org.javacord.core.entity.message.MessageSetImpl;
 import org.javacord.core.entity.message.UncachedMessageUtilImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.sticker.StickerImpl;
+import org.javacord.core.entity.sticker.StickerPackImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
 import org.javacord.core.entity.webhook.IncomingWebhookImpl;
 import org.javacord.core.entity.webhook.WebhookImpl;
-import org.javacord.core.interaction.ServerSlashCommandPermissionsImpl;
-import org.javacord.core.interaction.SlashCommandBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandBuilderDelegateImpl;
+import org.javacord.core.interaction.ApplicationCommandImpl;
+import org.javacord.core.interaction.MessageContextMenuImpl;
+import org.javacord.core.interaction.ServerApplicationCommandPermissionsImpl;
 import org.javacord.core.interaction.SlashCommandImpl;
-import org.javacord.core.interaction.SlashCommandPermissionsImpl;
+import org.javacord.core.interaction.UserContextMenuImpl;
 import org.javacord.core.util.ClassHelper;
 import org.javacord.core.util.Cleanupable;
 import org.javacord.core.util.cache.JavacordEntityCache;
@@ -86,7 +95,6 @@ import org.javacord.core.util.ratelimit.RatelimitManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -118,6 +126,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The implementation of {@link DiscordApi}.
@@ -135,6 +144,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * <p>The key is the bot's token (because ratelimits are per account) and the key is the ratelimiter for this token.
      */
     private static final Map<String, Ratelimiter> defaultGlobalRatelimiter = new ConcurrentHashMap<>();
+
+    /**
+     * The key prefix for bot accounts.
+     */
+    private static final String BOT_TOKEN_PREFIX = "Bot ";
 
     /**
      * A map with the default gateway identify ratelimiter.
@@ -180,24 +194,14 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private volatile DiscordWebSocketAdapter websocketAdapter = null;
 
     /**
-     * The account type of the bot.
-     */
-    private final AccountType accountType;
-
-    /**
      * The token used for authentication.
      */
     private final String token;
 
     /**
-     * Whether the {@link #disconnect()} method has been called before or not.
+     * The disconnect future, if disconnect has been called.
      */
-    private volatile boolean disconnectCalled = false;
-
-    /**
-     * A lock to synchronize on {@link DiscordApiImpl#disconnectCalled}.
-     */
-    private final Object disconnectCalledLock = new Object();
+    private final AtomicReference<CompletableFuture<Void>> disconnectFuture = new AtomicReference<>(null);
 
     /**
      * The status which should be displayed for the bot.
@@ -243,6 +247,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * The intents to be set.
      */
     private final Set<Intent> intents;
+
+    /**
+     * Whether events can be dispatched.
+     */
+    private boolean dispatchEvents = true;
 
     /**
      * Whether Javacord should wait for all servers to become available on startup or not.
@@ -302,14 +311,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private volatile User you;
 
     /**
-     * The client id of the application.
+     * The cached application info.
      */
-    private volatile long clientId = -1;
-
-    /**
-     * The id of the application's owner.
-     */
-    private volatile long ownerId = -1;
+    private volatile ApplicationInfo applicationInfo;
 
     /**
      * The time offset between the Discord time and our local time.
@@ -350,19 +354,29 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private final ConcurrentHashMap<Long, Server> nonReadyServers = new ConcurrentHashMap<>();
 
     /**
-     * A set with all unavailable servers.
+     * All unavailable servers.
      */
     private final HashSet<Long> unavailableServers = new HashSet<>();
 
     /**
-     * A map with all known custom emoji.
+     * All known custom emoji.
      */
     private final ConcurrentHashMap<Long, KnownCustomEmoji> customEmojis = new ConcurrentHashMap<>();
 
     /**
+     * A map with all stickers.
+     */
+    private final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
+
+    /**
      * A map with all cached messages.
      */
-    private final Map<Long, WeakReference<Message>> messages = Collections.synchronizedMap(new ConcurrentHashMap<>());
+    private final Map<Long, WeakReference<Message>> messages = new ConcurrentHashMap<>();
+
+    /**
+     * A lock for accessing the message cache.
+     */
+    private final ReentrantLock messageCacheLock = new ReentrantLock();
 
     /**
      * A map to retrieve message IDs by the weak ref that point to the respective
@@ -401,51 +415,49 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Creates a new discord api instance that can be used for auto-ratelimited REST calls,
      * but does not connect to the Discord WebSocket.
      *
-     * @param token                         The token used to connect without any account type specific prefix.
-     * @param globalRatelimiter             The ratelimiter used for global ratelimits.
-     * @param gatewayIdentifyRatelimiter    The ratelimiter used to respect the 5 second gateway identify ratelimit.
-     * @param proxySelector                 The proxy selector which should be used to determine the proxies that
-     *                                      should be used
-     *                                      to connect to the Discord REST API and websocket.
-     * @param proxy                         The proxy which should be used to connect to the Discord REST API and
-     *                                      websocket.
-     * @param proxyAuthenticator            The authenticator that should be used to authenticate against proxies that
-     *                                      require it.
-     * @param trustAllCertificates          Whether to trust all SSL certificates.
+     * @param token                      The token used to connect without any account type specific prefix.
+     * @param globalRatelimiter          The ratelimiter used for global ratelimits.
+     * @param gatewayIdentifyRatelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
+     * @param proxySelector              The proxy selector which should be used to determine the proxies that
+     *                                   should be used
+     *                                   to connect to the Discord REST API and websocket.
+     * @param proxy                      The proxy which should be used to connect to the Discord REST API and
+     *                                   websocket.
+     * @param proxyAuthenticator         The authenticator that should be used to authenticate against proxies that
+     *                                   require it.
+     * @param trustAllCertificates       Whether to trust all SSL certificates.
      */
     public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, Ratelimiter gatewayIdentifyRatelimiter,
                           ProxySelector proxySelector, Proxy proxy, Authenticator proxyAuthenticator,
                           boolean trustAllCertificates) {
-        this(AccountType.BOT, token, 0, 1, Collections.emptySet(), true, false, globalRatelimiter,
+        this(token, 0, 1, Collections.emptySet(), true, false, globalRatelimiter,
                 gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
     }
 
     /**
      * Creates a new discord api instance.
      *
-     * @param accountType                   The account type of the instance.
-     * @param token                         The token used to connect without any account type specific prefix.
-     * @param currentShard                  The current shard the bot should connect to.
-     * @param totalShards                   The total amount of shards.
-     * @param intents                       The intents for the events which should be received.
-     * @param waitForServersOnStartup       Whether Javacord should wait for all servers
-     *                                      to become available on startup or not.
-     * @param waitForUsersOnStartup         Whether Javacord should wait for all users
-     *                                      to become available on startup or not.
-     * @param globalRatelimiter             The ratelimiter used for global ratelimits.
-     * @param gatewayIdentifyRatelimiter    The ratelimiter used to respect the 5 second gateway identify ratelimit.
-     * @param proxySelector                 The proxy selector which should be used to determine the proxies that
-     *                                      should be used to connect to the Discord REST API and websocket.
-     * @param proxy                         The proxy which should be used to connect to the Discord REST API and
-     *                                      websocket.
-     * @param proxyAuthenticator            The authenticator that should be used to authenticate against proxies that
-     *                                      require it.
-     * @param trustAllCertificates           Whether to trust all SSL certificates.
-     * @param ready                         The future which will be completed when the connection to Discord was
-     *                                      successful.
+     * @param token                      The token used to connect without any account type specific prefix.
+     * @param currentShard               The current shard the bot should connect to.
+     * @param totalShards                The total amount of shards.
+     * @param intents                    The intents for the events which should be received.
+     * @param waitForServersOnStartup    Whether Javacord should wait for all servers
+     *                                   to become available on startup or not.
+     * @param waitForUsersOnStartup      Whether Javacord should wait for all users
+     *                                   to become available on startup or not.
+     * @param globalRatelimiter          The ratelimiter used for global ratelimits.
+     * @param gatewayIdentifyRatelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
+     * @param proxySelector              The proxy selector which should be used to determine the proxies that
+     *                                   should be used to connect to the Discord REST API and websocket.
+     * @param proxy                      The proxy which should be used to connect to the Discord REST API and
+     *                                   websocket.
+     * @param proxyAuthenticator         The authenticator that should be used to authenticate against proxies that
+     *                                   require it.
+     * @param trustAllCertificates       Whether to trust all SSL certificates.
+     * @param ready                      The future which will be completed when the connection to Discord was
+     *                                   successful.
      */
     public DiscordApiImpl(
-            AccountType accountType,
             String token,
             int currentShard,
             int totalShards,
@@ -460,39 +472,37 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready
     ) {
-        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
+        this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList());
+                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false, true);
     }
 
     /**
      * Creates a new discord api instance.
      *
-     * @param accountType                   The account type of the instance.
-     * @param token                         The token used to connect without any account type specific prefix.
-     * @param currentShard                  The current shard the bot should connect to.
-     * @param totalShards                   The total amount of shards.
-     * @param intents                       The intents for the events which should be received.
-     * @param waitForServersOnStartup       Whether Javacord should wait for all servers
-     *                                      to become available on startup or not.
-     * @param waitForUsersOnStartup         Whether Javacord should wait for all users
-     *                                      to become available on startup or not.
-     * @param globalRatelimiter             The ratelimiter used for global ratelimits.
-     * @param gatewayIdentifyRatelimiter    The ratelimiter used to respect the 5 second gateway identify ratelimit.
-     * @param proxySelector                 The proxy selector which should be used to determine the proxies that
-     *                                      should be used to connect to the Discord REST API and websocket.
-     * @param proxy                         The proxy which should be used to connect to the Discord REST API and
-     *                                      websocket.
-     * @param proxyAuthenticator            The authenticator that should be used to authenticate against proxies that
-     *                                      require it.
-     * @param trustAllCertificates           Whether to trust all SSL certificates.
-     * @param ready                         The future which will be completed when the connection to Discord was
-     *                                      successful.
-     * @param dns                           The DNS instance to use in the OkHttp client. This should only be used in
-     *                                      testing.
+     * @param token                      The token used to connect without any account type specific prefix.
+     * @param currentShard               The current shard the bot should connect to.
+     * @param totalShards                The total amount of shards.
+     * @param intents                    The intents for the events which should be received.
+     * @param waitForServersOnStartup    Whether Javacord should wait for all servers
+     *                                   to become available on startup or not.
+     * @param waitForUsersOnStartup      Whether Javacord should wait for all users
+     *                                   to become available on startup or not.
+     * @param globalRatelimiter          The ratelimiter used for global ratelimits.
+     * @param gatewayIdentifyRatelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
+     * @param proxySelector              The proxy selector which should be used to determine the proxies that
+     *                                   should be used to connect to the Discord REST API and websocket.
+     * @param proxy                      The proxy which should be used to connect to the Discord REST API and
+     *                                   websocket.
+     * @param proxyAuthenticator         The authenticator that should be used to authenticate against proxies that
+     *                                   require it.
+     * @param trustAllCertificates       Whether to trust all SSL certificates.
+     * @param ready                      The future which will be completed when the connection to Discord was
+     *                                   successful.
+     * @param dns                        The DNS instance to use in the OkHttp client. This should only be used in
+     *                                   testing.
      */
     private DiscordApiImpl(
-            AccountType accountType,
             String token,
             int currentShard,
             int totalShards,
@@ -507,42 +517,43 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
             Dns dns) {
-        this(accountType, token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
+        this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList());
+                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false, true);
     }
 
     /**
      * Creates a new discord api instance.
-     * @param accountType                   The account type of the instance.
-     * @param token                         The token used to connect without any account type specific prefix.
-     * @param currentShard                  The current shard the bot should connect to.
-     * @param totalShards                   The total amount of shards.
-     * @param intents                       The intents for the events which should be received.
-     * @param waitForServersOnStartup       Whether Javacord should wait for all servers
-     *                                      to become available on startup or not.
-     * @param waitForUsersOnStartup         Whether Javacord should wait for all users
-     *                                      to become available on startup or not.
-     * @param registerShutdownHook          Whether the shutdown hook should be registered or not.
-     * @param globalRatelimiter             The ratelimiter used for global ratelimits.
-     * @param gatewayIdentifyRatelimiter    The ratelimiter used to respect the 5 second gateway identify ratelimit.
-     * @param proxySelector                 The proxy selector which should be used to determine the proxies that
-     *                                      should be used to connect to the Discord REST API and websocket.
-     * @param proxy                         The proxy which should be used to connect to the Discord REST API and
-     *                                      websocket.
-     * @param proxyAuthenticator            The authenticator that should be used to authenticate against proxies that
-     *                                      require it.
-     * @param trustAllCertificates           Whether to trust all SSL certificates.
-     * @param ready                         The future which will be completed when the connection to Discord was
-     *                                      successful.
-     * @param dns                           The DNS instance to use in the OkHttp client. This should only be used in
-     *                                      testing.
-     * @param listenerSourceMap             The functions to create listeners for pre-registration.
-     * @param unspecifiedListeners           The listeners of unspecified types to pre-register.
+     *
+     * @param token                      The token used to connect without any account type specific prefix.
+     * @param currentShard               The current shard the bot should connect to.
+     * @param totalShards                The total amount of shards.
+     * @param intents                    The intents for the events which should be received.
+     * @param waitForServersOnStartup    Whether Javacord should wait for all servers
+     *                                   to become available on startup or not.
+     * @param waitForUsersOnStartup      Whether Javacord should wait for all users
+     *                                   to become available on startup or not.
+     * @param registerShutdownHook       Whether the shutdown hook should be registered or not.
+     * @param globalRatelimiter          The ratelimiter used for global ratelimits.
+     * @param gatewayIdentifyRatelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
+     * @param proxySelector              The proxy selector which should be used to determine the proxies that
+     *                                   should be used to connect to the Discord REST API and websocket.
+     * @param proxy                      The proxy which should be used to connect to the Discord REST API and
+     *                                   websocket.
+     * @param proxyAuthenticator         The authenticator that should be used to authenticate against proxies that
+     *                                   require it.
+     * @param trustAllCertificates       Whether to trust all SSL certificates.
+     * @param ready                      The future which will be completed when the connection to Discord was
+     *                                   successful.
+     * @param dns                        The DNS instance to use in the OkHttp client. This should only be used in
+     *                                   testing.
+     * @param listenerSourceMap          The functions to create listeners for pre-registration.
+     * @param unspecifiedListeners       The listeners of unspecified types to pre-register.
+     * @param userCacheEnabled           Whether the user cache should be enabled.
+     * @param dispatchEvents             Whether events can be dispatched.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
-            AccountType accountType,
             String token,
             int currentShard,
             int totalShards,
@@ -559,10 +570,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             CompletableFuture<DiscordApi> ready,
             Dns dns,
             Map<Class<? extends GloballyAttachableListener>,
-                    List<Function<DiscordApi,GloballyAttachableListener>>
+                    List<Function<DiscordApi, GloballyAttachableListener>>
                     > listenerSourceMap,
-            List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners) {
-        this.accountType = accountType;
+            List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners,
+            boolean userCacheEnabled,
+            boolean dispatchEvents
+    ) {
         this.token = token;
         this.currentShard = currentShard;
         this.totalShards = totalShards;
@@ -574,10 +587,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.proxy = proxy;
         this.proxyAuthenticator = proxyAuthenticator;
         this.trustAllCertificates = trustAllCertificates;
-        this.intents = intents;
-        userCacheEnabled = intents.contains(Intent.GUILD_MEMBERS);
+        this.userCacheEnabled = userCacheEnabled;
+        this.dispatchEvents = dispatchEvents;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
+        //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
+        this.intents = Stream.concat(intents.stream(), Stream.of(Intent.GUILDS)).collect(Collectors.toSet());
 
         if ((proxySelector != null) && (proxy != null)) {
             throw new IllegalStateException("proxy and proxySelector must not be configured both");
@@ -625,25 +640,21 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                                                 = (Class<GloballyAttachableListener>) clazz;
                                         GloballyAttachableListener listener = listenerSource.apply(this);
                                         addListener(type, type.cast(listener));
-                                    }
-                            ));
+                                    }));
                             unspecifiedListeners.stream()
                                     .map(source -> source.apply(this))
                                     .forEach(this::addListener);
                             // Application information
-                            if (accountType == AccountType.BOT) {
-                                getApplicationInfo().whenComplete((applicationInfo, exception) -> {
-                                    if (exception != null) {
-                                        logger.error("Could not access self application info on startup!", exception);
-                                    } else {
-                                        clientId = applicationInfo.getClientId();
-                                        ownerId = applicationInfo.getOwnerId();
-                                    }
+                            requestApplicationInfo().whenComplete((applicationInfo, exception) -> {
+                                if (exception != null) {
+                                    logger.error("Could not access self application info on startup!", exception);
+                                    threadPool.shutdown();
+                                    ready.completeExceptionally(exception);
+                                } else {
+                                    this.applicationInfo = applicationInfo;
                                     ready.complete(this);
-                                });
-                            } else {
-                                ready.complete(this);
-                            }
+                                }
+                            });
                         } else {
                             threadPool.shutdown();
                             ready.completeExceptionally(
@@ -660,6 +671,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
             // After minimum JDK 9 is required this can be switched to use a Cleaner
             getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+                messageCacheLock.lock();
                 try {
                     for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
                             messageRef != null;
@@ -671,6 +683,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     }
                 } catch (Throwable t) {
                     logger.error("Failed to process messages cleanup queue!", t);
+                } finally {
+                    messageCacheLock.unlock();
                 }
             }, 30, 30, TimeUnit.SECONDS);
 
@@ -705,10 +719,20 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Checks if the user cache is enabled.
      *
-     * @return Whetehr or not teh user cache is enabled.
+     * @return Whether the user cache is enabled.
      */
     public boolean hasUserCacheEnabled() {
         return userCacheEnabled;
+    }
+
+    @Override
+    public void setEventsDispatchable(boolean dispatchEvents) {
+        this.dispatchEvents = dispatchEvents;
+    }
+
+    @Override
+    public boolean canDispatchEvents() {
+        return dispatchEvents;
     }
 
     /**
@@ -717,7 +741,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @return The used http client.
      */
     public OkHttpClient getHttpClient() {
-        if (disconnectCalled) {
+        if (disconnectFuture.get() != null) {
             throw new IllegalStateException("disconnect was called already");
         }
         return httpClient;
@@ -766,8 +790,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         entityCache.set(JavacordEntityCache.empty());
         unavailableServers.clear();
         customEmojis.clear();
-        messages.clear();
-        messageIdByRef.clear();
+        messageCacheLock.lock();
+        try {
+            messages.clear();
+            messageIdByRef.clear();
+        } finally {
+            messageCacheLock.unlock();
+        }
         timeOffset = null;
     }
 
@@ -784,7 +813,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Sets the audio connection for the server with the given id.
      *
-     * @param serverId The server id.
+     * @param serverId   The server id.
      * @param connection The audio connection.
      */
     public void setAudioConnection(long serverId, AudioConnectionImpl connection) {
@@ -813,7 +842,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Sets the audio pending connection for the server with the given id.
      *
-     * @param serverId The server id.
+     * @param serverId   The server id.
      * @param connection The pending audio connection.
      */
     public void setPendingAudioConnection(long serverId, AudioConnectionImpl connection) {
@@ -830,9 +859,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Gets a collection with all servers, including ready and not ready ones.
+     * Gets all servers, including ready and not ready ones.
      *
-     * @return A collection with all servers.
+     * @return All servers.
      */
     public Collection<Server> getAllServers() {
         ArrayList<Server> allServers = new ArrayList<>(nonReadyServers.values());
@@ -841,7 +870,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Gets a server by it's id, including ready and not ready ones.
+     * Gets a server by its id, including ready and not ready ones.
      *
      * @param id The of the server.
      * @return The server with the given id.
@@ -927,6 +956,19 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             if (channel == null) {
                 return cache;
             }
+
+            //Remove all ServerThreadChannels when the parent channel is removed
+            channel.asServerChannel().ifPresent(serverChannel -> {
+                if (serverChannel.asServerThreadChannel().isPresent()) {
+                    return;
+                }
+
+                serverChannel.getServer().getThreadChannels().stream()
+                        .filter(c -> c.getParent().getId() == serverChannel.getId())
+                        .mapToLong(DiscordEntity::getId)
+                        .forEach(this::removeChannelFromCache);
+            });
+
             if (channel instanceof Cleanupable) {
                 ((Cleanupable) channel).cleanup();
             }
@@ -940,6 +982,9 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param member The member to add.
      */
     public void addMemberToCacheOrReplaceExisting(Member member) {
+        if (!isUserCacheEnabled()) {
+            return;
+        }
         entityCache.getAndUpdate(cache -> {
             Member oldMember = cache.getMemberCache()
                     .getMemberByIdAndServer(member.getId(), member.getServer().getId())
@@ -954,7 +999,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param user The new user object.
      */
     public void updateUserOfAllMembers(User user) {
-        entityCache.getAndUpdate(cache ->  {
+        entityCache.getAndUpdate(cache -> {
             JavacordEntityCache newCache = cache;
             for (Member member : cache.getMemberCache().getMembersById(user.getId())) {
                 newCache = newCache.updateMemberCache(memberCache -> memberCache
@@ -1001,7 +1046,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Gets the latest gateway latency in nano seconds.
+     * Gets the latest gateway latency in nanoseconds.
      *
      * @return The latest gateway latency.
      */
@@ -1010,7 +1055,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
-     * Sets the latest gateway latency in nano seconds.
+     * Sets the latest gateway latency in nanoseconds.
      *
      * @param latestGatewayLatencyNanos The latest gateway latency.
      */
@@ -1050,7 +1095,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Gets or creates a new known custom emoji object.
      *
      * @param server The server of the emoji.
-     * @param data The data of the emoji.
+     * @param data   The data of the emoji.
      * @return The emoji for the given json object.
      */
     public KnownCustomEmoji getOrCreateKnownCustomEmoji(Server server, JsonNode data) {
@@ -1073,11 +1118,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Gets a known custom emoji or creates a new (unknown) custom emoji object.
      *
-     * @param id The id of the emoji.
-     * @param name The name of the emoji.
+     * @param id       The id of the emoji.
+     * @param name     The name of the emoji.
      * @param animated Whether the emoji is animated or not.
      * @return The emoji for the given json object.
      */
+    @Override
     public CustomEmoji getKnownCustomEmojiOrCreateCustomEmoji(long id, String name, boolean animated) {
         CustomEmoji emoji = customEmojis.get(id);
         return emoji == null ? new CustomEmojiImpl(this, id, name, animated) : emoji;
@@ -1093,16 +1139,51 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     /**
+     * Gets or creates a new sticker object.
+     *
+     * @param data The json data of the sticker.
+     * @return The created sticker.
+     */
+    public Sticker getOrCreateSticker(JsonNode data) {
+        long id = data.get("id").asLong();
+        return stickers.computeIfAbsent(id, key -> new StickerImpl(this, data));
+    }
+
+    /**
+     * Removes a sticker object.
+     *
+     * @param sticker The sticker to remove.
+     */
+    public void removeSticker(Sticker sticker) {
+        stickers.remove(sticker.getId());
+    }
+
+    @Override
+    public Optional<Sticker> getStickerById(long id) {
+        return Optional.ofNullable(stickers.get(id));
+    }
+
+    @Override
+    public CompletableFuture<Sticker> requestStickerById(long id) {
+        return new RestRequest<Sticker>(this, RestMethod.GET, RestEndpoint.STICKER)
+                .setUrlParameters(String.valueOf(id))
+                .execute(result -> new StickerImpl(this, result.getJsonBody()));
+    }
+
+    /**
      * Gets or creates a new message object.
      *
      * @param channel The channel of the message.
-     * @param data The data of the message.
+     * @param data    The data of the message.
      * @return The message for the given json object.
      */
     public Message getOrCreateMessage(TextChannel channel, JsonNode data) {
         long id = Long.parseLong(data.get("id").asText());
-        synchronized (messages) {
+        messageCacheLock.lock();
+        try {
             return getCachedMessageById(id).orElseGet(() -> new MessageImpl(this, channel, data));
+        } finally {
+            messageCacheLock.unlock();
         }
     }
 
@@ -1112,14 +1193,19 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param message The message to add.
      */
     public void addMessageToCache(Message message) {
-        messages.compute(message.getId(), (key, value) -> {
-            if ((value == null) || (value.get() == null)) {
-                WeakReference<Message> result = new WeakReference<>(message, messagesCleanupQueue);
-                messageIdByRef.put(result, key);
-                return result;
-            }
-            return value;
-        });
+        messageCacheLock.lock();
+        try {
+            messages.compute(message.getId(), (key, value) -> {
+                if ((value == null) || (value.get() == null)) {
+                    WeakReference<Message> result = new WeakReference<>(message, messagesCleanupQueue);
+                    messageIdByRef.put(result, key);
+                    return result;
+                }
+                return value;
+            });
+        } finally {
+            messageCacheLock.unlock();
+        }
     }
 
     /**
@@ -1128,9 +1214,14 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param messageId The id of the message to remove.
      */
     public void removeMessageFromCache(long messageId) {
-        WeakReference<Message> messageRef = messages.remove(messageId);
-        if (messageRef != null) {
-            messageIdByRef.remove(messageRef, messageId);
+        messageCacheLock.lock();
+        try {
+            WeakReference<Message> messageRef = messages.remove(messageId);
+            if (messageRef != null) {
+                messageIdByRef.remove(messageRef, messageId);
+            }
+        } finally {
+            messageCacheLock.unlock();
         }
     }
 
@@ -1140,11 +1231,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * and return the same listener manager on each invocation.
      * The order of invocation is according to first addition.
      *
-     * @param objectClass The class of the object.
-     * @param objectId The id of the object.
+     * @param objectClass   The class of the object.
+     * @param objectId      The id of the object.
      * @param listenerClass The listener class.
-     * @param listener The listener to add.
-     * @param <T> The type of the listener.
+     * @param listener      The listener to add.
+     * @param <T>           The type of the listener.
      * @return The manager for the added listener.
      */
     @SuppressWarnings("unchecked")
@@ -1162,11 +1253,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Removes an object listener.
      *
-     * @param objectClass The class of the object.
-     * @param objectId The id of the object.
+     * @param objectClass   The class of the object.
+     * @param objectId      The id of the object.
      * @param listenerClass The listener class.
-     * @param listener The listener to remove.
-     * @param <T> The type of the listener.
+     * @param listener      The listener to remove.
+     * @param <T>           The type of the listener.
      */
     public <T extends ObjectAttachableListener> void removeObjectListener(
             Class<?> objectClass, long objectId, Class<T> listenerClass, T listener) {
@@ -1213,7 +1304,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Remove all listeners attached to an object.
      *
      * @param objectClass The class of the object.
-     * @param objectId The id of the object.
+     * @param objectId    The id of the object.
      */
     public void removeObjectListeners(Class<?> objectClass, long objectId) {
         if (objectClass == null) {
@@ -1246,10 +1337,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * assigned listener classes they listen to.
      *
      * @param objectClass The class of the object.
-     * @param objectId The id of the object.
-     * @param <T> The type of the listeners.
+     * @param objectId    The id of the object.
+     * @param <T>         The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and
-     *     their assigned listener classes they listen to.
+     *         their assigned listener classes they listen to.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
@@ -1267,18 +1358,18 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                                 .map(listener -> new SimpleEntry<>((T) listener, (Class<T>) entry.getKey()))))
                 .map(entryStream -> entryStream
                         .collect(Collectors.groupingBy(Entry::getKey,
-                                                       Collectors.mapping(Entry::getValue, Collectors.toList()))))
+                                Collectors.mapping(Entry::getValue, Collectors.toList()))))
                 .orElseGet(HashMap::new));
     }
 
     /**
      * Gets all object listeners of the given class.
      *
-     * @param objectClass The class of the object.
-     * @param objectId The id of the object.
+     * @param objectClass   The class of the object.
+     * @param objectId      The id of the object.
      * @param listenerClass The listener class.
-     * @param <T> The type of the listener.
-     * @return A list with all object listeners of the given type.
+     * @param <T>           The type of the listener.
+     * @return All object listeners of the given type.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> List<T> getObjectListeners(
@@ -1302,7 +1393,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                         .stream()
                         .map(listener -> new SimpleEntry<>((T) listener, (Class<T>) entry.getKey())))
                 .collect(Collectors.groupingBy(Entry::getKey,
-                                               Collectors.mapping(Entry::getValue, Collectors.toList()))));
+                        Collectors.mapping(Entry::getValue, Collectors.toList()))));
     }
 
     @Override
@@ -1317,7 +1408,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public String getPrefixedToken() {
-        return accountType.getTokenPrefix() + token;
+        return BOT_TOKEN_PREFIX + token;
     }
 
     @Override
@@ -1336,118 +1427,222 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public CompletableFuture<List<SlashCommand>> getGlobalSlashCommands() {
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
+    public CompletableFuture<Set<ApplicationCommand>> getGlobalApplicationCommands() {
+        return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getGlobalApplicationCommandById(long commandId) {
+        return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
+                .execute(result -> jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<ApplicationCommand>> getServerApplicationCommands(Server server) {
+        return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<ApplicationCommand> getServerApplicationCommandById(Server server, long commandId) {
+        return new RestRequest<ApplicationCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<SlashCommand>> getGlobalSlashCommands() {
+        return new RestRequest<Set<SlashCommand>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()))
                 .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> getGlobalSlashCommandById(long commandId) {
-        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), String.valueOf(commandId))
-                .execute(result -> new SlashCommandImpl(this, result.getJsonBody()));
+        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
+                .execute(result -> (SlashCommand) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<List<SlashCommand>> getServerSlashCommands(Server server) {
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
+    public CompletableFuture<Set<SlashCommand>> getServerSlashCommands(Server server) {
+        return new RestRequest<Set<SlashCommand>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
                 .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<SlashCommand> getServerSlashCommandById(Server server, long commandId) {
-        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SERVER_SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
-                .execute(result -> new SlashCommandImpl(this, result.getJsonBody()));
+        return new RestRequest<SlashCommand>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> (SlashCommand) jsonToApplicationCommand(result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<List<ServerSlashCommandPermissions>> getServerSlashCommandPermissions(
+    public CompletableFuture<Set<UserContextMenu>> getGlobalUserContextMenus() {
+        return new RestRequest<Set<UserContextMenu>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()))
+                .execute(result -> jsonToUserContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<UserContextMenu> getGlobalUserContextMenuById(long commandId) {
+        return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
+                .execute(result -> (UserContextMenu) jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<UserContextMenu>> getServerUserContextMenus(Server server) {
+        return new RestRequest<Set<UserContextMenu>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
+                .execute(result -> jsonToUserContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<UserContextMenu> getServerUserContextMenuById(Server server, long commandId) {
+        return new RestRequest<UserContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> (UserContextMenu) jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<MessageContextMenu>> getGlobalMessageContextMenus() {
+        return new RestRequest<Set<MessageContextMenu>>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()))
+                .execute(result -> jsonToMessageContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<MessageContextMenu> getGlobalMessageContextMenuById(long commandId) {
+        return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(commandId))
+                .execute(result -> (MessageContextMenu) jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<MessageContextMenu>> getServerMessageContextMenus(Server server) {
+        return new RestRequest<Set<MessageContextMenu>>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
+                .execute(result -> jsonToMessageContextMenuList(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<MessageContextMenu> getServerMessageContextMenuById(Server server, long commandId) {
+        return new RestRequest<MessageContextMenu>(this, RestMethod.GET, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> (MessageContextMenu) jsonToApplicationCommand(result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<ServerApplicationCommandPermissions>> getServerApplicationCommandPermissions(
             Server server) {
-        return new RestRequest<List<ServerSlashCommandPermissions>>(this, RestMethod.GET,
-                RestEndpoint.SERVER_SLASH_COMMAND_PERMISSIONS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
-                .execute(result -> jsonToServerSlashCommandPermissionsList(result.getJsonBody()));
+        return new RestRequest<Set<ServerApplicationCommandPermissions>>(this, RestMethod.GET,
+                RestEndpoint.SERVER_APPLICATION_COMMAND_PERMISSIONS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString())
+                .execute(result -> jsonToServerApplicationCommandPermissionsSet(result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<ServerSlashCommandPermissions> getServerSlashCommandPermissionsById(
+    public CompletableFuture<ServerApplicationCommandPermissions> getServerApplicationCommandPermissionsById(
             Server server, long commandId) {
-        return new RestRequest<ServerSlashCommandPermissions>(this, RestMethod.GET,
-                RestEndpoint.SLASH_COMMAND_PERMISSIONS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString(), String.valueOf(commandId))
-                .execute(result -> new ServerSlashCommandPermissionsImpl(result.getJsonBody()));
+        return new RestRequest<ServerApplicationCommandPermissions>(this, RestMethod.GET,
+                RestEndpoint.APPLICATION_COMMAND_PERMISSIONS)
+                .setUrlParameters(String.valueOf(getClientId()), server.getIdAsString(), String.valueOf(commandId))
+                .execute(result -> new ServerApplicationCommandPermissionsImpl(this, result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<List<ServerSlashCommandPermissions>> batchUpdateSlashCommandPermissions(
-            Server server, List<ServerSlashCommandPermissionsBuilder> slashCommandPermissionsBuilders) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (ServerSlashCommandPermissionsBuilder permission : slashCommandPermissionsBuilders) {
-            ObjectNode node = JsonNodeFactory.instance.objectNode();
-            node.put("id", permission.getCommandId());
-            ArrayNode array = node.putArray("permissions");
-            for (SlashCommandPermissions permissionPermission : permission.getPermissions()) {
-                array.add(((SlashCommandPermissionsImpl) permissionPermission).toJsonNode());
-            }
-            body.add(node);
-        }
-
-        return new RestRequest<List<ServerSlashCommandPermissions>>(server.getApi(), RestMethod.PUT,
-                RestEndpoint.SERVER_SLASH_COMMAND_PERMISSIONS)
-                .setUrlParameters(String.valueOf(server.getApi().getClientId()), server.getIdAsString())
-                .setBody(body)
-                .execute(result -> jsonToServerSlashCommandPermissionsList(result.getJsonBody()));
+    public CompletableFuture<Set<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(
+            Set<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
+        return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()))
+                .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
     }
 
-    private List<ServerSlashCommandPermissions> jsonToServerSlashCommandPermissionsList(
+    @Override
+    public CompletableFuture<Set<ApplicationCommand>> bulkOverwriteServerApplicationCommands(
+            long server, Set<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
+        return new RestRequest<Set<ApplicationCommand>>(this, RestMethod.PUT, RestEndpoint.SERVER_APPLICATION_COMMANDS)
+                .setUrlParameters(String.valueOf(getClientId()), String.valueOf(server))
+                .setBody(applicationCommandBuildersToArrayNode(applicationCommandBuilderList))
+                .execute(result -> jsonToApplicationCommandList(result.getJsonBody()));
+    }
+
+    //////////////////////////////////////////////
+    //Internal Application Command Utility methods
+    //////////////////////////////////////////////
+
+    private ArrayNode applicationCommandBuildersToArrayNode(
+            Set<? extends ApplicationCommandBuilder<?, ?, ?>> applicationCommandBuilderList) {
+        ArrayNode body = JsonNodeFactory.instance.arrayNode();
+        for (ApplicationCommandBuilder<?, ?, ?> applicationCommandBuilder : applicationCommandBuilderList) {
+            body.add(((ApplicationCommandBuilderDelegateImpl<?>)
+                    applicationCommandBuilder.getDelegate())
+                    .getJsonBodyForApplicationCommand());
+        }
+        return body;
+    }
+
+    private Set<ServerApplicationCommandPermissions> jsonToServerApplicationCommandPermissionsSet(
             JsonNode resultJson) {
-        List<ServerSlashCommandPermissions> permissions = new ArrayList<>();
+        Set<ServerApplicationCommandPermissions> permissions = new HashSet<>();
         for (JsonNode jsonNode : resultJson) {
-            permissions.add(new ServerSlashCommandPermissionsImpl(jsonNode));
+            permissions.add(new ServerApplicationCommandPermissionsImpl(this, jsonNode));
         }
         return permissions;
     }
 
-    private List<SlashCommand> jsonToSlashCommandList(JsonNode resultJson) {
-        List<SlashCommand> slashCommands = new ArrayList<>();
-        for (JsonNode slashCommandJson : resultJson) {
-            slashCommands.add(new SlashCommandImpl(this, slashCommandJson));
+    private Set<ApplicationCommand> jsonToApplicationCommandList(JsonNode resultJson) {
+        Set<ApplicationCommand> applicationCommands = new HashSet<>();
+        for (JsonNode applicationCommandJson : resultJson) {
+            applicationCommands.add(jsonToApplicationCommand(applicationCommandJson));
         }
-        return Collections.unmodifiableList(slashCommands);
+        return Collections.unmodifiableSet(applicationCommands);
     }
 
-    @Override
-    public CompletableFuture<List<SlashCommand>> bulkOverwriteGlobalSlashCommands(
-            List<SlashCommandBuilder> slashCommandBuilderList) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (SlashCommandBuilder slashCommandBuilder : slashCommandBuilderList) {
-            body.add(((SlashCommandBuilderDelegateImpl) slashCommandBuilder.getDelegate())
-                    .getJsonBodyForSlashCommand());
+    private ApplicationCommand jsonToApplicationCommand(JsonNode applicationCommandJson) {
+        ApplicationCommandType type = ApplicationCommandType.fromValue(applicationCommandJson.get("type").asInt());
+        if (type == ApplicationCommandType.SLASH) {
+            return new SlashCommandImpl(this, applicationCommandJson);
+        } else if (type == ApplicationCommandType.USER) {
+            return new UserContextMenuImpl(this, applicationCommandJson);
+        } else if (type == ApplicationCommandType.MESSAGE) {
+            return new MessageContextMenuImpl(this, applicationCommandJson);
+        } else {
+            return new ApplicationCommandImpl(this, applicationCommandJson) {
+                @Override
+                public ApplicationCommandType getType() {
+                    return ApplicationCommandType.APPLICATION_COMMAND;
+                }
+            };
         }
-
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.PUT, RestEndpoint.SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId))
-                .setBody(body)
-                .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
     }
 
-    @Override
-    public CompletableFuture<List<SlashCommand>> bulkOverwriteServerSlashCommands(
-            Server server, List<SlashCommandBuilder> slashCommandBuilderList) {
-        ArrayNode body = JsonNodeFactory.instance.arrayNode();
-        for (SlashCommandBuilder slashCommandBuilder : slashCommandBuilderList) {
-            body.add(((SlashCommandBuilderDelegateImpl) slashCommandBuilder.getDelegate())
-                    .getJsonBodyForSlashCommand());
-        }
+    private Set<SlashCommand> jsonToSlashCommandList(JsonNode resultJson) {
+        return jsonToApplicationCommandList(resultJson).stream()
+                .filter(applicationCommand -> applicationCommand.getType() == ApplicationCommandType.SLASH)
+                .map(SlashCommand.class::cast)
+                .collect(Collectors.toSet());
+    }
 
-        return new RestRequest<List<SlashCommand>>(this, RestMethod.PUT,
-                RestEndpoint.SERVER_SLASH_COMMANDS)
-                .setUrlParameters(String.valueOf(clientId), server.getIdAsString())
-                .setBody(body)
-                .execute(result -> jsonToSlashCommandList(result.getJsonBody()));
+    private Set<UserContextMenu> jsonToUserContextMenuList(JsonNode resultJson) {
+        return jsonToApplicationCommandList(resultJson).stream()
+                .filter(applicationCommand -> applicationCommand.getType() == ApplicationCommandType.USER)
+                .map(UserContextMenu.class::cast)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<MessageContextMenu> jsonToMessageContextMenuList(JsonNode resultJson) {
+        return jsonToApplicationCommandList(resultJson).stream()
+                .filter(applicationCommand -> applicationCommand.getType() == ApplicationCommandType.MESSAGE)
+                .map(MessageContextMenu.class::cast)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -1457,9 +1652,10 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     /*
      * Note: You might think the return type should be Optional<WebsocketAdapter>, because it's null till we receive
-     *       the gateway from Discord. However the DiscordApi instance is only passed to the user, AFTER we connect
+     *       the gateway from Discord. However, the DiscordApi instance is only passed to the user, AFTER we connect
      *       so for the end user it is in fact never null.
      */
+
     /**
      * Gets the websocket adapter which is used to connect to Discord.
      *
@@ -1467,11 +1663,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      */
     public DiscordWebSocketAdapter getWebSocketAdapter() {
         return websocketAdapter;
-    }
-
-    @Override
-    public AccountType getAccountType() {
-        return accountType;
     }
 
     @Override
@@ -1578,7 +1769,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * REST API and websocket.
      *
      * @return the proxy selector which should be used to determine the proxies that should be used to connect to the
-     *     Discord REST API and websocket.
+     *         Discord REST API and websocket.
      */
     public Optional<ProxySelector> getProxySelector() {
         return Optional.ofNullable(proxySelector);
@@ -1629,8 +1820,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Sets the current activity, along with type and streaming Url.
      *
-     * @param type The activity's type.
-     * @param name The name of the activity.
+     * @param type         The activity's type.
+     * @param name         The name of the activity.
      * @param streamingUrl The Url used for streaming.
      */
     private void updateActivity(ActivityType type, String name, String streamingUrl) {
@@ -1676,41 +1867,38 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public long getOwnerId() {
-        if (accountType != AccountType.BOT) {
-            throw new IllegalStateException("Cannot get owner id of non bot accounts");
-        }
-        return ownerId;
-    }
-
-    @Override
-    public long getClientId() {
-        if (accountType != AccountType.BOT) {
-            throw new IllegalStateException("Cannot get client id of non bot accounts");
-        }
-        return clientId;
-    }
-
-    @Override
-    public void disconnect() {
-        synchronized (disconnectCalledLock) {
-            if (!disconnectCalled) {
-                if (websocketAdapter == null) {
-                    // if no web socket is connected, immediately shutdown thread pool
-                    threadPool.shutdown();
-                } else {
-                    // shutdown thread pool after web socket disconnected event was dispatched
-                    addLostConnectionListener(event -> threadPool.shutdown());
-                    // disconnect web socket
-                    websocketAdapter.disconnect();
-                    // shutdown thread pool if within one minute no disconnect event was dispatched
-                    threadPool.getDaemonScheduler().schedule(threadPool::shutdown, 1, TimeUnit.MINUTES);
-                }
-                disconnectCalled = true;
-                httpClient.dispatcher().executorService().shutdown();
-                httpClient.connectionPool().evictAll();
+    public CompletableFuture<Void> disconnect() {
+        boolean doDisconnect = false;
+        synchronized (disconnectFuture) {
+            if (disconnectFuture.get() == null) {
+                disconnectFuture.set(new CompletableFuture<>());
+                doDisconnect = true;
             }
         }
+        if (doDisconnect) {
+            // Disconnect has not been called
+            if (websocketAdapter == null) {
+                // if no web socket is connected, immediately shutdown thread pool
+                threadPool.shutdown();
+                disconnectFuture.get().complete(null);
+            } else {
+                // shutdown thread pool after web socket disconnected event was dispatched
+                addLostConnectionListener(event -> {
+                    threadPool.shutdown();
+                    disconnectFuture.get().complete(null);
+                });
+                // disconnect web socket
+                websocketAdapter.disconnect();
+                // shutdown thread pool if within one minute no disconnect event was dispatched
+                threadPool.getDaemonScheduler().schedule(() -> {
+                    threadPool.shutdown();
+                    disconnectFuture.get().complete(null);
+                }, 1, TimeUnit.MINUTES);
+            }
+            httpClient.dispatcher().executorService().shutdown();
+            httpClient.connectionPool().evictAll();
+        }
+        return disconnectFuture.get();
     }
 
     @Override
@@ -1727,9 +1915,18 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public CompletableFuture<ApplicationInfo> getApplicationInfo() {
+    public ApplicationInfo getCachedApplicationInfo() {
+        return this.applicationInfo;
+    }
+
+    @Override
+    public CompletableFuture<ApplicationInfo> requestApplicationInfo() {
         return new RestRequest<ApplicationInfo>(this, RestMethod.GET, RestEndpoint.SELF_INFO)
-                .execute(result -> new ApplicationInfoImpl(this, result.getJsonBody()));
+                .execute(result -> {
+                    ApplicationInfo applicationInfo = new ApplicationInfoImpl(this, result.getJsonBody());
+                    this.applicationInfo = applicationInfo;
+                    return applicationInfo;
+                });
     }
 
     @Override
@@ -1747,8 +1944,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public Collection<Long> getUnavailableServers() {
-        return Collections.unmodifiableCollection(unavailableServers);
+    public Set<Long> getUnavailableServers() {
+        return Collections.unmodifiableSet(unavailableServers);
     }
 
     @Override
@@ -1773,7 +1970,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public Collection<User> getCachedUsers() {
+    public Set<User> getCachedUsers() {
         return getEntityCache().get().getMemberCache().getUserCache().getUsers();
     }
 
@@ -1787,17 +1984,20 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         return getCachedUserById(id)
                 .map(CompletableFuture::completedFuture)
                 .orElseGet(() -> new RestRequest<User>(this, RestMethod.GET, RestEndpoint.USER)
-                .setUrlParameters(Long.toUnsignedString(id))
-                .execute(result -> new UserImpl(this, result.getJsonBody(), (MemberImpl) null, null)));
+                        .setUrlParameters(Long.toUnsignedString(id))
+                        .execute(result -> new UserImpl(this, result.getJsonBody(), (MemberImpl) null, null)));
     }
 
     @Override
     public MessageSet getCachedMessages() {
-        synchronized (messages) {
+        messageCacheLock.lock();
+        try {
             return new MessageSetImpl(messages.values().stream()
                     .map(Reference::get)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
+        } finally {
+            messageCacheLock.unlock();
         }
     }
 
@@ -1805,15 +2005,18 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Get messages from the cache that satisfy a given condition.
      *
      * @param filter The filter for messages to be included.
-     * @return A set of cached messages satisfying the condition.
+     * @return The cached messages satisfying the condition.
      */
     public MessageSet getCachedMessagesWhere(Predicate<Message> filter) {
-        synchronized (messages) {
+        messageCacheLock.lock();
+        try {
             return new MessageSetImpl(messages.values().stream()
                     .map(Reference::get)
                     .filter(Objects::nonNull)
                     .filter(filter)
                     .collect(Collectors.toList()));
+        } finally {
+            messageCacheLock.unlock();
         }
     }
 
@@ -1824,23 +2027,31 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param action The action to be applied to the messages.
      */
     public void forEachCachedMessageWhere(Predicate<Message> filter, Consumer<Message> action) {
-        synchronized (messages) {
+        messageCacheLock.lock();
+        try {
             messages.values().stream()
                     .map(Reference::get)
                     .filter(Objects::nonNull)
                     .filter(filter)
                     .forEach(action);
+        } finally {
+            messageCacheLock.unlock();
         }
     }
 
     @Override
     public Optional<Message> getCachedMessageById(long id) {
-        return Optional.ofNullable(messages.get(id)).map(Reference::get);
+        messageCacheLock.lock();
+        try {
+            return Optional.ofNullable(messages.get(id)).map(Reference::get);
+        } finally {
+            messageCacheLock.unlock();
+        }
     }
 
     @Override
-    public Collection<Server> getServers() {
-        return Collections.unmodifiableList(new ArrayList<>(servers.values()));
+    public Set<Server> getServers() {
+        return Collections.unmodifiableSet(new HashSet<>(servers.values()));
     }
 
     @Override
@@ -1849,8 +2060,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public Collection<KnownCustomEmoji> getCustomEmojis() {
-        return Collections.unmodifiableCollection(customEmojis.values());
+    public Set<KnownCustomEmoji> getCustomEmojis() {
+        return Collections.unmodifiableSet(new HashSet<>(customEmojis.values()));
     }
 
     @Override
@@ -1859,58 +2070,103 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public Collection<Channel> getChannels() {
+    public CompletableFuture<Set<StickerPack>> getNitroStickerPacks() {
+        return new RestRequest<Set<StickerPack>>(this, RestMethod.GET, RestEndpoint.STICKER_PACK)
+                .execute(result -> {
+                    Set<StickerPack> stickerPacks = new HashSet<>();
+                    for (JsonNode stickerPackJson : result.getJsonBody().get("sticker_packs")) {
+                        stickerPacks.add(new StickerPackImpl(this, stickerPackJson));
+                    }
+
+                    return stickerPacks;
+                });
+    }
+
+    @Override
+    public Set<Channel> getChannels() {
         return entityCache.get().getChannelCache().getChannels();
     }
 
     @Override
-    public Collection<GroupChannel> getGroupChannels() {
-        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.GROUP_CHANNEL);
-    }
-
-    @Override
-    public Collection<PrivateChannel> getPrivateChannels() {
+    public Set<PrivateChannel> getPrivateChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.PRIVATE_CHANNEL);
     }
 
     @Override
-    public Collection<ServerChannel> getServerChannels() {
+    public Set<ServerChannel> getServerChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getServerChannelTypes());
     }
 
     @Override
-    public Collection<ChannelCategory> getChannelCategories() {
+    public Set<RegularServerChannel> getRegularServerChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getRegularServerChannelTypes());
+    }
+
+    @Override
+    public Set<ChannelCategory> getChannelCategories() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.CHANNEL_CATEGORY);
     }
 
     @Override
-    public Collection<ServerTextChannel> getServerTextChannels() {
+    public Set<ServerTextChannel> getServerTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_TEXT_CHANNEL);
     }
 
     @Override
-    public Collection<ServerVoiceChannel> getServerVoiceChannels() {
+    public Set<ServerForumChannel> getServerForumChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_FORUM_CHANNEL);
+    }
+
+    @Override
+    public Set<ServerThreadChannel> getServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(
+                ChannelType.SERVER_PRIVATE_THREAD,
+                ChannelType.SERVER_PUBLIC_THREAD,
+                ChannelType.SERVER_NEWS_THREAD);
+    }
+
+    @Override
+    public Set<ServerThreadChannel> getPrivateServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PRIVATE_THREAD);
+    }
+
+    @Override
+    public Set<ServerThreadChannel> getPublicServerThreadChannels() {
+        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_PUBLIC_THREAD);
+    }
+
+    @Override
+    public Set<ServerVoiceChannel> getServerVoiceChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_VOICE_CHANNEL);
     }
 
     @Override
-    public Collection<ServerStageVoiceChannel> getServerStageVoiceChannels() {
+    public Set<ServerStageVoiceChannel> getServerStageVoiceChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.SERVER_STAGE_VOICE_CHANNEL);
     }
 
     @Override
-    public Collection<TextChannel> getTextChannels() {
+    public Set<TextChannel> getTextChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getTextChannelTypes());
     }
 
     @Override
-    public Collection<VoiceChannel> getVoiceChannels() {
+    public Set<VoiceChannel> getVoiceChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getVoiceChannelTypes());
     }
 
     @Override
     public Optional<Channel> getChannelById(long id) {
         return entityCache.get().getChannelCache().getChannelById(id);
+    }
+
+    /**
+     * Get the message cache lock.
+     *
+     * @return the message cache lock
+     */
+    public ReentrantLock getMessageCacheLock() {
+        return messageCacheLock;
     }
 
     @Override

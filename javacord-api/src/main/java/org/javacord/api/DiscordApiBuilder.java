@@ -13,7 +13,7 @@ import org.javacord.api.util.ratelimit.Ratelimiter;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -46,9 +46,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * It is invalid to call {@link #setCurrentShard(int)} with
      * anything but {@code 0} before calling this method.
      *
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    public Collection<CompletableFuture<DiscordApi>> loginAllShards() {
+    public List<CompletableFuture<DiscordApi>> loginAllShards() {
         return loginShards(shard -> true);
     }
 
@@ -58,9 +58,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * anything but {@code 0} before calling this method.
      *
      * @param shardsCondition The predicate for identifying shards to connect, starting with {@code 0}!
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    public Collection<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
+    public List<CompletableFuture<DiscordApi>> loginShards(IntPredicate shardsCondition) {
         return loginShards(IntStream.range(0, delegate.getTotalShards()).filter(shardsCondition).toArray());
     }
 
@@ -70,9 +70,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * anything but {@code 0} before calling this method.
      *
      * @param shards The shards to connect, starting with {@code 0}!
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
+    public List<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         return delegate.loginShards(shards);
     }
 
@@ -104,7 +104,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * in the same Java program.
      *
      * <p>**DO NOT** set a custom gateway identify ratelimiter unless you have to synchronize the ratelimit across
-     * multiple Java programs (running on different JVMs, VMs, phyiscal servers etc.) that run Javacord on the same
+     * multiple Java programs (running on different JVMs, VMs, physical servers etc.) that run Javacord on the same
      * bot token. The default ratelimiter will handle the ratelimit for you as long as your whole bot runs in the same
      * Java program.
      *
@@ -113,6 +113,17 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      */
     public DiscordApiBuilder setGatewayIdentifyRatelimiter(Ratelimiter ratelimiter) {
         delegate.setGatewayIdentifyRatelimiter(ratelimiter);
+        return this;
+    }
+
+    /**
+     * Sets whether this API instance can dispatch events.
+     *
+     * @param dispatchEvents Whether events can be dispatched.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setEventsDispatchable(boolean dispatchEvents) {
+        delegate.setEventsDispatchable(dispatchEvents);
         return this;
     }
 
@@ -224,29 +235,6 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      */
     public Optional<String> getToken() {
         return delegate.getToken();
-    }
-
-    /**
-     * Sets the account type.
-     * By default the builder assumes that you want to login to a bot account.
-     * Please notice, that public client bots are not allowed by Discord!
-     *
-     * @param type The account type.
-     * @return The current instance in order to chain call methods.
-     */
-    public DiscordApiBuilder setAccountType(AccountType type) {
-        delegate.setAccountType(type);
-        return this;
-    }
-
-    /**
-     * Gets the account type.
-     *
-     * @return The account type.
-     * @see #setAccountType(AccountType)
-     */
-    public AccountType getAccountType() {
-        return delegate.getAccountType();
     }
 
     /**
@@ -395,7 +383,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
-     * Sets all non privileged intents.
+     * Sets all non-privileged intents.
      *
      * <p>This is the default behavior if no intents are set in the builder.
      *
@@ -429,6 +417,29 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets all non-privileged intents and the given intents.
+     *
+     * @param intentsToInclude One or more {@code Intent}s which should be included.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setAllNonPrivilegedIntentsAnd(Intent... intentsToInclude) {
+        setAllIntentsWhere(intent -> !intent.isPrivileged());
+        addIntents(intentsToInclude);
+        return this;
+    }
+
+    /**
+     * Adds the given intents to the already set.
+     *
+     * @param intents The intents to add.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder addIntents(Intent... intents) {
+        delegate.addIntents(intents);
+        return this;
+    }
+
+    /**
      * Sets the intents where the given predicate matches.
      *
      * @param condition Whether the intent should be added or not.
@@ -437,6 +448,28 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     public DiscordApiBuilder setAllIntentsWhere(Predicate<Intent> condition) {
         delegate.setAllIntentsWhere(condition);
         return this;
+    }
+
+    /**
+     * Sets whether the user cache should be enabled.
+     *
+     * <p>By default, the user cache is disabled.
+     *
+     * @param enabled Whether the user cache should be enabled.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setUserCacheEnabled(boolean enabled) {
+        delegate.setUserCacheEnabled(enabled);
+        return this;
+    }
+
+    /**
+     * Gets whether the user cache is enabled.
+     *
+     * @return Whether the user cache is enabled.
+     */
+    public boolean isUserCachedEnabled() {
+        return delegate.isUserCacheEnabled();
     }
 
     /**

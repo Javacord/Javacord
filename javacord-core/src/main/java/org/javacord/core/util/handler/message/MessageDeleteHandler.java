@@ -9,6 +9,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageDeleteEvent;
 import org.javacord.core.event.message.MessageDeleteEventImpl;
+import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -44,6 +45,8 @@ public class MessageDeleteHandler extends PacketHandler {
             TextChannel channel = optionalChannel.get();
             MessageDeleteEvent event = new MessageDeleteEventImpl(api, messageId, channel);
 
+            api.getCachedMessageById(messageId)
+                    .ifPresent(((MessageCacheImpl) channel.getMessageCache())::removeMessage);
             api.removeMessageFromCache(messageId);
 
             Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);

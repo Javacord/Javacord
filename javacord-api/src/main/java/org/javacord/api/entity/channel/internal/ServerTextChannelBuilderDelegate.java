@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link ServerTextChannelBuilder} to create server text channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerTextChannelBuilderDelegate extends ServerChannelBuilderDelegate {
+public interface ServerTextChannelBuilderDelegate extends RegularServerChannelBuilderDelegate {
 
     /**
      * Sets the topic of the channel.

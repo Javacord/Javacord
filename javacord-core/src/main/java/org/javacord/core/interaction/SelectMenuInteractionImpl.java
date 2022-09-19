@@ -37,7 +37,8 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
 
         for (JsonNode actionRow : componentsObject) {
             for (JsonNode interaction : actionRow.get("components")) {
-                if (interaction.get("custom_id").asText().equals(dataObject.get("custom_id").asText())) {
+                if (ComponentType.fromId(interaction.get("type").asInt()) == ComponentType.SELECT_MENU
+                        && interaction.get("custom_id").asText().equals(dataObject.get("custom_id").asText())) {
                     placeholder = interaction.has("placeholder") ? interaction.get("placeholder").asText() : null;
                     maximumValues = interaction.has("max_value") ? interaction.get("max_value").asInt() : 1;
                     minimumValues = interaction.has("min_value") ? interaction.get("min_values").asInt() : 1;

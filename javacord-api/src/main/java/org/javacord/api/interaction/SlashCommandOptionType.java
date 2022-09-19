@@ -5,12 +5,21 @@ public enum SlashCommandOptionType {
     SUB_COMMAND(1),
     SUB_COMMAND_GROUP(2),
     STRING(3),
-    INTEGER(4),
+    /**
+     * This is implemented as a long because it can be any integer between -2^53 and 2^53 and
+     * therefore exceeds Javas Integer range. This is the INTEGER option according to the Discord docs.
+     */
+    LONG(4),
     BOOLEAN(5),
     USER(6),
     CHANNEL(7),
     ROLE(8),
     MENTIONABLE(9),
+    /**
+     * Any double between -2^53 and 2^53. This is the NUMBER option according to the Discord docs.
+     */
+    DECIMAL(10),
+    ATTACHMENT(11),
     UNKNOWN(-1);
 
     private final int value;

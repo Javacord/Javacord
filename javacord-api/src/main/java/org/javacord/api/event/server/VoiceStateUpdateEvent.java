@@ -4,7 +4,7 @@ import org.javacord.api.event.channel.server.voice.ServerVoiceChannelEvent;
 
 /**
  * A voice state update event.
- * Provided only for the current logged in user.
+ * Provided only for the current logged-in user.
  */
 public interface VoiceStateUpdateEvent extends ServerVoiceChannelEvent {
 

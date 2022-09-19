@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The implementation of {@link ChannelCategoryBuilderDelegate}.
  */
-public class ChannelCategoryBuilderDelegateImpl extends ServerChannelBuilderDelegateImpl
+public class ChannelCategoryBuilderDelegateImpl extends RegularServerChannelBuilderDelegateImpl
         implements ChannelCategoryBuilderDelegate {
 
     /**

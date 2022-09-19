@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
 import org.javacord.api.interaction.InteractionBase;
 import org.javacord.api.interaction.MessageComponentInteraction;
@@ -13,14 +14,13 @@ import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 
-public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegateImpl
+public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDelegateImpl
         implements InteractionMessageBuilderDelegate {
 
     /**
@@ -43,6 +43,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .setBody(topBody)
                 .execute(result -> null);
     }
@@ -52,6 +54,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.DELETE, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .execute(result -> null);
     }
 
@@ -59,7 +63,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
     public CompletableFuture<Message> editOriginalResponse(InteractionBase interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.PATCH, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
-                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
+                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false);
 
         return executeResponse(request);
     }
@@ -68,7 +74,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
     public CompletableFuture<Message> sendFollowupMessage(InteractionBase interaction) {
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.WEBHOOK_SEND)
-                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken());
+                .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false);
 
         return executeResponse(request);
     }
@@ -85,6 +93,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
                 .setUrlParameters(interaction.getIdAsString(), interaction.getToken())
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .setBody(topBody)
                 .execute(result -> null);
     }
@@ -95,6 +105,8 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
                 RestEndpoint.WEBHOOK_MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
                         interaction.getToken(), messageId)
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false)
                 .execute(result -> null);
     }
 
@@ -103,7 +115,9 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
         RestRequest<Message> request = new RestRequest<Message>(interaction.getApi(), RestMethod.PATCH,
                 RestEndpoint.WEBHOOK_MESSAGE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()),
-                        interaction.getToken(), messageId);
+                        interaction.getToken(), messageId)
+                .consumeGlobalRatelimit(false)
+                .includeAuthorizationHeader(false);
 
         return executeResponse(request);
     }
@@ -111,7 +125,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
     @Override
     public void copy(InteractionBase interaction) {
         ((InteractionImpl) interaction).asMessageComponentInteraction()
-                .flatMap(MessageComponentInteraction::getMessage)
+                .map(MessageComponentInteraction::getMessage)
                 .ifPresent(this::copy);
     }
 
@@ -126,22 +140,23 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
         prepareCommonWebhookMessageBodyParts(body);
         prepareComponents(body, true);
         if (null != messageFlags) {
-            body.put("flags", messageFlags.stream().mapToInt(MessageFlag::getId).sum());
+            body.put("flags", messageFlags.stream()
+                    .mapToInt(MessageFlag::getId).sum());
         }
     }
 
     private CompletableFuture<Message> checkForAttachmentsAndExecuteRequest(RestRequest<Message> request,
                                                                             ObjectNode body) {
-        if (!attachments.isEmpty() || (embeds.size() > 0 && embeds.get(0).requiresAttachments())) {
+        if (!newAttachments.isEmpty() || embeds.stream().anyMatch(EmbedBuilder::requiresAttachments)) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             // We access files etc. so this should be async
             request.getApi().getThreadPool().getExecutorService().submit(() -> {
                 try {
-                    List<FileContainer> tempAttachments = new ArrayList<>(attachments);
+                    List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                     // Add the attachments required for the embed
-                    if (embeds.size() > 0) {
+                    for (EmbedBuilder embed : embeds) {
                         tempAttachments.addAll(
-                                ((EmbedBuilderDelegateImpl) embeds.get(0).getDelegate()).getRequiredAttachments());
+                                ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
                     }
 
                     addMultipartBodyToRequest(request, body, tempAttachments, request.getApi());
@@ -149,7 +164,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderDelegat
                     request.execute(result -> request.getApi().getOrCreateMessage(
                             request.getApi().getTextChannelById(result.getJsonBody().get("channel_id").asLong())
                                     .orElseThrow(() -> new NoSuchElementException("TextChannel is not cached")),
-                            result.getJsonBody()))
+                                    result.getJsonBody()))
                             .whenComplete((message, throwable) -> {
                                 if (throwable != null) {
                                     future.completeExceptionally(throwable);

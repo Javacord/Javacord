@@ -76,19 +76,19 @@ public class EmbedThumbnailImpl implements EmbedThumbnail {
     public int getWidth() {
         return width;
     }
-    
+
     @Override
-    public CompletableFuture<BufferedImage> downloadAsBufferedImage(DiscordApi api) {
+    public CompletableFuture<BufferedImage> asBufferedImage(DiscordApi api) {
         return new FileContainer(getUrl()).asBufferedImage(api);
     }
 
     @Override
-    public CompletableFuture<byte[]> downloadAsByteArray(DiscordApi api) {
+    public CompletableFuture<byte[]> asByteArray(DiscordApi api) {
         return new FileContainer(getUrl()).asByteArray(api);
     }
 
     @Override
-    public InputStream downloadAsInputStream(DiscordApi api) throws IOException {
+    public InputStream asInputStream(DiscordApi api) throws IOException {
         return new FileContainer(getUrl()).asInputStream(api);
     }
 }

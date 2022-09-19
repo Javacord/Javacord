@@ -40,6 +40,12 @@ import org.javacord.core.util.handler.channel.ChannelUpdateHandler;
 import org.javacord.core.util.handler.channel.WebhooksUpdateHandler;
 import org.javacord.core.util.handler.channel.invite.InviteCreateHandler;
 import org.javacord.core.util.handler.channel.invite.InviteDeleteHandler;
+import org.javacord.core.util.handler.channel.thread.ThreadCreateHandler;
+import org.javacord.core.util.handler.channel.thread.ThreadDeleteHandler;
+import org.javacord.core.util.handler.channel.thread.ThreadListSyncHandler;
+import org.javacord.core.util.handler.channel.thread.ThreadMembersUpdateHandler;
+import org.javacord.core.util.handler.channel.thread.ThreadUpdateHandler;
+import org.javacord.core.util.handler.guild.ApplicationCommandPermissionsUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildBanAddHandler;
 import org.javacord.core.util.handler.guild.GuildBanRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildCreateHandler;
@@ -49,6 +55,7 @@ import org.javacord.core.util.handler.guild.GuildMemberAddHandler;
 import org.javacord.core.util.handler.guild.GuildMemberRemoveHandler;
 import org.javacord.core.util.handler.guild.GuildMemberUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildMembersChunkHandler;
+import org.javacord.core.util.handler.guild.GuildStickersUpdateHandler;
 import org.javacord.core.util.handler.guild.GuildUpdateHandler;
 import org.javacord.core.util.handler.guild.VoiceServerUpdateHandler;
 import org.javacord.core.util.handler.guild.VoiceStateUpdateHandler;
@@ -251,7 +258,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     }
 
                     // reserve some places for heartbeats
-                    int webSocketFrameSendingLimit = webSocketFrameSendingQueueEntry.isPriorityLifecyle()
+                    int webSocketFrameSendingLimit = webSocketFrameSendingQueueEntry.isPriorityLifecycle()
                             ? WEB_SOCKET_FRAME_SENDING_RATELIMIT
                             : this.webSocketFrameSendingLimit.get();
 
@@ -285,7 +292,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     sendTimeList.add(currentNanoTime);
                     WebSocketFrame frame = webSocketFrameSendingQueueEntry.getFrame();
                     logger.debug("Sending {}frame {}",
-                            webSocketFrameSendingQueueEntry.isPriorityLifecyle() ? "priority lifecycle " : "",
+                            webSocketFrameSendingQueueEntry.isPriorityLifecycle() ? "priority lifecycle " : "",
                             frame);
                     webSocket.sendFrame(frame);
                     webSocketFrameSendingQueueEntry = null;
@@ -709,11 +716,9 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("compress", true)
                 .put("large_threshold", 250)
                 .putObject("properties")
-                .put("$os", System.getProperty("os.name"))
-                .put("$browser", "Javacord")
-                .put("$device", "Javacord")
-                .put("$referrer", "")
-                .put("$referring_domain", "");
+                .put("os", System.getProperty("os.name"))
+                .put("browser", "Javacord")
+                .put("device", "Javacord");
 
         data.put("intents", Intent.calculateBitmask(api.getIntents().toArray(new Intent[0])));
 
@@ -798,6 +803,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         addHandler(new GuildUpdateHandler(api));
         addHandler(new VoiceServerUpdateHandler(api));
         addHandler(new VoiceStateUpdateHandler(api));
+        addHandler(new ApplicationCommandPermissionsUpdateHandler(api));
 
         // role
         addHandler(new GuildRoleCreateHandler(api));
@@ -807,12 +813,22 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         // emoji
         addHandler(new GuildEmojisUpdateHandler(api));
 
+        // sticker
+        addHandler(new GuildStickersUpdateHandler(api));
+
         // channel
         addHandler(new ChannelCreateHandler(api));
         addHandler(new ChannelDeleteHandler(api));
         addHandler(new ChannelPinsUpdateHandler(api));
         addHandler(new ChannelUpdateHandler(api));
         addHandler(new WebhooksUpdateHandler(api));
+
+        //thread
+        addHandler(new ThreadCreateHandler(api));
+        addHandler(new ThreadDeleteHandler(api));
+        addHandler(new ThreadListSyncHandler(api));
+        addHandler(new ThreadMembersUpdateHandler(api));
+        addHandler(new ThreadUpdateHandler(api));
 
         // user
         addHandler(new PresencesReplaceHandler(api));

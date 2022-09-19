@@ -17,7 +17,7 @@ public interface Authenticator {
      * <p>The return value might be {@code null} or an empty map if no headers should be modified in the request, for
      * example because no challenge can be satisfied. If the map has entries, their keys are the HTTP headers to be set,
      * the values are the header values for the key. If the first entry in the values list is {@code null}, or the whole
-     * values list is {@code null}, the given header values replace any existing values for that header. Otherwise all
+     * values list is {@code null}, the given header values replace any existing values for that header. Otherwise, all
      * header values are added additionally to eventually already existing ones.
      *
      * <i>Note:</i> It might be advisable to not return the same set of headers again if the originating request already

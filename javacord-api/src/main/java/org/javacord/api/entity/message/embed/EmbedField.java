@@ -15,9 +15,9 @@ public interface EmbedField extends Nameable {
     String getValue();
 
     /**
-     * Gets whether or not this field should display inline.
+     * Gets whether this field should display inline.
      *
-     * @return Whether or not this field should display inline.
+     * @return Whether this field should display inline.
      */
     boolean isInline();
 

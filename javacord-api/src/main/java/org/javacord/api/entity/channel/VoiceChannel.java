@@ -15,58 +15,64 @@ public interface VoiceChannel extends Channel, VoiceChannelAttachableListenerMan
 
     /**
      * Checks if the given user can connect to the voice channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can connect or not.
+     * @deprecated Use {@link ServerVoiceChannel#canConnect(User)} instead.
      */
+    @Deprecated
     default boolean canConnect(User user) {
         if (!canSee(user)) {
             return false;
         }
         Optional<ServerVoiceChannel> severVoiceChannel = asServerVoiceChannel();
         return !severVoiceChannel.isPresent()
-               || severVoiceChannel.get().hasAnyPermission(user,
-                                                          PermissionType.ADMINISTRATOR,
-                                                          PermissionType.CONNECT);
+                || severVoiceChannel.get().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.CONNECT);
     }
 
     /**
      * Checks if the user of the connected account can connect to the voice channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can connect or not.
+     * @deprecated Use {@link ServerVoiceChannel#canYouConnect()} instead.
      */
+    @Deprecated
     default boolean canYouConnect() {
         return canConnect(getApi().getYourself());
     }
 
     /**
      * Checks if the given user can mute other users in this voice channel.
-     * In private chats (private channel or group channel) this always returns <code>false</code>.
+     * In private channels this always returns <code>false</code>.
      *
      * @param user The user to check.
      * @return Whether the given user can mute other users or not.
+     * @deprecated Use {@link ServerVoiceChannel#canMuteUsers(User)} instead.
      */
+    @Deprecated
     default boolean canMuteUsers(User user) {
-        if (!canConnect(user) || getType() == ChannelType.PRIVATE_CHANNEL || getType() == ChannelType.GROUP_CHANNEL) {
+        if (!canConnect(user) || getType() == ChannelType.PRIVATE_CHANNEL) {
             return false;
         }
         Optional<ServerVoiceChannel> serverVoiceChannel = asServerVoiceChannel();
         return !serverVoiceChannel.isPresent()
-               || serverVoiceChannel.get().hasAnyPermission(user,
-                                                            PermissionType.ADMINISTRATOR,
-                                                            PermissionType.MUTE_MEMBERS);
+                || serverVoiceChannel.get().hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MUTE_MEMBERS);
     }
 
     /**
      * Checks if the user of the connected account can mute other users in this voice channel.
-     * In private chats (private channel or group channel) this always returns {@code false}.
+     * In private channels this always returns {@code false}.
      *
      * @return Whether the user of the connected account can mute other users or not.
+     * @deprecated Use {@link ServerVoiceChannel#canYouMuteUsers()} instead.
      */
+    @Deprecated
     default boolean canYouMuteUsers() {
         return canMuteUsers(getApi().getYourself());
     }

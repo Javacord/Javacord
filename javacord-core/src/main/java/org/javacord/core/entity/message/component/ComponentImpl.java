@@ -26,5 +26,10 @@ public abstract class ComponentImpl implements Component {
         return type;
     }
 
-    abstract ObjectNode toJsonNode();
+    /**
+     * Gets the Component as a {@link ObjectNode}. This is what is sent to Discord.
+     *
+     * @return The component as a ObjectNode.
+     */
+    public abstract ObjectNode toJsonNode();
 }

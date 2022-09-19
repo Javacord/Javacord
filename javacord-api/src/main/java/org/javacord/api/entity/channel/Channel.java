@@ -25,15 +25,6 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
     ChannelType getType();
 
     /**
-     * Gets the channel as group channel.
-     *
-     * @return The channel as group channel.
-     */
-    default Optional<GroupChannel> asGroupChannel() {
-        return as(GroupChannel.class);
-    }
-
-    /**
      * Gets the channel as private channel.
      *
      * @return The channel as private channel.
@@ -49,6 +40,15 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
      */
     default Optional<ServerChannel> asServerChannel() {
         return as(ServerChannel.class);
+    }
+
+    /**
+     * Gets the channel as regular server channel.
+     *
+     * @return The channel as server text channel.
+     */
+    default Optional<RegularServerChannel> asRegularServerChannel() {
+        return as(RegularServerChannel.class);
     }
 
     /**
@@ -76,6 +76,15 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
      */
     default Optional<ServerTextChannel> asServerTextChannel() {
         return as(ServerTextChannel.class);
+    }
+
+    /**
+     * Gets the channel as server forum channel.
+     *
+     * @return The channel as server forum channel.
+     */
+    default Optional<ServerForumChannel> asServerForumChannel() {
+        return as(ServerForumChannel.class);
     }
 
     /**
@@ -114,11 +123,18 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
         return as(VoiceChannel.class);
     }
 
+    /**
+     * Gets the channel as server thread channel.
+     *
+     * @return The channel as server thread channel.
+     */
+    default Optional<ServerThreadChannel> asServerThreadChannel() {
+        return as(ServerThreadChannel.class);
+    }
 
     /**
      * Checks if the given user can see this channel.
-     * In private chats (private channel or group channel) this always returns <code>true</code> if the user is
-     * part of the chat.
+     * In private channels this always returns <code>true</code> if the user is  part of the chat.
      *
      * @param user The user to check.
      * @return Whether the given user can see this channel or not.
@@ -129,21 +145,16 @@ public interface Channel extends DiscordEntity, UpdatableFromCache, ChannelAttac
             return user.isYourself() || privateChannel.get().getRecipient()
                     .map(recipient -> recipient.equals(user)).orElse(false);
         }
-        Optional<GroupChannel> groupChannel = asGroupChannel();
-        if (groupChannel.isPresent()) {
-            return user.isYourself() || groupChannel.get().getMembers().contains(user);
-        }
-        Optional<ServerChannel> severChannel = asServerChannel();
+        Optional<RegularServerChannel> severChannel = asRegularServerChannel();
         return !severChannel.isPresent()
                 || severChannel.get().hasAnyPermission(user,
                                                        PermissionType.ADMINISTRATOR,
-                                                       PermissionType.READ_MESSAGES);
+                                                       PermissionType.VIEW_CHANNEL);
     }
 
     /**
      * Checks if the user of the connected account can see this channel.
-     * In private chats (private channel or group channel) this always returns {@code true} if the user is
-     * part of the chat.
+     * In private channels this always returns {@code true} if the user is part of the chat.
      *
      * @return Whether the user of the connected account can see this channel or not.
      */

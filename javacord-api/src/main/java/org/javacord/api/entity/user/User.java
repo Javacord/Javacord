@@ -1,6 +1,5 @@
 package org.javacord.api.entity.user;
 
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.DiscordEntity;
@@ -10,7 +9,6 @@ import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.UpdatableFromCache;
 import org.javacord.api.entity.activity.Activity;
-import org.javacord.api.entity.channel.GroupChannel;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.message.Messageable;
@@ -20,9 +18,9 @@ import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.listener.user.UserAttachableListenerManager;
 
 import java.awt.Color;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -66,13 +64,31 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     boolean isBot();
 
     /**
-     * Checks if this user is the owner of the current account.
-     * Always returns <code>false</code> if logged in to a user account.
+     * Checks if this user is the owner of the current account or the current account's team.
      *
      * @return Whether this user is the owner of the current account.
      */
     default boolean isBotOwner() {
-        return getApi().getAccountType() == AccountType.BOT && getApi().getOwnerId() == getId();
+        return getApi().getOwnerId().isPresent() && getApi().getOwnerId().get() == getId();
+    }
+
+    /**
+     * Checks if this user is a member of the team of the current account.
+     *
+     * @return Whether this user is a member of the team of the current account.
+     */
+    default boolean isTeamMember() {
+        return getApi().getCachedTeam().map(team -> team.getOwnerId() == getId()
+                || team.getTeamMembers().stream().anyMatch(teamMember -> teamMember.getId() == getId())).orElse(false);
+    }
+
+    /**
+     * Checks if this user is the owner or a member of the team of the current account.
+     *
+     * @return Whether this user is the owner or a member of the team of the current account.
+     */
+    default boolean isBotOwnerOrTeamMember() {
+        return isBotOwner() || isTeamMember();
     }
 
     /**
@@ -97,10 +113,10 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @return The server voice channels the user is connected to.
      */
-    default Collection<ServerVoiceChannel> getConnectedVoiceChannels() {
-        return Collections.unmodifiableCollection(getApi().getServerVoiceChannels().stream()
+    default Set<ServerVoiceChannel> getConnectedVoiceChannels() {
+        return Collections.unmodifiableSet(getApi().getServerVoiceChannels().stream()
                 .filter(this::isConnected)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toSet()));
     }
 
     /**
@@ -151,7 +167,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getStatusOnClient(DiscordClient)
      */
     default UserStatus getDesktopStatus() {
@@ -163,7 +179,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getStatusOnClient(DiscordClient)
      */
     default UserStatus getMobileStatus() {
@@ -175,7 +191,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * <p>This will return {@link UserStatus#OFFLINE} for invisible users.
      *
-     * @return The status of the the user.
+     * @return The status of the user.
      * @see #getStatusOnClient(DiscordClient)
      */
     default UserStatus getWebStatus() {
@@ -185,7 +201,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Gets all clients of the user that are not {@link UserStatus#OFFLINE offline}.
      *
-     * @return A set with the clients.
+     * @return The DiscordClients.
      * @see #getStatusOnClient(DiscordClient)
      */
     default Set<DiscordClient> getCurrentClients() {
@@ -204,11 +220,72 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     EnumSet<UserFlag> getUserFlags();
 
     /**
+     * Gets the avatar hash of the user.
+     *
+     * @return The avatar hash.
+     */
+    Optional<String> getAvatarHash();
+
+    /**
      * Gets the avatar of the user.
      *
      * @return The avatar of the user.
      */
     Icon getAvatar();
+
+    /**
+     * Gets the avatar of the user.
+     *
+     * @param size the size of the image. must be any power of 2 between 16 and 4096
+     * @return The avatar of the user.
+     */
+    Icon getAvatar(int size);
+
+    /**
+     * Gets the member's server avatar hash.
+     *
+     * @param server The server.
+     * @return The member's server avatar hash.
+     */
+    Optional<String> getServerAvatarHash(Server server);
+
+    /**
+     * Gets the user's server-specific avatar in the given server.
+     *
+     * @param server The server.
+     * @return The user's avatar in the server
+     */
+    Optional<Icon> getServerAvatar(Server server);
+
+    /**
+     * Gets the user's server-specific avatar in the given server at the given image size.
+     *
+     * @param server The server.
+     * @param size   The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The user's avatar in the server.
+     */
+    Optional<Icon> getServerAvatar(Server server, int size);
+
+    /**
+     * Gets the user's effective avatar in the given server.
+     * This will return the user's server-specific avatar if they have one, otherwise it will return their account
+     * avatar.
+     *
+     * @param server The server.
+     * @return The user's effective avatar.
+     */
+    Icon getEffectiveAvatar(Server server);
+
+    /**
+     * Gets the user's effective avatar in the given server at the given size.
+     * This will return the user's server-specific avatar if they have one, otherwise it will return their account
+     * avatar.
+     *
+     * @param server The server.
+     * @param size   The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The user's effective avatar.
+     */
+    Icon getEffectiveAvatar(Server server, int size);
 
     /**
      * Gets if the user has a default Discord avatar.
@@ -222,7 +299,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      *
      * @return All mutual servers with this user.
      */
-    Collection<Server> getMutualServers();
+    Set<Server> getMutualServers();
 
     /**
      * Gets the display name of the user.
@@ -234,7 +311,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     String getDisplayName(Server server);
 
     /**
-     * Gets the discriminated name of the user, e. g. {@code Bastian#8222}.
+     * Gets the discriminated name of the user, e.g. {@code Bastian#8222}.
      *
      * @return The discriminated name of the user.
      */
@@ -248,7 +325,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param server The server.
+     * @param server   The server.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
      */
@@ -262,9 +339,9 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param server The server.
+     * @param server   The server.
      * @param nickname The new nickname of the user.
-     * @param reason The audit log reason for this update.
+     * @param reason   The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNickname(Server server, String nickname, String reason) {
@@ -307,6 +384,123 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Optional<String> getNickname(Server server);
 
     /**
+     * Gets the timestamp of when this member started boosting the server.
+     *
+     * @param server The server.
+     * @return The timestamp of when this member started boosting the server.
+     */
+    Optional<Instant> getServerBoostingSinceTimestamp(Server server);
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param timeout The new timeout of the user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Instant timeout) {
+        return server.timeoutUser(this, timeout);
+    }
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param timeout The new timeout of the user.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Instant timeout, String reason) {
+        return server.timeoutUser(this, timeout, reason);
+    }
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param duration The duration of the timeout.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Duration duration) {
+        return server.timeoutUser(this, Instant.now().plus(duration));
+    }
+
+    /**
+     * Timeouts the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server  The server.
+     * @param duration The duration of the timeout.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeout(Server server, Duration duration, String reason) {
+        return server.timeoutUser(this, Instant.now().plus(duration), reason);
+    }
+
+    /**
+     * Removes a timeout of the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server The server.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeTimeout(Server server) {
+        return server.timeoutUser(this, Instant.MIN);
+    }
+
+    /**
+     * Removes a timeout of the user on the given server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
+     *
+     * @param server The server.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeTimeout(Server server, String reason) {
+        return server.timeoutUser(this, Instant.MIN, reason);
+    }
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant may be in the past which indicates that the user is not timed out.
+     *
+     * @param server The server to get the timeout for the user from.
+     * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
+     *         if user is currently not timed out.
+     */
+    Optional<Instant> getTimeout(Server server);
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant will be checked against {@link Instant#now()} and will only return an Instant,
+     * if the timeout is active at the moment when this method is called.
+     *
+     * @param server The server to get the timeout for the user from.
+     * @return The timestamp of when this user will no longer be timed out.
+     */
+    default Optional<Instant> getActiveTimeout(Server server) {
+        return getTimeout(server).filter(Instant.now()::isBefore);
+    }
+
+    /**
      * Gets the pending state of the user in the given server.
      *
      * <p>This will always return false if the server doesn't have membership screening enable.
@@ -347,7 +541,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Mutes this user on the given server.
      *
-     * @param server The server to umute this user on.
+     * @param server The server to mute this user on.
      * @return A future to check if the mute was successful.
      */
     default CompletableFuture<Void> mute(Server server) {
@@ -357,7 +551,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Mutes this user on the given server.
      *
-     * @param server The server to umute this user on.
+     * @param server The server to mute this user on.
      * @param reason The audit log reason for this action.
      * @return A future to check if the mute was successful.
      */
@@ -368,7 +562,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Unmutes this user on the given server.
      *
-     * @param server The server to unumute this user on.
+     * @param server The server to unmute this user on.
      * @return A future to check if the unmute was successful.
      */
     default CompletableFuture<Void> unmute(Server server) {
@@ -378,7 +572,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     /**
      * Unmutes this user on the given server.
      *
-     * @param server The server to unumute this user on.
+     * @param server The server to unmute this user on.
      * @param reason The audit log reason for this action.
      * @return A future to check if the unmute was successful.
      */
@@ -466,7 +660,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     List<Role> getRoles(Server server);
 
     /**
-     * Gets the displayed color of the user based on his roles in the given server.
+     * Gets the displayed color of the user based on their roles in the given server.
      *
      * @param server The server.
      * @return The color.
@@ -486,7 +680,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
 
     /**
      * Gets the private channel with the user.
-     * This will only be present, if there was an conversation with the user in the past or you manually opened a
+     * This will only be present, if there was a conversation with the user in the past, or you manually opened a
      * private channel with the given user, using {@link #openPrivateChannel()}.
      *
      * @return The private channel with the user.
@@ -500,17 +694,6 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return The new (or old) private channel with the user.
      */
     CompletableFuture<PrivateChannel> openPrivateChannel();
-
-    /**
-     * Gets the currently existing group channels with the user.
-     *
-     * @return The group channels with the user.
-     */
-    default Collection<GroupChannel> getGroupChannels() {
-        return getApi().getGroupChannels().stream()
-                .filter(groupChannel -> groupChannel.getMembers().contains(this))
-                .collect(Collectors.toList());
-    }
 
     /**
      * Adds the given role to the user.
@@ -532,7 +715,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role which should be added to the user.
+     * @param role   The role which should be added to the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#addRoleToUser(User, Role, String)
@@ -561,7 +744,7 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link Server#createUpdater()} which provides a better performance!
      *
-     * @param role The role which should be removed from the user.
+     * @param role   The role which should be removed from the user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      * @see Server#removeRoleFromUser(User, Role, String)

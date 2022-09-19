@@ -1,14 +1,18 @@
 package org.javacord.core.interaction;
 
+import org.javacord.api.interaction.DiscordLocale;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
 import org.javacord.api.interaction.internal.SlashCommandOptionChoiceBuilderDelegate;
 
-public class SlashCommandOptionChoiceBuilderDelegateImpl
-        implements SlashCommandOptionChoiceBuilderDelegate {
+import java.util.HashMap;
+import java.util.Map;
+
+public class SlashCommandOptionChoiceBuilderDelegateImpl implements SlashCommandOptionChoiceBuilderDelegate {
 
     private String name;
+    private Map<DiscordLocale, String> nameLocalizations = new HashMap<>();
     private String stringValue;
-    private Integer intValue;
+    private Long longValue;
 
     @Override
     public void setName(String name) {
@@ -16,19 +20,24 @@ public class SlashCommandOptionChoiceBuilderDelegateImpl
     }
 
     @Override
-    public void setValue(String value) {
-        stringValue = value;
-        intValue = null;
+    public void addNameLocalization(DiscordLocale locale, String localization) {
+        nameLocalizations.put(locale, localization);
     }
 
     @Override
-    public void setValue(int value) {
+    public void setValue(String value) {
+        stringValue = value;
+        longValue = null;
+    }
+
+    @Override
+    public void setValue(long value) {
         stringValue = null;
-        intValue = value;
+        longValue = value;
     }
 
     @Override
     public SlashCommandOptionChoice build() {
-        return new SlashCommandOptionChoiceImpl(name, stringValue, intValue);
+        return new SlashCommandOptionChoiceImpl(name, nameLocalizations, stringValue, longValue);
     }
 }

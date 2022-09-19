@@ -3,18 +3,18 @@ package org.javacord.core.entity.message.mention;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.message.mention.internal.AllowedMentionsBuilderDelegate;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * The implementation of {@link AllowedMentionsBuilderDelegate}.
  */
 public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilderDelegate {
 
-    // Lists
-    private final ArrayList<Long> allowedUserMentions = new ArrayList<>();
+    // Sets
+    private final HashSet<Long> allowedUserMentions = new HashSet<>();
 
-    private final ArrayList<Long> allowedRoleMentions = new ArrayList<>();
+    private final HashSet<Long> allowedRoleMentions = new HashSet<>();
 
     // General Mentions
     private boolean mentionAllRoles = false;
@@ -22,6 +22,8 @@ public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilde
     private boolean mentionAllUsers = false;
 
     private boolean mentionEveryoneAndHere = false;
+
+    private boolean mentionRepliedUser = false;
 
 
     @Override
@@ -37,6 +39,11 @@ public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilde
     @Override
     public void setMentionUsers(boolean value) {
         this.mentionAllUsers = value;
+    }
+
+    @Override
+    public void setMentionRepliedUser(boolean value) {
+        this.mentionRepliedUser = value;
     }
 
     @Override
@@ -102,6 +109,6 @@ public class AllowedMentionsBuilderDelegateImpl implements AllowedMentionsBuilde
     @Override
     public AllowedMentions build() {
         return new AllowedMentionsImpl(mentionAllRoles, mentionAllUsers, mentionEveryoneAndHere,
-                allowedRoleMentions, allowedUserMentions);
+                mentionRepliedUser, allowedRoleMentions, allowedUserMentions);
     }
 }

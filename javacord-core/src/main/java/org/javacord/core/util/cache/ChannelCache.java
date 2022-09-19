@@ -84,9 +84,9 @@ public class ChannelCache {
     }
 
     /**
-     * Gets a set with all channels in the cache.
+     * Gets all channels in the cache.
      *
-     * @return A set with all channels.
+     * @return All channels.
      */
     public Set<Channel> getChannels() {
         return ImmutableToJavaMapper.mapToJava(cache.getAll());
@@ -100,7 +100,7 @@ public class ChannelCache {
      *            E.g., if the provided {@code types} parameter is {@link ChannelType#SERVER_TEXT_CHANNEL} and
      *            {@link ChannelType#SERVER_VOICE_CHANNEL}, {@code T} can be {@link ServerChannel} but must not be
      *            {@link TextChannel}.
-     * @return A set with all channels that are of one of the given types.
+     * @return All channels that are of one of the given types.
      */
     public <T extends Channel> Set<T> getChannelsWithTypes(ChannelType... types) {
         io.vavr.collection.HashSet<Channel> channels = io.vavr.collection.HashSet.empty();
@@ -114,7 +114,7 @@ public class ChannelCache {
      * Gets all channels of the server with the given id.
      *
      * @param serverId The id of the server.
-     * @return A set with all channels in the server.
+     * @return All channels in the server.
      */
     public Set<ServerChannel> getChannelsOfServer(long serverId) {
         return ImmutableToJavaMapper.mapToJava(cache.findByIndex(SERVER_ID_INDEX_NAME, serverId));
@@ -129,7 +129,7 @@ public class ChannelCache {
      *            E.g., if the provided {@code type} parameter is {@link ChannelType#SERVER_TEXT_CHANNEL}
      *            {@code T} can be {@link ServerTextChannel} or {@link ServerChannel} but must not be
      *            {@link ServerVoiceChannel} or {@link VoiceChannel}.
-     * @return A set with all channels with the given type of the server with the given id.
+     * @return All channels with the given type of the server with the given id.
      */
     public <T extends Channel> Set<T> getChannelsOfServerAndType(long serverId, ChannelType type) {
         return ImmutableToJavaMapper.mapToJava(

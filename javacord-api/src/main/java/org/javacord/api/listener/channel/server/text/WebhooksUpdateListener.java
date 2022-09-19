@@ -7,7 +7,7 @@ import org.javacord.api.listener.server.ServerAttachableListener;
 
 /**
  * This listener listens to webhook updates.
- * The event get's fired when a server channel's webhook is created, updated, or deleted.
+ * The event gets fired when a server channel's webhook is created, updated, or deleted.
  */
 @FunctionalInterface
 public interface WebhooksUpdateListener extends ServerAttachableListener, ServerTextChannelAttachableListener,

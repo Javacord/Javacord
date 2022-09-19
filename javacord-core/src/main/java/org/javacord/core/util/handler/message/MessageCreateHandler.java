@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
@@ -12,6 +13,7 @@ import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
+import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.message.MessageCreateEventImpl;
@@ -54,6 +56,11 @@ public class MessageCreateHandler extends PacketHandler {
                     handle(serverTextChannel.get(), packet);
                     return;
                 }
+                Optional<ServerThreadChannel> serverThreadChannel = api.getServerThreadChannelById(channelId);
+                if (serverThreadChannel.isPresent()) {
+                    handle(serverThreadChannel.get(), packet);
+                    return;
+                }
             }
 
             UserImpl author = new UserImpl(api, packet.get("author"), (MemberImpl) null, null);
@@ -79,6 +86,11 @@ public class MessageCreateHandler extends PacketHandler {
 
         Optional<Server> optionalServer = channel.asServerChannel().map(ServerChannel::getServer);
         MessageAuthor author = message.getAuthor();
+
+        message.getServerThreadChannel().ifPresent(stc -> {
+            ((ServerThreadChannelImpl) stc).setTotalNumberOfMessagesSent(stc.getTotalNumberOfMessagesSent() + 1);
+        });
+
         api.getEventDispatcher().dispatchMessageCreateEvent(
                 optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
                 optionalServer.orElse(null),

@@ -6,8 +6,8 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.RequestableMessageEvent;
 import org.javacord.api.event.user.OptionalUserEvent;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -55,10 +55,10 @@ public interface SingleReactionEvent extends ReactionEvent, OptionalUserEvent {
     CompletableFuture<Integer> requestCount();
 
     /**
-     * Gets a list with all users who used the reaction.
+     * Gets all users who used the reaction.
      *
-     * @return A list with all users who used the reaction.
+     * @return All users who used the reaction.
      */
-    CompletableFuture<List<User>> getUsers();
+    CompletableFuture<Set<User>> getUsers();
 
 }

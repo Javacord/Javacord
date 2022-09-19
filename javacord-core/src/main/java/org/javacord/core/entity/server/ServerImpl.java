@@ -16,15 +16,22 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.auditlog.AuditLog;
 import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.ActiveThreads;
 import org.javacord.api.entity.server.Ban;
 import org.javacord.api.entity.server.BoostLevel;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
@@ -33,8 +40,11 @@ import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
 import org.javacord.api.entity.server.NsfwLevel;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.ServerFeature;
+import org.javacord.api.entity.server.SystemChannelFlag;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.server.invite.WelcomeScreen;
+import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -47,12 +57,18 @@ import org.javacord.core.entity.VanityUrlCodeImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
-import org.javacord.core.entity.channel.ServerChannelImpl;
+import org.javacord.core.entity.channel.RegularServerChannelImpl;
+import org.javacord.core.entity.channel.ServerForumChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
+import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.channel.UnknownRegularServerChannelImpl;
+import org.javacord.core.entity.channel.UnknownServerChannelImpl;
 import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
+import org.javacord.core.entity.server.invite.WelcomeScreenImpl;
+import org.javacord.core.entity.sticker.StickerImpl;
 import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -74,15 +90,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -194,34 +213,29 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private final ReentrantLock audioConnectionLock = new ReentrantLock();
 
     /**
-     * A list with all consumers who will be informed when the server is ready.
+     * All consumers who will be informed when the server is ready.
      */
     private final List<Consumer<Server>> readyConsumers = new ArrayList<>();
 
     /**
-     * A map with all roles of the server.
+     * All roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
 
     /**
-     * A set with all members that are muted.
+     * All custom emojis from this server.
      */
-    private final Set<Long> muted = new ConcurrentSkipListSet<>();
+    private final Set<KnownCustomEmoji> customEmojis = new HashSet<>();
 
     /**
-     * A set with all members that are deafened.
-     */
-    private final Set<Long> deafened = new ConcurrentSkipListSet<>();
-
-    /**
-     * A list with all custom emojis from this server.
-     */
-    private final Collection<KnownCustomEmoji> customEmojis = new ArrayList<>();
-
-    /**
-     * A list with all features from this server.
+     * All features from this server.
      */
     private final Collection<ServerFeature> serverFeatures = new ArrayList<>();
+
+    /**
+     * All stickers from this server.
+     */
+    private final ConcurrentHashMap<Long, Sticker> stickers = new ConcurrentHashMap<>();
 
     /**
      * The premium tier level of the server.
@@ -268,15 +282,47 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     private volatile String discoverySplash;
 
     /**
-     * Whether the server has join messages enabled.
+     * True if the server widget is enabled.
      */
-    private volatile boolean hasJoinMessagesEnabled = true;
+    private volatile boolean widgetEnabled;
+    
+    /**
+     * The channel id that the widget will generate an invite to, or null if set to no invite.
+     */
+    private volatile Long widgetChannelId;
+    
+    /**
+     * The maximum number of presences for the guild (null is always returned, apart from the largest of guilds).
+     */
+    private volatile Integer maxPresences;
+    
+    /**
+     * The maximum number of members for the guild.
+     */
+    private volatile Integer maxMembers;
+    
+    /**
+     * The maximum amount of users in a video channel.
+     */
+    private volatile Integer maxVideoChannelUsers;
+    
+    /**
+     * The welcome screen of a community server, shown to new members.
+     */
+    private volatile WelcomeScreen welcomeScreen;
+    
+    /**
+     * Whether the server's boost progress bar is enabled or not.
+     */
+    private volatile boolean premiumProgressBarEnabled;
 
     /**
-     * Whether the server has boost messages enabled.
+     * The enum set of all server system channel flags.
      */
-    private volatile boolean hasBoostMessagesEnabled = true;
-
+    private final EnumSet<SystemChannelFlag> systemChannelFlags = 
+            EnumSet.noneOf(SystemChannelFlag.class);
+    
+    
     /**
      * Creates a new server object.
      *
@@ -341,7 +387,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             vanityUrlCode = new VanityUrlCodeImpl(data.get("vanity_url_code").asText());
         }
         if (data.hasNonNull("system_channel_flags")) {
-            setSystemChannelFlag(data.get("system_channel_flags").asInt());
+            int systemChannelFlag = data.get("system_channel_flags").asInt();
+            setSystemChannelFlag(systemChannelFlag);
         }
 
         if (data.has("channels")) {
@@ -350,6 +397,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 switch (ChannelType.fromId(channel.get("type").asInt())) {
                     case SERVER_TEXT_CHANNEL:
                         getOrCreateServerTextChannel(channel);
+                        break;
+                    case SERVER_FORUM_CHANNEL:
+                        getOrCreateServerForumChannel(channel);
                         break;
                     case SERVER_VOICE_CHANNEL:
                         getOrCreateServerVoiceChannel(channel);
@@ -371,6 +421,33 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         logger.debug("{} has a store channel. These are not supported in this Javacord version"
                                 + " and get ignored!", this);
                         break;
+                    default: {
+                        try {
+                            if (channel.has("position")) {
+                                showFallbackWarningMessage(channel.get("type").asInt(), "UnknownRegularServerChannel");
+                                getOrCreateUnknownRegularServerChannel(channel);
+                            } else {
+                                showFallbackWarningMessage(channel.get("type").asInt(), "UnknownServerChannel");
+                                getOrCreateUnknownServerChannel(channel);
+                            }
+                        } catch (Exception exception) {
+                            logger.warn("An error occurred when trying to use a fallback channel implementation",
+                                    exception);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        if (data.has("threads")) {
+            for (JsonNode channel : data.get("threads")) {
+                switch (ChannelType.fromId(channel.get("type").asInt())) {
+                    case SERVER_PUBLIC_THREAD:
+                    case SERVER_PRIVATE_THREAD:
+                    case SERVER_NEWS_THREAD:
+                        getOrCreateServerThreadChannel(channel);
+                        break;
                     default:
                         logger.warn("Unknown or unexpected channel type. Your Javacord version might be outdated!");
                 }
@@ -390,17 +467,28 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
         if (data.hasNonNull("voice_states")) {
             for (JsonNode voiceStateJson : data.get("voice_states")) {
-                ServerVoiceChannelImpl channel =
-                        (ServerVoiceChannelImpl) getVoiceChannelById(voiceStateJson.get("channel_id").asLong())
-                                .orElseThrow(AssertionError::new);
-                channel.addConnectedUser(voiceStateJson.get("user_id").asLong());
+                Optional<ServerVoiceChannelImpl> channel =
+                        getVoiceChannelById(voiceStateJson.get("channel_id").asLong())
+                                .map(ch -> (ServerVoiceChannelImpl) ch);
+                // This gracefully disregards any channels in voice_states that are not present in the channels field.
+                // Bug occurred on a particular guild and prevented the guild from using the bot entirely.
+                // This log should happen almost never but should protect any guilds from failing creation due to
+                // mismatching guild data from Discord. https://github.com/discord/discord-api-docs/issues/4455
+                if (channel.isPresent()) {
+                    channel.get().addConnectedUser(voiceStateJson.get("user_id").asLong());
+                } else {
+                    logger.warn("Channel " + voiceStateJson.get("channel_id").asLong()
+                            + " was found in the voice_states property for server " + this.id
+                            + " but was not found in the channels property. It will not be"
+                            + " loaded.");
+                }
             }
         }
 
         if (
                 (isLarge() || !api.getIntents().contains(Intent.GUILD_PRESENCES))
-                && getMembers().size() < getMemberCount()
-                && api.hasUserCacheEnabled()
+                        && getMembers().size() < getMemberCount()
+                        && api.hasUserCacheEnabled()
         ) {
             api.getWebSocketAdapter().queueRequestGuildMembers(this);
         }
@@ -412,6 +500,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             }
         }
 
+        if (data.has("stickers")) {
+            for (JsonNode stickerJson : data.get("stickers")) {
+                Sticker sticker = api.getOrCreateSticker(stickerJson);
+                addSticker(sticker);
+            }
+        }
+
         if (data.has("presences")) {
             for (JsonNode presenceJson : data.get("presences")) {
                 long userId = Long.parseLong(presenceJson.get("user").get("id").asText());
@@ -420,10 +515,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         .orElse(null);
 
                 if (user == null) {
-                    // In theory, every user in "presences" should also be in "members", but Discord is weird
-                    // sometimes. This happens very rarely, but when it happens, we should ignore the presence.
+                    // Ignore rogue presences.
                     // It might be a similar issue than https://github.com/discordapp/discord-api-docs/issues/855
-                    logger.debug("Found rogue presence. Ignoring it. ({})", presenceJson);
                     continue;
                 }
 
@@ -457,17 +550,43 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
             }
         }
 
+        if (data.has("welcome_screen")) {
+            this.welcomeScreen = new WelcomeScreenImpl(data.get("welcome_screen"));
+        } else {
+            this.welcomeScreen = null;
+        }
+
+        this.widgetEnabled = data.path("widget_enabled").asBoolean(false);
+        this.widgetChannelId = data.hasNonNull("widget_channel_id") 
+                            ? data.get("widget_channel_id").asLong() : null;
+        this.maxPresences = data.hasNonNull("max_presences") 
+                            ? data.get("max_presences").asInt() : null;
+        this.maxMembers = data.hasNonNull("max_members") 
+                            ? data.get("max_members").asInt() : null;
+        this.maxVideoChannelUsers = data.hasNonNull("max_video_channel_users") 
+                            ? data.get("max_video_channel_users").asInt() : null;
+        this.premiumProgressBarEnabled = data.path("premium_progress_bar_enabled").asBoolean(false);
+        
         api.addServerToCache(this);
+    }
+
+    private void showFallbackWarningMessage(int channelType, String fallbackName) {
+        logger.warn("Encountered not handled channel type: {}. "
+                        + "Trying to use the {} fallback implementation",
+                channelType, fallbackName);
     }
 
     /**
      * Sets the system channel flags.
      *
-     * @param value The system channel flag.
+     * @param systemChannelFlag The system channel flag.
      */
-    public void setSystemChannelFlag(int value) {
-        hasJoinMessagesEnabled = (value & (1)) != (1);
-        hasBoostMessagesEnabled = (value & (1 << 1)) != (1 << 1);
+    public void setSystemChannelFlag(int systemChannelFlag) {
+        for (SystemChannelFlag flag : SystemChannelFlag.values()) {
+            if ((flag.asInt() & systemChannelFlag) == flag.asInt()) {
+                systemChannelFlags.add(flag);
+            }
+        }
     }
 
     /**
@@ -709,13 +828,37 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         long id = Long.parseLong(data.get("id").asText());
         ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            // TODO Treat news channels differently
-            if (type == ChannelType.SERVER_TEXT_CHANNEL || type == ChannelType.SERVER_NEWS_CHANNEL) {
-                return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
+            switch (type) {
+                case SERVER_TEXT_CHANNEL:
+                case SERVER_NEWS_CHANNEL: // TODO Treat news channels differently
+                    return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
+                default:
+                    // Invalid channel type
+                    return null;
             }
         }
-        // Invalid channel type
-        return null;
+    }
+
+    /**
+     * Gets or creates a server text channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server text channel.
+     */
+    public ServerThreadChannel getOrCreateServerThreadChannel(final JsonNode data) {
+        final long id = Long.parseLong(data.get("id").asText());
+        final ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            switch (type) {
+                case SERVER_PUBLIC_THREAD:
+                case SERVER_PRIVATE_THREAD:
+                case SERVER_NEWS_THREAD:
+                    return getThreadChannelById(id).orElseGet(() -> new ServerThreadChannelImpl(api, this, data));
+                default:
+                    // Invalid channel type
+                    return null;
+            }
+        }
     }
 
     /**
@@ -755,13 +898,60 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
+     * Gets or creates a server forum channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server forum channel.
+     */
+    public ServerForumChannel getOrCreateServerForumChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            switch (type) {
+                case SERVER_FORUM_CHANNEL:
+                    return getForumChannelById(id).orElseGet(() -> new ServerForumChannelImpl(api, this, data));
+                default:
+                    // Invalid channel type
+                    return null;
+            }
+        }
+    }
+
+    /**
+     * Gets or creates an unknown server channel.
+     *
+     * @param data The json data of the channel.
+     * @return The unknown server channel.
+     */
+    public UnknownServerChannel getOrCreateUnknownServerChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            return getUnknownChannelById(id).orElseGet(() -> new UnknownServerChannelImpl(api, this, data));
+        }
+    }
+
+    /**
+     * Gets or creates an unknown regular server channel.
+     *
+     * @param data The json data of the channel.
+     * @return The unknown regular server channel.
+     */
+    public UnknownRegularServerChannel getOrCreateUnknownRegularServerChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            return getUnknownRegularChannelById(id)
+                    .orElseGet(() -> new UnknownRegularServerChannelImpl(api, this, data));
+        }
+    }
+
+    /**
      * Removes a member from the server.
      *
      * @param userId The id of the user to remove.
      */
     public void removeMember(long userId) {
-        muted.remove(userId);
-        deafened.remove(userId);
         api.removeMemberFromCache(userId, getId());
     }
 
@@ -800,42 +990,29 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
-     * Sets the muted state of the user with the given id.
-     *
-     * @param userId The id of the user.
-     * @param muted  Whether the user with the given id is muted or not.
-     */
-    public void setMuted(long userId, boolean muted) {
-        if (muted) {
-            this.muted.add(userId);
-        } else {
-            this.muted.remove(userId);
-        }
-    }
-
-    /**
-     * Sets the deafened state of the user with the given id.
-     *
-     * @param userId   The id of the user.
-     * @param deafened Whether the user with the given id is deafened or not.
-     */
-    public void setDeafened(long userId, boolean deafened) {
-        if (deafened) {
-            this.deafened.add(userId);
-        } else {
-            this.deafened.remove(userId);
-        }
-    }
-
-    /**
      * Adds members to the server.
      *
-     * @param members An array of guild member objects.
+     * @param membersJson An array of guild member objects.
      */
-    public void addMembers(JsonNode members) {
-        for (JsonNode member : members) {
-            addMember(member);
+    public void addMembers(JsonNode membersJson) {
+        for (JsonNode memberJson : membersJson) {
+            addMember(memberJson);
         }
+    }
+
+    /**
+     * Adds members to the server and returns the added members.
+     *
+     * @param membersJson An array of guild member objects.
+     * @return The added members.
+     */
+    public List<Member> addAndGetMembers(JsonNode membersJson) {
+        List<Member> members = new ArrayList<>();
+        for (JsonNode memberJson : membersJson) {
+            Member member = addMember(memberJson);
+            members.add(member);
+        }
+        return members;
     }
 
     /**
@@ -947,12 +1124,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         this.serverFeatures.addAll(serverFeatures);
     }
 
-    /**
-     * Gets an unordered collection with all channels in the server.
-     *
-     * @return An unordered collection with all channels in the server.
-     */
-    public Collection<ServerChannel> getUnorderedChannels() {
+    @Override
+    public Set<ServerChannel> getUnorderedChannels() {
         return api.getEntityCache().get().getChannelCache().getChannelsOfServer(getId());
     }
 
@@ -1027,18 +1200,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public boolean hasBoostMessagesEnabled() {
-        return hasBoostMessagesEnabled;
-    }
-
-    @Override
-    public boolean hasJoinMessagesEnabled() {
-        return hasJoinMessagesEnabled;
-    }
-
-    @Override
-    public Collection<ServerFeature> getFeatures() {
-        return Collections.unmodifiableCollection(new HashSet<>(serverFeatures));
+    public Set<ServerFeature> getFeatures() {
+        return Collections.unmodifiableSet(new HashSet<>(serverFeatures));
     }
 
     @Override
@@ -1084,7 +1247,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         try {
             return Optional.of(new IconImpl(
                     getApi(),
-                    new URL("https://cdn.discordapp.com/discovery-splashes/" + getIdAsString() + "/" + discoverySplash + ".png")));
+                    new URL("https://" + Javacord.DISCORD_CDN_DOMAIN + "/discovery-splashes/" + getIdAsString() + "/"
+                            + discoverySplash + ".png")));
         } catch (MalformedURLException e) {
             throw new AssertionError("Unexpected malformed discovery splash url", e);
         }
@@ -1104,6 +1268,36 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public Optional<String> getNickname(User user) {
         return getRealMemberById(user.getId())
                 .flatMap(Member::getNickname);
+    }
+
+    @Override
+    public Optional<Instant> getServerBoostingSinceTimestamp(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerBoostingSinceTimestamp);
+    }
+
+    @Override
+    public Optional<Instant> getTimeout(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getTimeout);
+    }
+
+    @Override
+    public Optional<String> getUserServerAvatarHash(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerAvatarHash);
+    }
+
+    @Override
+    public Optional<Icon> getUserServerAvatar(User user) {
+        return getRealMemberById(user.getId())
+                .flatMap(Member::getServerAvatar);
+    }
+
+    @Override
+    public Optional<Icon> getUserServerAvatar(User user, int size) {
+        return getRealMemberById(user.getId())
+                .flatMap(member -> member.getServerAvatar(size));
     }
 
     @Override
@@ -1129,12 +1323,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public boolean isMuted(long userId) {
-        return muted.contains(userId);
+        return getRealMemberById(userId)
+                .map(Member::isMuted)
+                .orElse(false);
     }
 
     @Override
     public boolean isDeafened(long userId) {
-        return deafened.contains(userId);
+        return getRealMemberById(userId)
+                .map(Member::isDeafened)
+                .orElse(false);
     }
 
     @Override
@@ -1253,21 +1451,26 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Collection<RichInvite>> getInvites() {
-        return new RestRequest<Collection<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
+    public CompletableFuture<Set<RichInvite>> getInvites() {
+        return new RestRequest<Set<RichInvite>>(getApi(), RestMethod.GET, RestEndpoint.SERVER_INVITE)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {
-                    Collection<RichInvite> invites = new HashSet<>();
+                    Set<RichInvite> invites = new HashSet<>();
                     for (JsonNode inviteJson : result.getJsonBody()) {
                         invites.add(new InviteImpl(getApi(), inviteJson));
                     }
-                    return Collections.unmodifiableCollection(invites);
+                    return Collections.unmodifiableSet(invites);
                 });
     }
 
     @Override
     public boolean hasAllMembersInCache() {
         return getRealMembers().size() >= getMemberCount();
+    }
+
+    @Override
+    public void requestMembersChunks() {
+        api.getWebSocketAdapter().queueRequestGuildMembers(this);
     }
 
     @Override
@@ -1280,7 +1483,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     /**
-     * Gets a set with the real member objects of the server.
+     * Gets the real member objects of the server.
      *
      * @return The real members.
      */
@@ -1329,6 +1532,41 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 .orElseGet(() ->
                         getRealMemberById(user.getId())
                                 .map(Member::getRoles).orElseGet(Collections::emptyList));
+    }
+
+    @Override
+    public boolean isWidgetEnabled() {
+        return widgetEnabled;
+    }
+
+    @Override
+    public Optional<Long> getWidgetChannelId() {
+        return Optional.ofNullable(widgetChannelId);
+    }
+
+    @Override
+    public Optional<Integer> getMaxPresences() {
+        return Optional.ofNullable(maxPresences);
+    }
+
+    @Override
+    public Optional<Integer> getMaxMembers() {
+        return Optional.ofNullable(maxMembers);
+    }
+
+    @Override
+    public Optional<Integer> getMaxVideoChannelUsers() {
+        return Optional.ofNullable(maxVideoChannelUsers);
+    }
+
+    @Override
+    public Optional<WelcomeScreen> getWelcomeScreen() {
+        return Optional.ofNullable(welcomeScreen);
+    }
+
+    @Override
+    public boolean isPremiumProgressBarEnabled() {
+        return premiumProgressBarEnabled;
     }
 
     @Override
@@ -1408,6 +1646,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public CompletableFuture<User> requestMember(long userId) {
+        return new RestRequest<User>(getApi(), RestMethod.GET, RestEndpoint.SERVER_MEMBER)
+                .setUrlParameters(getIdAsString(), Long.toUnsignedString(userId))
+                .execute(result -> new MemberImpl(api, this, result.getJsonBody(), null).getUser());
+    }
+
+    @Override
     public CompletableFuture<Void> kickUser(User user, String reason) {
         return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.SERVER_MEMBER)
                 .setUrlParameters(getIdAsString(), user.getIdAsString())
@@ -1416,13 +1661,17 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
+    public CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit, String reason) {
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString(), userId)
-                .addQueryParameter("delete_message_days", String.valueOf(deleteMessageDays));
-        if (reason != null) {
-            request.addQueryParameter("reason", reason);
+                .setUrlParameters(getIdAsString(), userId);
+        if (deleteMessageDuration > 0) {
+            request.addQueryParameter("delete_message_seconds", String.valueOf(unit.toSeconds(deleteMessageDuration)));
         }
+
+        if (reason != null) {
+            request.setAuditLogReason(reason);
+        }
+
         return request.execute(result -> null);
     }
 
@@ -1435,16 +1684,70 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public CompletableFuture<Collection<Ban>> getBans() {
-        return new RestRequest<Collection<Ban>>(getApi(), RestMethod.GET, RestEndpoint.BAN)
-                .setUrlParameters(getIdAsString())
-                .execute(result -> {
-                    Collection<Ban> bans = new ArrayList<>();
-                    for (JsonNode ban : result.getJsonBody()) {
-                        bans.add(new BanImpl(this, ban));
-                    }
-                    return Collections.unmodifiableCollection(bans);
-                });
+    public CompletableFuture<Ban> requestBan(long userId) {
+        return new RestRequest<Ban>(getApi(), RestMethod.GET, RestEndpoint.BAN)
+                .setUrlParameters(getIdAsString(), Long.toUnsignedString(userId))
+                .execute(result -> new BanImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<Ban>> getBans(Integer limit, Long after) {
+        RestRequest<Set<Ban>> request = new RestRequest<Set<Ban>>(
+                getApi(),
+                RestMethod.GET,
+                RestEndpoint.BAN
+        ).setUrlParameters(getIdAsString());
+
+        if (limit != null) {
+            request.addQueryParameter("limit", String.valueOf(limit));
+        }
+
+        if (after != null) {
+            request.addQueryParameter("after", String.valueOf(after));
+        }
+
+        return request.execute(result -> {
+            Set<Ban> bans = new HashSet<>();
+            for (JsonNode ban : result.getJsonBody()) {
+                bans.add(new BanImpl(this, ban));
+            }
+            return Collections.unmodifiableSet(bans);
+        });
+    }
+
+    @Override
+    public CompletableFuture<Set<Ban>> getBans() {
+        CompletableFuture<Set<Ban>> future = new CompletableFuture<>();
+        ArrayList<Ban> bans = new ArrayList<>();
+
+        fetchBansPageAndAddAllToCollection(null, bans, future);
+
+        return future;
+    }
+
+    private void fetchBansPageAndAddAllToCollection(Long after,
+                                                    ArrayList<Ban> banList,
+                                                    CompletableFuture<Set<Ban>> futureToComplete) {
+        this.getBans(1000, after).thenAccept((page) -> {
+            banList.addAll(page);
+
+            // If the response was smaller than 1000 entries, this was the last page.
+            // Let's pass the full list to the future!
+            if (page.size() < 1000) {
+                futureToComplete.complete(Collections.unmodifiableSet(new HashSet<>(banList)));
+                return;
+            }
+
+            // The response contained 1000 bans. There could be more, so let's request the next page
+            fetchBansPageAndAddAllToCollection(
+                    banList.get(banList.size() - 1).getUser().getId(),
+                    banList,
+                    futureToComplete
+            );
+        }).exceptionally(t -> {
+            futureToComplete.completeExceptionally(t);
+            return null;
+        });
     }
 
     @Override
@@ -1511,7 +1814,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         request.addQueryParameter(
                                 "before", lastAuditLogEntries.get(lastAuditLogEntries.size() - 1).getIdAsString());
                     } else if (before != null) {
-                        // It's the first request and we have a non-null "before" parameter
+                        // It's the first request, and we have a non-null "before" parameter
                         request.addQueryParameter("before", before.getIdAsString());
                     }
 
@@ -1522,7 +1825,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                     JsonNode data = request.execute(RestRequestResult::getJsonBody).join();
                     // Add the new entries
                     auditLog.addEntries(data);
-                    // Check if we have to made another request
+                    // Check if we have to make another request
                     requestMore = auditLog.getEntries().size() < limit
                             && data.get("audit_log_entries").size() >= requestAmount;
                 }
@@ -1535,12 +1838,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
-    public Collection<KnownCustomEmoji> getCustomEmojis() {
-        return Collections.unmodifiableCollection(new ArrayList<>(customEmojis));
+    public Set<KnownCustomEmoji> getCustomEmojis() {
+        return Collections.unmodifiableSet(customEmojis);
     }
 
     @Override
-    public CompletableFuture<List<SlashCommand>> getSlashCommands() {
+    public CompletableFuture<Set<SlashCommand>> getSlashCommands() {
         return api.getServerSlashCommands(this);
     }
 
@@ -1551,45 +1854,102 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
 
     @Override
     public List<ServerChannel> getChannels() {
-        List<ServerChannel> channels = getUnorderedChannels().stream()
+        final List<ServerChannel> channels = getUnorderedChannels().stream()
                 .filter(channel -> channel.asCategorizable()
                         .map(categorizable -> !categorizable.getCategory().isPresent())
                         .orElse(false))
+                .map(Channel::asRegularServerChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .sorted(Comparator
-                        .<ServerChannel>comparingInt(channel -> channel.getType().getId())
-                        .thenComparing(ServerChannelImpl.COMPARE_BY_RAW_POSITION))
+                        .<RegularServerChannel>comparingInt(channel -> channel.getType().getId())
+                        .thenComparing(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION))
                 .collect(Collectors.toList());
         getChannelCategories().forEach(category -> {
             channels.add(category);
             channels.addAll(category.getChannels());
         });
+
+        final Map<RegularServerChannel, List<ServerThreadChannel>> regularServerChannelThreads = new HashMap<>();
+        getThreadChannels().forEach(serverThreadChannel -> {
+            final RegularServerChannel regularServerChannel = serverThreadChannel.getParent();
+            regularServerChannelThreads.merge(regularServerChannel,
+                    new ArrayList<>(Collections.singletonList(serverThreadChannel)),
+                    (serverThreadChannels, serverThreadChannels2) -> {
+                        serverThreadChannels.addAll(serverThreadChannels2);
+                        return new ArrayList<>(serverThreadChannels);
+                    });
+        });
+        regularServerChannelThreads.forEach(
+                (serverTextChannel, serverThreadChannels) -> channels.addAll(channels.indexOf(serverTextChannel) + 1,
+                        serverThreadChannels));
+
         return Collections.unmodifiableList(channels);
+    }
+
+    @Override
+    public List<RegularServerChannel> getRegularChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(RegularServerChannel.class::isInstance)
+                .map(Channel::asRegularServerChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
     }
 
     @Override
     public List<ChannelCategory> getChannelCategories() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
-                .filter(channel -> channel instanceof ChannelCategory)
-                .sorted(ServerChannelImpl.COMPARE_BY_RAW_POSITION)
-                .map(channel -> (ChannelCategory) channel)
+                .filter(ChannelCategory.class::isInstance)
+                .map(Channel::asChannelCategory)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .collect(Collectors.toList()));
     }
 
     @Override
     public List<ServerTextChannel> getTextChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
-                .filter(channel -> channel instanceof ServerTextChannel)
-                .sorted(ServerChannelImpl.COMPARE_BY_RAW_POSITION)
-                .map(channel -> (ServerTextChannel) channel)
+                .filter(ServerTextChannel.class::isInstance)
+                .map(Channel::asServerTextChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<ServerForumChannel> getForumChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(ServerForumChannel.class::isInstance)
+                .map(Channel::asServerForumChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
                 .collect(Collectors.toList()));
     }
 
     @Override
     public List<ServerVoiceChannel> getVoiceChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
-                .filter(channel -> channel instanceof ServerVoiceChannel)
-                .sorted(ServerChannelImpl.COMPARE_BY_RAW_POSITION)
-                .map(channel -> (ServerVoiceChannel) channel)
+                .filter(ServerVoiceChannel.class::isInstance)
+                .map(Channel::asServerVoiceChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<ServerThreadChannel> getThreadChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(ServerThreadChannel.class::isInstance)
+                .map(Channel::asServerThreadChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(Comparator.comparing(channel -> channel.getMetadata().getArchiveTimestamp()))
                 .collect(Collectors.toList()));
     }
 
@@ -1601,10 +1961,87 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Optional<RegularServerChannel> getRegularChannelById(long id) {
+        return api.getEntityCache().get().getChannelCache().getChannelById(id)
+                .filter(RegularServerChannel.class::isInstance)
+                .map(RegularServerChannel.class::cast);
+    }
+
+    @Override
+    public CompletableFuture<Void> joinServerThreadChannel(long channelId) {
+        return new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.JOIN_LEAVE_THREAD)
+                .setUrlParameters(String.valueOf(channelId))
+                .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<Void> leaveServerThreadChannel(long channelId) {
+        return new RestRequest<Void>(getApi(), RestMethod.DELETE, RestEndpoint.JOIN_LEAVE_THREAD)
+                .setUrlParameters(String.valueOf(channelId))
+                .execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<ActiveThreads> getActiveThreads() {
+        return new RestRequest<ActiveThreads>(getApi(), RestMethod.GET, RestEndpoint.LIST_ACTIVE_THREADS)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> new ActiveThreadsImpl((DiscordApiImpl) getApi(), this,
+                        result.getJsonBody()));
+    }
+
+    @Override
+    public Set<Sticker> getStickers() {
+        return Collections.unmodifiableSet(new HashSet<>(stickers.values()));
+    }
+
+    @Override
+    public CompletableFuture<Set<Sticker>> requestStickers() {
+        return new RestRequest<Set<Sticker>>(api, RestMethod.GET, RestEndpoint.SERVER_STICKER)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> {
+                    Set<Sticker> stickers = new HashSet<>();
+                    for (JsonNode stickerJson : result.getJsonBody()) {
+                        stickers.add(new StickerImpl(api, stickerJson));
+                    }
+
+                    return stickers;
+                });
+    }
+
+    @Override
+    public CompletableFuture<Sticker> requestStickerById(long id) {
+        return new RestRequest<Sticker>(api, RestMethod.GET, RestEndpoint.SERVER_STICKER)
+                .setUrlParameters(getIdAsString())
+                .execute(result -> new StickerImpl(api, result.getJsonBody()));
+    }
+
+    /**
+     * Adds a sticker to the server's cache.
+     *
+     * @param sticker The sticker to add to the server's cache.
+     */
+    public void addSticker(Sticker sticker) {
+        stickers.put(sticker.getId(), sticker);
+    }
+
+    /**
+     * Removes a sticker from the server's cache.
+     *
+     * @param sticker The sticker to remove from the server's cache.
+     */
+    public void removeSticker(Sticker sticker) {
+        stickers.remove(sticker.getId());
+    }
+
+    @Override
     public void cleanup() {
         getUnorderedChannels().stream()
                 .map(ServerChannel::getId)
                 .forEach(api::removeChannelFromCache);
+
+        getMembers().forEach(user -> removeMember(user.getId()));
+        stickers.values().forEach(api::removeSticker);
+        getAudioConnection().ifPresent(this::removeAudioConnection);
     }
 
     @Override
@@ -1624,5 +2061,9 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public String toString() {
         return String.format("Server (id: %s, name: %s)", getIdAsString(), getName());
     }
-
+    
+    @Override
+    public EnumSet<SystemChannelFlag> getSystemChannelFlags() {
+        return EnumSet.copyOf(systemChannelFlags);
+    }
 }

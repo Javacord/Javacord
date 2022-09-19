@@ -67,13 +67,13 @@ public abstract class EventDispatcherBase {
             Collections.synchronizedMap(new HashMap<>());
 
     /**
-     * A list with all objects which currently have a running listener.
+     * All objects which currently have a running listener.
      */
     private final Set<DispatchQueueSelector> runningListeners = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * A map with all running listeners as its key. The value contains an array where the first element is a long
-     * with the start time of the listener (using {@link System#nanoTime()} and the second element is the object
+     * with the start time of the listener (using {@link System#nanoTime()}) and the second element is the object
      * of the listener (usually a server).
      */
     private final Map<AtomicReference<Future<?>>, Object[]> activeListeners =
@@ -191,6 +191,10 @@ public abstract class EventDispatcherBase {
      * @param <T>           The type of the listener.
      */
     protected <T> void dispatchEvent(DispatchQueueSelector queueSelector, List<T> listeners, Consumer<T> consumer) {
+        if (!api.canDispatchEvents()) {
+            return;
+        }
+
         api.getThreadPool().getSingleThreadExecutorService("Event Dispatch Queues Manager").submit(() -> {
             if (queueSelector != null) { // Object dependent listeners
                 // Don't allow adding of more events while there are unfinished object independent tasks
@@ -204,9 +208,13 @@ public abstract class EventDispatcherBase {
                     } catch (InterruptedException ignored) { }
                 }
             }
-            Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(
-                    queueSelector, o -> new ConcurrentLinkedQueue<>());
-            listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
+            if (!listeners.isEmpty()) {
+                synchronized (queuedListenerTasks) {
+                    Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(
+                            queueSelector, o -> new ConcurrentLinkedQueue<>());
+                    listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
+                }
+            }
             checkRunningListenersAndStartIfPossible(queueSelector);
         });
     }
@@ -229,6 +237,10 @@ public abstract class EventDispatcherBase {
             // - running for object-dependent tasks, but queue is empty or not present
             Queue<Runnable> queue = queueSelector == null ? null : queuedListenerTasks.get(queueSelector);
             if (queue == null || queue.isEmpty()) {
+                if (queueSelector != null) {
+                    // Remove the entry for the queue selector, so that it eventually can be garbage collected
+                    queuedListenerTasks.remove(queueSelector);
+                }
                 // if no object-independent tasks to be processed everything is fine, return
                 if (queuedListenerTasks.get(null).isEmpty()) {
                     return;
@@ -281,8 +293,15 @@ public abstract class EventDispatcherBase {
                     activeListeners.remove(activeListener);
                     alreadyCanceledListeners.remove(activeListener);
                     runningListeners.remove(finalQueueSelector);
-                    // Inform the dispatchEvent method that it maybe can queue new listeners now
                     synchronized (queuedListenerTasks) {
+                        // Remove the entry for the queue selector, so that it eventually can be garbage collected
+                        if (finalQueueSelector != null) {
+                            Queue<Runnable> remainingQueue = queuedListenerTasks.get(finalQueueSelector);
+                            if (remainingQueue != null && remainingQueue.isEmpty()) {
+                                queuedListenerTasks.remove(finalQueueSelector);
+                            }
+                        }
+                        // Inform the dispatchEvent method that it maybe can queue new listeners now
                         queuedListenerTasks.notifyAll();
                     }
                     checkRunningListenersAndStartIfPossible(finalQueueSelector);

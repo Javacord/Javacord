@@ -29,5 +29,4 @@ public interface Ban {
      * @return The reason for the ban.
      */
     Optional<String> getReason();
-
 }

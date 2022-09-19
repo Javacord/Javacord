@@ -13,6 +13,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -576,6 +578,40 @@ public class ServerUpdater {
      */
     public ServerUpdater setNickname(User user, String nickname) {
         delegate.setNickname(user, nickname);
+        return this;
+    }
+
+    /**
+     * Queues a user's timeout to be updated.
+     *
+     * @param user The user whose nickname should be updated.
+     * @param timeout The new timeout of the user.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setUserTimeout(User user, Instant timeout) {
+        delegate.setUserTimeout(user, timeout);
+        return this;
+    }
+
+    /**
+     * Queues a user's timeout to be updated.
+     *
+     * @param user The user whose nickname should be updated.
+     * @param duration The duration of the timeout.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater setUserTimeout(User user, Duration duration) {
+        return setUserTimeout(user, Instant.now().plus(duration));
+    }
+
+    /**
+     * Queues a user's timeout to be updated.
+     *
+     * @param user The user whose nickname should be updated.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerUpdater removeUserTimeout(User user) {
+        delegate.setUserTimeout(user, Instant.MIN);
         return this;
     }
 

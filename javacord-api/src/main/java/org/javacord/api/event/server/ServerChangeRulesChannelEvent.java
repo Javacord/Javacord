@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * A server change rules channel event.
  */
-public interface ServerChangeRulesChannelEvent {
+public interface ServerChangeRulesChannelEvent extends ServerEvent {
 
     /**
      * Gets the old rules channel of the server.

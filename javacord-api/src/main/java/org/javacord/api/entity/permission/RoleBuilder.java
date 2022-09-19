@@ -39,7 +39,7 @@ public class RoleBuilder {
 
     /**
      * Sets the name of the role.
-     * By default it's <code>"new role"</code>.
+     * By default, it's <code>"new role"</code>.
      *
      * @param name The name of the role.
      * @return The current instance in order to chain call methods.
@@ -51,7 +51,7 @@ public class RoleBuilder {
 
     /**
      * Sets the permissions of the role.
-     * By default it uses the permissions of the @everyone role.
+     * By default, it uses the permissions of the @everyone role.
      *
      * @param permissions The permissions to set.
      * @return The current instance in order to chain call methods.
@@ -74,7 +74,7 @@ public class RoleBuilder {
 
     /**
      * Sets if the role is mentionable or not.
-     * By default it's set to <code>false</code>.
+     * By default, it's set to <code>false</code>.
      *
      * @param mentionable Whether the role should be mentionable or not.
      * @return The current instance in order to chain call methods.
@@ -96,9 +96,9 @@ public class RoleBuilder {
     }
 
     /**
-     * Creates the server text channel.
+     * Creates the role.
      *
-     * @return The created text channel.
+     * @return The created role.
      */
     public CompletableFuture<Role> create() {
         return delegate.create();

@@ -1,6 +1,5 @@
 package org.javacord.api.internal;
 
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
@@ -10,7 +9,7 @@ import org.javacord.api.util.ratelimit.Ratelimiter;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -31,9 +30,16 @@ public interface DiscordApiBuilderDelegate {
     void setGlobalRatelimiter(Ratelimiter ratelimiter);
 
     /**
-     * Sets a ratelimiter that can be used to respect the 5 second gateway identify ratelimit.
+     * Sets whether this API instance can dispatch events.
      *
-     * @param ratelimiter The ratelimiter used to respect the 5 second gateway identify ratelimit.
+     * @param dispatchEvents Whether events can be dispatched.
+     */
+    void setEventsDispatchable(boolean dispatchEvents);
+
+    /**
+     * Sets a ratelimiter that can be used to respect the 5-second gateway identify ratelimit.
+     *
+     * @param ratelimiter The ratelimiter used to respect the 5-second gateway identify ratelimit.
      */
     void setGatewayIdentifyRatelimiter(Ratelimiter ratelimiter);
 
@@ -79,20 +85,6 @@ public interface DiscordApiBuilderDelegate {
      * @return The token.
      */
     Optional<String> getToken();
-
-    /**
-     * Sets the account type.
-     *
-     * @param accountType The account type to set.
-     */
-    void setAccountType(AccountType accountType);
-
-    /**
-     * Gets the account type.
-     *
-     * @return The account type.
-     */
-    AccountType getAccountType();
 
     /**
      * Sets the total shards.
@@ -172,11 +164,34 @@ public interface DiscordApiBuilderDelegate {
     boolean isShutdownHookRegistrationEnabled();
 
     /**
+     * Adds the given intents to the already set.
+     *
+     * @param intents The intents to add.
+     */
+    void addIntents(Intent... intents);
+
+    /**
      * Sets the intents where the given predicate matches.
      *
      * @param condition Whether the intent should be added or not.
      */
     void setAllIntentsWhere(Predicate<Intent> condition);
+
+    /**
+     * Sets whether the user cache should be enabled.
+     *
+     * <p>By default, the user cache is disabled.
+     *
+     * @param enabled Whether the user cache should be enabled.
+     */
+    void setUserCacheEnabled(boolean enabled);
+
+    /**
+     * Gets whether the user cache is enabled.
+     *
+     * @return Whether the user cache is enabled.
+     */
+    boolean isUserCacheEnabled();
 
     /**
      * Logs the bot in.
@@ -191,9 +206,9 @@ public interface DiscordApiBuilderDelegate {
      * anything but {@code 0} before calling this method.
      *
      * @param shards The shards to connect, starting with {@code 0}!
-     * @return A collection of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
+     * @return A list of {@link CompletableFuture}s which contain the {@code DiscordApi}s for the shards.
      */
-    Collection<CompletableFuture<DiscordApi>> loginShards(int... shards);
+    List<CompletableFuture<DiscordApi>> loginShards(int... shards);
 
     /**
      * Sets the recommended total shards.

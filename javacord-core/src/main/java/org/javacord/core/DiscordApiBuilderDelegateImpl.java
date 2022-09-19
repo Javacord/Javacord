@@ -3,7 +3,6 @@ package org.javacord.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
-import org.javacord.api.AccountType;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
@@ -22,7 +21,6 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +55,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private volatile Ratelimiter globalRatelimiter;
 
     /**
+     * Whether events can be dispatched.
+     */
+    private volatile boolean dispatchEvents = true;
+
+    /**
      * A ratelimiter used to respect the 5 seconds gateway identify ratelimit.
      */
     private volatile Ratelimiter gatewayIdentifyRatelimiter;
@@ -86,11 +89,6 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      * The token which is used to login. Must be present in order to login!
      */
     private volatile String token = null;
-
-    /**
-     * The account type of the account with the given token.
-     */
-    private volatile AccountType accountType = AccountType.BOT;
 
     /**
      * The current shard starting with <code>0</code>.
@@ -128,6 +126,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      */
     private Set<Intent> intents = Arrays.stream(Intent.values())
             .filter(intent -> !intent.isPrivileged()).collect(Collectors.toCollection(HashSet::new));
+
+    /**
+     * Whether the user cache should be enabled or not.
+     */
+    private boolean userCacheEnabled = true;
 
     /**
      * The globally attachable listeners to register for every created DiscordApi instance.
@@ -191,10 +194,10 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         }
         try (CloseableThreadContext.Instance closeableThreadContextInstance =
                      CloseableThreadContext.put("shard", Integer.toString(currentShard.get()))) {
-            new DiscordApiImpl(accountType, token, currentShard.get(), totalShards.get(), intents,
+            new DiscordApiImpl(token, currentShard.get(), totalShards.get(), intents,
                     waitForServersOnStartup, waitForUsersOnStartup, registerShutdownHook, globalRatelimiter,
                     gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates,
-                    future, null, preparedListeners, preparedUnspecifiedListeners);
+                    future, null, preparedListeners, preparedUnspecifiedListeners, userCacheEnabled, dispatchEvents);
         }
         return future;
     }
@@ -234,7 +237,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
-    public Collection<CompletableFuture<DiscordApi>> loginShards(int... shards) {
+    public List<CompletableFuture<DiscordApi>> loginShards(int... shards) {
         Objects.requireNonNull(shards);
         if (shards.length == 0) {
             return Collections.emptyList();
@@ -255,7 +258,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             logger.info("Creating {} out of {} shards ({})", shards.length, getTotalShards(), shards);
         }
 
-        Collection<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
+        List<CompletableFuture<DiscordApi>> result = new ArrayList<>(shards.length);
         int currentShard = getCurrentShard();
         for (int shard : shards) {
             if (currentShard != 0) {
@@ -275,6 +278,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public void setGlobalRatelimiter(Ratelimiter ratelimiter) {
         globalRatelimiter = ratelimiter;
+    }
+
+    @Override
+    public void setEventsDispatchable(boolean dispatchEvents) {
+        this.dispatchEvents = dispatchEvents;
     }
 
     @Override
@@ -311,16 +319,6 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     @Override
     public Optional<String> getToken() {
         return Optional.ofNullable(token);
-    }
-
-    @Override
-    public void setAccountType(AccountType type) {
-        this.accountType = type;
-    }
-
-    @Override
-    public AccountType getAccountType() {
-        return accountType;
     }
 
     @Override
@@ -386,6 +384,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
+    public void addIntents(Intent... intents) {
+        this.intents.addAll(Arrays.asList(intents));
+    }
+
+    @Override
     public void setAllIntentsWhere(Predicate<Intent> condition) {
         intents = new HashSet<>();
         for (Intent value : Intent.values()) {
@@ -393,6 +396,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
                 intents.add(value);
             }
         }
+    }
+
+    @Override
+    public void setUserCacheEnabled(boolean enabled) {
+        userCacheEnabled = enabled;
+    }
+
+    @Override
+    public boolean isUserCacheEnabled() {
+        return userCacheEnabled;
     }
 
     @Override

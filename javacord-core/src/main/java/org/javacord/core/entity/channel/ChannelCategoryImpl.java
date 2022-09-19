@@ -3,22 +3,23 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.Categorizable;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ChannelCategory;
-import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.InternalChannelCategoryAttachableListenerManager;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link ChannelCategory}.
  */
-public class ChannelCategoryImpl extends ServerChannelImpl
+public class ChannelCategoryImpl extends RegularServerChannelImpl
         implements ChannelCategory, InternalChannelCategoryAttachableListenerManager {
 
     /**
@@ -48,16 +49,19 @@ public class ChannelCategoryImpl extends ServerChannelImpl
     }
 
     @Override
-    public List<ServerChannel> getChannels() {
+    public List<RegularServerChannel> getChannels() {
         return Collections.unmodifiableList(
                 ((ServerImpl) getServer()).getUnorderedChannels().stream()
                         .filter(channel -> channel.asCategorizable()
                                 .flatMap(Categorizable::getCategory)
                                 .map(this::equals)
                                 .orElse(false))
+                        .map(Channel::asRegularServerChannel)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .sorted(Comparator
-                                        .<ServerChannel>comparingInt(channel -> channel.getType().getId())
-                                        .thenComparing(ServerChannelImpl.COMPARE_BY_RAW_POSITION))
+                                .<RegularServerChannel>comparingInt(channel -> channel.getType().getId())
+                                .thenComparing(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION))
                         .collect(Collectors.toList()));
     }
 

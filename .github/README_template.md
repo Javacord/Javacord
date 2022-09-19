@@ -1,11 +1,14 @@
 ![](https://javacord.org/img/javacord3_banner.png)
-# Javacord [![Latest version](https://shields.javacord.org/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square)](https://github.com/Javacord/Javacord/releases/latest) [![Latest JavaDocs](https://shields.javacord.org/badge/JavaDoc-Latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.javacord.org/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.javacord.org/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
+# Javacord [![Latest version](https://shields.io/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square)](https://github.com/Javacord/Javacord/releases/latest) [![Latest JavaDocs](https://shields.io/badge/JavaDoc-Latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.io/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
 
 An easy to use multithreaded library for creating Discord bots in Java.
 
 Javacord is a modern library that focuses on simplicity and speed 🚀.
 By reducing itself to standard Java classes and features like [`Optional`](https://javacord.org/wiki/essential-knowledge/optionals.html)s and [`CompletableFuture`](https://javacord.org/wiki/essential-knowledge/completable-futures.html)s, it is extremely easy to use for every Java developer, as it does not require you to learn any new frameworks or complex abstractions. 
 It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
+
+> *Starting in early 2023, support for Java 8 will be discontinued and Java 11 will be the new minimum requirement for using Javacord.
+> If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of 2022.*
 
 ## 🎉 Basic Usage
 
@@ -82,6 +85,7 @@ public class MyFirstBot {
 }
 ```
 A more detailed version of how to use slash commands can be found in the [wiki](https://javacord.org/wiki/basic-tutorials/interactions/commands.html) 
+
 ## 📦 Download / Installation
 
 The recommended way to get Javacord is to use a build manager, like Gradle or Maven.  
@@ -91,7 +95,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 #### Gradle
 
-```groovy
+```gradle
 repositories { mavenCentral() }
 dependencies { implementation 'org.javacord:javacord:$version' }
 ```
@@ -120,8 +124,8 @@ with being able to configure log format, log targets (console, file, database, D
 log levels per class, and much more.
 
 For example, Log4j Core in Gradle
-```groovy
-dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.11.0' }
+```gradle
+dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.17.1' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-config.html) wiki article for further information.
 
@@ -162,10 +166,19 @@ best to deprecate it before removing it. We are unable to guarantee this though,
 something due to changes made by Discord, which we are unable to control. Usually you can expect a deprecated method or
 class to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
 
+## ✨ Contributing
+
+Contributions of any kind are welcome. You can start contributing to this library by creating issues, submitting pull requests or improving the [Javacord Wiki](https://github.com/Javacord/Website). 
+
+If you want to submit pull requests you can find a list of good first issues [here](https://github.com/Javacord/Javacord/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). You are not restricted to only these issues, so you can start with any other issue that you would like to do.
+Be sure to read the [Contributing Guidelines](./CONTRIBUTING.md) before you start.
+
+The awesome people that contributed to Javacord in the past can be found ✨[here](../CONTRIBUTORS.md)✨
+
 ## 🥇 Large Bots Using Javacord
 
 Javacord is used by many large bots. Here are just a few of them:
-* [**Yunite**](https://yunite.xyz/): A bot for Fortnite which runs on over 60,000 servers with over eight million users.
+* [**Yunite**](https://yunite.xyz/): A bot for Fortnite which runs on over 100,000 servers with over ten million users.
 * [**Beemo**](https://beemo.gg/): A bot that prevents raids of many large servers such as [discord.gg/LeagueOfLegends](https://discord.gg/LeagueOfLegends), [discord.gg/VALORANT](https://discord.gg/VALORANT), and many more.
 
 If you own a large bot that uses Javacord, feel free to add it to the list in a pull request!
@@ -217,6 +230,7 @@ api.addListener(new MyListener());
 For commands, you have the option of using one of the many existing command frameworks such as
 * [**Command Framework**](https://github.com/Vampire/command-framework) by [@Vampire](https://github.com/Vampire)
 * [**Sdcf4j**](https://github.com/Bastian/sdcf4j) by [@Bastian](https://github.com/Bastian)
+* [**KCommando Framework**](https://github.com/koply/KCommando) by [@koply](https://github.com/koply)
 
 or even write your own!
 

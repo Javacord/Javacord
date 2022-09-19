@@ -32,7 +32,7 @@ public class RatelimitManager {
     private final DiscordApiImpl api;
 
     /**
-     * A set with all buckets.
+     * All buckets.
      */
     private final Set<RatelimitBucket> buckets = new HashSet<>();
 
@@ -46,9 +46,9 @@ public class RatelimitManager {
     }
 
     /**
-     * Gets a set with all ratelimit buckets.
+     * Gets all ratelimit buckets.
      *
-     * @return A set with all ratelimit buckets.
+     * @return All ratelimit buckets.
      */
     public Set<RatelimitBucket> getBuckets() {
         return buckets;
@@ -174,11 +174,7 @@ public class RatelimitManager {
         Response response = result.getResponse();
         boolean global = response.header("X-RateLimit-Global", "false").equalsIgnoreCase("true");
         int remaining = Integer.parseInt(response.header("X-RateLimit-Remaining", "1"));
-        long reset = request
-                .getEndpoint()
-                .getHardcodedRatelimit()
-                .map(ratelimit -> responseTimestamp + api.getTimeOffset() + ratelimit)
-                .orElseGet(() -> (long) (Double.parseDouble(response.header("X-RateLimit-Reset", "0")) * 1000));
+        long reset =  (long) (Double.parseDouble(response.header("X-RateLimit-Reset", "0")) * 1000);
 
         // Check if we received a 429 response
         if (result.getResponse().code() == 429) {

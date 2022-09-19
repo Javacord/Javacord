@@ -20,7 +20,7 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
     }
 
     /**
-     * Get the component's type (always {@link ComponentType#BUTTON}.
+     * Get the component's type (always {@link ComponentType#BUTTON}).
      *
      * @return The component's type.
      */
@@ -122,7 +122,7 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
      * Set the button's emoji based on a unicode character.
      *
      * @param unicode The emoji unicode character.
-     * @return The current instance in order to chaain call methods.
+     * @return The current instance in order to chain call methods.
      */
     public ButtonBuilder setEmoji(String unicode) {
         delegate.setEmoji(unicode);
@@ -133,7 +133,7 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
      * Set the button's emoji.
      *
      * @param emoji The emoji.
-     * @return The current instance in order to chaain call methods.
+     * @return The current instance in order to chain call methods.
      */
     public ButtonBuilder setEmoji(Emoji emoji) {
         delegate.setEmoji(emoji);
@@ -144,7 +144,7 @@ public class ButtonBuilder implements LowLevelComponentBuilder {
      * Set the button's emoji to a custom emoji.
      *
      * @param emoji The custom emoji.
-     * @return The current instance in order to chaain call methods.
+     * @return The current instance in order to chain call methods.
      */
     public ButtonBuilder setEmoji(CustomEmoji emoji) {
         delegate.setEmoji(emoji);

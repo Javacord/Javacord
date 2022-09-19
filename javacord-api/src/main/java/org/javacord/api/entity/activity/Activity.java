@@ -4,10 +4,12 @@ import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.emoji.Emoji;
 
 import java.time.Instant;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 /**
- * This class represents a activity as it is displayed in Discord.
+ * This class represents an activity as it is displayed in Discord.
  */
 public interface Activity extends Nameable {
 
@@ -24,6 +26,13 @@ public interface Activity extends Nameable {
      * @return The streaming url of the activity.
      */
     Optional<String> getStreamingUrl();
+
+    /**
+     * Gets the time at which the activity was added/changed by the user.
+     *
+     * @return The time at which the activity was added/changed by the user.
+     */
+    Instant getCreatedAt();
 
     /**
      * Gets details about what's the user is currently doing.
@@ -54,6 +63,13 @@ public interface Activity extends Nameable {
     Optional<ActivityAssets> getAssets();
 
     /**
+     * Gets the secrets for Rich Presence joining and spectating.
+     *
+     * @return The secrets for Rich Presence joining and spectating.
+     */
+    Optional<ActivitySecrets> getSecrets();
+
+    /**
      * Gets the application id of the game.
      *
      * @return The application id of the game.
@@ -81,4 +97,25 @@ public interface Activity extends Nameable {
      */
     Optional<Emoji> getEmoji();
 
+    /**
+     * Whether the activity is an instanced game session.
+     *
+     * @return true if the activity is an instanced game session and false otherwise.
+     */
+    Optional<Boolean> getInstance();
+
+    /**
+     * Gets the activity flags of this activity.
+     * The flags describe what the payload includes.
+     *
+     * @return the activity flags.
+     */
+    EnumSet<ActivityFlag> getFlags();
+
+    /**
+     * Gets the custom button labels shown in the Rich Presence (max 2).
+     *
+     * @return The custom button labels shown in the Rich Presence (max 2).
+     */
+    List<String> getButtonLabels();
 }

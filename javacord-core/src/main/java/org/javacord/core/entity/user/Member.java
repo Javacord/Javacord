@@ -1,13 +1,13 @@
 package org.javacord.core.entity.user;
 
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
-
 import java.awt.Color;
 import java.time.Instant;
 import java.util.List;
@@ -76,6 +76,28 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     Optional<Color> getRoleColor();
 
     /**
+     * Gets the member's server avatar hash.
+     *
+     * @return The member's server avatar hash.
+     */
+    Optional<String> getServerAvatarHash();
+
+    /**
+     * Gets the member's server avatar.
+     *
+     * @return The member's server avatar.
+     */
+    Optional<Icon> getServerAvatar();
+
+    /**
+     * Gets the member's server avatar in the given size.
+     *
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The member's server avatar in the given size.
+     */
+    Optional<Icon> getServerAvatar(int size);
+
+    /**
      * Gets the timestamp of when this member joined the server.
      *
      * @return The timestamp of when this member joined the server.
@@ -85,21 +107,35 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     /**
      * Gets the timestamp of when this member started boosting the server.
      *
-     * @return The timestamp of when this member started boosting joined the server.
+     * @return The timestamp of when this member started boosting the server.
      */
     Optional<Instant> getServerBoostingSinceTimestamp();
 
     /**
+     * Gets the muted state of this member.
+     *
+     * @return Whether or not this member is muted.
+     */
+    boolean isMuted();
+
+    /**
+     * Gets the deafened state of this member.
+     *
+     * @return Whether or not this member is deafened.
+     */
+    boolean isDeafened();
+
+    /**
      * Gets the self-muted state of this member.
      *
-     * @return Whether or not this member is self-muted.
+     * @return Whether this member is self-muted.
      */
     boolean isSelfMuted();
 
     /**
      * Gets the self-deafened state of this member.
      *
-     * @return Whether or not this member is self-deafened.
+     * @return Whether this member is self-deafened.
      */
     boolean isSelfDeafened();
 
@@ -109,5 +145,14 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
      * @return Whether this user has passed the membership screening.
      */
     boolean isPending();
+
+    /**
+     * Gets the timestamp of the timeout when the timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant may be in the past which indicates that the user is not timed out.
+     *
+     * @return The timestamp of when this member will no longer be timed out.
+     */
+    Optional<Instant> getTimeout();
 
 }

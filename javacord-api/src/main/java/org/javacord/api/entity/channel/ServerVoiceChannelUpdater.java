@@ -1,17 +1,13 @@
 package org.javacord.api.entity.channel;
 
-import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
-import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.util.internal.DelegateFactory;
-
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class can be used to update server voice channels.
  */
-public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
+public class ServerVoiceChannelUpdater extends RegularServerChannelUpdater<ServerVoiceChannelUpdater> {
 
     /**
      * The server voice channel delegate used by this instance.
@@ -24,7 +20,8 @@ public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
      * @param channel The channel to update.
      */
     public ServerVoiceChannelUpdater(ServerVoiceChannel channel) {
-        delegate = DelegateFactory.createServerVoiceChannelUpdaterDelegate(channel);
+        super(DelegateFactory.createServerVoiceChannelUpdaterDelegate(channel));
+        delegate = (ServerVoiceChannelUpdaterDelegate) super.regularServerChannelUpdaterDelegate;
     }
 
     /**
@@ -77,38 +74,6 @@ public class ServerVoiceChannelUpdater extends ServerChannelUpdater {
      */
     public ServerVoiceChannelUpdater removeCategory() {
         delegate.removeCategory();
-        return this;
-    }
-
-    @Override
-    public ServerVoiceChannelUpdater setAuditLogReason(String reason) {
-        delegate.setAuditLogReason(reason);
-        return this;
-    }
-
-    @Override
-    public ServerVoiceChannelUpdater setName(String name) {
-        delegate.setName(name);
-        return this;
-    }
-
-    @Override
-    public ServerVoiceChannelUpdater setRawPosition(int rawPosition) {
-        delegate.setRawPosition(rawPosition);
-        return this;
-    }
-
-    @Override
-    public <T extends Permissionable & DiscordEntity> ServerVoiceChannelUpdater addPermissionOverwrite(
-            T permissionable, Permissions permissions) {
-        delegate.addPermissionOverwrite(permissionable, permissions);
-        return this;
-    }
-
-    @Override
-    public <T extends Permissionable & DiscordEntity> ServerVoiceChannelUpdater removePermissionOverwrite(
-            T permissionable) {
-        delegate.removePermissionOverwrite(permissionable);
         return this;
     }
 

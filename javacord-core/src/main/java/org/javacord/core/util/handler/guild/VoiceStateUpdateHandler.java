@@ -3,7 +3,7 @@ package org.javacord.core.util.handler.guild;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.GroupChannel;
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
@@ -12,7 +12,6 @@ import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberJoinE
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
 import org.javacord.api.event.server.VoiceStateUpdateEvent;
 import org.javacord.core.audio.AudioConnectionImpl;
-import org.javacord.core.entity.channel.GroupChannelImpl;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -63,8 +62,8 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                 VoiceChannel voiceChannel = optionalChannel.get();
                 if (voiceChannel instanceof PrivateChannel) {
                     handlePrivateChannel(userId, ((PrivateChannelImpl) voiceChannel));
-                } else if (voiceChannel instanceof GroupChannel) {
-                    handleGroupChannel(userId, ((GroupChannelImpl) voiceChannel));
+                } else if (voiceChannel.getType() == ChannelType.GROUP_CHANNEL) {
+                    logger.info("Received a VOICE_STATE_UPDATE packet for a group channel. This should be impossible.");
                 }
             } else {
                 LoggerUtil.logMissingChannel(logger, channelId);
@@ -105,7 +104,43 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     private void handleServerVoiceChannel(JsonNode packet, long userId) {
         api.getPossiblyUnreadyServerById(packet.get("guild_id").asLong())
                 .map(ServerImpl.class::cast).ifPresent(server -> {
-                    Member member = new MemberImpl(api, server, packet.get("member"), null);
+
+                    // We grab the old states prior to replacing the Member in the cache since we pull
+                    // the old states from the cache.
+                    boolean newSelfMuted = packet.get("self_mute").asBoolean();
+                    boolean oldSelfMuted = server.isSelfMuted(userId);
+                    boolean newSelfDeafened = packet.get("self_deaf").asBoolean();
+                    boolean oldSelfDeafened = server.isSelfDeafened(userId);
+                    boolean newMuted = packet.get("mute").asBoolean();
+                    boolean oldMuted = server.isMuted(userId);
+                    boolean newDeafened = packet.get("deaf").asBoolean();
+                    boolean oldDeafened = server.isDeafened(userId);
+
+                    // Check the cache first to see if we can update an existing Member object.
+                    MemberImpl oldMember = (MemberImpl) server.getRealMemberById(userId).orElse(null);
+                    if (oldMember == null && !packet.hasNonNull("member")) {
+                        // If there is no member in the cache and we don't receive a member field,
+                        // we will log it and return. I'm actually not sure if this is normal behavior;
+                        // Maybe the logging should be removed if it is, but the data being lost (non-cacheable)
+                        // is still notable.
+                        logger.warn("Received VOICE_STATE_UPDATE packet without "
+                                + "member field or member in the cache: {}", packet);
+                        return;
+                    }
+
+                    // For the update, prioritizes using the Member in the cache;
+                    // If not present, we use the member in the packet.
+                    MemberImpl newMember = ((oldMember != null)
+                            ? oldMember
+                            : new MemberImpl(api, server, packet.get("member"), null))
+                                .setMuted(newMuted)
+                                .setDeafened(newDeafened)
+                                .setSelfMuted(newSelfMuted)
+                                .setSelfDeafened(newSelfDeafened);
+
+                    // Update the cache with the new member prior to dispatching any events.
+                    api.addMemberToCacheOrReplaceExisting(newMember);
+
                     Optional<ServerVoiceChannelImpl> oldChannel = server
                             .getConnectedVoiceChannel(userId)
                             .map(ServerVoiceChannelImpl.class::cast);
@@ -123,32 +158,22 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                         oldChannel.ifPresent(channel -> {
                             channel.removeConnectedUser(userId);
                             dispatchServerVoiceChannelMemberLeaveEvent(
-                                    member, newChannel.orElse(null), channel, server);
+                                    newMember, newChannel.orElse(null), channel, server);
                         });
 
                         newChannel.ifPresent(channel -> {
                             channel.addConnectedUser(userId);
-                            dispatchServerVoiceChannelMemberJoinEvent(member, channel, oldChannel.orElse(null), server);
+                            dispatchServerVoiceChannelMemberJoinEvent(newMember, channel, oldChannel.orElse(null),
+                                    server);
                         });
                     }
 
-                    if (!packet.hasNonNull("member")) {
-                        logger.warn("Received VOICE_STATE_UPDATE packet without non-null member field: {}", packet);
-                        return;
-                    }
-                    MemberImpl newMember = new MemberImpl(api, server, packet.get("member"), null);
-                    Member oldMember = server.getRealMemberById(packet.get("user_id").asLong()).orElse(null);
-
-                    boolean newSelfMuted = packet.get("self_mute").asBoolean();
-                    boolean oldSelfMuted = server.isSelfMuted(userId);
                     if (newSelfMuted != oldSelfMuted) {
                         UserChangeSelfMutedEventImpl event = new UserChangeSelfMutedEventImpl(newMember, oldMember);
                         api.getEventDispatcher()
                                 .dispatchUserChangeSelfMutedEvent(server, server, newMember.getUser(), event);
                     }
 
-                    boolean newSelfDeafened = packet.get("self_deaf").asBoolean();
-                    boolean oldSelfDeafened = server.isSelfDeafened(userId);
                     if (newSelfDeafened != oldSelfDeafened) {
                         UserChangeSelfDeafenedEventImpl event = new UserChangeSelfDeafenedEventImpl(
                                 newMember, oldMember);
@@ -156,19 +181,13 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                                 .dispatchUserChangeSelfDeafenedEvent(server, server, newMember.getUser(), event);
                     }
 
-                    boolean newMuted = packet.get("mute").asBoolean();
-                    boolean oldMuted = server.isMuted(userId);
                     if (newMuted != oldMuted) {
-                        server.setMuted(userId, newMuted);
                         UserChangeMutedEventImpl event = new UserChangeMutedEventImpl(newMember, oldMember);
                         api.getEventDispatcher()
                                 .dispatchUserChangeMutedEvent(server, server, newMember.getUser(), event);
                     }
 
-                    boolean newDeafened = packet.get("deaf").asBoolean();
-                    boolean oldDeafened = server.isDeafened(userId);
                     if (newDeafened != oldDeafened) {
-                        server.setDeafened(userId, newDeafened);
                         UserChangeDeafenedEventImpl event = new UserChangeDeafenedEventImpl(newMember, oldMember);
                         api.getEventDispatcher()
                                 .dispatchUserChangeDeafenedEvent(server, server, newMember.getUser(), event);
@@ -177,11 +196,6 @@ public class VoiceStateUpdateHandler extends PacketHandler {
     }
 
     private void handlePrivateChannel(long userId, PrivateChannelImpl channel) {
-        //channel.addConnectedUser(user);
-        //dispatchVoiceChannelMemberJoinEvent(user, channel);
-    }
-
-    private void handleGroupChannel(long userId, GroupChannelImpl channel) {
         //channel.addConnectedUser(user);
         //dispatchVoiceChannelMemberJoinEvent(user, channel);
     }

@@ -36,7 +36,7 @@ public interface ServerChannelChangeOverwrittenPermissionsEvent extends ServerCh
     /**
      * Checks if the affected entity is a user.
      *
-     * @return Whether or not the affected entity is a user.
+     * @return Whether the affected entity is a user.
      */
     default boolean isUserEntity() {
         return !getRole().isPresent();
@@ -45,7 +45,7 @@ public interface ServerChannelChangeOverwrittenPermissionsEvent extends ServerCh
     /**
      * Checks if the affected entity is a role.
      *
-     * @return Whether or not the affected entity is a role.
+     * @return Whether the affected entity is a role.
      */
     default boolean isRoleEntity() {
         return getRole().isPresent();

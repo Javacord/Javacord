@@ -1,9 +1,6 @@
 package org.javacord.api.entity.channel;
 
-import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
-import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update server text channels.
  */
-public class ServerTextChannelUpdater extends ServerChannelUpdater {
+public class ServerTextChannelUpdater extends RegularServerChannelUpdater<ServerTextChannelUpdater> {
 
     /**
      * The server text channel delegate used by this instance.
@@ -24,7 +21,8 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
      * @param channel The channel to update.
      */
     public ServerTextChannelUpdater(ServerTextChannel channel) {
-        delegate = DelegateFactory.createServerTextChannelUpdaterDelegate(channel);
+        super(DelegateFactory.createServerTextChannelUpdaterDelegate(channel));
+        delegate = (ServerTextChannelUpdaterDelegate) super.regularServerChannelUpdaterDelegate;
     }
 
     /**
@@ -88,38 +86,6 @@ public class ServerTextChannelUpdater extends ServerChannelUpdater {
      */
     public ServerTextChannelUpdater unsetSlowmode() {
         return this.setSlowmodeDelayInSeconds(0);
-    }
-
-    @Override
-    public ServerTextChannelUpdater setAuditLogReason(String reason) {
-        delegate.setAuditLogReason(reason);
-        return this;
-    }
-
-    @Override
-    public ServerTextChannelUpdater setName(String name) {
-        delegate.setName(name);
-        return this;
-    }
-
-    @Override
-    public ServerTextChannelUpdater setRawPosition(int rawPosition) {
-        delegate.setRawPosition(rawPosition);
-        return this;
-    }
-
-    @Override
-    public <T extends Permissionable & DiscordEntity> ServerTextChannelUpdater addPermissionOverwrite(
-            T permissionable, Permissions permissions) {
-        delegate.addPermissionOverwrite(permissionable, permissions);
-        return this;
-    }
-
-    @Override
-    public <T extends Permissionable & DiscordEntity> ServerTextChannelUpdater removePermissionOverwrite(
-            T permissionable) {
-        delegate.removePermissionOverwrite(permissionable);
-        return this;
     }
 
     @Override

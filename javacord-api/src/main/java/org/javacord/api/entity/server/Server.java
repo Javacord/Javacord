@@ -12,12 +12,17 @@ import org.javacord.api.entity.auditlog.AuditLogActionType;
 import org.javacord.api.entity.auditlog.AuditLogEntry;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelCategoryBuilder;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
+import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
+import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
+import org.javacord.api.entity.channel.UnknownRegularServerChannel;
+import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.CustomEmojiBuilder;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.permission.PermissionState;
@@ -27,9 +32,12 @@ import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
+import org.javacord.api.entity.server.invite.WelcomeScreen;
+import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
 
@@ -38,16 +46,20 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -63,25 +75,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<AudioConnection> getAudioConnection();
 
     /**
-     * Checks if the server has boost messages enabled.
-     *
-     * @return Whether the the server has boost messages enabled or not.
-     */
-    boolean hasBoostMessagesEnabled();
-
-    /**
-     * Checks if the server has join messages enabled.
-     *
-     * @return Whether the the server has join messages enabled or not.
-     */
-    boolean hasJoinMessagesEnabled();
-
-    /**
      * Gets the features of the server.
      *
      * @return The server's available features.
      */
-    Collection<ServerFeature> getFeatures();
+    Set<ServerFeature> getFeatures();
 
     /**
      * Gets the boost level of the server.
@@ -158,7 +156,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * <p>Setting a preferred locale is only available for public servers.
      * You can check if a server is public using the {@link #getFeatures()} methods.
-     * @return The sever's preferred locale.
+     *
+     * @return The severs preferred locale.
      */
     Locale getPreferredLocale();
 
@@ -176,6 +175,63 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return The nickname of the user.
      */
     Optional<String> getNickname(User user);
+
+    /**
+     * Gets the timestamp of when this member started boosting the server.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this member started boosting the server.
+     */
+    Optional<Instant> getServerBoostingSinceTimestamp(User user);
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant may be in the past which indicates that the user is not timed out.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this user will no longer be timed out. Empty or a timestamp in the past,
+     *         if user is currently not timed out.
+     */
+    Optional<Instant> getTimeout(User user);
+
+    /**
+     * Gets the timestamp of when the user's timeout will expire
+     * and the user will be able to communicate in the server again.
+     * The returned Instant will be checked against {@link Instant#now()} and will only return an Instant,
+     * if the timeout is active at the moment when this method is called.
+     *
+     * @param user The user to check.
+     * @return The timestamp of when this user will no longer be timed out.
+     */
+    default Optional<Instant> getActiveTimeout(User user) {
+        return getTimeout(user).filter(Instant.now()::isBefore);
+    }
+
+    /**
+     * Gets the user's server specific avatar hash.
+     *
+     * @param user The user.
+     * @return The user's server specific avatar hash.
+     */
+    Optional<String> getUserServerAvatarHash(User user);
+
+    /**
+     * Gets the user's server specific avatar.
+     *
+     * @param user The user.
+     * @return The user's server specific avatar.
+     */
+    Optional<Icon> getUserServerAvatar(User user);
+
+    /**
+     * Gets the user's server specific avatar in the given size.
+     *
+     * @param user The user.
+     * @param size The size of the image, must be any power of 2 between 16 and 4096.
+     * @return The user's server specific avatar in the given size.
+     */
+    Optional<Icon> getUserServerAvatar(User user, int size);
 
     /**
      * Gets the pending state of the user.
@@ -449,7 +505,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Kicks all members without a role which were inactive at least the given amount of days.
      *
-     * @param days The amount of days the member has to be inactive.
+     * @param days   The amount of days the member has to be inactive.
      * @param reason The audit log reason for the prune.
      * @return The amount of member who got kicked.
      */
@@ -460,21 +516,28 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      *
      * @return The invites of the server.
      */
-    CompletableFuture<Collection<RichInvite>> getInvites();
+    CompletableFuture<Set<RichInvite>> getInvites();
 
     /**
      * Checks if all members of the server are in the cache.
      *
-     * @return Whether or not all members of the server are in the cache.
+     * @return Whether all members of the server are in the cache.
      */
     boolean hasAllMembersInCache();
 
     /**
-     * Gets a collection with all members of the server.
+     * Requests Discord to send the members for this server.
      *
-     * @return A collection with all members of the server.
+     * <p>After calling this method, your bot will receive {@link ServerMembersChunkEvent}s.
      */
-    Collection<User> getMembers();
+    void requestMembersChunks();
+
+    /**
+     * Gets all members of the server.
+     *
+     * @return All members of the server.
+     */
+    Set<User> getMembers();
 
     /**
      * Gets a member by its id.
@@ -499,8 +562,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
-     * This method is case sensitive!
+     * Gets a member by its discriminated name like e.g. {@code Bastian#8222}.
+     * This method is case-sensitive!
      *
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
@@ -513,8 +576,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a member by its discriminated name like e. g. {@code Bastian#8222}.
-     * This method is case insensitive!
+     * Gets a member by its discriminated name like e.g. {@code Bastian#8222}.
+     * This method is case-insensitive!
      *
      * @param discriminatedName The discriminated name of the member.
      * @return The member with the given discriminated name.
@@ -528,9 +591,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a member by its name and discriminator.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
-     * @param name The name of the member.
+     * @param name          The name of the member.
      * @param discriminator The discriminator of the member.
      * @return The member with the given name and discriminator.
      */
@@ -542,9 +605,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a member by its name and discriminator.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
-     * @param name The name of the member.
+     * @param name          The name of the member.
      * @param discriminator The discriminator of the member.
      * @return The member with the given name and discriminator.
      */
@@ -555,87 +618,87 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection with all members with the given name.
-     * This method is case sensitive!
+     * Gets all members with the given name.
+     * This method is case-sensitive!
      *
      * @param name The name of the members.
-     * @return A collection with all members with the given name.
+     * @return All members with the given name.
      */
-    default Collection<User> getMembersByName(String name) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByName(String name) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getName().equals(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given name.
-     * This method is case insensitive!
+     * Gets all members with the given name.
+     * This method is case-insensitive!
      *
      * @param name The name of the members.
-     * @return A collection with all members with the given name.
+     * @return All members with the given name.
      */
-    default Collection<User> getMembersByNameIgnoreCase(String name) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getName().equalsIgnoreCase(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given nickname on this server.
-     * This method is case sensitive!
+     * Gets all members with the given nickname on this server.
+     * This method is case-sensitive!
      *
      * @param nickname The nickname of the members.
-     * @return A collection with all members with the given nickname on this server.
+     * @return All members with the given nickname on this server.
      */
-    default Collection<User> getMembersByNickname(String nickname) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByNickname(String nickname) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getNickname(this).map(nickname::equals).orElse(false))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given nickname on this server.
-     * This method is case insensitive!
+     * Gets all members with the given nickname on this server.
+     * This method is case-insensitive!
      *
      * @param nickname The nickname of the members.
-     * @return A collection with all members with the given nickname on this server.
+     * @return All members with the given nickname on this server.
      */
-    default Collection<User> getMembersByNicknameIgnoreCase(String nickname) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByNicknameIgnoreCase(String nickname) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getNickname(this).map(nickname::equalsIgnoreCase).orElse(false))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given display name on this server.
-     * This method is case sensitive!
+     * Gets all members with the given display name on this server.
+     * This method is case-sensitive!
      *
      * @param displayName The display name of the members.
-     * @return A collection with all members with the given display name on this server.
+     * @return All members with the given display name on this server.
      */
-    default Collection<User> getMembersByDisplayName(String displayName) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByDisplayName(String displayName) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getDisplayName(this).equals(displayName))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection with all members with the given display name on this server.
-     * This method is case insensitive!
+     * Gets all members with the given display name on this server.
+     * This method is case-insensitive!
      *
      * @param displayName The display name of the members.
-     * @return A collection with all members with the given display name on this server.
+     * @return All members with the given display name on this server.
      */
-    default Collection<User> getMembersByDisplayNameIgnoreCase(String displayName) {
-        return Collections.unmodifiableList(
+    default Set<User> getMembersByDisplayNameIgnoreCase(String displayName) {
+        return Collections.unmodifiableSet(
                 getMembers().stream()
                         .filter(user -> user.getDisplayName(this).equalsIgnoreCase(displayName))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
@@ -694,7 +757,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all roles with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the roles.
      * @return A sorted list (by position) with all roles with the given name.
@@ -708,7 +771,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all roles with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the roles.
      * @return A sorted list (by position) with all roles with the given name.
@@ -748,20 +811,20 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Get the allowed permissions of a given user.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      *
      * @param user The user.
      * @return The allowed permissions of the given user.
      */
-    default Collection<PermissionType> getAllowedPermissions(User user) {
-        Collection<PermissionType> allowed = new HashSet<>();
+    default Set<PermissionType> getAllowedPermissions(User user) {
+        Set<PermissionType> allowed = new HashSet<>();
         if (isOwner(user)) {
             allowed.addAll(Arrays.asList(PermissionType.values()));
         } else {
             getRoles(user).forEach(role -> allowed.addAll(role.getAllowedPermissions()));
         }
-        return Collections.unmodifiableCollection(allowed);
+        return Collections.unmodifiableSet(allowed);
     }
 
     /**
@@ -770,13 +833,13 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @param user The user.
      * @return The unset permissions of the given user.
      */
-    default Collection<PermissionType> getUnsetPermissions(User user) {
+    default Set<PermissionType> getUnsetPermissions(User user) {
         if (isOwner(user)) {
             return Collections.emptySet();
         }
-        Collection<PermissionType> unset = new HashSet<>();
+        Set<PermissionType> unset = new HashSet<>();
         getRoles(user).forEach(role -> unset.addAll(role.getUnsetPermissions()));
-        return Collections.unmodifiableCollection(unset);
+        return Collections.unmodifiableSet(unset);
     }
 
     /**
@@ -947,7 +1010,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param icon The new icon of the server.
+     * @param icon     The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1014,7 +1077,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param icon The new icon of the server.
+     * @param icon     The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1042,7 +1105,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param icon The new icon of the server.
+     * @param icon     The new icon of the server.
      * @param fileType The type of the icon, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1096,7 +1159,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param splash The new splash of the server.
+     * @param splash   The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1163,7 +1226,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param splash The new splash of the server.
+     * @param splash   The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1191,7 +1254,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param splash The new splash of the server.
+     * @param splash   The new splash of the server.
      * @param fileType The type of the splash, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1231,7 +1294,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param banner The new banner of the server.
+     * @param banner   The new banner of the server.
      * @param fileType The type of the banner, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1298,7 +1361,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param banner The new banner of the server.
+     * @param banner   The new banner of the server.
      * @param fileType The type of the banner, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1326,7 +1389,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param banner The new banner of the server.
+     * @param banner   The new banner of the server.
      * @param fileType The type of the banner, e.g. "png" or "jpg".
      * @return A future to check if the update was successful.
      */
@@ -1441,7 +1504,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user.
+     * @param user     The user.
      * @param nickname The new nickname of the user.
      * @return A future to check if the update was successful.
      */
@@ -1455,9 +1518,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user.
+     * @param user     The user.
      * @param nickname The new nickname of the user.
-     * @param reason The audit log reason for this update.
+     * @param reason   The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> updateNickname(User user, String nickname, String reason) {
@@ -1483,12 +1546,99 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user.
+     * @param user   The user.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
     default CompletableFuture<Void> resetNickname(User user, String reason) {
         return createUpdater().setNickname(user, null).setAuditLogReason(reason).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user    The user.
+     * @param timeout The timestamp until the user should be timed out.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Instant timeout) {
+        return createUpdater().setUserTimeout(user, timeout).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user    The user.
+     * @param timeout The timestamp until the user should be timed out.
+     * @param reason  The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Instant timeout, String reason) {
+        return createUpdater().setUserTimeout(user, timeout).setAuditLogReason(reason).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user     The user.
+     * @param duration The duration of the timeout.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Duration duration) {
+        return createUpdater().setUserTimeout(user, Instant.now().plus(duration)).update();
+    }
+
+    /**
+     * Timeout the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user     The user.
+     * @param duration The duration of the timeout.
+     * @param reason   The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> timeoutUser(User user, Duration duration, String reason) {
+        return createUpdater().setUserTimeout(user, Instant.now().plus(duration))
+                .setAuditLogReason(reason)
+                .update();
+    }
+
+    /**
+     * Remove a timeout for the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user The user.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeUserTimeout(User user) {
+        return createUpdater().setUserTimeout(user, Instant.MIN).update();
+    }
+
+    /**
+     * Remove a timeout for the given user on this server.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param user   The user.
+     * @param reason The audit log reason for this update.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeUserTimeout(User user, String reason) {
+        return createUpdater().setUserTimeout(user, Instant.MIN).setAuditLogReason(reason).update();
     }
 
     /**
@@ -1525,8 +1675,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member the role should be added to.
-     * @param role The role which should be added to the server member.
+     * @param user   The server member the role should be added to.
+     * @param role   The role which should be added to the server member.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1552,8 +1702,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The server member the role should be removed from.
-     * @param role The role which should be removed from the server member.
+     * @param user   The server member the role should be removed from.
+     * @param role   The role which should be removed from the server member.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1566,7 +1716,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user to update the roles of.
+     * @param user  The user to update the roles of.
      * @param roles The collection of roles to replace the user's roles.
      * @return A future to check if the update was successful.
      */
@@ -1584,8 +1734,8 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerUpdater} from {@link #createUpdater()} which provides a better performance!
      *
-     * @param user The user to update the roles of.
-     * @param roles The collection of roles to replace the user's roles.
+     * @param user   The user to update the roles of.
+     * @param roles  The collection of roles to replace the user's roles.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1610,7 +1760,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Reorders the roles of the server.
      *
-     * @param roles An ordered list with the new role positions.
+     * @param roles  An ordered list with the new role positions.
      * @param reason The audit log reason for this update.
      * @return A future to check if the update was successful.
      */
@@ -1629,7 +1779,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Moves the given user to the given channel on the server.
      *
-     * @param user The user to move.
+     * @param user    The user to move.
      * @param channel The channel to move the user to.
      * @return A future to check if the move was successful.
      */
@@ -1650,7 +1800,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Mutes yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to mute yourself server-sidely, so that others can unmute
+     * <p>This cannot be undone by other users. If you want to mute yourself server-side, so that others can unmute
      * you, use {@link #muteYourself()}, {@link #muteUser(User)} or {@link #muteUser(User, String)}.
      *
      * @see #muteYourself()
@@ -1662,7 +1812,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Unmutes yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to unmute yourself server-sidely, so that others can
+     * <p>This cannot be undone by other users. If you want to unmute yourself server-side, so that others can
      * mute you, use {@link #unmuteYourself()}, {@link #unmuteUser(User)} or {@link #unmuteUser(User, String)}.
      *
      * @see #unmuteYourself()
@@ -1702,7 +1852,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Mutes the given user on the server.
      *
-     * @param user The user to mute.
+     * @param user   The user to mute.
      * @param reason The audit log reason for this action.
      * @return A future to check if the mute was successful.
      */
@@ -1723,7 +1873,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Unmutes the given user on the server.
      *
-     * @param user The user to unmute.
+     * @param user   The user to unmute.
      * @param reason The audit log reason for this action.
      * @return A future to check if the unmute was successful.
      */
@@ -1734,7 +1884,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Deafens yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to deafen yourself server-sidely, so that others can
+     * <p>This cannot be undone by other users. If you want to deafen yourself server-side, so that others can
      * undeafen you, use {@link #deafenYourself()}, {@link #deafenUser(User)} or {@link #deafenUser(User, String)}.
      *
      * @see #deafenYourself()
@@ -1746,7 +1896,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Undeafens yourself locally for the server.
      *
-     * <p>This cannot be undone by other users. If you want to undeafen yourself server-sidely, so that others can
+     * <p>This cannot be undone by other users. If you want to undeafen yourself server-side, so that others can
      * deafen you, use {@link #undeafenYourself()}, {@link #undeafenUser(User)} or {@link #undeafenUser(User, String)}.
      *
      * @see #undeafenYourself()
@@ -1786,13 +1936,31 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Deafens the given user on the server.
      *
-     * @param user The user to deafen.
+     * @param user   The user to deafen.
      * @param reason The audit log reason for this action.
      * @return A future to check if the deafen was successful.
      */
     default CompletableFuture<Void> deafenUser(User user, String reason) {
         return createUpdater().setDeafened(user, true).setAuditLogReason(reason).update();
     }
+
+    /**
+     * Requests a server member.
+     *
+     * @param user The user to request as a member.
+     * @return A future to get a server member if it exists in the server.
+     */
+    default CompletableFuture<User> requestMember(User user) {
+        return requestMember(user.getId());
+    }
+
+    /**
+     * Requests a server member.
+     *
+     * @param userId The user id of the member to request.
+     * @return A future to get a server member if it exists in the server.
+     */
+    CompletableFuture<User> requestMember(long userId);
 
     /**
      * Undeafens the given user on the server.
@@ -1807,7 +1975,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Undeafens the given user on the server.
      *
-     * @param user The user to undeafen.
+     * @param user   The user to undeafen.
      * @param reason The audit log reason for this action.
      * @return A future to check if the undeafen was successful.
      */
@@ -1828,7 +1996,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Kicks the given user from the server.
      *
-     * @param user The user to kick.
+     * @param user   The user to kick.
      * @param reason The audit log reason for this action.
      * @return A future to check if the kick was successful.
      */
@@ -1841,30 +2009,84 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(User user) {
-        return banUser(user.getId(), 0, null);
+        return banUser(user.getId(), 0, TimeUnit.SECONDS, null);
     }
 
     /**
      * Bans the given user from the server.
      *
-     * @param user The user to ban.
+     * @param user              The user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(User, long, TimeUnit, String)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays) {
-        return banUser(user.getId(), deleteMessageDays, null);
+        return banUser(user.getId(), deleteMessageDays);
     }
 
     /**
      * Bans the given user from the server.
      *
-     * @param user The user to ban.
+     * @param user              The user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason The reason for the ban.
+     * @param reason            The reason for the ban.
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(User, long, TimeUnit, String)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
         return banUser(user.getId(), deleteMessageDays, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user                  The user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, long deleteMessageDuration, TimeUnit unit) {
+        return banUser(user.getId(), deleteMessageDuration, unit);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user                  The user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, long deleteMessageDuration, TimeUnit unit, String reason) {
+        return banUser(user.getId(), deleteMessageDuration, unit, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user     The user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, Duration duration) {
+        return banUser(user.getId(), duration, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param user     The user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param reason   The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(User user, Duration duration, String reason) {
+        return banUser(user.getId(), duration, reason);
     }
 
     /**
@@ -1874,7 +2096,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(String userId) {
-        return banUser(userId, 0, null);
+        return banUser(userId, null);
     }
 
     /**
@@ -1890,21 +2112,25 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
+     * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(String userId, int deleteMessageDays) {
-        return banUser(userId, deleteMessageDays, null);
+        return banUser(userId, deleteMessageDays, TimeUnit.DAYS);
     }
 
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
+     * @param userId            The id of the user to ban.
      * @param deleteMessageDays The number of days to delete messages for (0-7).
      * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays) {
         return banUser(Long.toUnsignedString(userId), deleteMessageDays);
     }
@@ -1912,23 +2138,127 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason The reason for the ban.
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
-    CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason);
+    default CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit) {
+        return banUser(userId, deleteMessageDuration, unit, null);
+    }
 
     /**
      * Bans the given user from the server.
      *
-     * @param userId The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason The reason for the ban.
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
      * @return A future to check if the ban was successful.
      */
+    default CompletableFuture<Void> banUser(long userId, long deleteMessageDuration, TimeUnit unit) {
+        return banUser(Long.toUnsignedString(userId), deleteMessageDuration, unit);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(String userId, Duration duration) {
+        return banUser(userId, duration, null);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, Duration duration) {
+        return banUser(Long.toUnsignedString(userId), duration);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId            The id of the user to ban.
+     * @param deleteMessageDays The number of days to delete messages for (0-7).
+     * @param reason            The reason for the ban.
+     * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
+     */
+    @Deprecated
+    default CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
+        return banUser(userId, deleteMessageDays, TimeUnit.DAYS, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId            The id of the user to ban.
+     * @param deleteMessageDays The number of days to delete messages for (0-7).
+     * @param reason            The reason for the ban.
+     * @return A future to check if the ban was successful.
+     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
+     */
+    @Deprecated
     default CompletableFuture<Void> banUser(long userId, int deleteMessageDays, String reason) {
         return banUser(Long.toUnsignedString(userId), deleteMessageDays, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    CompletableFuture<Void> banUser(String userId, long deleteMessageDuration, TimeUnit unit, String reason);
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId                The id of the user to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, long deleteMessageDuration, TimeUnit unit, String reason) {
+        return banUser(Long.toUnsignedString(userId), deleteMessageDuration, unit, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param reason   The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(String userId, Duration duration, String reason) {
+        return banUser(userId, duration.getSeconds(), TimeUnit.SECONDS, reason);
+    }
+
+    /**
+     * Bans the given user from the server.
+     *
+     * @param userId   The id of the user to ban.
+     * @param duration The number of messages to delete within the duration. (Between 0 and 604800 seconds (7 days))
+     * @param reason   The reason for the ban.
+     * @return A future to check if the ban was successful.
+     */
+    default CompletableFuture<Void> banUser(long userId, Duration duration, String reason) {
+        return banUser(Long.toUnsignedString(userId), duration, reason);
     }
 
     /**
@@ -1964,7 +2294,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Unbans the given user from the server.
      *
-     * @param user The user to ban.
+     * @param user   The user to ban.
      * @param reason The audit log reason for this action.
      * @return A future to check if the unban was successful.
      */
@@ -1999,31 +2329,65 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection with all server bans.
+     * Requests a ban object for the specified user.
      *
-     * @return A collection with all server bans.
+     * @param user The user to request the ban object for.
+     * @return A future to get a server ban object if the user is currently banned.
      */
-    CompletableFuture<Collection<Ban>> getBans();
+    default CompletableFuture<Ban> requestBan(User user) {
+        return requestBan(user.getId());
+    }
 
     /**
-     * Gets a list of all webhooks in this server.
+     * Requests a ban object for the specified user.
      *
-     * @return A list of all webhooks in this server.
+     * @param userId The user id to request the ban object for.
+     * @return A future to get a server ban object if the user is currently banned.
+     */
+    CompletableFuture<Ban> requestBan(long userId);
+
+    /**
+     * Gets all server bans.
+     * Note: This method fires <code>ceil((number of bans + 1) / 1000)</code> requests to Discord
+     * as the API returns the results in pages and Javacord collects all pages into one collection.
+     * If you want to control pagination yourself, use {@link Server#getBans(Integer, Long)}.
+     *
+     * @return All server bans.
+     */
+    CompletableFuture<Set<Ban>> getBans();
+
+    /**
+     * Gets up to <code>limit</code> server bans, only taking users with an ID higher than
+     * <code>after</code> into account.
+     * This can be used to get a specific page of bans.
+     * To get all pages / all bans at once, use {@link Server#getBans()}.
+     *
+     * @param limit How many bans should be returned at most. Must be within [0, 1000]. If null, it will default to 1000
+     * @param after Should be a snowflake to only take bans of users with IDs higher
+     *              than this parameter into account; can be null
+     * @return Server bans on the given page with at most <code>limit</code> entries.
+     */
+    CompletableFuture<Set<Ban>> getBans(Integer limit, Long after);
+
+    /**
+     * Gets all webhooks in this server.
+     *
+     * @return All webhooks in this server.
      */
     CompletableFuture<List<Webhook>> getWebhooks();
 
     /**
-     * Gets a list of all incoming webhooks in this server, they are not guaranteed to have an accessible token.
+     * Gets all incoming webhooks in this server, they are not guaranteed to have an accessible token.
      *
-     * @return A list of all incoming webhooks in this server.
+     * @return All incoming webhooks in this server.
      */
     CompletableFuture<List<Webhook>> getAllIncomingWebhooks();
 
     /**
-     * Gets a list of incoming webhooks in this server.
+     * Gets all incoming webhooks in this server.
      * This method only returns webhooks with a token, that the bot can access.
      *
-     * @return A list of all incoming webhooks in this server.
+     * @return All incoming webhooks in this server.
      */
     CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks();
 
@@ -2039,7 +2403,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Gets the audit log of this server.
      *
      * @param limit The maximum amount of audit log entries.
-     * @param type The action type of the audit log.
+     * @param type  The action type of the audit log.
      * @return The audit log.
      */
     CompletableFuture<AuditLog> getAuditLog(int limit, AuditLogActionType type);
@@ -2047,7 +2411,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Gets the audit log of this server.
      *
-     * @param limit The maximum amount of audit log entries.
+     * @param limit  The maximum amount of audit log entries.
      * @param before Filter the log before this entry.
      * @return The audit log.
      */
@@ -2056,9 +2420,9 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Gets the audit log of this server.
      *
-     * @param limit The maximum amount of audit log entries.
+     * @param limit  The maximum amount of audit log entries.
      * @param before Filter the log before this entry.
-     * @param type The action type of the audit log.
+     * @param type   The action type of the audit log.
      * @return The audit log.
      */
     CompletableFuture<AuditLog> getAuditLogBefore(int limit, AuditLogEntry before, AuditLogActionType type);
@@ -2066,11 +2430,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if a user has a given permission.
      * Remember, that some permissions affect others!
-     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#READ_MESSAGES} cannot
+     * E.g. a user who has {@link PermissionType#SEND_MESSAGES} but not {@link PermissionType#VIEW_CHANNEL} cannot
      * send messages, even though he has the {@link PermissionType#SEND_MESSAGES} permission.
      * This method also do not take into account overwritten permissions in some channels!
      *
-     * @param user The user.
+     * @param user       The user.
      * @param permission The permission to check.
      * @return Whether the user has the permission or not.
      */
@@ -2079,11 +2443,11 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection with all custom emojis of this server.
+     * Gets all custom emojis of this server.
      *
-     * @return A collection with all custom emojis of this server.
+     * @return All custom emojis of this server.
      */
-    Collection<KnownCustomEmoji> getCustomEmojis();
+    Set<KnownCustomEmoji> getCustomEmojis();
 
     /**
      * Gets a custom emoji in this server by its id.
@@ -2110,39 +2474,39 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
-     * Gets a collection of all custom emojis with the given name in the server.
-     * This method is case sensitive!
+     * Gets all custom emojis with the given name in the server.
+     * This method is case-sensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A collection of all custom emojis with the given name in this server.
+     * @return All custom emojis with the given name in this server.
      */
-    default Collection<KnownCustomEmoji> getCustomEmojisByName(String name) {
-        return Collections.unmodifiableList(
+    default Set<KnownCustomEmoji> getCustomEmojisByName(String name) {
+        return Collections.unmodifiableSet(
                 getCustomEmojis().stream()
                         .filter(emoji -> emoji.getName().equals(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a collection of all custom emojis with the given name in the server.
-     * This method is case insensitive!
+     * Gets all custom emojis with the given name in the server.
+     * This method is case-insensitive!
      *
      * @param name The name of the custom emojis.
-     * @return A collection of all custom emojis with the given name in this server.
+     * @return All custom emojis with the given name in this server.
      */
-    default Collection<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
-        return Collections.unmodifiableCollection(
+    default Set<KnownCustomEmoji> getCustomEmojisByNameIgnoreCase(String name) {
+        return Collections.unmodifiableSet(
                 getCustomEmojis().stream()
                         .filter(emoji -> emoji.getName().equalsIgnoreCase(name))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets a list with all slash commands for the given server.
+     * Gets all slash commands for the given server.
      *
-     * @return A list with all slash commands from the server.
+     * @return All slash commands from the server.
      */
-    CompletableFuture<List<SlashCommand>> getSlashCommands();
+    CompletableFuture<Set<SlashCommand>> getSlashCommands();
 
     /**
      * Gets a server slash command by its id.
@@ -2196,6 +2560,20 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<ServerChannel> getChannels();
 
     /**
+     * Gets an unordered collection with all channels in the server.
+     *
+     * @return An unordered collection with all channels in the server.
+     */
+    Set<ServerChannel> getUnorderedChannels();
+
+    /**
+     * Gets a sorted list (by position) with all regular channels of the server.
+     *
+     * @return A sorted list (by position) with all regular channels of the server.
+     */
+    List<RegularServerChannel> getRegularChannels();
+
+    /**
      * Gets a sorted list (by position) with all channel categories of the server.
      *
      * @return A sorted list (by position) with all channel categories of the server.
@@ -2210,11 +2588,25 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     List<ServerTextChannel> getTextChannels();
 
     /**
+     * Gets a sorted list (by position) with all forum channels of the server.
+     *
+     * @return A sorted list (by position) with all forum channels of the server.
+     */
+    List<ServerForumChannel> getForumChannels();
+
+    /**
      * Gets a sorted list (by position) with all voice channels of the server.
      *
      * @return A sorted list (by position) with all voice channels of the server.
      */
     List<ServerVoiceChannel> getVoiceChannels();
+
+    /**
+     * Gets a sorted list (by archive timestamp from old to new) with all thread channels of the server.
+     *
+     * @return A sorted list (by archive timestamp from old to new) with all thread channels of the server.
+     */
+    List<ServerThreadChannel> getThreadChannels();
 
     /**
      * Gets a channel by its id.
@@ -2240,7 +2632,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channels with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the channels.
      * @return A sorted list (by position) with all channels with the given name.
@@ -2254,7 +2646,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channels with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the channels.
      * @return A sorted list (by position) with all channels with the given name.
@@ -2262,6 +2654,56 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default List<ServerChannel> getChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a regular channel by its id.
+     *
+     * @param id The id of the regular channel.
+     * @return The regular channel with the given id.
+     */
+    Optional<RegularServerChannel> getRegularChannelById(long id);
+
+    /**
+     * Gets a regular channel by its id.
+     *
+     * @param id The id of the regular channel.
+     * @return The regular channel with the given id.
+     */
+    default Optional<RegularServerChannel> getRegularChannelById(String id) {
+        try {
+            return getRegularChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a sorted list (by position) with all channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the channels.
+     * @return A sorted list (by position) with all channels with the given name.
+     */
+    default List<RegularServerChannel> getRegularChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getRegularChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the channels.
+     * @return A sorted list (by position) with all channels with the given name.
+     */
+    default List<RegularServerChannel> getRegularChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getRegularChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
@@ -2294,7 +2736,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channel categories with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the channel categories.
      * @return A sorted list (by position) with all channel categories with the given name.
@@ -2308,7 +2750,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all channel categories with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the channel categories.
      * @return A sorted list (by position) with all channel categories with the given name.
@@ -2318,6 +2760,58 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
                 getChannelCategories().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets an unknown channel by its id.
+     *
+     * @param id The id of the unknown channel.
+     * @return The unknown channel with the given id.
+     */
+    default Optional<UnknownServerChannel> getUnknownChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof UnknownServerChannel)
+                .map(channel -> (UnknownServerChannel) channel);
+    }
+
+    /**
+     * Gets an unknown channel by its id.
+     *
+     * @param id The id of the unknown channel.
+     * @return The unknown channel with the given id.
+     */
+    default Optional<UnknownServerChannel> getUnknownChannelById(String id) {
+        try {
+            return getUnknownChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets an unknown regular channel by its id.
+     *
+     * @param id The id of the unknown regular channel.
+     * @return The unknown regular channel with the given id.
+     */
+    default Optional<UnknownRegularServerChannel> getUnknownRegularChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof UnknownRegularServerChannel)
+                .map(channel -> (UnknownRegularServerChannel) channel);
+    }
+
+    /**
+     * Gets an unknown regular channel by its id.
+     *
+     * @param id The id of the unknown regular channel.
+     * @return The unknown regular channel with the given id.
+     */
+    default Optional<UnknownRegularServerChannel> getUnknownRegularChannelById(String id) {
+        try {
+            return getUnknownRegularChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -2347,8 +2841,58 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     }
 
     /**
+     * Gets a forum channel by its id.
+     *
+     * @param id The id of the forum channel.
+     * @return The forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getForumChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerForumChannel)
+                .map(channel -> (ServerForumChannel) channel);
+    }
+
+    /**
+     * Gets a forum channel by its id.
+     *
+     * @param id The id of the forum channel.
+     * @return The forum channel with the given id.
+     */
+    default Optional<ServerForumChannel> getForumChannelById(String id) {
+        try {
+            return getForumChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a channel thread by its id.
+     *
+     * @param id The id of the threat.
+     * @return The threat with the given id.
+     */
+    default Optional<ServerThreadChannel> getThreadChannelById(final long id) {
+        return getChannelById(id).flatMap(ServerChannel::asServerThreadChannel);
+    }
+
+    /**
+     * Gets a channel thread by its id.
+     *
+     * @param id The id of the thread.
+     * @return The thread with the given id.
+     */
+    default Optional<ServerThreadChannel> getThreadChannelById(final String id) {
+        try {
+            return getThreadChannelById(Long.parseLong(id));
+        } catch (final NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Gets a sorted list (by position) with all text channels with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the text channels.
      * @return A sorted list (by position) with all text channels with the given name.
@@ -2362,7 +2906,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all text channels with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the text channels.
      * @return A sorted list (by position) with all text channels with the given name.
@@ -2370,6 +2914,34 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default List<ServerTextChannel> getTextChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getTextChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all text channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the text channels.
+     * @return A sorted list (by position) with all text channels with the given name.
+     */
+    default List<ServerForumChannel> getForumChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getForumChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all forum channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the text channels.
+     * @return A sorted list (by position) with all text channels with the given name.
+     */
+    default List<ServerForumChannel> getForumChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getForumChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
@@ -2428,7 +3000,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all voice channels with the given name.
-     * This method is case sensitive!
+     * This method is case-sensitive!
      *
      * @param name The name of the voice channels.
      * @return A sorted list (by position) with all voice channels with the given name.
@@ -2442,7 +3014,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
 
     /**
      * Gets a sorted list (by position) with all voice channels with the given name.
-     * This method is case insensitive!
+     * This method is case-insensitive!
      *
      * @param name The name of the voice channels.
      * @return A sorted list (by position) with all voice channels with the given name.
@@ -2702,7 +3274,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     default boolean canUseSlashCommands(User user) {
         return hasAnyPermission(user,
                 PermissionType.ADMINISTRATOR,
-                PermissionType.USE_SLASH_COMMANDS);
+                PermissionType.USE_APPLICATION_COMMANDS);
     }
 
     /**
@@ -2738,7 +3310,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if the user can manage the roles of the target user.
      *
-     * @param user The user that tries to manage roles.
+     * @param user   The user that tries to manage roles.
      * @param target The user whose roles are to be managed.
      * @return Whether the user can manage the target's roles.
      */
@@ -2749,7 +3321,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     /**
      * Checks if the user can manage the target role.
      *
-     * @param user The user that tries to manage the role.
+     * @param user   The user that tries to manage the role.
      * @param target The role that is to be managed.
      * @return Whether the user can manage the role.
      */
@@ -2807,7 +3379,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * This method also considers the position of the user roles and the owner.
      * If the to-be-kicked user is not part of this server, still {@code true} is returned as Discord allows this.
      *
-     * @param user The user which "want" to kick the other user.
+     * @param user       The user which "want" to kick the other user.
      * @param userToKick The user which should be kicked.
      * @return Whether the given user can kick the other user or not.
      */
@@ -2865,7 +3437,7 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      * Checks if the given user can ban the other user.
      * This method also considers the position of the user roles and the owner.
      *
-     * @param user The user which "want" to ban the other user.
+     * @param user      The user which "want" to ban the other user.
      * @param userToBan The user which should be banned.
      * @return Whether the given user can ban the other user or not.
      */
@@ -2903,4 +3475,199 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
         return getApi().getServerById(getId());
     }
 
+    /**
+     * Joins this ServerThreadChannel.
+     * Also requires the thread is not archived.
+     *
+     * @param serverThreadChannel The ServerThreadChannel which should be joined.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> joinServerThreadChannel(ServerThreadChannel serverThreadChannel) {
+        return joinServerThreadChannel(serverThreadChannel.getId());
+    }
+
+    /**
+     * Joins this ServerThreadChannel.
+     * Also requires the thread is not archived.
+     *
+     * @param channelId The ServerThreadChannel ID which should be joined.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Void> joinServerThreadChannel(long channelId);
+
+
+    /**
+     * Leaves this ServerThreadChannel.
+     *
+     * @param serverThreadChannel The ServerThreadChannel which should be left.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> leaveServerThreadChannel(ServerThreadChannel serverThreadChannel) {
+        return leaveServerThreadChannel(serverThreadChannel.getId());
+    }
+
+    /**
+     * Leaves this ServerThreadChannel.
+     *
+     * @param channelId The ServerThreadChannel ID which should be left.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Void> leaveServerThreadChannel(long channelId);
+
+    /**
+     * Gets the active threads in this Server.
+     *
+     * @return The active threads.
+     */
+    CompletableFuture<ActiveThreads> getActiveThreads();
+
+    /**
+     * Gets the stickers of this server.
+     *
+     * @return The stickers of this server.
+     */
+    Set<Sticker> getStickers();
+
+    /**
+     * Requests the sticker of this server from the Discord API without checking the cache.
+     *
+     * @return The stickers of this server.
+     */
+    CompletableFuture<Set<Sticker>> requestStickers();
+
+    /**
+     * Gets a sticker by its ID.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    default Optional<Sticker> getStickerById(long id) {
+        return getStickers().stream().filter(sticker -> sticker.getId() == id).findAny();
+    }
+
+    /**
+     * Gets a sticker by its ID.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    default Optional<Sticker> getStickerById(String id) {
+        try {
+            return getStickerById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets stickers by their name. The name is case-sensitive!
+     *
+     * @param name The name of the stickers.
+     * @return Stickers with the given name.
+     */
+    default Set<Sticker> getStickersByName(String name) {
+        return getStickers().stream()
+                .filter(sticker -> sticker.getName().equals(name))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets stickers by their name. The name is case-insensitive!
+     *
+     * @param name The name of the stickers.
+     * @return Stickers with the given name.
+     */
+    default Set<Sticker> getStickersByNameIgnoreCase(String name) {
+        return getStickers().stream()
+                .filter(sticker -> sticker.getName().equalsIgnoreCase(name))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Requests a sticker by its ID from the Discord API without checking the cache.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    CompletableFuture<Sticker> requestStickerById(long id);
+
+    /**
+     * Requests a sticker by its ID from the Discord API without checking the cache.
+     *
+     * @param id The ID of the sticker.
+     * @return The sticker with the given ID.
+     */
+    default CompletableFuture<Sticker> requestStickerById(String id) {
+        try {
+            return requestStickerById(Long.parseLong(id));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("The ID must be a number.");
+        }
+    }
+
+    /**
+     * True if the server widget is enabled.
+     *
+     * @return true if the server widget is enabled.
+     */
+    boolean isWidgetEnabled();
+
+    /**
+     * Gets the channel id that the widget will generate an invite to, or null if set to no invite.
+     *
+     * @return the channel id that the widget will generate an invite to, or null if set to no invite.
+     */
+    Optional<Long> getWidgetChannelId();
+
+    /**
+     * Gets the maximum number of presences for the guild
+     * (null is always returned, apart from the largest of guilds).
+     *
+     * @return the maximum number of presences for the guild.
+     */
+    Optional<Integer> getMaxPresences();
+
+    /**
+     * Gets the maximum number of members for the guild.
+     *
+     * @return the maximum number of members for the guild.
+     */
+    Optional<Integer> getMaxMembers();
+
+    /**
+     * Gets the maximum amount of users in a video channel.
+     *
+     * @return the maximum amount of users in a video channel.
+     */
+    Optional<Integer> getMaxVideoChannelUsers();
+
+    /**
+     * Gets the welcome screen of a Community server shown to new members.
+     *
+     * @return the welcome screen of a Community server shown to new members.
+     */
+    Optional<WelcomeScreen> getWelcomeScreen();
+
+    /**
+     * True if the server's boost progress bar is enabled.
+     *
+     * @return whether the server's boost progress bar is enabled or not.
+     */
+    boolean isPremiumProgressBarEnabled();
+
+    /**
+     * Gets regular server channel for widget.
+     *
+     * @return the regular server channel for widget.
+     */
+    default Optional<RegularServerChannel> getWidgetChannel() {
+        return getWidgetChannelId().flatMap(this::getRegularChannelById);
+    }
+
+    /**
+     * Gets system channel flags for this server.
+     *
+     * @return The system channel flags for this server.
+     */
+    EnumSet<SystemChannelFlag> getSystemChannelFlags();
 }

@@ -9,6 +9,7 @@ import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.TextInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +40,14 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
                         SelectMenu selectMenu = new SelectMenuImpl(componentJson);
                         components.add(selectMenu);
                         break;
+                    case TEXT_INPUT:
+                        TextInput textInput = new TextInputImpl(componentJson);
+                        components.add(textInput);
+                        break;
                     default:
                         throw new IllegalStateException(
                             String.format(
-                                "Couldn't parse the component of type '%d'. Please contact the developer!",
-                                typeInt
+                                "Couldn't parse the component of type '%d'. Please contact the developer!", typeInt
                             )
                         );
                 }
@@ -51,11 +55,7 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
         }
     }
 
-    /**
-     * Gets the ActionRow as a {@link ObjectNode}. This is what is sent to Discord.
-     *
-     * @return The button as a ObjectNode.
-     */
+    @Override
     public ObjectNode toJsonNode() {
         ObjectNode object = JsonNodeFactory.instance.objectNode();
         return toJsonNode(object);
@@ -71,7 +71,7 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
     public ObjectNode toJsonNode(ObjectNode object) throws IllegalStateException {
         object.put("type", ComponentType.ACTION_ROW.value());
 
-        if (components.size() == 0) {
+        if (components.isEmpty()) {
             object.putArray("components");
             return object;
         }
@@ -88,6 +88,10 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
                 case SELECT_MENU:
                     SelectMenuImpl selectMenu = (SelectMenuImpl) component;
                     componentsJson.add(selectMenu.toJsonNode());
+                    break;
+                case TEXT_INPUT:
+                    TextInputImpl textInput = (TextInputImpl) component;
+                    componentsJson.add(textInput.toJsonNode());
                     break;
                 default:
                     throw new IllegalStateException("An unknown component type was added.");
@@ -112,7 +116,7 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
     /**
      * Get the components of the action row.
      *
-     * @return A list which contains components.
+     * @return The components.
      */
     @Override
     public List<LowLevelComponent> getComponents() {

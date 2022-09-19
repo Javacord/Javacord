@@ -21,11 +21,14 @@ import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -77,7 +80,12 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     private final Map<User, ServerVoiceChannel> userMoveTargets = new HashMap<>();
 
     /**
-     * A list with the new order of the roles.
+     * A map with all user timeouts to update.
+     */
+    private final Map<User, Instant> userTimeouts = new HashMap<>();
+
+    /**
+     * The new order of the roles.
      */
     private List<Role> newRolesOrder = null;
 
@@ -482,6 +490,11 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
+    public void setUserTimeout(User user, Instant timeout) {
+        userTimeouts.put(user, timeout);
+    }
+
+    @Override
     public void setMuted(User user, boolean muted) {
         userMuted.put(user, muted);
     }
@@ -533,14 +546,15 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
 
     @Override
     public CompletableFuture<Void> update() {
-        // A set with all members that get updates
+        // All members that get updates
         HashSet<User> members = new HashSet<>(userRoles.keySet());
         members.addAll(userNicknames.keySet());
         members.addAll(userMuted.keySet());
         members.addAll(userDeafened.keySet());
         members.addAll(userMoveTargets.keySet());
+        members.addAll(userTimeouts.keySet());
 
-        // A list with all tasks
+        // All tasks
         List<CompletableFuture<?>> tasks = new ArrayList<>();
 
         members.forEach(member -> {
@@ -593,6 +607,15 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
                     updateNode.putNull("channel_id");
                     patchMember = true;
                 }
+            }
+
+            if (userTimeouts.containsKey(member)) {
+                updateNode.put("communication_disabled_until",
+                        userTimeouts.get(member).equals(Instant.MIN)
+                                ? null
+                                : DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC))
+                                .format(userTimeouts.get(member)));
+                patchMember = true;
             }
 
             if (patchMember) {
@@ -740,16 +763,16 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
 
                 tasks.add(future.thenCompose(
                         aVoid -> new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
+                                .setUrlParameters(server.getIdAsString())
+                                .setBody(body)
+                                .setAuditLogReason(reason)
+                                .execute(result -> null)));
+            } else {
+                tasks.add(new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
                         .setUrlParameters(server.getIdAsString())
                         .setBody(body)
                         .setAuditLogReason(reason)
-                        .execute(result -> null)));
-            } else {
-                tasks.add(new RestRequest<Void>(server.getApi(), RestMethod.PATCH, RestEndpoint.SERVER)
-                                  .setUrlParameters(server.getIdAsString())
-                                  .setBody(body)
-                                  .setAuditLogReason(reason)
-                                  .execute(result -> null));
+                        .execute(result -> null));
             }
         }
 

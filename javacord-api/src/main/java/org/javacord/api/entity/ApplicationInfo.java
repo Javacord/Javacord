@@ -1,7 +1,9 @@
 package org.javacord.api.entity;
 
+import org.javacord.api.entity.team.Team;
 import org.javacord.api.entity.user.User;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -32,6 +34,15 @@ public interface ApplicationInfo extends Nameable {
     boolean isPublicBot();
 
     /**
+     * Check if the application is owned by a team rather than a single user.
+     *
+     * @return Whether the application is owned by a team.
+     */
+    default boolean isOwnedByTeam() {
+        return getTeam().isPresent();
+    }
+
+    /**
      * Check if the application's bot require OAuth2 code grant.
      *
      * @return Whether the application's bot require OAuth2 code grant or not.
@@ -41,29 +52,72 @@ public interface ApplicationInfo extends Nameable {
     /**
      * Gets the name of the application owner.
      *
-     * @return The name of the application owner.
+     * <p>If the application is owned by a user, this will be the username. If it
+     * is owned by a team, the return value will be empty.</p>
+     *
+     * @return The name of the application owner, if applicable.
+     * @deprecated This method is deprecated. Access {@link #getOwner()} instead. This method is scheduled for removal.
      */
-    String getOwnerName();
+    @Deprecated
+    default Optional<String> getOwnerName() {
+        return getOwner().map(ApplicationOwner::getName);
+    }
 
     /**
      * Gets the id of the application owner.
      *
      * @return The id of the application owner.
+     * @deprecated This method is deprecated. Access {@link #getOwner()} instead. This method is scheduled for removal.
      */
-    long getOwnerId();
+    @Deprecated
+    default Optional<Long> getOwnerId() {
+        return getOwner().isPresent() ? Optional.of(getOwner().get().getId()) : Optional.empty();
+    }
+
+    /**
+     * Gets the owner of the Application.
+     *
+     * <p>An application might be owned by a user or team. If it is not owned
+     * by a user, this methods return value will be empty.</p>
+     *
+     * @return The user owning this application, if applicable.
+     */
+    Optional<ApplicationOwner> getOwner();
 
     /**
      * Gets the discriminator of the application owner.
      *
-     * @return The discriminator of the application owner.
+     * <p>The contents of this are undefined if the owner is a team, but will
+     * likely always be "0000"</p>
+     *
+     * @return The discriminator of the application owner, if applicable.
+     * @deprecated This method is deprecated. Access {@link #getOwner()} instead. This method is scheduled for removal.
      */
-    String getOwnerDiscriminator();
+    @Deprecated
+    default Optional<String> getOwnerDiscriminator() {
+        return getOwner().map(ApplicationOwner::getDiscriminator);
+    }
 
     /**
-     * Gets the owner of the application.
+     * Requests the owner of the application.
      *
      * @return The owner of the application.
+     * @deprecated This method is deprecated. Access {@link #getOwner()} instead. This method is scheduled for removal.
      */
-    CompletableFuture<User> getOwner();
+    @Deprecated
+    default CompletableFuture<Optional<User>> requestOwner() {
+        if (getOwner().isPresent()) {
+            return getOwner().get().requestUser().thenApply(Optional::of);
+        } else {
+            return CompletableFuture.completedFuture(Optional.empty());
+        }
+    }
+
+    /**
+     * Gets the team owning the application.
+     *
+     * @return The team owning the application, if applicable.
+     */
+    Optional<Team> getTeam();
 
 }

@@ -6,17 +6,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.mention.AllowedMentionType;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AllowedMentionsImpl implements AllowedMentions {
 
 
-    private final List<Long> allowedRoleMentions;
-    private final List<Long> allowedUserMentions;
+    private final Set<Long> allowedRoleMentions;
+    private final Set<Long> allowedUserMentions;
 
     private final EnumSet<AllowedMentionType> allowedMentionTypes = EnumSet.noneOf(AllowedMentionType.class);
+
+    private final boolean mentionRepliedUser;
 
     /**
      * Creates a new mention.
@@ -24,13 +26,16 @@ public class AllowedMentionsImpl implements AllowedMentions {
      * @param mentionAllRoles        Whether it mentions all roles.
      * @param mentionAllUsers        Whether it mentions all users.
      * @param mentionEveryoneAndHere Whether it mentions @everyone and @here.
+     * @param mentionRepliedUser     Whether it mentions the replied user.
      * @param allowedRoleMentions    Mentions added role ids.
      * @param allowedUserMentions    Mentions added user ids.
      */
     public AllowedMentionsImpl(boolean mentionAllRoles, boolean mentionAllUsers, boolean mentionEveryoneAndHere,
-                               ArrayList<Long> allowedRoleMentions, ArrayList<Long> allowedUserMentions) {
+                               boolean mentionRepliedUser, HashSet<Long> allowedRoleMentions,
+                               HashSet<Long> allowedUserMentions) {
         this.allowedRoleMentions = allowedRoleMentions;
         this.allowedUserMentions = allowedUserMentions;
+        this.mentionRepliedUser = mentionRepliedUser;
         if (mentionAllRoles) {
             allowedMentionTypes.add(AllowedMentionType.ROLES);
         }
@@ -43,18 +48,23 @@ public class AllowedMentionsImpl implements AllowedMentions {
     }
 
     @Override
-    public List<Long> getAllowedRoleMentions() {
+    public Set<Long> getAllowedRoleMentions() {
         return allowedRoleMentions;
     }
 
     @Override
-    public List<Long> getAllowedUserMentions() {
+    public Set<Long> getAllowedUserMentions() {
         return allowedUserMentions;
     }
 
     @Override
     public EnumSet<AllowedMentionType> getMentionTypes() {
         return allowedMentionTypes;
+    }
+
+    @Override
+    public boolean getMentionRepliedUser() {
+        return mentionRepliedUser;
     }
 
     /**
@@ -95,6 +105,8 @@ public class AllowedMentionsImpl implements AllowedMentions {
         if (allowedMentionTypes.contains(AllowedMentionType.EVERYONE)) {
             parse.add("everyone");
         }
+
+        object.put("replied_user", mentionRepliedUser);
 
         return object;
     }

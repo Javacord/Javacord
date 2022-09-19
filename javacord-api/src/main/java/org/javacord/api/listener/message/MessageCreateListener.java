@@ -22,5 +22,4 @@ public interface MessageCreateListener extends ServerAttachableListener, UserAtt
      * @param event The event.
      */
     void onMessageCreate(MessageCreateEvent event);
-
 }

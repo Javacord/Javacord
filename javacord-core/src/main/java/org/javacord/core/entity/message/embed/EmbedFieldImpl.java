@@ -28,7 +28,7 @@ public class EmbedFieldImpl implements EmbedField {
      *
      * @param name The name of the field.
      * @param value The value of the field.
-     * @param inline Whether or not this field should display inline.
+     * @param inline Whether this field should display inline.
      */
     public EmbedFieldImpl(String name, String value, boolean inline) {
         this.name = name;
@@ -56,9 +56,9 @@ public class EmbedFieldImpl implements EmbedField {
     }
 
     /**
-     * Sets whether or not this field should display inline.
+     * Sets whether this field should display inline.
      *
-     * @param inline Whether or not this field should display inline.
+     * @param inline Whether this field should display inline.
      */
     void setInline(boolean inline) {
         this.inline = inline;

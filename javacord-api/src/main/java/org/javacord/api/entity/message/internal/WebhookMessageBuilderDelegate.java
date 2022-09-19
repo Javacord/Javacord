@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link WebhookMessageBuilder} to create messages.
  * You usually don't want to interact with this object.
  */
-public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
+public interface WebhookMessageBuilderDelegate extends MessageBuilderBaseDelegate {
 
     /**
      * Sets the display name of the webhook.
@@ -74,7 +74,7 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      *
      * @param webhook The webhook from which the message should be sent.
      *
-     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
+     * @return A CompletableFuture indicating whether sending the request to discord was successful.
      */
     CompletableFuture<Void> sendSilently(IncomingWebhook webhook);
 
@@ -85,7 +85,7 @@ public interface WebhookMessageBuilderDelegate extends MessageBuilderDelegate {
      * @param webhookId The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
      *
-     * @return A CompletableFuture indicating whether or not sending the request to discord was successful.
+     * @return A CompletableFuture indicating whether sending the request to discord was successful.
      */
     CompletableFuture<Void> sendSilently(DiscordApi api, String webhookId, String webhookToken);
 }

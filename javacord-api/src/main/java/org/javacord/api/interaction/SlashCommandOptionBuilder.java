@@ -1,8 +1,9 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.interaction.internal.SlashCommandOptionBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
-
+import java.util.Collection;
 import java.util.List;
 
 public class SlashCommandOptionBuilder {
@@ -38,6 +39,18 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
+     * Adds a name localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The option name localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder addNameLocalization(DiscordLocale locale, String localization) {
+        delegate.addNameLocalization(locale, localization);
+        return this;
+    }
+
+    /**
      * Sets the description of the slash command option.
      *
      * @param description The description.
@@ -49,9 +62,21 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
+     * Adds a description localization for the given locale.
+     *
+     * @param locale The locale to add this localization for.
+     * @param localization The option description localization.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder addDescriptionLocalization(DiscordLocale locale, String localization) {
+        delegate.addDescriptionLocalization(locale, localization);
+        return this;
+    }
+
+    /**
      * Sets if the slash command option is required.
      *
-     * @param required Whether or not the option is required.
+     * @param required Whether the option is required.
      * @return The current instance in order to chain call methods.
      */
     public SlashCommandOptionBuilder setRequired(boolean required) {
@@ -60,7 +85,18 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an choice for the slash command option.
+     * Sets if this option can be autocompleted.
+     *
+     * @param autocompletable Whether the option can be autocompleted.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder setAutocompletable(boolean autocompletable) {
+        delegate.setAutocompletable(autocompletable);
+        return this;
+    }
+
+    /**
+     * Adds a choice for the slash command option.
      *
      * @param choice The choice.
      * @return The current instance in order to chain call methods.
@@ -71,9 +107,9 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an string choice for the slash command option.
+     * Adds a string choice for the slash command option.
      *
-     * @param name The name of the choice.
+     * @param name  The name of the choice.
      * @param value The value of the choice.
      * @return The current instance in order to chain call methods.
      */
@@ -85,7 +121,7 @@ public class SlashCommandOptionBuilder {
     /**
      * Adds an int choice for the slash command option.
      *
-     * @param name The name of the choice.
+     * @param name  The name of the choice.
      * @param value The value of the choice.
      * @return The current instance in order to chain call methods.
      */
@@ -106,7 +142,7 @@ public class SlashCommandOptionBuilder {
     }
 
     /**
-     * Adds an slash command option to the slash command option.
+     * Adds a slash command option to the slash command option.
      *
      * @param option The option.
      * @return The current instance in order to chain call methods.
@@ -124,6 +160,95 @@ public class SlashCommandOptionBuilder {
      */
     public SlashCommandOptionBuilder setOptions(List<SlashCommandOption> options) {
         delegate.setOptions(options);
+        return this;
+    }
+
+    /**
+     * Adds a channel type to the slash command option.
+     *
+     * @param channelType The channel type.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder addChannelType(ChannelType channelType) {
+        delegate.addChannelType(channelType);
+        return this;
+    }
+
+    /**
+     * Sets the channel types for the slash command option.
+     *
+     * @param channelTypes The channel types.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionBuilder setChannelTypes(Collection<ChannelType> channelTypes) {
+        delegate.setChannelTypes(channelTypes);
+        return this;
+    }
+
+    /**
+     * Sets the minimum value permitted for the {@link SlashCommandOptionType#LONG} slash command option.
+     *
+     * @param longMinValue The minimum value permitted.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setLongMinValue(long longMinValue) {
+        delegate.setLongMinValue(longMinValue);
+        return this;
+    }
+
+    /**
+     * Sets the maximum value permitted for the {@link SlashCommandOptionType#LONG} slash command option.
+     *
+     * @param longMaxValue The maximum value permitted.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setLongMaxValue(long longMaxValue) {
+        delegate.setLongMaxValue(longMaxValue);
+        return this;
+    }
+
+    /**
+     * Sets the minimum value permitted for the {@link SlashCommandOptionType#DECIMAL} slash command option.
+     *
+     * @param decimalMinValue The minimum value permitted.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setDecimalMinValue(double decimalMinValue) {
+        delegate.setDecimalMinValue(decimalMinValue);
+        return this;
+    }
+
+    /**
+     * Sets the maximum value permitted for the {@link SlashCommandOptionType#DECIMAL} slash command option.
+     *
+     * @param decimalMaxValue The maximum value permitted.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setDecimalMaxValue(double decimalMaxValue) {
+        delegate.setDecimalMaxValue(decimalMaxValue);
+        return this;
+    }
+
+    /**
+     * Sets the {@link SlashCommandOptionType#STRING} min length for the slash command option.
+     *
+     * @param minLength The string min length.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setMinLength(long minLength) {
+        delegate.setMinLength(minLength);
+        return this;
+    }
+
+
+    /**
+     * Sets the {@link SlashCommandOptionType#STRING} max length for the slash command option.
+     *
+     * @param maxLength The string min length.
+     * @return The current instance in order to chain call methods
+     */
+    public SlashCommandOptionBuilder setMaxLength(long maxLength) {
+        delegate.setMaxLength(maxLength);
         return this;
     }
 

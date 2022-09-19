@@ -61,6 +61,17 @@ public class AllowedMentionsBuilder {
     }
 
     /**
+     * Mention the replied user if the message is a reply.
+     *
+     * @param value If the replied user should be mentioned.
+     * @return The current instance in order to chain call methods.
+     */
+    public AllowedMentionsBuilder setMentionRepliedUser(boolean value) {
+        delegate.setMentionRepliedUser(value);
+        return this;
+    }
+
+    /**
      * Adds a role to the list which will be mentioned.
      *
      * @param roleId The id of the role.
@@ -162,7 +173,7 @@ public class AllowedMentionsBuilder {
     }
 
     /**
-     * Removes an user from the list which will be mentioned.
+     * Removes a user from the list which will be mentioned.
      *
      * @param userId The id of the user.
      * @return The current instance in order to chain call methods.
@@ -173,7 +184,7 @@ public class AllowedMentionsBuilder {
     }
 
     /**
-     * Removes an user from the list which will be mentioned.
+     * Removes a user from the list which will be mentioned.
      *
      * @param userId The id of the user.
      * @return The current instance in order to chain call methods.

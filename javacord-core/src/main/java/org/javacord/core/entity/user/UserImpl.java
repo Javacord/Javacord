@@ -27,10 +27,8 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,6 +41,8 @@ import java.util.concurrent.CompletableFuture;
  * @see <a href="https://discord.com/developers/docs/resources/user#user-object">Discord Docs</a>
  */
 public class UserImpl implements User, InternalUserAttachableListenerManager {
+
+    private static final int DEFAULT_AVATAR_SIZE = 1024;
 
     private final DiscordApiImpl api;
     private final Long id;
@@ -168,13 +168,9 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         return Optional.ofNullable(member);
     }
 
-    /**
-     * Gets the avatar hash of the user.
-     *
-     * @return The avatar hash.
-     */
-    public String getAvatarHash() {
-        return avatarHash;
+    @Override
+    public Optional<String> getAvatarHash() {
+        return Optional.ofNullable(avatarHash);
     }
 
     @Override
@@ -212,6 +208,20 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
      * @return The avatar for the given details.
      */
     public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId) {
+        return getAvatar(api, avatarHash, discriminator, userId, DEFAULT_AVATAR_SIZE);
+    }
+
+    /**
+     * Gets the avatar for the given details.
+     *
+     * @param api The discord api instance.
+     * @param avatarHash The avatar hash or {@code null} for default avatar.
+     * @param discriminator The discriminator if default avatar is wanted.
+     * @param userId The user id.
+     * @param size The size of the image. Must be any power of 2 between 16 and 4096.
+     * @return The avatar for the given details.
+     */
+    public static Icon getAvatar(DiscordApi api, String avatarHash, String discriminator, long userId, int size) {
         StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/");
         if (avatarHash == null) {
             url.append("embed/avatars/")
@@ -222,6 +232,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
                     .append(userId).append('/').append(avatarHash)
                     .append(avatarHash.startsWith("a_") ? ".gif" : ".png");
         }
+        url.append("?size=").append(size);
         try {
             return new IconImpl(api, new URL(url.toString()));
         } catch (MalformedURLException e) {
@@ -236,20 +247,54 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     }
 
     @Override
+    public Icon getAvatar(int size) {
+        return getAvatar(api, avatarHash, discriminator, getId(), size);
+    }
+
+    @Override
+    public Optional<Icon> getServerAvatar(Server server) {
+        return getServerAvatar(server, DEFAULT_AVATAR_SIZE);
+    }
+
+    @Override
+    public Optional<Icon> getServerAvatar(Server server, int size) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getUserServerAvatar(this, size);
+        } else {
+            return member.getServerAvatar(size);
+        }
+    }
+
+    @Override
+    public Icon getEffectiveAvatar(Server server) {
+        return getServerAvatar(server).orElse(getAvatar());
+    }
+
+    @Override
+    public Icon getEffectiveAvatar(Server server, int size) {
+        return getServerAvatar(server, size).orElse(getAvatar(size));
+    }
+
+    @Override
     public boolean hasDefaultAvatar() {
         return avatarHash == null;
     }
 
     @Override
-    public Collection<Server> getMutualServers() {
+    public Set<Server> getMutualServers() {
         if (api.isUserCacheEnabled()) {
-            HashSet<Server> servers = new HashSet<>();
-            if (member != null) {
-                servers.add(member.getServer());
-            }
-            return servers;
+            return api.getEntityCache().get().getMemberCache().getServers(getId());
         }
-        return api.getEntityCache().get().getMemberCache().getServers(getId());
+        return member == null ? Collections.emptySet() : Collections.singleton(member.getServer());
+    }
+
+    @Override
+    public Optional<Instant> getServerBoostingSinceTimestamp(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getServerBoostingSinceTimestamp(this);
+        } else {
+            return member.getServerBoostingSinceTimestamp();
+        }
     }
 
     @Override
@@ -267,6 +312,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             return server.getNickname(this);
         } else {
             return member.getNickname();
+        }
+    }
+
+    @Override
+    public Optional<Instant> getTimeout(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getTimeout(this);
+        } else {
+            return member.getTimeout();
         }
     }
 
@@ -321,6 +375,15 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             return server.getRoleColor(this);
         } else {
             return member.getRoleColor();
+        }
+    }
+
+    @Override
+    public Optional<String> getServerAvatarHash(Server server) {
+        if (api.hasUserCacheEnabled() || member == null || member.getServer().getId() != server.getId()) {
+            return server.getUserServerAvatarHash(this);
+        } else {
+            return member.getServerAvatarHash();
         }
     }
 
