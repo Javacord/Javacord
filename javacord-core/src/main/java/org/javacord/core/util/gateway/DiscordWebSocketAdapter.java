@@ -518,7 +518,12 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
         // Squash it, until it stops beating
         heart.squash();
 
-        if (!ready.isDone()) {
+        // If reconnect is due to a received INVALID_SESSION, we ran into the identifying ratelimit
+        // We simply reconnect to perform another fresh identify
+        if (!ready.isDone()
+                && closeFrameOptional
+                       .map(closeFrame -> closeFrame.getCloseCode() != WebSocketCloseReason.INVALID_SESSION_RECONNECT.getNumericCloseCode()
+                       .orElse(true))) {
             ready.complete(false);
             return;
         }
@@ -660,8 +665,8 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 }
 
                 sendCloseFrame(websocket,
-                        WebSocketCloseReason.DISCONNECT.getNumericCloseCode(),
-                        WebSocketCloseReason.DISCONNECT.getCloseReason());
+                        WebSocketCloseReason.INVALID_SESSION_RECONNECT.getNumericCloseCode(),
+                        WebSocketCloseReason.INVALID_SESSION_RECONNECT.getCloseReason());
                 break;
             case HELLO:
                 logger.debug("Received HELLO packet");

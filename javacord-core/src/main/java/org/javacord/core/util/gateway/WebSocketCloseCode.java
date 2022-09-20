@@ -251,6 +251,12 @@ public enum WebSocketCloseCode {
     UNKNOWN_ENCRYPTION_MODE(4016, Usage.VOICE),
 
     /**
+     * We reconnect after receiving an INVALID_SESSION packet, and there is no pre-defined matching close reason,
+     * thus 4998 is used which is unlikely to get assigned by Discord.
+     */
+    INVALID_SESSION_RECONNECT(4998, Usage.NORMAL),
+
+    /**
      * Discord asked for a reconnect, and there is no pre-defined matching close reason,
      * thus 4999 is used which is unlikely to get assigned by Discord.
      */
