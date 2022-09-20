@@ -520,10 +520,10 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         // If reconnect is due to a received INVALID_SESSION, we ran into the identifying ratelimit
         // We simply reconnect to perform another fresh identify
-        if (!ready.isDone()
-                && closeFrameOptional
-                       .map(closeFrame -> closeFrame.getCloseCode() != WebSocketCloseReason.INVALID_SESSION_RECONNECT.getNumericCloseCode()
-                       .orElse(true))) {
+        if (!ready.isDone() && closeFrameOptional
+                .map(closeFrame -> closeFrame.getCloseCode()
+                        != WebSocketCloseReason.INVALID_SESSION_RECONNECT.getNumericCloseCode())
+                .orElse(true)) {
             ready.complete(false);
             return;
         }
