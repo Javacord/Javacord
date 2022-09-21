@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelFlag;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -13,6 +14,8 @@ import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.forum.DefaultReaction;
+import org.javacord.api.entity.channel.forum.ForumTag;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
@@ -20,6 +23,10 @@ import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeNsfwFlagEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangePositionEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeAppliedTagsEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeDefaultReactionEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeFlagsEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeTagsEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmodeEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
@@ -33,12 +40,18 @@ import org.javacord.core.entity.channel.ServerForumChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.channel.forum.DefaultReactionImpl;
+import org.javacord.core.entity.channel.forum.ForumTagImpl;
 import org.javacord.core.entity.permission.PermissionsImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNsfwFlagEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeOverwrittenPermissionsEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangePositionEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeAppliedTagsEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeDefaultReactionEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeFlagsEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeTagsEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmodeEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
@@ -50,9 +63,12 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -98,7 +114,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             case SERVER_FORUM_CHANNEL:
                 handleServerChannel(packet);
                 handleRegularServerChannel(packet);
-                //handleServerForumChannel(packet);
+                handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
                 logger.debug("Received CHANNEL_UPDATE packet for a news channel. In this Javacord version it is "
@@ -195,6 +211,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                         newCategory == null ? -1 : newCategory.getId());
             } else if (regularServerChannel instanceof ServerVoiceChannelImpl) {
                 ((ServerVoiceChannelImpl) regularServerChannel).setParentId(
+                        newCategory == null ? -1 : newCategory.getId());
+            } else if (regularServerChannel instanceof ServerForumChannelImpl) {
+                ((ServerForumChannelImpl) regularServerChannel).setParentId(
                         newCategory == null ? -1 : newCategory.getId());
             }
             regularServerChannel.setRawPosition(newRawPosition);
@@ -419,6 +438,74 @@ public class ChannelUpdateHandler extends PacketHandler {
         }
 
         ServerForumChannelImpl channel = (ServerForumChannelImpl) optionalChannel.get();
+
+        EnumSet<ChannelFlag> oldFlags = channel.getFlags();
+        EnumSet<ChannelFlag> newFlags = EnumSet.noneOf(ChannelFlag.class);
+        if (jsonChannel.hasNonNull("flags")) {
+            for (JsonNode flag : jsonChannel.get("flags")) {
+                newFlags.add(ChannelFlag.fromInt(flag.asInt()));
+            }
+        }
+
+        if (!oldFlags.equals(newFlags)) {
+            channel.setFlags(newFlags);
+            ServerForumChannelChangeFlagsEvent event =
+                    new ServerForumChannelChangeFlagsEventImpl(channel, newFlags, oldFlags);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeFlagsEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel, event);
+        }
+
+        List<ForumTag> oldTags = channel.getTags();
+        List<ForumTag> newTags = new ArrayList<>();
+        if (jsonChannel.hasNonNull("tags")) {
+            for (JsonNode tag : jsonChannel.get("tags")) {
+                newTags.add(new ForumTagImpl(api, tag.get("id").asLong(), tag));
+            }
+        }
+
+        if (!oldTags.equals(newTags)) {
+            channel.setTags(newTags);
+            ServerForumChannelChangeTagsEvent event =
+                    new ServerForumChannelChangeTagsEventImpl(channel, newTags, oldTags);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeTagsEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel, event);
+        }
+
+        List<Long> oldAppliedTags = channel.getAppliedTags();
+        List<Long> newAppliedTags = new ArrayList<>();
+        if (jsonChannel.hasNonNull("applied_tags")) {
+            for (JsonNode tag : jsonChannel.get("applied_tags")) {
+                newAppliedTags.add(tag.asLong());
+            }
+        }
+
+        if (!oldAppliedTags.equals(newAppliedTags)) {
+            channel.setAppliedTags(newAppliedTags);
+            ServerForumChannelChangeAppliedTagsEvent event =
+                    new ServerForumChannelChangeAppliedTagsEventImpl(channel, newAppliedTags,
+                            oldAppliedTags);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeAppliedTagsEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel, event);
+        }
+
+        DefaultReaction oldDefaultReaction = !channel.getDefaultReaction().isPresent()
+                ? null : channel.getDefaultReaction().get();
+        DefaultReaction newDefaultReaction = jsonChannel.hasNonNull("default_auto_archive_duration")
+                ? new DefaultReactionImpl(jsonChannel.get("default_auto_archive_duration"))
+                : null;
+
+        if (!Objects.equals(oldDefaultReaction, newDefaultReaction)) {
+            channel.setDefaultReaction(newDefaultReaction);
+            ServerForumChannelChangeDefaultReactionEvent event =
+                    new ServerForumChannelChangeDefaultReactionEventImpl(channel, newDefaultReaction,
+                            oldDefaultReaction);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeDefaultReactionEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel, event);
+        }
     }
 
     /**
