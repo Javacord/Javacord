@@ -649,7 +649,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 sessionId = null;
                 resumeUrl = null;
                 if (lastSentFrameWasIdentify.isMarked()) {
-                    logger.info("Hit identifying rate limit. Reconnecting ...");
+                    logger.info("Hit identifying rate limit. Reconnecting...");
                 } else if (triedToResume) {
                     // Invalid session :(
                     int oneToFiveSeconds = 1000 + (int) (Math.random() * 4000);
