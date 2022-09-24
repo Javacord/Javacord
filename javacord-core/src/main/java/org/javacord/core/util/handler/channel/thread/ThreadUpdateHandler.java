@@ -218,7 +218,7 @@ public class ThreadUpdateHandler extends PacketHandler {
         final Boolean isInvitable = metadataJson.hasNonNull("invitable")
                 ? metadataJson.get("invitable").asBoolean() : null;
 
-        if (wasInvitable != isInvitable) {
+        if (thread.isPrivate() && wasInvitable != isInvitable) {
             metadata.setInvitable(isInvitable);
 
             final ServerThreadChannelChangeInvitableEvent event =
