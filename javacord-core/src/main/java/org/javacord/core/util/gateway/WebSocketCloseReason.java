@@ -7,8 +7,7 @@ public enum WebSocketCloseReason {
 
     DISCONNECT(WebSocketCloseCode.NORMAL),
     HEARTBEAT_NOT_PROPERLY_ANSWERED(WebSocketCloseCode.UNKNOWN_ERROR, "Heartbeat was not answered properly"),
-    INVALID_SESSION_RECONNECT(WebSocketCloseCode.INVALID_SESSION_RECONNECT, "Received an INVALID_SESSION - "
-            + "reconnecting."),
+    INVALID_SESSION_RECONNECT(WebSocketCloseCode.INVALID_SESSION_RECONNECT, "Session is invalid (Received opcode 9)"),
     COMMANDED_RECONNECT(WebSocketCloseCode.COMMANDED_RECONNECT, "Discord commanded a reconnect (Received opcode 7)");
 
     /**
