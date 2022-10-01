@@ -1,6 +1,7 @@
 package org.javacord.api.interaction;
 
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 
@@ -9,7 +10,19 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface SlashCommand extends ApplicationCommand {
+public interface SlashCommand extends ApplicationCommand, Mentionable {
+
+    @Override
+    default String getMentionTag() {
+        return "</" + getFullCommandName() + ":" + getId() + ">";
+    }
+
+    /**
+     * Gets the full command name.
+     *
+     * @return The full command name.
+     */
+    String getFullCommandName();
 
     /**
      * Gets all options (i.e., parameters) for this command.

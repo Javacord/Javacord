@@ -65,6 +65,16 @@ public interface SlashCommandOption {
     boolean isAutocompletable();
 
     /**
+     * Gets whether this slash command option is a subcommand or subcommand group.
+     *
+     * @return Whether this slash command option is a subcommand or subcommand group.
+     */
+    default boolean isSubcommandOrGroup() {
+        return getType() == SlashCommandOptionType.SUB_COMMAND
+                || getType() == SlashCommandOptionType.SUB_COMMAND_GROUP;
+    }
+
+    /**
      * Gets all choices for this option.
      *
      * <p>If this option has any choices, they are the only valid values for a user to pick.
@@ -359,8 +369,8 @@ public interface SlashCommandOption {
      * @return The new slash command option builder.
      */
     static SlashCommandOption createAttachmentOption(String name,
-                                                  String description,
-                                                  boolean required) {
+                                                     String description,
+                                                     boolean required) {
         return new SlashCommandOptionBuilder()
                 .setType(SlashCommandOptionType.ATTACHMENT)
                 .setName(name)
