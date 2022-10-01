@@ -36,6 +36,19 @@ public class SlashCommandImpl extends ApplicationCommandImpl implements SlashCom
     }
 
     @Override
+    public String getFullCommandName() {
+        return getName() + getNestedCommandNamesRecursive(getOptions());
+    }
+
+    private String getNestedCommandNamesRecursive(List<SlashCommandOption> options) {
+        if (!options.isEmpty() && options.get(0).isSubcommandOrGroup()) {
+            return " " + options.get(0).getName() + getNestedCommandNamesRecursive(options.get(0).getOptions());
+        } else {
+            return "";
+        }
+    }
+
+    @Override
     public List<SlashCommandOption> getOptions() {
         return Collections.unmodifiableList(options);
     }
