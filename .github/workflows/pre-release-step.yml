@@ -1,6 +1,7 @@
 # This workflow will be run manually
-# This workflow is pre release step and updates readme and 
-# remove SNAPSHOT suffix from version in gradle properties file
+# This workflow is a pre-release step and updates the readme and
+# removes SNAPSHOT suffix from version in gradle properties file
+name: Pre Release Step
 on:
   workflow_dispatch:
 
@@ -12,7 +13,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Modifiy the gradle properties file to remove the SNAPSHOT
+    - name: Modify the gradle properties file to remove the SNAPSHOT
       run: |
         sed -i -E "s/\(version \= .*\)-SNAPSHOT/\1/g" gradle.properties
     
