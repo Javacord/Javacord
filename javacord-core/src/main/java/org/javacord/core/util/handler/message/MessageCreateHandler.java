@@ -11,17 +11,23 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.event.message.MessageReplyEvent;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.message.MessageCreateEventImpl;
+import org.javacord.core.event.message.MessageReplyEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Handles the message create packet.
@@ -98,6 +104,27 @@ public class MessageCreateHandler extends PacketHandler {
                 author.asUser().orElse(null),
                 author.isWebhook() ? author.getId() : null,
                 event);
+
+        message.getReferencedMessage().ifPresent(referencedMessage -> {
+            MessageReplyEvent replyEvent = new MessageReplyEventImpl(message, referencedMessage);
+            Set<User> users = new HashSet<>();
+            referencedMessage.getUserAuthor().ifPresent(users::add);
+            message.getUserAuthor().ifPresent(users::add);
+
+            Set<Long> webhookIds =  new HashSet<>();
+            message.getAuthor().getWebhookId().ifPresent(webhookIds::add);
+            referencedMessage.getAuthor().getWebhookId().ifPresent(webhookIds::add);
+
+            api.getEventDispatcher().dispatchMessageReplyEvent(
+                    optionalServer.map(DispatchQueueSelector.class::cast).orElse(api),
+                    Collections.singleton(referencedMessage),
+                    optionalServer.map(Collections::singleton).orElse(null),
+                    Collections.singleton(message.getChannel()),
+                    users,
+                    webhookIds,
+                    replyEvent
+            );
+        });
     }
 
 }
