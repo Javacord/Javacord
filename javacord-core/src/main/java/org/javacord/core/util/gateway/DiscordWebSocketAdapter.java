@@ -23,7 +23,6 @@ import org.javacord.api.event.connection.LostConnectionEvent;
 import org.javacord.api.event.connection.ReconnectEvent;
 import org.javacord.api.event.connection.ResumeEvent;
 import org.javacord.api.util.auth.Authenticator;
-import org.javacord.api.util.auth.Request;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.connection.LostConnectionEventImpl;
@@ -413,7 +412,7 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                     if (proxyAuthenticator.isPresent()) {
                         Map<String, List<String>> requestHeaders = proxyAuthenticator.get().authenticate(
                                 new NvWebSocketRouteImpl(webSocketUrl, proxy, proxyInetAddress),
-                                new Request() { },
+                                () -> null,
                                 new NvWebSocketResponseImpl());
                         if (requestHeaders != null) {
                             requestHeaders.forEach((headerName, headerValues) -> {

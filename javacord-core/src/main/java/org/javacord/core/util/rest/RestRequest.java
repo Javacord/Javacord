@@ -9,10 +9,14 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.event.connection.RestRequestEvent;
 import org.javacord.api.exception.DiscordException;
 import org.javacord.api.util.rest.RestRequestInformation;
 import org.javacord.api.util.rest.RestRequestResponseInformation;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.event.connection.RestRequestEventImpl;
+import org.javacord.core.util.auth.OkHttpRequestImpl;
+import org.javacord.core.util.auth.OkHttpResponseImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.io.UnsupportedEncodingException;
@@ -67,8 +71,8 @@ public class RestRequest<T> {
     /**
      * Creates a new instance of this class.
      *
-     * @param api The api which will be used to execute the request.
-     * @param method The http method of the request.
+     * @param api      The api which will be used to execute the request.
+     * @param method   The http method of the request.
      * @param endpoint The endpoint to which the request should be sent.
      */
     public RestRequest(DiscordApi api, RestMethod method, RestEndpoint endpoint) {
@@ -156,7 +160,7 @@ public class RestRequest<T> {
     /**
      * Adds a query parameter to the url.
      *
-     * @param key The key of the parameter.
+     * @param key   The key of the parameter.
      * @param value The value of the parameter.
      * @return The current instance in order to chain call methods.
      */
@@ -168,7 +172,7 @@ public class RestRequest<T> {
     /**
      * Adds a header to the request.
      *
-     * @param name The name of the header.
+     * @param name  The name of the header.
      * @param value The value of the header.
      * @return The current instance in order to chain call methods.
      */
@@ -343,9 +347,9 @@ public class RestRequest<T> {
         if (multipartBody != null) {
             requestBody = multipartBody;
         } else if (body != null) {
-            requestBody = RequestBody.create(MediaType.parse("application/json"), body);
+            requestBody = RequestBody.create(body, MediaType.parse("application/json"));
         } else {
-            requestBody = RequestBody.create(null, new byte[0]);
+            requestBody = RequestBody.create(new byte[0], null);
         }
 
         switch (method) {
@@ -373,13 +377,21 @@ public class RestRequest<T> {
         headers.forEach(requestBuilder::addHeader);
         logger.debug("Trying to send {} request to {}{}",
                 method::name, () -> endpoint.getFullUrl(urlParameters), () -> body != null ? " with body " + body : "");
+        Request okhttpRequest = requestBuilder.build();
+        try (Response response = getApi().getHttpClient().newCall(okhttpRequest).execute()) {
+            OkHttpResponseImpl okHttpResponse = new OkHttpResponseImpl(response);
+            RestRequestResult result = new RestRequestResult(this, okHttpResponse);
 
-        try (Response response = getApi().getHttpClient().newCall(requestBuilder.build()).execute()) {
-            RestRequestResult result = new RestRequestResult(this, response);
-            logger.debug("Sent {} request to {} and received status code {} with{} body{}",
-                    method::name, () -> endpoint.getFullUrl(urlParameters), response::code,
-                    () -> result.getBody().map(b -> "").orElse(" empty"),
+            logger.debug("Sent {} request to {} and received status code {} with {} body{}",
+                    method::name,
+                    () -> endpoint.getFullUrl(urlParameters),
+                    response::code,
+                    () -> result.getStringBody().map(b -> "").orElse(" empty"),
                     () -> result.getStringBody().map(s -> " " + s).orElse(""));
+
+            RestRequestEvent restRequestEvent = new RestRequestEventImpl(getApi(), new OkHttpRequestImpl(okhttpRequest),
+                    okHttpResponse);
+            getApi().getEventDispatcher().dispatchRestRequestEvent(null, restRequestEvent);
 
             if (response.code() >= 300 || response.code() < 200) {
 
@@ -414,22 +426,22 @@ public class RestRequest<T> {
                         // There are specific exceptions for specific response codes (e.g. NotFoundException for 404)
                         Optional<? extends DiscordException> discordException = responseCode
                                 .flatMap(restRequestHttpResponseCode ->
-                                                 restRequestHttpResponseCode.getDiscordException(
-                                                         origin,
-                                                         "Received a " + response.code() + " response from Discord with"
-                                                         + (result.getBody().isPresent() ? "" : " empty")
-                                                         + " body"
-                                                         + result.getStringBody().map(s -> " " + s).orElse("")
-                                                         + "!",
-                                                         requestInformation, responseInformation));
+                                        restRequestHttpResponseCode.getDiscordException(
+                                                origin,
+                                                "Received a " + response.code() + " response from Discord with"
+                                                        + (result.getStringBody().isPresent() ? "" : " empty")
+                                                        + " body"
+                                                        + result.getStringBody().map(s -> " " + s).orElse("")
+                                                        + "!",
+                                                requestInformation, responseInformation));
                         if (discordException.isPresent()) {
                             throw discordException.get();
                         } else {
                             // No specific exception was defined for the response code, so throw a "normal"
                             throw new DiscordException(
                                     origin, "Received a " + response.code() + " response from Discord with"
-                                            + (result.getBody().isPresent() ? "" : " empty") + " body"
-                                            + result.getStringBody().map(s -> " " + s).orElse("") + "!",
+                                    + (result.getStringBody().isPresent() ? "" : " empty") + " body"
+                                    + result.getStringBody().map(s -> " " + s).orElse("") + "!",
                                     requestInformation, responseInformation);
                         }
                 }

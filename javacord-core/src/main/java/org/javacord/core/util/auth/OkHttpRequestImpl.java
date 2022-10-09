@@ -5,6 +5,7 @@ import okio.Buffer;
 import org.javacord.api.util.auth.Request;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,6 +55,11 @@ public class OkHttpRequestImpl implements Request {
         Buffer buffer = new Buffer();
         requestBody.writeTo(buffer);
         return Optional.of(buffer.readUtf8());
+    }
+
+    @Override
+    public URL getUrl() {
+        return request.url().url();
     }
 
     @Override

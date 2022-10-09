@@ -1,6 +1,5 @@
 package org.javacord.api.util.auth;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -88,12 +87,11 @@ public interface Response {
     }
 
     /**
-     * The body of the response.
+     * Gets the string body of the response.
      *
-     * @return The body of the response.
-     * @throws IOException If an IO error occurs.
+     * @return The string body of the response.
      */
-    default Optional<String> getBody() throws IOException {
+    default Optional<String> getStringBody() {
         return Optional.empty();
     }
 
