@@ -46,7 +46,7 @@ public enum RestRequestResultErrorCode {
     UNKNOWN_BUILD(10030, "Unknown build"),
     UNKNOWN_LOBBY(10031, "Unknown lobby"),
     UNKNOWN_BRANCH(10032, "Unknown branch"),
-    UNKNOWN_STORE_DIRECTORY_LAYOUT(10036, "Unknown store directory layout"),
+    UNKNOWN_STORE_DIRECTORY_LAYOUT(10033, "Unknown store directory layout"),
     UNKNOWN_REDISTRIBUTABLE(10036, "Unknown redistributable"),
     UNKNOWN_GIFT_CODE(10038, "Unknown gift code"),
     UNKNOWN_STREAM(10049, "Unknown stream"),
