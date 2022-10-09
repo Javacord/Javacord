@@ -1895,8 +1895,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     disconnectFuture.get().complete(null);
                 }, 1, TimeUnit.MINUTES);
             }
-            httpClient.dispatcher().executorService().shutdown();
-            httpClient.connectionPool().evictAll();
         }
         return disconnectFuture.get();
     }
