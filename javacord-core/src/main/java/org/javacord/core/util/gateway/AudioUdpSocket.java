@@ -76,7 +76,7 @@ public class AudioUdpSocket {
      *
      * @return You real external address.
      * @throws IOException If an I/O error occurs.
-     * @see <a href="https://discordapp.com/developers/docs/topics/voice-connections#ip-discovery">Discord Docs</a>
+     * @see <a href="https://discord.com/developers/docs/topics/voice-connections#ip-discovery">Discord Docs</a>
      */
     public InetSocketAddress discoverIp() throws IOException {
         byte[] buffer = new byte[70];

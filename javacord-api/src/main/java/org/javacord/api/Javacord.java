@@ -87,15 +87,17 @@ public class Javacord {
 
     /**
      * The gateway version from Discord which we are using.
-     * A list with all gateway versions can be found
-     * <a href="https://discord.com/developers/docs/topics/gateway#gateways-gateway-versions">here</a>.
+     * The available gateway versions are identical to the available api versions as per discords
+     * <a href="https://discord.com/developers/docs/topics/gateway#connecting">documentation</a>.
+     *
+     * @see #DISCORD_API_VERSION
      */
     public static final String DISCORD_GATEWAY_VERSION = "10";
 
     /**
      * The voice gateway version from Discord which we are using.
      * A list with all voice gateway versions can be found
-     * <a href="https://discordapp.com/developers/docs/topics/voice-connections#voice-gateway-versioning">here</a>.
+     * <a href="https://discord.com/developers/docs/topics/voice-connections#voice-gateway-versioning">here</a>.
      */
     public static final String DISCORD_VOICE_GATEWAY_VERSION = "4";
 

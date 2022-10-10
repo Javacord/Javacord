@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 /**
  * An enum with all rest request result codes as defined by
- * <a href="https://discord.com/developers/docs/topics/response-codes#json-error-response">Discord</a>.
+ * <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#http">Discord</a>.
  */
 public enum RestRequestHttpResponseCode {
 
