@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 
 /**
  * An enum with all web socket close reasons as
- * defined by <a href="https://tools.ietf.org/html/rfc6455#section-7.4">RFC 6455</a> (1000-2999),
+ * defined by <a href="https://www.rfc-editor.org/rfc/rfc6455#section-7.4">RFC 6455</a> (1000-2999),
  * assigned by <a href="https://www.iana.org/assignments/websocket/websocket.xml">IANA</a> (3000-3999),
- * assigned by <a href="https://discord.com/developers/docs/topics/gateway#disconnections">Discord</a> (4000-4998) or
- * self-assigned (4999).
+ * assigned by
+ * <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes">
+ *     Discord</a>
+ * (4000-4998) or self-assigned (4999).
  */
 public enum WebSocketCloseCode {
 
@@ -77,7 +79,7 @@ public enum WebSocketCloseCode {
      * <i>1007 indicates that an endpoint is terminating the connection
      * because it has received data within a message that was not
      * consistent with the type of the message (e&#46;g&#46;, non-UTF-8
-     * [<a href="http://tools.ietf.org/html/rfc3629">RFC3629</a>] data
+     * [<a href="https://www.rfc-editor.org/rfc/rfc3629">RFC3629</a>] data
      * within a text message).</i>
      */
     INCONSISTENT(com.neovisionaries.ws.client.WebSocketCloseCode.INCONSISTENT, Usage.BOTH),
@@ -143,25 +145,25 @@ public enum WebSocketCloseCode {
 
     /**
      * You sent an invalid
-     * <a href="https://discord.com/developers/docs/topics/gateway#payloads-and-opcodesspec.html">Gateway opcode</a>
+     * <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-opcodes">Gateway opcode</a>
      * or an invalid payload for an opcode. Don't do that!
      */
     UNKNOWN_OPCODE(4001, Usage.BOTH),
 
     /**
-     * You sent an invalid <a href="https://discord.com/developers/docs/topics/gateway#sending-payloads">payload</a>
+     * You sent an invalid <a href="https://discord.com/developers/docs/topics/gateway#sending-events">payload</a>
      * to us. Don't do that!
      */
     DECODE_ERROR(4002, Usage.NORMAL),
 
     /**
-     * You sent us a payload prior to <a href="https://discord.com/developers/docs/topics/gateway#identify">
+     * You sent us a payload prior to <a href="https://discord.com/developers/docs/topics/gateway#identifying">
      * identifying</a>.
      */
     NOT_AUTHENTICATED(4003, Usage.BOTH),
 
     /**
-     * The account token sent with your <a href="https://discord.com/developers/docs/topics/gateway#identify">
+     * The account token sent with your <a href="https://discord.com/developers/docs/topics/gateway#identifying">
      * identify payload</a> is incorrect.
      */
     AUTHENTICATION_FAILED(4004, Usage.BOTH),
@@ -177,7 +179,7 @@ public enum WebSocketCloseCode {
     SESSION_NO_LONGER_VALID(4006, Usage.VOICE),
 
     /**
-     * The sequence sent when <a href="https://discord.com/developers/docs/topics/gateway#resume">resuming</a>
+     * The sequence sent when <a href="https://discord.com/developers/docs/topics/gateway#resuming">resuming</a>
      * the session was invalid. Reconnect and start a new session.
      */
     INVALID_SEQ(4007, Usage.NORMAL),

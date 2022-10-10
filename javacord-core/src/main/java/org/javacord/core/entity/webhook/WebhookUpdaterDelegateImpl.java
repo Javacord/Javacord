@@ -140,7 +140,7 @@ public class WebhookUpdaterDelegateImpl implements WebhookUpdaterDelegate {
     }
 
     private RestRequest<Webhook> setUrlParameters(RestRequest<Webhook> request) {
-        //see: https://discord.com/developers/docs/resources/webhook#execute-webhook-querystring-params
+        //see: https://discord.com/developers/docs/resources/webhook#execute-webhook-query-string-params
         if (channel == null) { //changing channel doesn't work when using token.
             Optional<String> token = webhook.asIncomingWebhook().map(IncomingWebhook::getToken);
             if (token.isPresent()) {

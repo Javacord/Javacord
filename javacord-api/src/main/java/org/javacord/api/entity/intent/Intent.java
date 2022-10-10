@@ -3,7 +3,7 @@ package org.javacord.api.entity.intent;
 /**
  * Represents an intent.
  *
- * @see <a href="https://discordapp.com/developers/docs/topics/gateway#list-of-intents">Discord docs</a>
+ * @see <a href="https://discord.com/developers/docs/topics/gateway#list-of-intents">Discord docs</a>
  */
 public enum Intent {
 
@@ -34,7 +34,7 @@ public enum Intent {
      *
      * <p>Note: This is a privileged intent which must be enabled in the bots application page in the Developer portal
      *
-     * @see <a href="https://discordapp.com/developers/applications">Discord developer portal</a>
+     * @see <a href="https://discord.com/developers/applications">Discord developer portal</a>
      */
     GUILD_MEMBERS(1, true),
 
@@ -96,7 +96,7 @@ public enum Intent {
      *
      * <p>Note: This is a privileged intent which must be enabled in the bots application page in the Developer portal
      *
-     * @see <a href="https://discordapp.com/developers/applications">Discord developer portal</a>
+     * @see <a href="https://discord.com/developers/applications">Discord developer portal</a>
      */
     GUILD_PRESENCES(8, true),
 
@@ -168,7 +168,7 @@ public enum Intent {
      *
      * <p>Note: This is a privileged intent which must be enabled in the bots application page in the Developer portal
      *
-     * @see <a href="https://discordapp.com/developers/applications">Discord developer portal</a>
+     * @see <a href="https://discord.com/developers/applications">Discord developer portal</a>
      */
     MESSAGE_CONTENT(15, true);
 
@@ -200,7 +200,7 @@ public enum Intent {
      * Check if the intent is privileged.
      *
      * <p>Privileged intents are usually related so sensitive data and must manually be enabled
-     * in the <a href="https://discordapp.com/developers/applications">developer portal</a>.
+     * in the <a href="https://discord.com/developers/applications">developer portal</a>.
      *
      * @return Whether this intent is privileged or not.
      */

@@ -135,11 +135,11 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy selector,
      * the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
      * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
-     * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
+     * documented on the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html">Networking
      * Properties</a> page.
      *
-     * <p><b>Note:</b> It is an error to configure an explicit proxy via {@link #setProxy(Proxy)} and a proxy selector
-     * using this method.
+     * <p><b>Note:</b> It is an error to configure both an explicit proxy via {@link #setProxy(Proxy)} and a proxy
+     * selector using this method.
      *
      * @param proxySelector The proxy selector to set.
      * @return The current instance in order to chain call methods.
@@ -147,7 +147,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * @see #setProxyAuthenticator(Authenticator)
      * @see ProxySelector#getDefault()
      * @see ProxySelector#setDefault(ProxySelector)
-     * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
+     * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html">Networking Properties</a>
      */
     public DiscordApiBuilder setProxySelector(ProxySelector proxySelector) {
         delegate.setProxySelector(proxySelector);
@@ -161,10 +161,10 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * appropriate proxies. If {@link ProxySelector#setDefault(ProxySelector)} was not used to set a custom proxy
      * selector, the default one evaluates the system properties {@code https.proxyHost}, {@code https.proxyPort},
      * {@code http.nonProxyHosts}, {@code socksProxyHost}, {@code socksProxyPort} and {@code socksProxyVersion} as
-     * documented on the <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking
-     * Properties</a> page.
+     * documented on the <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html">
+     * Networking Properties</a> page.
      *
-     * <p><b>Note:</b> It is an error to configure an explicit proxy using this method and a proxy selector using
+     * <p><b>Note:</b> It is an error to configure both an explicit proxy using this method and a proxy selector using
      * {@link #setProxySelector(ProxySelector)}.
      *
      * @param proxy The proxy to set.
@@ -173,7 +173,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * @see #setProxySelector(ProxySelector)
      * @see ProxySelector#getDefault()
      * @see ProxySelector#setDefault(ProxySelector)
-     * @see <a href=https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html>Networking Properties</a>
+     * @see <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/net/properties.html">Networking Properties</a>
      */
     public DiscordApiBuilder setProxy(Proxy proxy) {
         delegate.setProxy(proxy);
@@ -217,7 +217,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     /**
      * Sets the token which is required for the login process.
      * A tutorial on how to get the token can be found in the
-     * <a href="https://github.com/Javacord/Javacord/wiki">Javacord wiki</a>.
+     * <a href="https://javacord.org/wiki/">Javacord wiki</a>.
      *
      * @param token The token to set.
      * @return The current instance in order to chain call methods.
