@@ -84,41 +84,6 @@ public interface Attachment extends DiscordEntity {
      *
      * @return The attachment as an input stream.
      * @throws IOException If an IO error occurs.
-     * @deprecated Use {@link #asInputStream()} instead.
-     */
-    @Deprecated
-    default InputStream downloadAsInputStream() throws IOException {
-        return asInputStream();
-    }
-
-    /**
-     * Downloads the attachment as a byte array.
-     *
-     * @return The attachment as a byte array.
-     * @deprecated Use {@link #asByteArray()} instead.
-     */
-    @Deprecated
-    default CompletableFuture<byte[]> downloadAsByteArray() {
-        return asByteArray();
-    }
-
-    /**
-     * Downloads the attachment as an image.
-     *
-     * @return The attachment as an image. Only present, if the attachment is an image.
-     * @throws IllegalStateException If the attachment is not an image.
-     * @deprecated Use {@link #asImage()} instead.
-     */
-    @Deprecated
-    default CompletableFuture<BufferedImage> downloadAsImage() {
-        return asImage();
-    }
-
-    /**
-     * Downloads the attachment as an input stream.
-     *
-     * @return The attachment as an input stream.
-     * @throws IOException If an IO error occurs.
      */
     InputStream asInputStream() throws IOException;
 
