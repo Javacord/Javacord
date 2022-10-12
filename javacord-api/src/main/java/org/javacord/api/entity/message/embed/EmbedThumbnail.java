@@ -46,43 +46,6 @@ public interface EmbedThumbnail {
      *
      * @param api The discord api instance used to download the thumbnail.
      * @return The thumbnail as a {@code BufferedImage}.
-     * @deprecated Use {@link #asBufferedImage(DiscordApi)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<BufferedImage> downloadAsBufferedImage(DiscordApi api) {
-        return asBufferedImage(api);
-    }
-
-    /**
-     * Downloads the thumbnail as a byte array.
-     *
-     * @param api The discord api instance used to download the thumbnail.
-     * @return The thumbnail as a byte array.
-     * @deprecated Use {@link #asByteArray(DiscordApi)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<byte[]> downloadAsByteArray(DiscordApi api) {
-        return asByteArray(api);
-    }
-
-    /**
-     * Downloads the thumbnail as an input stream.
-     *
-     * @param api The discord api instance used to download the thumbnail.
-     * @return The thumbnail as an input stream.
-     * @throws IOException If an IO error occurs.
-     * @deprecated Use {@link #asInputStream(DiscordApi)} instead.
-     */
-    @Deprecated
-    default InputStream downloadAsInputStream(DiscordApi api) throws IOException {
-        return asInputStream(api);
-    }
-
-    /**
-     * Downloads the thumbnail as a {@code BufferedImage}.
-     *
-     * @param api The discord api instance used to download the thumbnail.
-     * @return The thumbnail as a {@code BufferedImage}.
      */
     CompletableFuture<BufferedImage> asBufferedImage(DiscordApi api);
 

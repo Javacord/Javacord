@@ -2010,33 +2010,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     /**
      * Bans the given user from the server.
      *
-     * @param user              The user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @return A future to check if the ban was successful.
-     * @deprecated Use {@link #banUser(User, long, TimeUnit, String)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<Void> banUser(User user, int deleteMessageDays) {
-        return banUser(user.getId(), deleteMessageDays);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
-     * @param user              The user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
-     * @return A future to check if the ban was successful.
-     * @deprecated Use {@link #banUser(User, long, TimeUnit, String)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<Void> banUser(User user, int deleteMessageDays, String reason) {
-        return banUser(user.getId(), deleteMessageDays, reason);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
      * @param user                  The user to ban.
      * @param deleteMessageDuration The number of messages to delete within the duration.
      *                              (Between 0 and 604800 seconds (7 days))
@@ -2107,32 +2080,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     /**
      * Bans the given user from the server.
      *
-     * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @return A future to check if the ban was successful.
-     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<Void> banUser(String userId, int deleteMessageDays) {
-        return banUser(userId, deleteMessageDays, TimeUnit.DAYS);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
-     * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @return A future to check if the ban was successful.
-     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<Void> banUser(long userId, int deleteMessageDays) {
-        return banUser(Long.toUnsignedString(userId), deleteMessageDays);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
      * @param userId                The id of the user to ban.
      * @param deleteMessageDuration The number of messages to delete within the duration.
      *                              (Between 0 and 604800 seconds (7 days))
@@ -2176,34 +2123,6 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      */
     default CompletableFuture<Void> banUser(long userId, Duration duration) {
         return banUser(Long.toUnsignedString(userId), duration);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
-     * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
-     * @return A future to check if the ban was successful.
-     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<Void> banUser(String userId, int deleteMessageDays, String reason) {
-        return banUser(userId, deleteMessageDays, TimeUnit.DAYS, reason);
-    }
-
-    /**
-     * Bans the given user from the server.
-     *
-     * @param userId            The id of the user to ban.
-     * @param deleteMessageDays The number of days to delete messages for (0-7).
-     * @param reason            The reason for the ban.
-     * @return A future to check if the ban was successful.
-     * @deprecated Use {@link #banUser(String, long, TimeUnit)} instead.
-     */
-    @Deprecated
-    default CompletableFuture<Void> banUser(long userId, int deleteMessageDays, String reason) {
-        return banUser(Long.toUnsignedString(userId), deleteMessageDays, reason);
     }
 
     /**

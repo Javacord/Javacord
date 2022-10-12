@@ -531,40 +531,6 @@ public interface MessageAuthor extends DiscordEntity, Nameable {
     }
 
     /**
-     * Checks if the author can connect to the voice channel where the message was sent.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     * Always returns {@code false} if the author is not a user or if the channel is not a voice channel.
-     *
-     * @return Whether the author can connect to the voice channel or not.
-     * @deprecated Use {@link ServerVoiceChannel#canConnect(User)} instead.
-     */
-    @Deprecated
-    default boolean canConnectToVoiceChannel() {
-        return getMessage()
-            .getChannel()
-            .asVoiceChannel()
-            .flatMap(voiceChannel -> asUser().map(voiceChannel::canConnect))
-            .orElse(false);
-    }
-
-    /**
-     * Checks if the author can mute other users in the voice channel where the message was sent.
-     * In private channels this always returns @{code false}.
-     * Always returns {@code false} if the author is not a user or if the channel is not a voice channel.
-     *
-     * @return Whether the author can mute other users in the voice channel or not.
-     * @deprecated Use {@link ServerVoiceChannel#canMuteUsers(User)} instead.
-     */
-    @Deprecated
-    default boolean canMuteUsersInVoiceChannel() {
-        return getMessage()
-                .getChannel()
-                .asVoiceChannel()
-                .flatMap(voiceChannel -> asUser().map(voiceChannel::canMuteUsers))
-                .orElse(false);
-    }
-
-    /**
      * Checks if the author is allowed to add <b>new</b> reactions to the message.
      * Always returns {@code false} if the author is not a user.
      *
