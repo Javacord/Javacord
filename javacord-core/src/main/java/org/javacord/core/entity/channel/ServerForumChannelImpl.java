@@ -7,13 +7,13 @@ import org.javacord.api.entity.channel.ChannelFlag;
 import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.forum.DefaultReaction;
 import org.javacord.api.entity.channel.forum.ForumTag;
+import org.javacord.api.entity.channel.forum.PermissionOverwrite;
+import org.javacord.api.entity.channel.forum.SortOrderType;
 import org.javacord.core.DiscordApiImpl;
-import org.javacord.core.entity.channel.forum.DefaultReactionImpl;
-import org.javacord.core.entity.channel.forum.ForumTagImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.forum.InternalServerForumChannelAttachableListenerManager;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -26,31 +26,70 @@ import java.util.concurrent.CompletableFuture;
 public class ServerForumChannelImpl extends RegularServerChannelImpl
         implements ServerForumChannel, InternalServerForumChannelAttachableListenerManager {
 
-
     /**
      * The parent id of the channel.
      */
-    private volatile long parentId;
+    private long parentId;
 
     /**
-     * The channel's flags.
+     * The topic of the channel.
      */
-    private volatile EnumSet<ChannelFlag> flags = EnumSet.noneOf(ChannelFlag.class);
+    private String topic;
 
     /**
-     * The set of tags that can be used.
+     * The rate limit per user of the channel.
      */
-    private volatile List<ForumTag> tags = new ArrayList<>();
+    private int rateLimitPerUser;
 
     /**
-     * The list of applied tags ids.
+     * The position of the channel.
      */
-    private volatile List<Long> appliedTags = new ArrayList<>();
+    private int position;
 
     /**
-     * The default emoji shown in the add reaction button.
+     * The permission overwrites of the channel.
      */
-    private volatile DefaultReaction defaultReaction;
+    private List<PermissionOverwrite> permissionOverwrites;
+
+    /**
+     * Whether the channel is nsfw.
+     */
+    private boolean nsfw;
+
+    /**
+     * The last message id of the channel.
+     */
+    private Long lastMessageId;
+
+    /**
+     * The default auto archive duration of the channel.
+     */
+    private int defaultAutoArchiveDuration;
+
+    /**
+     * The flags of the channel.
+     */
+    private EnumSet<ChannelFlag> flags;
+
+    /**
+     * The available tags of the channel.
+     */
+    private List<ForumTag> availableTags;
+
+    /**
+     * The template for the channel.
+     */
+    private String template;
+
+    /**
+     * The default sort order of the channel.
+     */
+    private SortOrderType defaultSortOrder;
+
+    /**
+     * The default reaction of the channel.
+     */
+    private DefaultReaction defaultReaction;
 
     /**
      * Creates a new server forum channel object.
@@ -62,27 +101,13 @@ public class ServerForumChannelImpl extends RegularServerChannelImpl
     public ServerForumChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         super(api, server, data);
         parentId = Long.parseLong(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
+        topic = data.get("topic").asText();
+        rateLimitPerUser = data.get("rate_limit_per_user").asInt();
+        position = data.get("position").asInt();
+        nsfw = data.get("nsfw").asBoolean();
+        lastMessageId = data.has("last_message_id") ? data.get("last_message_id").asLong() : null;
+        defaultAutoArchiveDuration = data.get("default_auto_archive_duration").asInt();
 
-        if (data.hasNonNull("flags")) {
-            for (JsonNode flag : data.get("flags")) {
-                flags.add(ChannelFlag.fromInt(flag.asInt()));
-            }
-        }
-
-        if (data.hasNonNull("tags")) {
-            for (JsonNode tag : data.get("tags")) {
-                tags.add(new ForumTagImpl(api, tag.get("id").asLong(), tag));
-            }
-        }
-
-        if (data.hasNonNull("applied_tags")) {
-            for (JsonNode tag : data.get("applied_tags")) {
-                appliedTags.add(tag.asLong());
-            }
-        }
-
-        defaultReaction = data.hasNonNull("default_reaction_emoji")
-                ? new DefaultReactionImpl(data.get("default_reaction_emoji")) : null;
     }
 
 
@@ -95,45 +120,39 @@ public class ServerForumChannelImpl extends RegularServerChannelImpl
         this.parentId = parentId;
     }
 
-    /**
-     * Sets the channel's flags.
-     *
-     * @param flags The channel's flags.
-     */
-    public void setFlags(EnumSet<ChannelFlag> flags) {
-        this.flags = flags;
-    }
-
-    /**
-     * Sets the set of tags that can be used.
-     *
-     * @param tags The set of tags that can be used.
-     */
-    public void setTags(List<ForumTag> tags) {
-        this.tags = tags;
-    }
-
-    /**
-     * Sets the list of applied tags ids.
-     *
-     * @param appliedTags The list of applied tags ids.
-     */
-    public void setAppliedTags(List<Long> appliedTags) {
-        this.appliedTags = appliedTags;
-    }
-
-    /**
-     * Sets the default emoji shown in the add reaction button.
-     *
-     * @param defaultReaction The default emoji shown in the add reaction button.
-     */
-    public void setDefaultReaction(DefaultReaction defaultReaction) {
-        this.defaultReaction = defaultReaction;
+    @Override
+    public String getTopic() {
+        return topic;
     }
 
     @Override
-    public Optional<ChannelCategory> getCategory() {
-        return getServer().getChannelCategoryById(parentId);
+    public int getRateLimitPerUser() {
+        return rateLimitPerUser;
+    }
+
+    @Override
+    public int getPosition() {
+        return position;
+    }
+
+    @Override
+    public List<PermissionOverwrite> getPermissionOverwrites() {
+        return Collections.unmodifiableList(permissionOverwrites);
+    }
+
+    @Override
+    public boolean isNsfw() {
+        return nsfw;
+    }
+
+    @Override
+    public Optional<Long> getLastMessageId() {
+        return Optional.ofNullable(lastMessageId);
+    }
+
+    @Override
+    public int getDefaultRateLimitPerUser() {
+        return defaultAutoArchiveDuration;
     }
 
     @Override
@@ -142,18 +161,28 @@ public class ServerForumChannelImpl extends RegularServerChannelImpl
     }
 
     @Override
-    public List<ForumTag> getTags() {
-        return tags;
+    public List<ForumTag> getAvailableTags() {
+        return Collections.unmodifiableList(availableTags);
     }
 
     @Override
-    public List<Long> getAppliedTags() {
-        return appliedTags;
+    public Optional<String> getTemplate() {
+        return Optional.ofNullable(template);
+    }
+
+    @Override
+    public Optional<SortOrderType> getDefaultSortType() {
+        return Optional.ofNullable(defaultSortOrder);
     }
 
     @Override
     public Optional<DefaultReaction> getDefaultReaction() {
         return Optional.ofNullable(defaultReaction);
+    }
+
+    @Override
+    public Optional<ChannelCategory> getCategory() {
+        return getApi().getChannelCategoryById(parentId);
     }
 
     @Override

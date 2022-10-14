@@ -506,6 +506,8 @@ public class ChannelUpdateHandler extends PacketHandler {
             api.getEventDispatcher().dispatchServerForumChannelChangeDefaultReactionEvent(
                     (DispatchQueueSelector) channel.getServer(), channel, event);
         }
+
+        //TODO: add the rest of the properties
     }
 
     /**

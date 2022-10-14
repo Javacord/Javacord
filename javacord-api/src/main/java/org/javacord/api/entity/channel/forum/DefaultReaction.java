@@ -1,5 +1,7 @@
 package org.javacord.api.entity.channel.forum;
 
+import java.util.Optional;
+
 /**
  * This class represents a default reaction.
  */
@@ -25,5 +27,5 @@ public interface DefaultReaction {
      *
      * @return The name of a guild's custom emoji.
      */
-    String getEmojiName();
+    Optional<String> getEmojiName();
 }
