@@ -29,7 +29,7 @@ public interface LowLevelComponent extends Component, Specializable<LowLevelComp
      * @return True if it's of that type.
      */
     default boolean isSelectMenu() {
-        return getType() == ComponentType.SELECT_MENU;
+        return getType().isSelectMenuType();
     }
 
     /**
