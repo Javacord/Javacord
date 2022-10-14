@@ -15,6 +15,11 @@ import java.util.concurrent.CompletableFuture;
 public interface ServerTextChannel extends RegularServerChannel, TextChannel, Mentionable, Categorizable,
         ServerTextChannelAttachableListenerManager {
 
+    @Override
+    default String getMentionTag() {
+        return "<#" + getIdAsString() + ">";
+    }
+
     /**
      * Gets the default auto archive duration for threads that will be created in this channel.
      *

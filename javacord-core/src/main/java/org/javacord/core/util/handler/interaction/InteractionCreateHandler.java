@@ -98,23 +98,17 @@ public class InteractionCreateHandler extends PacketHandler {
                 }
                 break;
             case MESSAGE_COMPONENT:
-                int componentTypeId = packet.get("data").get("component_type").asInt();
+                final int componentTypeId = packet.get("data").get("component_type").asInt();
                 componentType = ComponentType.fromId(componentTypeId);
-                switch (componentType) {
-                    case BUTTON:
-                        interaction = new ButtonInteractionImpl(api, channel, packet);
-                        break;
-                    case ACTION_ROW:
-                        logger.warn("Received a message component interaction of type ACTION_ROW. This should not"
-                                + " be possible.");
-                        return;
-                    case SELECT_MENU:
-                        interaction = new SelectMenuInteractionImpl(api, channel, packet);
-                        break;
-                    default:
-                        logger.warn("Received message component interaction of unknown type <{}>. "
-                                + "Please contact the developer!", componentTypeId);
-                        return;
+
+                if (componentType == ComponentType.BUTTON) {
+                    interaction = new ButtonInteractionImpl(api, channel, packet);
+                } else if (componentType.isSelectMenuType()) {
+                    interaction = new SelectMenuInteractionImpl(api, channel, packet);
+                } else {
+                    logger.warn("Received message component interaction of unknown type <{}>. "
+                            + "Please contact the developer!", componentTypeId);
+                    return;
                 }
                 break;
             case APPLICATION_COMMAND_AUTOCOMPLETE:
@@ -195,29 +189,25 @@ public class InteractionCreateHandler extends PacketHandler {
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
                         messageComponentCreateEvent);
-                switch (componentType) {
-                    case BUTTON:
-                        ButtonClickEvent buttonClickEvent = new ButtonClickEventImpl(interaction);
-                        api.getEventDispatcher().dispatchButtonClickEvent(
-                                server == null ? api : server,
-                                messageId,
-                                server,
-                                interaction.getChannel().orElse(null),
-                                interaction.getUser(),
-                                buttonClickEvent);
-                        break;
-                    case SELECT_MENU:
-                        SelectMenuChooseEvent selectMenuChooseEvent = new SelectMenuChooseEventImpl(interaction);
-                        api.getEventDispatcher().dispatchSelectMenuChooseEvent(
-                                server == null ? api : server,
-                                messageId,
-                                server,
-                                interaction.getChannel().orElse(null),
-                                interaction.getUser(),
-                                selectMenuChooseEvent);
-                        break;
-                    default:
-                        break;
+
+                if (componentType == ComponentType.BUTTON) {
+                    ButtonClickEvent buttonClickEvent = new ButtonClickEventImpl(interaction);
+                    api.getEventDispatcher().dispatchButtonClickEvent(
+                            server == null ? api : server,
+                            messageId,
+                            server,
+                            interaction.getChannel().orElse(null),
+                            interaction.getUser(),
+                            buttonClickEvent);
+                } else if (componentType.isSelectMenuType()) {
+                    SelectMenuChooseEvent selectMenuChooseEvent = new SelectMenuChooseEventImpl(interaction);
+                    api.getEventDispatcher().dispatchSelectMenuChooseEvent(
+                            server == null ? api : server,
+                            messageId,
+                            server,
+                            interaction.getChannel().orElse(null),
+                            interaction.getUser(),
+                            selectMenuChooseEvent);
                 }
                 break;
             case APPLICATION_COMMAND_AUTOCOMPLETE:
