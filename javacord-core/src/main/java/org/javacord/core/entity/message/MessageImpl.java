@@ -257,7 +257,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                         List<Embed> embeds, List<Reaction> reactions,
                         List<MessageAttachment> attachments, List<User> mentions,
                         List<Role> roleMentions, Set<StickerItem> stickerItems, MessageInteraction messageInteraction,
-                        int position) {
+                        Integer position) {
         this.api = api;
         this.channel = channel;
         this.id = id;

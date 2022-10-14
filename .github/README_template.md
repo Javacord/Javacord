@@ -60,7 +60,6 @@ public class MyFirstBot {
 ```
 
 Discord now knows about your command and will offer it in your text channels if you type ``/``.
-*Note: Creating a global command may take up to 1 hour to become usable* 
 
 Next, let's see how we can let the bot send answers to this simple slash command:
 ```java
@@ -125,7 +124,7 @@ log levels per class, and much more.
 
 For example, Log4j Core in Gradle
 ```gradle
-dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.17.1' }
+dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.19.0' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-config.html) wiki article for further information.
 

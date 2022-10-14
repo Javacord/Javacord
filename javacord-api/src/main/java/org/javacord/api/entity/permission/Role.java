@@ -1,5 +1,6 @@
 package org.javacord.api.entity.permission;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
@@ -19,8 +20,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a Discord role, e.g. "moderator".
  */
-public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionable, Comparable<Role>,
-        UpdatableFromCache<Role>, RoleAttachableListenerManager {
+public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, Permissionable,
+        Comparable<Role>, UpdatableFromCache<Role>, RoleAttachableListenerManager {
 
     /**
      * Gets the server of the role.
@@ -276,13 +277,6 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Permissionab
     default CompletableFuture<Void> removeUser(User user, String reason) {
         return getServer().removeRoleFromUser(user, this, reason);
     }
-
-    /**
-     * Deletes the role.
-     *
-     * @return A future to check if the deletion was successful.
-     */
-    CompletableFuture<Void> delete();
 
     /**
      * Gets the allowed permissions of the role.

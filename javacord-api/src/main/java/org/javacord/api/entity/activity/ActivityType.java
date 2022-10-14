@@ -3,7 +3,7 @@ package org.javacord.api.entity.activity;
 /**
  * Represents an activity type.
  *
- * @see <a href="https://discord.com/developers/docs/topics/gateway#activity-object-activity-types">Discord docs</a>
+ * @see <a href="https://discord.com/developers/docs/topics/gateway-events#activity-object-activity-types">Discord docs</a>
  */
 public enum ActivityType {
 

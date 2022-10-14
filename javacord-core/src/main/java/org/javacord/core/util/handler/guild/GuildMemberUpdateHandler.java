@@ -66,7 +66,7 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                     boolean selfMuted = server.isSelfMuted(userId);
                     boolean selfDeafened = server.isSelfDeafened(userId);
                     // GUILD_MEMBER_UPDATE doesn't contain self voice states, so we either pass the old or set to false.
-                    // https://discord.com/developers/docs/topics/gateway#guild-member-update
+                    // https://discord.com/developers/docs/topics/gateway-events#guild-member-update
                     MemberImpl newMember = new MemberImpl(api, server, packet, null)
                             .setSelfMuted(selfMuted)
                             .setSelfDeafened(selfDeafened);

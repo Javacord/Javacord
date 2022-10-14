@@ -1,5 +1,6 @@
 package org.javacord.api.entity.server.invite;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -9,13 +10,12 @@ import org.javacord.api.entity.user.User;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents an invite object.
  * Invite objects won't receive any updates!
  */
-public interface Invite {
+public interface Invite extends Deletable {
 
     /**
      * Gets the code of the invite.
@@ -100,23 +100,6 @@ public interface Invite {
      * @return The type of the channel.
      */
     ChannelType getChannelType();
-
-    /**
-     * Deletes the invite.
-     *
-     * @return A future to check if the deletion was successful.
-     */
-    default CompletableFuture<Void> delete() {
-        return delete(null);
-    }
-
-    /**
-     * Deletes the invite.
-     *
-     * @param reason The audit log reason for the deletion.
-     * @return A future to check if the deletion was successful.
-     */
-    CompletableFuture<Void> delete(String reason);
 
     /**
      * Gets the approximate number of members for the target server.

@@ -59,6 +59,34 @@ public class DiscordRegexPattern {
                             + ">                   # '>'");
 
     /**
+     * A pattern which checks for mentioned slash commands (e.g. {@code </ping:1234567890>}).
+     */
+    public static final Pattern SLASH_COMMAND_MENTION =
+            Pattern.compile("(?x)                                # enable comment mode \n"
+                            + "(?<!                              # negative lookbehind \n"
+                            + "                                  # (do not have uneven amount of backslashes before) \n"
+                            + "    (?<!\\\\)                     # negative lookbehind \n"
+                            + "                                  #     (do not have one backslash before) \n"
+                            + "    (?:\\\\{2}+)                  # exactly two backslashes \n"
+                            + "    {0,1000000000}+               # 0 to 1_000_000_000 times (basically * \n"
+                            + "                                  #  but a lookbehind has to have a maximum length) \n"
+                            + "    \\\\                          # the one escaping backslash \n"
+                            + ")                                 # \n"
+                            + "</                                # '</' \n"
+                            + "(?<command>\\w++)                 # the command name as named group \n"
+                            + "(?:                               # the optional subcommand group and subcommand \n"
+                            + "    (?:                           # the optional subcommand group \n"
+                            + "        (?-x: )                   # ' ' with disabled comment mode due to the space \n"
+                            + "        (?<subcommandGroup>\\w++) # the subcommand group as named group \n"
+                            + "    )?                            # optional \n"
+                            + "    (?-x: )                       # ' ' with disabled comment mode due to the space \n"
+                            + "    (?<subcommand>\\w++)          # the subcommand as named group \n"
+                            + ")?                                # optional \n"
+                            + ":                                 # ':' \n"
+                            + "(?<id>[0-9]++)                    # the slash command id as named group \n"
+                            + ">                                 # '>'");
+
+    /**
      * A pattern which checks for custom emojis (e.g. {@code <:my_emoji:1234567890>}).
      */
     public static final Pattern CUSTOM_EMOJI =

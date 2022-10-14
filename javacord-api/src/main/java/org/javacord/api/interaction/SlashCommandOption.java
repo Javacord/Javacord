@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ChannelType;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,6 +64,16 @@ public interface SlashCommandOption {
      * @return Whether this option can be autocompleted.
      */
     boolean isAutocompletable();
+
+    /**
+     * Gets whether this slash command option is a subcommand or subcommand group.
+     *
+     * @return Whether this slash command option is a subcommand or subcommand group.
+     */
+    default boolean isSubcommandOrGroup() {
+        return getType() == SlashCommandOptionType.SUB_COMMAND
+                || getType() == SlashCommandOptionType.SUB_COMMAND_GROUP;
+    }
 
     /**
      * Gets all choices for this option.
@@ -138,7 +149,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption create(SlashCommandOptionType type,
                                      String name,
@@ -159,7 +170,7 @@ public interface SlashCommandOption {
      * @param type        The type of the option.
      * @param name        The name of the option.
      * @param description The description of the option.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption create(SlashCommandOptionType type, String name, String description) {
         return new SlashCommandOptionBuilder()
@@ -177,7 +188,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param options     The options of this subcommand or subcommand group.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createWithOptions(SlashCommandOptionType type,
                                                 String name,
@@ -197,7 +208,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param options     The options of this subcommand or subcommand group.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createWithOptions(SlashCommandOptionType type,
                                                 String name,
@@ -212,6 +223,49 @@ public interface SlashCommandOption {
     }
 
     /**
+     * Create a new subcommand group option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name        The name of the subcommand group.
+     * @param description The description of the subcommand group.
+     * @param options     The sub command options of this subcommand group.
+     * @return A new slash command option instance.
+     */
+    static SlashCommandOption createSubcommandGroup(String name,
+                                                    String description,
+                                                    List<SlashCommandOption> options) {
+        return createWithOptions(SlashCommandOptionType.SUB_COMMAND_GROUP, name, description, options);
+    }
+
+    /**
+     * Create a new subcommand option to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name        The name of the subcommand.
+     * @param description The description of the subcommand.
+     * @return A new slash command option instance.
+     */
+    static SlashCommandOption createSubcommand(String name,
+                                               String description) {
+        return createSubcommand(name, description, Collections.emptyList());
+    }
+
+    /**
+     * Create a new subcommand option with options to be used with a slash command builder.
+     * This is a convenience method.
+     *
+     * @param name        The name of the subcommand.
+     * @param description The description of the subcommand.
+     * @param options     The options of this subcommand.
+     * @return A new slash command option instance.
+     */
+    static SlashCommandOption createSubcommand(String name,
+                                               String description,
+                                               List<SlashCommandOption> options) {
+        return createWithOptions(SlashCommandOptionType.SUB_COMMAND, name, description, options);
+    }
+
+    /**
      * Create a new slash command option to be used with a slash command builder.
      * This is a convenience method.
      *
@@ -220,7 +274,7 @@ public interface SlashCommandOption {
      * @param description The description of the option.
      * @param required    Whether this option is required.
      * @param choices     The choices of the option.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createWithChoices(SlashCommandOptionType type,
                                                 String name,
@@ -241,7 +295,7 @@ public interface SlashCommandOption {
      * @param description The description of the option.
      * @param required    Whether this option is required.
      * @param choices     The choices of the option.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createWithChoices(SlashCommandOptionType type,
                                                 String name,
@@ -265,7 +319,7 @@ public interface SlashCommandOption {
      * @param description  The description of the option.
      * @param required     Whether this option is required.
      * @param channelTypes Channel types that are shown.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createChannelOption(String name,
                                                   String description,
@@ -287,7 +341,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createDecimalOption(String name,
                                                   String description,
@@ -308,7 +362,7 @@ public interface SlashCommandOption {
      * @param description  The description of the option.
      * @param required     Whether this option is required
      * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createDecimalOption(String name,
                                                   String description,
@@ -332,7 +386,7 @@ public interface SlashCommandOption {
      * @param required    Whether this option is required
      * @param minValue    The minimum value permitted.
      * @param maxValue    The maximum value permitted.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createDecimalOption(String name,
                                                   String description,
@@ -356,11 +410,11 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createAttachmentOption(String name,
-                                                  String description,
-                                                  boolean required) {
+                                                     String description,
+                                                     boolean required) {
         return new SlashCommandOptionBuilder()
                 .setType(SlashCommandOptionType.ATTACHMENT)
                 .setName(name)
@@ -376,7 +430,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createLongOption(String name,
                                                String description,
@@ -398,7 +452,7 @@ public interface SlashCommandOption {
      * @param required    Whether this option is required
      * @param minValue    The minimum value permitted.
      * @param maxValue    The maximum value permitted.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createLongOption(String name,
                                                String description,
@@ -423,7 +477,7 @@ public interface SlashCommandOption {
      * @param description  The description of the option.
      * @param required     Whether this option is required
      * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createLongOption(String name,
                                                String description,
@@ -445,7 +499,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createStringOption(String name,
                                                  String description,
@@ -467,7 +521,7 @@ public interface SlashCommandOption {
      * @param required    Whether this option is required
      * @param minLength   The minimum allowed length.
      * @param maxLength   The maximum allowed length.
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createStringOption(String name,
                                                  String description,
@@ -492,7 +546,7 @@ public interface SlashCommandOption {
      * @param description  The description of the option.
      * @param required     Whether this option is required
      * @param autocomplete Whether this option can be autocompleted
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createStringOption(String name,
                                                  String description,
@@ -514,7 +568,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createRoleOption(String name,
                                                String description,
@@ -535,7 +589,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createMentionableOption(String name,
                                                       String description,
@@ -555,7 +609,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createUserOption(String name,
                                                String description,
@@ -575,7 +629,7 @@ public interface SlashCommandOption {
      * @param name        The name of the option.
      * @param description The description of the option.
      * @param required    Whether this option is required
-     * @return The new slash command option builder.
+     * @return A new slash command option instance.
      */
     static SlashCommandOption createBooleanOption(String name,
                                                   String description,

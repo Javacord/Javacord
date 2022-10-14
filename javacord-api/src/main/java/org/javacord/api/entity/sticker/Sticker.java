@@ -1,5 +1,6 @@
 package org.javacord.api.entity.sticker;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.server.Server;
@@ -15,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @see <a href="https://discord.com/developers/docs/resources/sticker#sticker-object-sticker-structure">Discord Docs</a>
  */
-public interface Sticker extends DiscordEntity, Nameable, StickerAttachableListenerManager {
+public interface Sticker extends DiscordEntity, Nameable, Deletable, StickerAttachableListenerManager {
 
     /**
      * Gets the ID of the sticker pack.
@@ -195,23 +196,6 @@ public interface Sticker extends DiscordEntity, Nameable, StickerAttachableListe
      * @return A new sticker updater for the sticker.
      */
     StickerUpdater createUpdater();
-
-    /**
-     * Deletes the sticker.
-     *
-     * @return A future.
-     */
-    default CompletableFuture<Void> delete() {
-        return delete(null);
-    }
-
-    /**
-     * Deletes the sticker.
-     *
-     * @param reason The reason for the audit log.
-     * @return A future.
-     */
-    CompletableFuture<Void> delete(String reason);
 
     /**
      * Creates a new sticker with the given values.

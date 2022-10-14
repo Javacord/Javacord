@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.InviteBuilder;
@@ -13,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server channel.
  */
-public interface ServerChannel extends Channel, Nameable, ServerChannelAttachableListenerManager {
+public interface ServerChannel extends Channel, Nameable, Deletable, ServerChannelAttachableListenerManager {
 
     /**
      * Gets the server of the channel.
@@ -59,23 +60,6 @@ public interface ServerChannel extends Channel, Nameable, ServerChannelAttachabl
     default CompletableFuture<Void> updateName(String name) {
         return createUpdater().setName(name).update();
     }
-
-    /**
-     * Deletes the channel.
-     *
-     * @return A future to tell us if the deletion was successful.
-     */
-    default CompletableFuture<Void> delete() {
-        return delete(null);
-    }
-
-    /**
-     * Deletes the channel.
-     *
-     * @param reason The audit log reason for the deletion.
-     * @return A future to tell us if the deletion was successful.
-     */
-    CompletableFuture<Void> delete(String reason);
 
     @Override
     default Optional<? extends ServerChannel> getCurrentCachedInstance() {

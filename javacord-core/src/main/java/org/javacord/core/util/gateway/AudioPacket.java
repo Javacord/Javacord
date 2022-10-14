@@ -42,7 +42,7 @@ public class AudioPacket {
             audioFrame = SilentAudioSource.SILENCE_FRAME;
         }
         this.audioFrame = audioFrame;
-        // See https://discordapp.com/developers/docs/topics/voice-connections#encrypting-and-sending-voice
+        // See https://discord.com/developers/docs/topics/voice-connections#encrypting-and-sending-voice
         ByteBuffer buffer = ByteBuffer.allocate(RTP_HEADER_LENGTH)
                 .put(0, RTP_TYPE)
                 .put(1, RTP_VERSION)
