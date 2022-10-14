@@ -31,7 +31,17 @@ import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.server.*;
+import org.javacord.api.entity.server.ActiveThreads;
+import org.javacord.api.entity.server.Ban;
+import org.javacord.api.entity.server.BoostLevel;
+import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
+import org.javacord.api.entity.server.ExplicitContentFilterLevel;
+import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
+import org.javacord.api.entity.server.NsfwLevel;
+import org.javacord.api.entity.server.ScheduledEvent;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.server.ServerFeature;
+import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.server.invite.WelcomeScreen;
 import org.javacord.api.entity.sticker.Sticker;
@@ -211,6 +221,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * All roles of the server.
      */
     private final ConcurrentHashMap<Long, Role> roles = new ConcurrentHashMap<>();
+
+    /**
+     * All events on the server.
+     */
+    private final ConcurrentHashMap<Long, ScheduledEvent> events = new ConcurrentHashMap<>();
 
     /**
      * All custom emojis from this server.
@@ -753,6 +768,15 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      */
     public void removeRole(long roleId) {
         roles.remove(roleId);
+    }
+
+    /**
+     * Removes an event from the cache.
+     *
+     * @param eventId The id of the event to remove.
+     */
+    public void removeEvent(long eventId) {
+        events.remove(eventId);
     }
 
     /**
@@ -1567,6 +1591,18 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public Optional<Role> getRoleById(long id) {
         return Optional.ofNullable(roles.get(id));
+    }
+
+    @Override
+    public List<ScheduledEvent> getEvents() {
+        return Collections.unmodifiableList(events.values().stream()
+                .sorted()
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public Optional<ScheduledEvent> getEventById(long id) {
+        return Optional.ofNullable(events.get(id));
     }
 
     @Override

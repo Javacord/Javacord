@@ -562,8 +562,8 @@ public class DelegateFactory {
         return delegateFactoryDelegate.createEventBuilderDelegate(server);
     }
 
-    public static EventUpdaterDelegate createEventUpdaterDelegate(Server server, ScheduledEvent event) {
-        return delegateFactoryDelegate.createEventUpdaterDelegate(server, event);
+    public static EventUpdaterDelegate createEventUpdaterDelegate(ScheduledEvent event) {
+        return delegateFactoryDelegate.createEventUpdaterDelegate(event);
     }
 
     /**

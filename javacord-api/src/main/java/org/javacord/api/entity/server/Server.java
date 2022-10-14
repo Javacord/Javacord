@@ -715,6 +715,21 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
     Optional<Role> getRoleById(long id);
 
     /**
+     * Gets a sorted list (by creation date) with all events in the server.
+     *
+     * @return A sorted list (by creation date) with all roles events in the server.
+     */
+    List<ScheduledEvent> getEvents();
+
+    /**
+     * Gets an event by its id.
+     *
+     * @param id The id of the event.
+     * @return The event with the given id.
+     */
+    Optional<ScheduledEvent> getEventById(long id);
+
+    /**
      * Gets a role by its id.
      *
      * @param id The id of the role.
@@ -2370,6 +2385,10 @@ public interface Server extends DiscordEntity, Nameable, UpdatableFromCache<Serv
      */
     default RoleBuilder createRoleBuilder() {
         return new RoleBuilder(this);
+    }
+
+    default EventBuilder createEventBuilder() {
+        return new EventBuilder(this);
     }
 
     /**

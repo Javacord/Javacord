@@ -40,4 +40,6 @@ public interface ScheduledEvent extends DiscordEntity, Nameable {
     Optional<Icon> getCoverImage();
 
     Optional<String> getCoverImageHash();
+
+    EventUpdater createUpdater();
 }

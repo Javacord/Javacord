@@ -440,5 +440,5 @@ public interface DelegateFactoryDelegate {
 
     EventBuilderDelegate createEventBuilderDelegate(Server server);
 
-    EventUpdaterDelegate createEventUpdaterDelegate(Server server, ScheduledEvent event);
+    EventUpdaterDelegate createEventUpdaterDelegate(ScheduledEvent event);
 }
