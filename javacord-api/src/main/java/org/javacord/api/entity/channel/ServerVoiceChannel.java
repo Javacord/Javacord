@@ -48,7 +48,7 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
     }
 
     /**
-     * Checks is the channel is "not safe for work".
+     * Checks if the channel is "not safe for work".
      *
      * @return Whether the channel is "not safe for work" or not.
      */
@@ -333,7 +333,7 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
     }
 
     /**
-     * Updates the nsfw flag of the vc.
+     * Updates the nsfw flag of the channel.
      *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
