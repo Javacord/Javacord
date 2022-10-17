@@ -205,11 +205,6 @@ public class ServerTextChannelImpl extends RegularServerChannelImpl
     }
 
     @Override
-    public String getMentionTag() {
-        return "<#" + getIdAsString() + ">";
-    }
-
-    @Override
     public void cleanup() {
         messageCache.cleanup();
     }

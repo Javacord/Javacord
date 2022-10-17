@@ -5,12 +5,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.component.ActionRow;
-import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
-import org.javacord.api.entity.message.component.SelectMenu;
-import org.javacord.api.entity.message.component.TextInput;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,25 +27,19 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
                 int typeInt = componentJson.get("type").asInt();
                 ComponentType type = ComponentType.fromId(typeInt);
 
-                switch (type) {
-                    case BUTTON:
-                        Button button = new ButtonImpl(componentJson);
-                        components.add(button);
-                        break;
-                    case SELECT_MENU:
-                        SelectMenu selectMenu = new SelectMenuImpl(componentJson);
-                        components.add(selectMenu);
-                        break;
-                    case TEXT_INPUT:
-                        TextInput textInput = new TextInputImpl(componentJson);
-                        components.add(textInput);
-                        break;
-                    default:
-                        throw new IllegalStateException(
+
+                if (type == ComponentType.BUTTON) {
+                    components.add(new ButtonImpl(componentJson));
+                } else if (type.isSelectMenuType()) {
+                    components.add(new SelectMenuImpl(componentJson));
+                } else if (type == ComponentType.TEXT_INPUT) {
+                    components.add(new TextInputImpl(componentJson));
+                } else {
+                    throw new IllegalStateException(
                             String.format(
-                                "Couldn't parse the component of type '%d'. Please contact the developer!", typeInt
+                                    "Couldn't parse the component of type '%d'. Please contact the developer!", typeInt
                             )
-                        );
+                    );
                 }
             }
         }
@@ -78,23 +68,16 @@ public class ActionRowImpl extends ComponentImpl implements ActionRow {
 
         ArrayNode componentsJson = JsonNodeFactory.instance.objectNode().arrayNode();
         for (LowLevelComponent component : this.components) {
-            switch (component.getType()) {
-                case ACTION_ROW:
-                    throw new IllegalStateException("An action row can not contain an action row.");
-                case BUTTON:
-                    ButtonImpl button = (ButtonImpl) component;
-                    componentsJson.add(button.toJsonNode());
-                    break;
-                case SELECT_MENU:
-                    SelectMenuImpl selectMenu = (SelectMenuImpl) component;
-                    componentsJson.add(selectMenu.toJsonNode());
-                    break;
-                case TEXT_INPUT:
-                    TextInputImpl textInput = (TextInputImpl) component;
-                    componentsJson.add(textInput.toJsonNode());
-                    break;
-                default:
-                    throw new IllegalStateException("An unknown component type was added.");
+            if (component.getType() == ComponentType.BUTTON) {
+                componentsJson.add(((ButtonImpl) component).toJsonNode());
+            } else if (component.getType().isSelectMenuType()) {
+                componentsJson.add(((SelectMenuImpl) component).toJsonNode());
+            } else if (component.getType() == ComponentType.TEXT_INPUT) {
+                componentsJson.add(((TextInputImpl) component).toJsonNode());
+            } else if (component.getType() == ComponentType.ACTION_ROW) {
+                throw new IllegalStateException("An action row can not contain an action row.");
+            } else {
+                throw new IllegalStateException("An unknown component type was added.");
             }
         }
         object.set("components", componentsJson);

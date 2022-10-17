@@ -8,7 +8,7 @@ By reducing itself to standard Java classes and features like [`Optional`](https
 It has rich [documentation](#-documentation) and an [awesome community on Discord](#-support) that loves to help with any specific problems and questions.
 
 > *Starting in early 2023, support for Java 8 will be discontinued and Java 11 will be the new minimum requirement for using Javacord.
-> If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of this year.*
+> If you are not yet running Java 11+, we strongly recommend that you upgrade before the end of 2022.*
 
 ## 🎉 Basic Usage
 
@@ -60,7 +60,6 @@ public class MyFirstBot {
 ```
 
 Discord now knows about your command and will offer it in your text channels if you type ``/``.
-*Note: Creating a global command may take up to 1 hour to become usable* 
 
 Next, let's see how we can let the bot send answers to this simple slash command:
 ```java
@@ -95,9 +94,9 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 #### Gradle
 
-```groovy
+```gradle
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.5.0' }
+dependencies { implementation 'org.javacord:javacord:3.6.0' }
 ```
 
 #### Maven
@@ -106,7 +105,7 @@ dependencies { implementation 'org.javacord:javacord:3.5.0' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.5.0</version>
+    <version>3.6.0</version>
     <type>pom</type>
 </dependency>
 ```
@@ -114,7 +113,7 @@ dependencies { implementation 'org.javacord:javacord:3.5.0' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.5.0")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.6.0")
 ```
 
 ### Optional Logger Dependency
@@ -124,8 +123,8 @@ with being able to configure log format, log targets (console, file, database, D
 log levels per class, and much more.
 
 For example, Log4j Core in Gradle
-```groovy
-dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.17.1' }
+```gradle
+dependencies { runtimeOnly 'org.apache.logging.log4j:log4j-core:2.19.0' }
 ```
 Take a look at the [logger configuration](https://javacord.org/wiki/basic-tutorials/logger-config.html) wiki article for further information.
 
@@ -165,6 +164,15 @@ several minor releases). A minor release might remove a class or method without 
 best to deprecate it before removing it. We are unable to guarantee this though, because we might have to remove / replace
 something due to changes made by Discord, which we are unable to control. Usually you can expect a deprecated method or
 class to stay for at least 6 months before it finally gets removed, but this is not guaranteed.
+
+## ✨ Contributing
+
+Contributions of any kind are welcome. You can start contributing to this library by creating issues, submitting pull requests or improving the [Javacord Wiki](https://github.com/Javacord/Website). 
+
+If you want to submit pull requests you can find a list of good first issues [here](https://github.com/Javacord/Javacord/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). You are not restricted to only these issues, so you can start with any other issue that you would like to do.
+Be sure to read the [Contributing Guidelines](./CONTRIBUTING.md) before you start.
+
+The awesome people that contributed to Javacord in the past can be found ✨[here](../CONTRIBUTORS.md)✨
 
 ## 🥇 Large Bots Using Javacord
 
@@ -221,6 +229,7 @@ api.addListener(new MyListener());
 For commands, you have the option of using one of the many existing command frameworks such as
 * [**Command Framework**](https://github.com/Vampire/command-framework) by [@Vampire](https://github.com/Vampire)
 * [**Sdcf4j**](https://github.com/Bastian/sdcf4j) by [@Bastian](https://github.com/Bastian)
+* [**KCommando Framework**](https://github.com/koply/KCommando) by [@koply](https://github.com/koply)
 
 or even write your own!
 

@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message.component.internal;
 
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.SelectMenu;
 import org.javacord.api.entity.message.component.SelectMenuOption;
@@ -9,9 +10,16 @@ public interface SelectMenuBuilderDelegate extends ComponentBuilderDelegate {
     /**
      * Get the select menu's type.
      *
-     * @return Always {@link ComponentType#SELECT_MENU}
+     * @return The specific type of the select menu.
      */
     ComponentType getType();
+
+    /**
+     * Sets the type of this select menu.
+     *
+     * @param type The type of the select menu.
+     */
+    void setType(ComponentType type);
 
     /**
      * Copy a select menu's values into the builder.
@@ -20,6 +28,12 @@ public interface SelectMenuBuilderDelegate extends ComponentBuilderDelegate {
      */
     void copy(SelectMenu selectMenu);
 
+    /**
+     * Add a channel type to the select menu.
+     *
+     * @param channelType The channel type to add.
+     */
+    void addChannelType(ChannelType channelType);
 
     /**
      * Add an option to the select menu.
@@ -30,7 +44,7 @@ public interface SelectMenuBuilderDelegate extends ComponentBuilderDelegate {
 
     /**
      * Remove an option from the select menu.
-     * 
+     *
      * @param selectMenuOption The option to remove.
      */
     void removeOption(SelectMenuOption selectMenuOption);

@@ -41,43 +41,6 @@ public interface EmbedAuthor extends Nameable {
      *
      * @param api The discord api instance used to download the author icon.
      * @return The thumbnail as a {@code BufferedImage}.
-     * @deprecated Use {@link #iconAsBufferedImage(DiscordApi)} instead.
-     */
-    @Deprecated
-    default Optional<CompletableFuture<BufferedImage>> downloadIconAsBufferedImage(DiscordApi api) {
-        return iconAsBufferedImage(api);
-    }
-
-    /**
-     * Downloads the author icon as a byte array.
-     *
-     * @param api The discord api instance used to download the author icon.
-     * @return The thumbnail as a byte array.
-     * @deprecated Use {@link #iconAsByteArray(DiscordApi)} instead.
-     */
-    @Deprecated
-    default Optional<CompletableFuture<byte[]>> downloadIconAsByteArray(DiscordApi api) {
-        return iconAsByteArray(api);
-    }
-
-    /**
-     * Downloads the author icon as an input stream.
-     *
-     * @param api The discord api instance used to download the author icon.
-     * @return The thumbnail as an input stream.
-     * @throws IOException If an IO error occurs.
-     * @deprecated Use {@link #iconAsInputStream(DiscordApi)} instead.
-     */
-    @Deprecated
-    default Optional<InputStream> downloadIconAsInputStream(DiscordApi api) throws IOException {
-        return iconAsInputStream(api);
-    }
-
-    /**
-     * Downloads the author icon as a {@code BufferedImage}.
-     *
-     * @param api The discord api instance used to download the author icon.
-     * @return The thumbnail as a {@code BufferedImage}.
      */
     Optional<CompletableFuture<BufferedImage>> iconAsBufferedImage(DiscordApi api);
 

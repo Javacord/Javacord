@@ -29,9 +29,10 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
                 ButtonBuilder builder = new ButtonBuilder();
                 builder.copy((Button) component);
                 components.add(builder.build());
-            } else if (component.getType() == ComponentType.SELECT_MENU) {
-                SelectMenuBuilder builder = new SelectMenuBuilder();
-                builder.copy((SelectMenu) component);
+            } else if (component.getType().isSelectMenuType()) {
+                SelectMenu sm = (SelectMenu) component;
+                SelectMenuBuilder builder = new SelectMenuBuilder(sm.getType(), sm.getCustomId());
+                builder.copy(sm);
                 components.add(builder.build());
             }
         });
@@ -53,7 +54,7 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
             if (componentBuilder.getType() == ComponentType.BUTTON) {
                 ButtonBuilder buttonBuilder = (ButtonBuilder) componentBuilder;
                 return buttonBuilder.getDelegate().getCustomId().equals(customId);
-            } else if (componentBuilder.getType() == ComponentType.SELECT_MENU) {
+            } else if (componentBuilder.getType().isSelectMenuType()) {
                 SelectMenuBuilder selectMenuBuilder = (SelectMenuBuilder) componentBuilder;
                 return selectMenuBuilder.getDelegate().getCustomId().equals(customId);
             }

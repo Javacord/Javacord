@@ -1,5 +1,6 @@
 package org.javacord.core.entity.message.component.internal;
 
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.SelectMenu;
 import org.javacord.api.entity.message.component.SelectMenuOption;
@@ -7,13 +8,16 @@ import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDeleg
 import org.javacord.core.entity.message.component.SelectMenuImpl;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
 public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate {
-    private final ComponentType type = ComponentType.SELECT_MENU;
+    private ComponentType type = null;
 
     private List<SelectMenuOption> options = new ArrayList<>();
+
+    private EnumSet<ChannelType> channelTypes = EnumSet.noneOf(ChannelType.class);
 
     private String placeholder = null;
 
@@ -31,6 +35,11 @@ public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate 
     }
 
     @Override
+    public void setType(ComponentType type) {
+        this.type = type;
+    }
+
+    @Override
     public void copy(SelectMenu selectMenu) {
         Optional<String> placeholder = selectMenu.getPlaceholder();
         this.customId = selectMenu.getCustomId();
@@ -38,8 +47,15 @@ public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate 
         this.maximumValues = selectMenu.getMaximumValues();
         this.isDisabled = selectMenu.isDisabled();
         this.options = selectMenu.getOptions();
+        this.channelTypes = selectMenu.getChannelTypes();
+        this.type = selectMenu.getType();
 
         placeholder.ifPresent(this::setPlaceholder);
+    }
+
+    @Override
+    public void addChannelType(ChannelType channelType) {
+        channelTypes.add(channelType);
     }
 
     @Override
@@ -79,7 +95,8 @@ public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate 
 
     @Override
     public SelectMenu build() {
-        return new SelectMenuImpl(options, placeholder, customId, minimumValues, maximumValues, isDisabled);
+        return new SelectMenuImpl(type, options, placeholder, customId, minimumValues, maximumValues, isDisabled,
+                channelTypes);
     }
 
     @Override

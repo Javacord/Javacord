@@ -1,8 +1,8 @@
 package org.javacord.api.entity.message.component;
 
+import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
-
 import java.util.List;
 
 public class SelectMenuBuilder implements LowLevelComponentBuilder {
@@ -16,6 +16,24 @@ public class SelectMenuBuilder implements LowLevelComponentBuilder {
     @Override
     public SelectMenuBuilderDelegate getDelegate() {
         return delegate;
+    }
+
+    /**
+     * Create a new SelectMenuBuilder.
+     *
+     * @param type     The type of SelectMenu to create.
+     * @param customId The custom id of the SelectMenu.
+     */
+    public SelectMenuBuilder(ComponentType type, String customId) {
+        if (!type.isSelectMenuType()) {
+            throw new IllegalArgumentException("Invalid SelectMenu type.");
+        }
+        delegate.setType(type);
+        delegate.setCustomId(customId);
+    }
+
+    private SelectMenuBuilder() {
+
     }
 
     /**
@@ -63,7 +81,35 @@ public class SelectMenuBuilder implements LowLevelComponentBuilder {
     }
 
     /**
+     * Add a channel type to the select menu.
+     * 
+     * <p>Only usable with {@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @param channelType The channel type to add.
+     * @return The builder.
+     */
+    public SelectMenuBuilder addChannelType(ChannelType channelType) {
+        delegate.addChannelType(channelType);
+        return this;
+    }
+
+    /**
+     * Adds all given channel types to the select menu.
+     * 
+     * <p>Only usable with {@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @param channelTypes The channel types to add.
+     * @return The builder.
+     */
+    public SelectMenuBuilder addChannelTypes(Iterable<ChannelType> channelTypes) {
+        channelTypes.forEach(delegate::addChannelType);
+        return this;
+    }
+
+    /**
      * Add an option to the select menu.
+     * 
+     * <p>Only usable with {@link ComponentType#SELECT_MENU_STRING}.
      *
      * @param selectMenuOption The option.
      * @return The builder.
@@ -75,6 +121,8 @@ public class SelectMenuBuilder implements LowLevelComponentBuilder {
 
     /**
      * Remove an option from the select menu.
+     * 
+     * <p>Only usable with {@link ComponentType#SELECT_MENU_STRING}.
      *
      * @param selectMenuOption The option.
      * @return The builder.
@@ -86,6 +134,8 @@ public class SelectMenuBuilder implements LowLevelComponentBuilder {
 
     /**
      * Adds all given options to the select menu.
+     * 
+     * <p>Only usable with {@link ComponentType#SELECT_MENU_STRING}.
      *
      * @param selectMenuOptions The options.
      * @return The builder.
@@ -97,6 +147,8 @@ public class SelectMenuBuilder implements LowLevelComponentBuilder {
 
     /**
      * Removes all options from the select menu.
+     * 
+     * <p>Only usable with {@link ComponentType#SELECT_MENU_STRING}.
      *
      * @return The builder.
      */

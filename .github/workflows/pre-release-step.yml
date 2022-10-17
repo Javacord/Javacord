@@ -1,4 +1,4 @@
-# This workflow will be run manually
+# This workflow will be run manually.
 # This workflow is a pre-release step and updates the readme and
 # removes SNAPSHOT suffix from version in gradle properties file
 name: Pre Release Step
@@ -8,20 +8,25 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name : Prepare Release - Update README and remove SNAPSHOT suffix
+    name : Prepare Release - Update Readme and Remove Snapshot Suffix
     steps:
-    - name: Checkout repository
+    - name: Checkout Repository
       uses: actions/checkout@v2
-
-    - name: Modify the gradle properties file to remove the SNAPSHOT
+    - name: Remove Snapshot Suffix
       run: |
-        sed -i -E "s/\(version \= .*\)-SNAPSHOT/\1/g" gradle.properties
-    
-    - name: Update README file and Commit Release Version
+        sed -i -E "s/(version \= .*)-SNAPSHOT/\1/g" gradle.properties
+    - name: Update Readme File
       run: |
         ./gradlew updateReadme
+    - name: Read Version
+      id: read-version
+      run: |
+        version=`cat gradle.properties | sed -n "s/^.*version\s*=\s*\(\S*\).*$/\1/p"`
+        echo "::set-output name=version::$version"
+    - name: Commit Release Version
+      run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
         git add .
-        git commit -am "Update README and Remove SNAPSHOT suffix"
+        git commit -am "Release version ${{ steps.read-version.outputs.version }}"
         git push
