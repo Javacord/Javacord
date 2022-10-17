@@ -32,7 +32,7 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends RegularServerChannelU
     protected boolean modifyCategory = false;
 
     /**
-     * Whether the vc is nsfw or not.
+     * Whether the channel is nsfw or not.
      */
     protected Boolean nsfw = null;
 
