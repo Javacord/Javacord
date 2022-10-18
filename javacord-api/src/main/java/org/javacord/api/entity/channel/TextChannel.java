@@ -331,8 +331,10 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     default CompletableFuture<Message> getMessageById(String id) {
         try {
             return getMessageById(Long.parseLong(id));
-        } catch (NumberFormatException e) {
-            return getMessageById(-1);
+        } catch (NumberFormatException exception) {
+            CompletableFuture<Message> future = new CompletableFuture<>();
+            future.completeExceptionally(exception);
+            return future;
         }
     }
 

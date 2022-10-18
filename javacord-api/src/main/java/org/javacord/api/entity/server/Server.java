@@ -3515,7 +3515,9 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
         try {
             return requestStickerById(Long.parseLong(id));
         } catch (NumberFormatException exception) {
-            throw new IllegalArgumentException("The ID must be a number.");
+            CompletableFuture<Sticker> future = new CompletableFuture<>();
+            future.completeExceptionally(exception);
+            return future;
         }
     }
 
