@@ -66,7 +66,8 @@ public enum RestEndpoint {
     LIST_ACTIVE_THREADS("/guilds/%s/threads/active", 0),
     LIST_PUBLIC_ARCHIVED_THREADS("/channels/%s/threads/archived/public", 0),
     LIST_PRIVATE_ARCHIVED_THREADS("/channels/%s/threads/archived/private", 0),
-    LIST_JOINED_PRIVATE_ARCHIVED_THREADS("/channels/%s/users/@me/threads/archived/private", 0);
+    LIST_JOINED_PRIVATE_ARCHIVED_THREADS("/channels/%s/users/@me/threads/archived/private", 0),
+    THREAD_MEMBER("/channels/%s/thread-members/%s", 0);
 
     /**
      * The endpoint url (only including the base, not the https://discord.com/api/vXYZ/ "prefix").
