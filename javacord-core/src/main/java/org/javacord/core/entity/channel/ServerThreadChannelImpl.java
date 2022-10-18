@@ -219,7 +219,14 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     }
 
     @Override
-    public CompletableFuture<Set<ThreadMember>> getThreadMembers() {
+    public CompletableFuture<ThreadMember> requestThreadMemberById(long userId) {
+        return new RestRequest<ThreadMember>(getApi(), RestMethod.GET, RestEndpoint.THREAD_MEMBER)
+                .setUrlParameters(getIdAsString(), String.valueOf(userId))
+                .execute(result -> new ThreadMemberImpl(getApi(), getServer(), result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<Set<ThreadMember>> requestThreadMembers() {
         return new RestRequest<Set<ThreadMember>>(getApi(), RestMethod.GET, RestEndpoint.LIST_THREAD_MEMBERS)
                 .setUrlParameters(getIdAsString())
                 .execute(result -> {

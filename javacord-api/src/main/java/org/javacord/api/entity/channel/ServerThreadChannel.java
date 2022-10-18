@@ -183,12 +183,42 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     }
 
     /**
+     * Gets a thread member by their id.
+     *
+     * @param userId The id of the user.
+     * @return The thread member.
+     */
+    CompletableFuture<ThreadMember> requestThreadMemberById(long userId);
+
+    /**
+     * Gets a thread member by their id.
+     *
+     * @param userId The id of the user.
+     * @return The thread member.
+     */
+    default CompletableFuture<ThreadMember> requestThreadMemberById(String userId) {
+        return requestThreadMemberById(Long.parseLong(userId));
+    }
+
+    /**
+     * Gets all members in this thread.
+     * Requires the {@link org.javacord.api.entity.intent.Intent#GUILD_MEMBERS} intent.
+     *
+     * @return All members in this thread.
+     * @deprecated Use {@link #requestThreadMembers()} instead.
+     */
+    @Deprecated
+    default CompletableFuture<Set<ThreadMember>> getThreadMembers() {
+        return requestThreadMembers();
+    }
+
+    /**
      * Gets all members in this thread.
      * Requires the {@link org.javacord.api.entity.intent.Intent#GUILD_MEMBERS} intent.
      *
      * @return All members in this thread.
      */
-    CompletableFuture<Set<ThreadMember>> getThreadMembers();
+    CompletableFuture<Set<ThreadMember>> requestThreadMembers();
 
     /**
      * Creates an updater for this thread.
