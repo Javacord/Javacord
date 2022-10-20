@@ -677,8 +677,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 messageCacheLock.lock();
                 try {
                     for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                         messageRef != null;
-                         messageRef = messagesCleanupQueue.poll()) {
+                            messageRef != null;
+                            messageRef = messagesCleanupQueue.poll()) {
                         Long messageId = messageIdByRef.remove(messageRef);
                         if (messageId != null) {
                             messages.remove(messageId, messageRef);
@@ -1343,7 +1343,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param objectId    The id of the object.
      * @param <T>         The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and
-     * their assigned listener classes they listen to.
+     *         their assigned listener classes they listen to.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
@@ -1772,7 +1772,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * REST API and websocket.
      *
      * @return the proxy selector which should be used to determine the proxies that should be used to connect to the
-     * Discord REST API and websocket.
+     *         Discord REST API and websocket.
      */
     public Optional<ProxySelector> getProxySelector() {
         return Optional.ofNullable(proxySelector);
