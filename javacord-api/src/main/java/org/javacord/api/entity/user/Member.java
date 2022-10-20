@@ -1,4 +1,4 @@
-package org.javacord.core.entity.user;
+package org.javacord.api.entity.user;
 
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;

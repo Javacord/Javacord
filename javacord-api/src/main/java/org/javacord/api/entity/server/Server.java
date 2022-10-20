@@ -35,6 +35,7 @@ import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.server.invite.WelcomeScreen;
 import org.javacord.api.entity.sticker.Sticker;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
@@ -3584,4 +3585,26 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @return The system channel flags for this server.
      */
     EnumSet<SystemChannelFlag> getSystemChannelFlags();
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param id The id of the member.
+     * @return The member with the given id.
+     */
+    CompletableFuture<Member> requestMemberById(long id);
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param id The id of the member.
+     * @return The member with the given id.
+     */
+    default CompletableFuture<Member> requestMemberById(String id) {
+        try {
+            return requestMemberById(Long.parseLong(id));
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("The ID must be a number.");
+        }
+    }
 }

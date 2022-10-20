@@ -1,7 +1,7 @@
 package org.javacord.core.event.user;
 
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.event.user.UserChangeSelfMutedEvent;
-import org.javacord.core.entity.user.Member;
 
 /**
  * The implementation of {@link UserChangeSelfMutedEvent}.

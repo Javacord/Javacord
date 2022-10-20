@@ -1,8 +1,8 @@
 package org.javacord.core.event.user;
 
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.event.user.UserChangeServerAvatarEvent;
-import org.javacord.core.entity.user.Member;
 
 import java.util.Optional;
 

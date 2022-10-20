@@ -4,8 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Reaction;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
-import org.javacord.core.entity.user.Member;
 
 import java.util.concurrent.CompletableFuture;
 

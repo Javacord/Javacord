@@ -3,7 +3,7 @@ package org.javacord.core.util.cache;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import org.javacord.api.entity.server.Server;
-import org.javacord.core.entity.user.Member;
+import org.javacord.api.entity.user.Member;
 import org.javacord.core.util.ImmutableToJavaMapper;
 
 import java.util.Optional;

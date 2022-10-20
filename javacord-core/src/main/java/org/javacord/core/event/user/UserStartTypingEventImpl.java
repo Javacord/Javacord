@@ -1,9 +1,9 @@
 package org.javacord.core.event.user;
 
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.user.UserStartTypingEvent;
-import org.javacord.core.entity.user.Member;
 import org.javacord.core.event.EventImpl;
 
 import java.util.Optional;

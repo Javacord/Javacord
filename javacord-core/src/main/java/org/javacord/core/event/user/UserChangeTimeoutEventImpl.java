@@ -1,7 +1,8 @@
 package org.javacord.core.event.user;
 
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.event.user.UserChangeTimeoutEvent;
-import org.javacord.core.entity.user.Member;
+
 import java.time.Instant;
 import java.util.Optional;
 

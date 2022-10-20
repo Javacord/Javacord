@@ -31,6 +31,7 @@ import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.sticker.StickerPack;
 import org.javacord.api.entity.team.Team;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -2178,6 +2179,133 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
             return getPrivateChannelById(Long.parseLong(id));
         } catch (NumberFormatException e) {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a group channel by its id.
+     *
+     * @param id The id of the server.
+     * @return A server request.
+     */
+    CompletableFuture<Server> requestServerById(long id);
+
+    /**
+     * Gets a server by its id.
+     *
+     * @param id The id of the server.
+     * @return A server request.
+     */
+    default CompletableFuture<Server> requestServerById(String id) {
+        try {
+            return requestServerById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Server> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Gets a user by its id.
+     *
+     * @param id The id of the user.
+     * @return A user request.
+     */
+    CompletableFuture<User> requestUserById(long id);
+
+    /**
+     * Gets a user by its id.
+     *
+     * @param id The id of the user.
+     * @return A user request.
+     */
+    default CompletableFuture<User> requestUserById(String id) {
+        try {
+            return requestUserById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            CompletableFuture<User> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Gets a channel by its id.
+     *
+     * @param id The id of the channel.
+     * @return A channel request.
+     */
+    CompletableFuture<Channel> requestChannelById(long id);
+
+    /**
+     * Gets a channel by its id.
+     *
+     * @param id The id of the channel.
+     * @return A channel request.
+     */
+    default CompletableFuture<Channel> requestChannelById(String id) {
+        try {
+            return requestChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Channel> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param serverId The id of the server of the member.
+     * @param id The id of the member.
+     * @return A member request.
+     */
+    CompletableFuture<Member> requestMemberById(long serverId, long id);
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param serverId The id of the server of the member.
+     * @param id The id of the member.
+     * @return A member request.
+     */
+    default CompletableFuture<Member> requestMemberById(String serverId, String id) {
+        try {
+            return requestMemberById(Long.parseLong(serverId), Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Member> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
+
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param server The server of the member.
+     * @param id The id of the member.
+     * @return A member request.
+     */
+    default CompletableFuture<Member> requestMemberById(Server server, long id) {
+        return requestMemberById(server.getId(), id);
+    }
+
+    /**
+     * Gets a member by its id.
+     *
+     * @param server The server of the member.
+     * @param id The id of the member.
+     * @return A member request.
+     */
+    default CompletableFuture<Member> requestMemberById(Server server, String id) {
+        try {
+            return requestMemberById(server, Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Member> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
         }
     }
 }

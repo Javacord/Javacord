@@ -1,8 +1,7 @@
 package org.javacord.core.event.user;
 
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.event.user.UserChangePendingEvent;
-import org.javacord.core.entity.user.Member;
-import org.javacord.core.event.user.ServerUserEventImpl;
 
 /**
  * The implementation of {@link UserChangePendingEvent}.

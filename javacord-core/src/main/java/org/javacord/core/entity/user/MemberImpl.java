@@ -6,6 +6,7 @@ import org.javacord.api.Javacord;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;

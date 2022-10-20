@@ -45,6 +45,7 @@ import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.server.invite.WelcomeScreen;
 import org.javacord.api.entity.sticker.Sticker;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -69,7 +70,6 @@ import org.javacord.core.entity.permission.RoleImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.server.invite.WelcomeScreenImpl;
 import org.javacord.core.entity.sticker.StickerImpl;
-import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.webhook.IncomingWebhookImpl;
@@ -2067,5 +2067,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     @Override
     public EnumSet<SystemChannelFlag> getSystemChannelFlags() {
         return EnumSet.copyOf(systemChannelFlags);
+    }
+
+    @Override
+    public CompletableFuture<Member> requestMemberById(long id) {
+        return new RestRequest<Member>(api, RestMethod.GET, RestEndpoint.MEMBER)
+                .setUrlParameters(getIdAsString(), String.valueOf(id))
+                .execute(result -> new MemberImpl(api, this, result.getJsonBody(), null));
     }
 }

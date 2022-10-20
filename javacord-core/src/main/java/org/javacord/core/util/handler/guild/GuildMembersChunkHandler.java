@@ -2,10 +2,11 @@ package org.javacord.core.util.handler.guild;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.user.Member;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.Member;
 import org.javacord.core.event.server.member.ServerMembersChunkEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

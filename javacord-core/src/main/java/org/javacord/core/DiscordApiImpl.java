@@ -38,6 +38,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.sticker.StickerPack;
+import org.javacord.api.entity.user.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -59,6 +60,8 @@ import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.activity.ApplicationInfoImpl;
+import org.javacord.core.entity.channel.PrivateChannelImpl;
+import org.javacord.core.entity.channel.ServerChannelImpl;
 import org.javacord.core.entity.emoji.CustomEmojiImpl;
 import org.javacord.core.entity.emoji.KnownCustomEmojiImpl;
 import org.javacord.core.entity.message.MessageImpl;
@@ -68,7 +71,6 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.server.invite.InviteImpl;
 import org.javacord.core.entity.sticker.StickerImpl;
 import org.javacord.core.entity.sticker.StickerPackImpl;
-import org.javacord.core.entity.user.Member;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
@@ -95,6 +97,7 @@ import org.javacord.core.util.ratelimit.RatelimitManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -674,8 +677,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 messageCacheLock.lock();
                 try {
                     for (Reference<? extends Message> messageRef = messagesCleanupQueue.poll();
-                            messageRef != null;
-                            messageRef = messagesCleanupQueue.poll()) {
+                         messageRef != null;
+                         messageRef = messagesCleanupQueue.poll()) {
                         Long messageId = messageIdByRef.remove(messageRef);
                         if (messageId != null) {
                             messages.remove(messageId, messageRef);
@@ -1340,7 +1343,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param objectId    The id of the object.
      * @param <T>         The type of the listeners.
      * @return A map with all registered listeners that implement one or more {@code ObjectAttachableListener}s and
-     *         their assigned listener classes they listen to.
+     * their assigned listener classes they listen to.
      */
     @SuppressWarnings("unchecked")
     public <T extends ObjectAttachableListener> Map<T, List<Class<T>>> getObjectListeners(
@@ -1769,7 +1772,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * REST API and websocket.
      *
      * @return the proxy selector which should be used to determine the proxies that should be used to connect to the
-     *         Discord REST API and websocket.
+     * Discord REST API and websocket.
      */
     public Optional<ProxySelector> getProxySelector() {
         return Optional.ofNullable(proxySelector);
@@ -2156,6 +2159,49 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Optional<Channel> getChannelById(long id) {
         return entityCache.get().getChannelCache().getChannelById(id);
+    }
+
+    @Override
+    public CompletableFuture<Server> requestServerById(long id) {
+        return new RestRequest<Server>(this, RestMethod.GET, RestEndpoint.SERVER)
+                .setUrlParameters(String.valueOf(id))
+                .execute(result -> new ServerImpl(this, result.getJsonBody()));
+    }
+
+    @Override
+    public CompletableFuture<User> requestUserById(long id) {
+        return new RestRequest<User>(this, RestMethod.GET, RestEndpoint.USER)
+                .setUrlParameters(String.valueOf(id))
+                .execute(result -> new UserImpl(this, result.getJsonBody(), (MemberImpl) null, null));
+    }
+
+    @Override
+    public CompletableFuture<Channel> requestChannelById(long id) {
+        return new RestRequest<Channel>(this, RestMethod.GET, RestEndpoint.CHANNEL)
+                .setUrlParameters(String.valueOf(id))
+                .execute(result -> {
+                    if (result.getJsonBody().has("guild_id")) {
+                        if (!getServerById(result.getJsonBody().get("guild_id").asLong()).isPresent()) {
+                            throw new IllegalStateException("Cannot request channel of server that is not cached");
+                        } else {
+                            return new ServerChannelImpl(this, (ServerImpl) getServerById(
+                                    result.getJsonBody().get("guild_id").asLong()).get(), result.getJsonBody());
+                        }
+                    } else {
+                        return new PrivateChannelImpl(this, result.getJsonBody());
+                    }
+                });
+    }
+
+    @Override
+    public CompletableFuture<Member> requestMemberById(long serverId, long id) {
+        return new RestRequest<Member>(this, RestMethod.GET, RestEndpoint.SERVER_MEMBER)
+                .setUrlParameters(String.valueOf(serverId), String.valueOf(id))
+                .execute(result -> {
+                    Server server = getServerById(serverId).orElseThrow(() ->
+                            new IllegalStateException("Cannot request member of server that is not cached"));
+                    return new MemberImpl(this, (ServerImpl) server, result.getJsonBody(), null);
+                });
     }
 
     /**
