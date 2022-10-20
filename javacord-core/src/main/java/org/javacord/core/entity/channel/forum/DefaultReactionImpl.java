@@ -3,6 +3,8 @@ package org.javacord.core.entity.channel.forum;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.forum.DefaultReaction;
 
+import java.util.Optional;
+
 public class DefaultReactionImpl implements DefaultReaction {
 
     /**
@@ -22,7 +24,7 @@ public class DefaultReactionImpl implements DefaultReaction {
      */
     public DefaultReactionImpl(JsonNode data) {
         emojiId = data.get("emoji_id").asLong();
-        emojiName = data.get("emoji_name").asText();
+        emojiName = data.has("emoji_name") ? data.get("emoji_name").asText() : null;
     }
 
     /**
@@ -42,7 +44,7 @@ public class DefaultReactionImpl implements DefaultReaction {
     }
 
     @Override
-    public String getEmojiName() {
-        return emojiName;
+    public Optional<String> getEmojiName() {
+        return Optional.ofNullable(emojiName);
     }
 }

@@ -42,7 +42,7 @@ public enum ChannelFlag {
      * @param flag The integer to get the flag from.
      * @return The flag.
      */
-    public static ChannelFlag fromInt(int flag) {
+    public static ChannelFlag getByValue(int flag) {
         for (ChannelFlag channelFlag : values()) {
             if (channelFlag.asInt() == flag) {
                 return channelFlag;

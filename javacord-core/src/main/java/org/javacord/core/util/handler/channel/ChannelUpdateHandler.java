@@ -443,7 +443,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         EnumSet<ChannelFlag> newFlags = EnumSet.noneOf(ChannelFlag.class);
         if (jsonChannel.hasNonNull("flags")) {
             for (JsonNode flag : jsonChannel.get("flags")) {
-                newFlags.add(ChannelFlag.fromInt(flag.asInt()));
+                newFlags.add(ChannelFlag.getByValue(flag.asInt()));
             }
         }
 
@@ -456,11 +456,11 @@ public class ChannelUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) channel.getServer(), channel, event);
         }
 
-        List<ForumTag> oldTags = channel.getTags();
+        List<ForumTag> oldTags = channel.getAvailableTags();
         List<ForumTag> newTags = new ArrayList<>();
         if (jsonChannel.hasNonNull("tags")) {
             for (JsonNode tag : jsonChannel.get("tags")) {
-                newTags.add(new ForumTagImpl(api, tag.get("id").asLong(), tag));
+                newTags.add(new ForumTagImpl(api, tag));
             }
         }
 
@@ -473,28 +473,10 @@ public class ChannelUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) channel.getServer(), channel, event);
         }
 
-        List<Long> oldAppliedTags = channel.getAppliedTags();
-        List<Long> newAppliedTags = new ArrayList<>();
-        if (jsonChannel.hasNonNull("applied_tags")) {
-            for (JsonNode tag : jsonChannel.get("applied_tags")) {
-                newAppliedTags.add(tag.asLong());
-            }
-        }
-
-        if (!oldAppliedTags.equals(newAppliedTags)) {
-            channel.setAppliedTags(newAppliedTags);
-            ServerForumChannelChangeAppliedTagsEvent event =
-                    new ServerForumChannelChangeAppliedTagsEventImpl(channel, newAppliedTags,
-                            oldAppliedTags);
-
-            api.getEventDispatcher().dispatchServerForumChannelChangeAppliedTagsEvent(
-                    (DispatchQueueSelector) channel.getServer(), channel, event);
-        }
-
         DefaultReaction oldDefaultReaction = !channel.getDefaultReaction().isPresent()
                 ? null : channel.getDefaultReaction().get();
-        DefaultReaction newDefaultReaction = jsonChannel.hasNonNull("default_auto_archive_duration")
-                ? new DefaultReactionImpl(jsonChannel.get("default_auto_archive_duration"))
+        DefaultReaction newDefaultReaction = jsonChannel.hasNonNull("default_reaction_emoji")
+                ? new DefaultReactionImpl(jsonChannel.get("default_reaction_emoji"))
                 : null;
 
         if (!Objects.equals(oldDefaultReaction, newDefaultReaction)) {

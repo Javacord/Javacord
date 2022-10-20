@@ -5,7 +5,14 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.forum.ForumTag;
 
 public class ForumTagImpl implements ForumTag {
+    /**
+     * The api instance.
+     */
     private final DiscordApi api;
+
+    /**
+     * The id of the tag.
+     */
     private final long id;
 
     /**
@@ -32,12 +39,11 @@ public class ForumTagImpl implements ForumTag {
      * Creates a new forum tag.
      *
      * @param api The discord api instance.
-     * @param id The id of the tag.
      * @param data The json data of the tag.
      */
-    public ForumTagImpl(DiscordApi api, long id, JsonNode data) {
+    public ForumTagImpl(DiscordApi api, JsonNode data) {
         this.api = api;
-        this.id = id;
+        this.id = data.get("id").asLong();
 
         name = data.get("name").asText();
         moderated = data.get("moderated").asBoolean();
