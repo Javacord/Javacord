@@ -2180,4 +2180,28 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
             return Optional.empty();
         }
     }
+
+    /**
+     * Used to request a server.
+     *
+     * @param id The id of the server.
+     * @return A server request.
+     */
+    CompletableFuture<Server> requestServerById(long id);
+
+    /**
+     * Used to request a server.
+     *
+     * @param id The id of the server.
+     * @return A server request.
+     */
+    default CompletableFuture<Server> requestServerById(String id) {
+        try {
+            return requestServerById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            CompletableFuture<Server> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
+        }
+    }
 }
