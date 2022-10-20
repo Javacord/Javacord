@@ -12,17 +12,32 @@ import java.util.stream.Collectors;
 
 public interface SlashCommand extends ApplicationCommand, Mentionable {
 
+    /**
+     * Gets the mention tag of this slash command with its base name.
+     *
+     * @return The mention tag of this slash command.
+     */
     @Override
     default String getMentionTag() {
-        return "</" + getFullCommandName() + ":" + getId() + ">";
+        return "</" + getName() + ":" + getId() + ">";
     }
 
     /**
-     * Gets the full command name.
+     * Gets all mention tags of this slash command taking the groups and subcommands into account.
      *
-     * @return The full command name.
+     * @return All mention tags of this slash command.
      */
-    String getFullCommandName();
+    default List<String> getMentionTags() {
+        return getFullCommandNames().stream().map(name -> "</" + name + ":" + getId() + ">")
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets the full command names.
+     *
+     * @return All command names for this slash command.
+     */
+    List<String> getFullCommandNames();
 
     /**
      * Gets all options (i.e., parameters) for this command.
