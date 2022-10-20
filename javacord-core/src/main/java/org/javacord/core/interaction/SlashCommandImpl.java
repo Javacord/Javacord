@@ -17,7 +17,7 @@ public class SlashCommandImpl extends ApplicationCommandImpl implements SlashCom
     /**
      * Class constructor.
      *
-     * @param api The api instance.
+     * @param api  The api instance.
      * @param data The JSON data.
      */
     public SlashCommandImpl(DiscordApiImpl api, JsonNode data) {
@@ -36,16 +36,26 @@ public class SlashCommandImpl extends ApplicationCommandImpl implements SlashCom
     }
 
     @Override
-    public String getFullCommandName() {
-        return getName() + getNestedCommandNamesRecursive(getOptions());
+    public List<String> getFullCommandNames() {
+        final List<String> names = new ArrayList<>();
+        getNestedCommandNamesRecursive(getName(), getOptions(), names);
+        return names;
     }
 
-    private String getNestedCommandNamesRecursive(List<SlashCommandOption> options) {
-        if (!options.isEmpty() && options.get(0).isSubcommandOrGroup()) {
-            return " " + options.get(0).getName() + getNestedCommandNamesRecursive(options.get(0).getOptions());
+    private void getNestedCommandNamesRecursive(final String preName, final List<SlashCommandOption> options,
+                                                final List<String> names) {
+        if (options.isEmpty()) {
+            names.add(preName);
         } else {
-            return "";
+            for (final SlashCommandOption option : options) {
+                if (option.isSubcommandOrGroup()) {
+                    getNestedCommandNamesRecursive(preName + " " + option.getName(), option.getOptions(), names);
+                } else {
+                    names.add(preName);
+                }
+            }
         }
+
     }
 
     @Override
