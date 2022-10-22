@@ -10,6 +10,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerNewsChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
@@ -20,6 +21,8 @@ import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeNsfwFlagEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangePositionEvent;
+import org.javacord.api.event.channel.server.news.ServerNewsChannelChangeDefaultAutoArchiveDurationEvent;
+import org.javacord.api.event.channel.server.news.ServerNewsChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmodeEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
@@ -31,6 +34,7 @@ import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.RegularServerChannelImpl;
 import org.javacord.core.entity.channel.ServerChannelImpl;
 import org.javacord.core.entity.channel.ServerForumChannelImpl;
+import org.javacord.core.entity.channel.ServerNewsChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
@@ -40,6 +44,8 @@ import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNsfwFlagEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeOverwrittenPermissionsEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangePositionEventImpl;
+import org.javacord.core.event.channel.server.news.ServerNewsChannelChangeDefaultAutoArchiveDurationEventImpl;
+import org.javacord.core.event.channel.server.news.ServerNewsChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmodeEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
@@ -103,16 +109,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                 //handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
-                logger.debug("Received CHANNEL_UPDATE packet for a news channel. In this Javacord version it is "
-                        + "treated as a normal text channel!");
                 handleServerChannel(packet);
                 handleRegularServerChannel(packet);
-                handleServerTextChannel(packet);
-                break;
-            case SERVER_STORE_CHANNEL:
-                // TODO Handle store channels
-                logger.debug("Received CHANNEL_UPDATE packet for a store channel. These are not supported in this"
-                        + " Javacord version and get ignored!");
+                handleServerNewsChannel(packet);
                 break;
             case PRIVATE_CHANNEL:
                 handlePrivateChannel(packet);
@@ -331,7 +330,7 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
                 api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel, channel.getServer(), null, event);
+                        (DispatchQueueSelector) channel.getServer(), channel, channel.getServer(), null, null, event);
             }
         });
     }
@@ -372,7 +371,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                     new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
             api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, event);
+                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), null,
+                    channel, event);
         }
 
         int oldSlowmodeDelay = channel.getSlowmodeDelayInSeconds();
@@ -404,6 +404,63 @@ public class ChannelUpdateHandler extends PacketHandler {
                     (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
             );
 
+        }
+    }
+
+    /**
+     * Handles a server news channel update.
+     *
+     * @param jsonChannel The json channel data.
+     */
+    private void handleServerNewsChannel(JsonNode jsonChannel) {
+        long channelId = jsonChannel.get("id").asLong();
+        Optional<ServerNewsChannel> optionalChannel = api.getServerNewsChannelById(channelId);
+        if (!optionalChannel.isPresent()) {
+            LoggerUtil.logMissingChannel(logger, channelId);
+            return;
+        }
+
+        ServerNewsChannelImpl channel = (ServerNewsChannelImpl) optionalChannel.get();
+
+        String oldTopic = channel.getTopic();
+        String newTopic = jsonChannel.has("topic") && !jsonChannel.get("topic").isNull()
+                ? jsonChannel.get("topic").asText() : "";
+        if (!oldTopic.equals(newTopic)) {
+            channel.setTopic(newTopic);
+
+            ServerNewsChannelChangeTopicEvent event =
+                    new ServerNewsChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
+
+            api.getEventDispatcher().dispatchServerNewsChannelChangeTopicEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        boolean oldNsfwFlag = channel.isNsfw();
+        boolean newNsfwFlag = jsonChannel.get("nsfw").asBoolean();
+        if (oldNsfwFlag != newNsfwFlag) {
+            channel.setNsfwFlag(newNsfwFlag);
+            ServerChannelChangeNsfwFlagEvent event =
+                    new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
+
+            api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
+                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel,
+                    null, event);
+        }
+
+        int oldDefaultAutoArchiveDuration = channel.getDefaultAutoArchiveDuration();
+        int newDefaultAutoArchiveDuration = jsonChannel.has("default_auto_archive_duration")
+                ? jsonChannel.get("default_auto_archive_duration").asInt()
+                : 1440;
+        if (oldDefaultAutoArchiveDuration != newDefaultAutoArchiveDuration) {
+            channel.setDefaultAutoArchiveDuration(newDefaultAutoArchiveDuration);
+
+            ServerNewsChannelChangeDefaultAutoArchiveDurationEvent event =
+                    new ServerNewsChannelChangeDefaultAutoArchiveDurationEventImpl(channel,
+                            oldDefaultAutoArchiveDuration, newDefaultAutoArchiveDuration);
+
+            api.getEventDispatcher().dispatchServerNewsChannelChangeDefaultAutoArchiveDurationEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event
+            );
         }
     }
 

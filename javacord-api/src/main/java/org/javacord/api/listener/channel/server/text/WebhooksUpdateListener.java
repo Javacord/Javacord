@@ -1,8 +1,9 @@
 package org.javacord.api.listener.channel.server.text;
 
-import org.javacord.api.event.channel.server.text.WebhooksUpdateEvent;
+import org.javacord.api.event.channel.server.message.WebhooksUpdateEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
+import org.javacord.api.listener.channel.server.news.ServerNewsChannelAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 
 /**
@@ -11,7 +12,7 @@ import org.javacord.api.listener.server.ServerAttachableListener;
  */
 @FunctionalInterface
 public interface WebhooksUpdateListener extends ServerAttachableListener, ServerTextChannelAttachableListener,
-        GloballyAttachableListener, ObjectAttachableListener {
+        ServerNewsChannelAttachableListener, GloballyAttachableListener, ObjectAttachableListener {
 
     /**
      * This method is called every time the webhooks of a channel get updated.

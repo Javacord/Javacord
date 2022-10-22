@@ -7,6 +7,7 @@ import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerNewsChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -57,14 +58,7 @@ public class ChannelCreateHandler extends PacketHandler {
                 handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
-                logger.debug("Received CHANNEL_CREATE packet for a news channel. In this Javacord version it is "
-                        + "treated as a normal text channel!");
-                handleServerTextChannel(packet);
-                break;
-            case SERVER_STORE_CHANNEL:
-                // TODO Handle store channels
-                logger.debug("Received CHANNEL_CREATE packet for a store channel. These are not supported in this"
-                        + " Javacord version and get ignored!");
+                handleServerNewsChannel(packet);
                 break;
             case PRIVATE_CHANNEL:
                 handlePrivateChannel(packet);
@@ -167,6 +161,21 @@ public class ChannelCreateHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             ServerTextChannel textChannel = ((ServerImpl) server).getOrCreateServerTextChannel(channel);
             ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(textChannel);
+
+            api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
+        });
+    }
+
+    /**
+     * Handles server news channel creation.
+     *
+     * @param channel The channel data.
+     */
+    private void handleServerNewsChannel(JsonNode channel) {
+        long serverId = channel.get("guild_id").asLong();
+        api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
+            ServerNewsChannel newsChannel = ((ServerImpl) server).getOrCreateServerNewsChannel(channel);
+            ServerChannelCreateEvent event = new ServerChannelCreateEventImpl(newsChannel);
 
             api.getEventDispatcher().dispatchServerChannelCreateEvent((DispatchQueueSelector) server, server, event);
         });

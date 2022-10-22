@@ -16,6 +16,8 @@ import org.javacord.api.entity.channel.ChannelCategoryBuilder;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerMessageChannel;
+import org.javacord.api.entity.channel.ServerNewsChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerTextChannelBuilder;
@@ -2729,6 +2731,32 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     }
 
     /**
+     * Gets a server message channel by its id.
+     *
+     * @param id The id of the server message channel.
+     * @return The server message channel with the given id.
+     */
+    default Optional<ServerMessageChannel> getServerMessageChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerMessageChannel)
+                .map(channel -> (ServerMessageChannel) channel);
+    }
+
+    /**
+     * Gets a server message channel by its id.
+     *
+     * @param id The id of the server message channel.
+     * @return The server message channel with the given id.
+     */
+    default Optional<ServerMessageChannel> getServerMessageChannelById(String id) {
+        try {
+            return getServerMessageChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Gets a text channel by its id.
      *
      * @param id The id of the text channel.
@@ -2803,6 +2831,33 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
             return Optional.empty();
         }
     }
+
+    /**
+     * Gets a news channel by its id.
+     *
+     * @param id The id of the news channel.
+     * @return The news channel with the given id.
+     */
+    default Optional<ServerNewsChannel> getNewsChannelById(long id) {
+        return getChannelById(id)
+                .filter(channel -> channel instanceof ServerNewsChannel)
+                .map(channel -> (ServerNewsChannel) channel);
+    }
+
+    /**
+     * Gets a news channel by its id.
+     *
+     * @param id The id of the news channel.
+     * @return The news channel with the given id.
+     */
+    default Optional<ServerNewsChannel> getNewsChannelById(String id) {
+        try {
+            return getNewsChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
 
     /**
      * Gets a sorted list (by position) with all text channels with the given name.
