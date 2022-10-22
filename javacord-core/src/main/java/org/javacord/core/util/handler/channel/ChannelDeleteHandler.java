@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerNewsChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -55,13 +56,7 @@ public class ChannelDeleteHandler extends PacketHandler {
                 handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
-                // TODO Handle server news channel differently
-                handleServerTextChannel(packet);
-                break;
-            case SERVER_STORE_CHANNEL:
-                // TODO Handle store channels
-                logger.debug("Received CHANNEL_DELETE packet for a store channel. These are not supported in this"
-                        + " Javacord version and get ignored!");
+                handleServerNewsChannel(packet);
                 break;
             case GROUP_CHANNEL:
                 logger.info("Received CHANNEL_DELETE packet for a group channel. This should be impossible.");
@@ -152,6 +147,30 @@ public class ChannelDeleteHandler extends PacketHandler {
                     );
                 });
         api.removeObjectListeners(ServerTextChannel.class, channelId);
+        api.removeObjectListeners(RegularServerChannel.class, channelId);
+        api.removeObjectListeners(ServerChannel.class, channelId);
+        api.removeObjectListeners(TextChannel.class, channelId);
+        api.removeObjectListeners(Channel.class, channelId);
+    }
+
+    /**
+     * Handles server news channel deletion.
+     *
+     * @param channelJson The channel data.
+     */
+    private void handleServerNewsChannel(JsonNode channelJson) {
+        long serverId = channelJson.get("guild_id").asLong();
+        long channelId = channelJson.get("id").asLong();
+        api.getPossiblyUnreadyServerById(serverId)
+                .flatMap(server -> server.getNewsChannelById(channelId))
+                .ifPresent(channel -> {
+                    dispatchServerChannelDeleteEvent(channel);
+                    api.forEachCachedMessageWhere(
+                            msg -> msg.getChannel().getId() == channelId,
+                            msg -> api.removeMessageFromCache(msg.getId())
+                    );
+                });
+        api.removeObjectListeners(ServerNewsChannel.class, channelId);
         api.removeObjectListeners(RegularServerChannel.class, channelId);
         api.removeObjectListeners(ServerChannel.class, channelId);
         api.removeObjectListeners(TextChannel.class, channelId);

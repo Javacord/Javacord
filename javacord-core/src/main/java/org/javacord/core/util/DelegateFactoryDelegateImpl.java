@@ -5,6 +5,7 @@ import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerMessageChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -13,6 +14,7 @@ import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDeleg
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerForumChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerForumChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerMessageChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
@@ -69,6 +71,7 @@ import org.javacord.core.entity.channel.RegularServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerForumChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerForumChannelUpdaterDelegateImpl;
+import org.javacord.core.entity.channel.ServerMessageChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerTextChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelBuilderDelegateImpl;
@@ -171,7 +174,7 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
 
     @Override
     public ServerThreadChannelBuilderDelegate createServerThreadChannelBuilderDelegate(
-            ServerTextChannel serverTextChannel) {
+            ServerMessageChannel serverTextChannel) {
         return new ServerThreadChannelBuilderDelegateImpl(serverTextChannel);
     }
 
@@ -191,7 +194,7 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     }
 
     @Override
-    public WebhookBuilderDelegate createWebhookBuilderDelegate(ServerTextChannel channel) {
+    public WebhookBuilderDelegate createWebhookBuilderDelegate(ServerMessageChannel channel) {
         return new WebhookBuilderDelegateImpl(channel);
     }
 
@@ -244,6 +247,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public ServerTextChannelUpdaterDelegate createServerTextChannelUpdaterDelegate(ServerTextChannel channel) {
         return new ServerTextChannelUpdaterDelegateImpl(channel);
+    }
+
+    @Override
+    public ServerMessageChannelUpdaterDelegate createServerMessageChannelUpdaterDelegate(ServerMessageChannel channel) {
+        return new ServerMessageChannelUpdaterDelegateImpl(channel);
     }
 
     @Override
