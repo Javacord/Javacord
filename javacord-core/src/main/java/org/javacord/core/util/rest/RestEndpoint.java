@@ -41,6 +41,8 @@ public enum RestEndpoint {
     WEBHOOK("/webhooks/%s", 0),
     WEBHOOK_SEND("/webhooks/%s/%s", 0),
     WEBHOOK_MESSAGE("/webhooks/%s/%s/messages/%s",0),
+    DELETE_FOLLOWUP_MESSAGE("/webhooks/%s/%s/messages/%s",0),
+    DELETE_ORIGINAL_INTERACTION_RESPONSE("/webhooks/%s/%s/messages/@original",0),
     INVITE("/invites/%s"),
     BAN("/guilds/%s/bans", 0),
     CURRENT_USER("/users/@me"),
