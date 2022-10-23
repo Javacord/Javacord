@@ -11,6 +11,7 @@ import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.NitroType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserFlag;
 import org.javacord.api.entity.user.UserStatus;
@@ -52,6 +53,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     private EnumSet<UserFlag> userFlags = EnumSet.noneOf(UserFlag.class);
     private final boolean bot;
     private final MemberImpl member;
+    private final NitroType nitroType;
 
     /**
      * Creates a new user instance.
@@ -87,6 +89,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         } else {
             this.member = member;
         }
+        nitroType = NitroType.fromValue(data.hasNonNull("premium_type") ? data.get("premium_type").asInt() : 0);
     }
 
     /**
@@ -118,10 +121,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
 
         bot = data.hasNonNull("bot") && data.get("bot").asBoolean();
         member = new MemberImpl(api, server, memberJson, this);
+        nitroType = NitroType.fromValue(data.hasNonNull("premium_type") ? data.get("premium_type").asInt() : 0);
     }
 
     private UserImpl(DiscordApiImpl api, Long id, String name, String discriminator, String avatarHash, boolean bot,
-                     MemberImpl member) {
+                     MemberImpl member, NitroType nitroType) {
         this.api = api;
         this.id = id;
         this.name = name;
@@ -129,6 +133,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         this.avatarHash = avatarHash;
         this.bot = bot;
         this.member = member;
+        this.nitroType = nitroType;
     }
 
     /**
@@ -156,7 +161,12 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             avatarHash = partialUserJson.get("avatar").asText();
         }
 
-        return new UserImpl(api, id, name, discriminator, avatarHash, bot, member);
+        NitroType nitroType = this.nitroType;
+        if (partialUserJson.hasNonNull("premium_type")) {
+            nitroType = NitroType.fromValue(partialUserJson.get("premium_type").asInt());
+        }
+
+        return new UserImpl(api, id, name, discriminator, avatarHash, bot, member, nitroType);
     }
 
     /**
@@ -427,6 +437,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
                                 .setBody(JsonNodeFactory.instance.objectNode().put("recipient_id", getIdAsString()))
                                 .execute(result -> new PrivateChannelImpl(api, result.getJsonBody()))
                 );
+    }
+
+    @Override
+    public NitroType getNitroType() {
+        return nitroType;
     }
 
     @Override

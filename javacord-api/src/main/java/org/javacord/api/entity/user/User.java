@@ -763,4 +763,10 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
         return getApi().getUserById(getId());
     }
 
+    /**
+     * Used to get the nitro type.
+     *
+     * @return The nitro type.
+     */
+    NitroType getNitroType();
 }
