@@ -129,6 +129,24 @@ public interface SelectMenuOption {
      * @param label The label for the option.
      * @param value The value for the option.
      * @param description The description for the option.
+     * @param unicodeEmoji The emoji for the option as a unicode string.
+     * @return The created select menu option.
+     */
+    static SelectMenuOption create(String label, String value, String description, String unicodeEmoji) {
+        return new SelectMenuOptionBuilder()
+                .setLabel(label)
+                .setValue(value)
+                .setDescription(description)
+                .setEmoji(unicodeEmoji)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu option with the given values.
+     *
+     * @param label The label for the option.
+     * @param value The value for the option.
+     * @param description The description for the option.
      * @param emoji The emoji for the option.
      * @param isDefault If the option is the default option.
      * @return The created select menu option.
@@ -139,6 +157,27 @@ public interface SelectMenuOption {
                 .setValue(value)
                 .setDescription(description)
                 .setEmoji(emoji)
+                .setDefault(isDefault)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu option with the given values.
+     *
+     * @param label The label for the option.
+     * @param value The value for the option.
+     * @param description The description for the option.
+     * @param unicodeEmoji The emoji for the option as a unicode string.
+     * @param isDefault If the option is the default option.
+     * @return The created select menu option.
+     */
+    static SelectMenuOption create(String label, String value, String description, String unicodeEmoji,
+                                   boolean isDefault) {
+        return new SelectMenuOptionBuilder()
+                .setLabel(label)
+                .setValue(value)
+                .setDescription(description)
+                .setEmoji(unicodeEmoji)
                 .setDefault(isDefault)
                 .build();
     }
