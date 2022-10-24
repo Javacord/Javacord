@@ -41,6 +41,17 @@ public class SelectMenuOptionBuilder {
     }
 
     /**
+     * Sets the emoji for the select menu option.
+     *
+     * @param unicode The emoji as a unicode string
+     * @return The builder.
+     */
+    public SelectMenuOptionBuilder setEmoji(String unicode) {
+        delegate.setEmoji(unicode);
+        return this;
+    }
+
+    /**
      * Set the emoji for the select menu option.
      *
      * @param emoji The emoji.

@@ -3,6 +3,7 @@ package org.javacord.core.entity.message.component.internal;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
+import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.component.SelectMenuOptionImpl;
 
 public class SelectMenuOptionBuilderDelegateImpl implements SelectMenuOptionBuilderDelegate {
@@ -39,6 +40,11 @@ public class SelectMenuOptionBuilderDelegateImpl implements SelectMenuOptionBuil
     @Override
     public void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
+    }
+
+    @Override
+    public void setEmoji(String unicode) {
+        this.emoji = UnicodeEmojiImpl.fromString(unicode);
     }
 
     @Override

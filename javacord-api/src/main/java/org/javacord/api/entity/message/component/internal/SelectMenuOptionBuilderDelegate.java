@@ -41,6 +41,13 @@ public interface SelectMenuOptionBuilderDelegate {
     void setDefault(boolean isDefault);
 
     /**
+     * Sets the emoji for the option.
+     *
+     * @param unicode The emoji as a unicode string.
+     */
+    void setEmoji(String unicode);
+
+    /**
      * Set the emoji for the option.
      *
      * @param emoji The emoji.
