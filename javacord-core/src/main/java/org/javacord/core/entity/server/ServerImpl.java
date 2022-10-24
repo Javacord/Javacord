@@ -1667,7 +1667,8 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         RestRequest<Void> request = new RestRequest<Void>(getApi(), RestMethod.PUT, RestEndpoint.BAN)
                 .setUrlParameters(getIdAsString(), userId);
         if (deleteMessageDuration > 0) {
-            request.addQueryParameter("delete_message_seconds", String.valueOf(unit.toSeconds(deleteMessageDuration)));
+            request.setBody(JsonNodeFactory.instance.objectNode()
+                    .put("delete_message_seconds", unit.toSeconds(deleteMessageDuration)));
         }
 
         if (reason != null) {
