@@ -139,6 +139,7 @@ public enum RestRequestResultErrorCode {
     CANNOT_SEND_A_MESSAGE_IN_A_FORUM_CHANNEL(40058, "Cannot send a message in a forum channel"),
     INTERACTION_HAS_ALREADY_BEEN_ACKNOWLEDGED(40060, "Interaction has already been acknowledged"),
     TAG_NAMES_MUST_BE_UNIQUE(40061, "Tag names must be unique"),
+    SERVICE_RESOURCE_IS_BEING_RATE_LIMITED(40062, "Service resource is being rate limited"),
     THERE_ARE_NO_TAGS_AVAILABLE_THAT_CAN_BE_SET_BY_NON_MODERATORS(40066,
             "There are no tags available that can be set by non-moderators"),
     A_TAG_IS_REQUIRED_TO_CREATE_A_FORUM_POST_IN_THIS_CHANNEL(40067,
@@ -177,6 +178,7 @@ public enum RestRequestResultErrorCode {
     INVALID_FORM_BODY(50035, "Invalid Form Body"),
     AN_INVITE_WAS_ACCEPTED_TO_A_GUILD_THE_APPLICATIONS_BOT_IS_NOT_IN(
             50036, "An invite was accepted to a guild the application's bot is not in"),
+    INVALID_ACTIVITY_ACTION(50039, "Invalid activity action"),
     INVALID_API_VERSION(50041, "Invalid API version"),
     FILE_UPLOADED_EXCEEDS_THE_MAXIMUM_SIZE(50045, "File uploaded exceeds the maximum size"),
     INVALID_FILE_UPLOADED(50046, "Invalid file uploaded"),
