@@ -609,7 +609,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body, updateAll || componentsChanged);
 
-        prepareAttachments(message.getAttachments(), body);
+        prepareAttachments(message.getAttachments(), body, updateAll);
 
         RestRequest<Message> request = new RestRequest<Message>(message.getApi(),
                 RestMethod.PATCH, RestEndpoint.MESSAGE)
@@ -678,7 +678,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
     }
 
-    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body) {
+    private void prepareAttachments(List<MessageAttachment> attachmentsList, ObjectNode body, boolean updateAll) {
         ArrayNode attachments = body.putArray("attachments");
 
         if (removeAllAttachments) {
@@ -691,6 +691,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                 }
             }
         } else {
+            // True in case this is a MessageUpdater which wants to replace the message.
+            // Then return immediately because we do not want to retain any attachments.
+            if (updateAll) {
+                return;
+            }
+
             for (Attachment attachment : attachmentsList) {
                 attachments.add(((AttachmentImpl) attachment).toJsonNode());
             }
