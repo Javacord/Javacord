@@ -413,10 +413,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         getOrCreateChannelCategory(channel);
                         break;
                     case SERVER_NEWS_CHANNEL:
-                        // TODO Handle server news channel differently
-                        logger.debug("{} has a news channel. In this Javacord version it is treated as a normal "
-                                + "text channel!", this);
-                        getOrCreateServerTextChannel(channel);
+                        getOrCreateServerNewsChannel(channel);
                         break;
                     default: {
                         try {
