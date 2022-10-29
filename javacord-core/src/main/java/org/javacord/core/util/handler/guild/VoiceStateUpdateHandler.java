@@ -29,6 +29,7 @@ import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Handles the voice state update packet.
@@ -133,10 +134,10 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                     MemberImpl newMember = ((oldMember != null)
                             ? oldMember
                             : new MemberImpl(api, server, packet.get("member"), null))
-                                .setMuted(newMuted)
-                                .setDeafened(newDeafened)
-                                .setSelfMuted(newSelfMuted)
-                                .setSelfDeafened(newSelfDeafened);
+                            .setMuted(newMuted)
+                            .setDeafened(newDeafened)
+                            .setSelfMuted(newSelfMuted)
+                            .setSelfDeafened(newSelfDeafened);
 
                     // Update the cache with the new member prior to dispatching any events.
                     api.addMemberToCacheOrReplaceExisting(newMember);
@@ -155,6 +156,27 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                     }
 
                     if (!newChannel.equals(oldChannel)) {
+
+                        if (userId == api.getYourself().getId()) {
+                            if (oldChannel.isPresent() && newChannel.isPresent()) {
+                                // If the user is being moved from one channel to another,
+                                // also move the audio connection if it exists
+                                oldChannel.get().getServer().getAudioConnection().ifPresent(audioConnection -> {
+                                    audioConnection.moveTo(newChannel.get());
+                                });
+                            } else if (oldChannel.isPresent()) {
+                                // Close connection when kicking the bot from a voice channel.
+                                oldChannel.get().getServer().getAudioConnection().ifPresent(audioConnection -> {
+                                            CompletableFuture<Void> future =
+                                                    ((AudioConnectionImpl) audioConnection).getDisconnectFuture();
+                                            if (future == null || !future.isDone()) {
+                                                audioConnection.close();
+                                            }
+                                        }
+                                );
+                            }
+                        }
+
                         oldChannel.ifPresent(channel -> {
                             channel.removeConnectedUser(userId);
                             dispatchServerVoiceChannelMemberLeaveEvent(
@@ -166,6 +188,7 @@ public class VoiceStateUpdateHandler extends PacketHandler {
                             dispatchServerVoiceChannelMemberJoinEvent(newMember, channel, oldChannel.orElse(null),
                                     server);
                         });
+
                     }
 
                     if (newSelfMuted != oldSelfMuted) {
