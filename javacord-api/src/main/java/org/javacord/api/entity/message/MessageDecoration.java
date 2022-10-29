@@ -51,4 +51,14 @@ public enum MessageDecoration {
         return suffix;
     }
 
+    /**
+     * Applies the message decoration to the given text.
+     *
+     * @param text The text to apply the decoration to.
+     * @return The text with the decoration applied.
+     */
+    public String applyToText(String text) {
+        return prefix + text + suffix;
+    }
+
 }
