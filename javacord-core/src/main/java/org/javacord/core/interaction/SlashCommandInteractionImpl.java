@@ -100,6 +100,8 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
         return commandName;
     }
 
+    // TODO: Move the implementation to the SlashCommandInteractionOptionsProvider once we upgraded to Java 9+
+    // because interfaces currently do not support private methods
     @Override
     public List<SlashCommandInteractionOption> getArguments() {
         return getArgumentsRecursive(getOptions());
