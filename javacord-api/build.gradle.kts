@@ -2,8 +2,8 @@ import java.time.Instant
 
 plugins {
     `java-library`
-    id("com.gorylenko.gradle-git-properties") version "2.4.0"
-    id("biz.aQute.bnd.builder") version "6.2.0"
+    id("com.gorylenko.gradle-git-properties") version "2.4.1"
+    id("biz.aQute.bnd.builder") version "6.3.1"
 }
 
 repositories {
