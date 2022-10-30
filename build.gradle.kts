@@ -6,8 +6,8 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("com.github.johnrengelman.shadow") version "2.0.4" apply false
-    id("net.researchgate.release") version "2.7.0" apply false
+    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+    id("net.researchgate.release") version "3.0.2" apply false
 }
 
 repositories {
