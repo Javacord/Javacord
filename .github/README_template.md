@@ -12,7 +12,8 @@ It has rich [documentation](#-documentation) and an [awesome community on Discor
 
 ## 🎉 Basic Usage
 
-The following example logs the bot in and replies to every "!ping" message with "Pong!". 
+The following example logs the bot in and replies to every "!ping" message with "Pong!". Note that message content is a 
+[privileged Intent](https://javacord.org/wiki/basic-tutorials/gateway-intents.html#privileged-intents) and needs to specifically be enabled.
 
 ```java
 public class MyFirstBot {
@@ -21,7 +22,7 @@ public class MyFirstBot {
         // Insert your bot's token here
         String token = "your token";
 
-        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        DiscordApi api = new DiscordApiBuilder().setToken(token).addIntent(Intent.MESSAGE_CONTENT).login().join();
 
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
