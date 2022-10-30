@@ -22,7 +22,7 @@ public class MyFirstBot {
         // Insert your bot's token here
         String token = "your token";
 
-        DiscordApi api = new DiscordApiBuilder().setToken(token).setAllIntents().login().join();
+        DiscordApi api = new DiscordApiBuilder().setToken(token).addIntent(Intent.MESSAGE_CONTENT).login().join();
 
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
