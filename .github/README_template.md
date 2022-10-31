@@ -226,13 +226,17 @@ public class MyListener implements MessageCreateListener {
 ```java
 api.addListener(new MyListener());
 ```
+### Libraries compatible with Javacord 📚
+> This is a not exhaustive list of libraries that are compatible with Javacord.
+If you want to add your own library to this list, feel free to open a pull request!
+They are sorted alphabetically that means that the order does not reflect the usage or quality of the library.
 
-For commands, you have the option of using one of the many existing command frameworks such as
 * [**Command Framework**](https://github.com/Vampire/command-framework) by [@Vampire](https://github.com/Vampire)
-* [**Sdcf4j**](https://github.com/Bastian/sdcf4j) by [@Bastian](https://github.com/Bastian)
+  * A generic CDI-based command framework.
+* [**Discord Interaction Handler**](https://github.com/KILLEliteMaste/discord-interaction-handler) by [@KILLEliteMaste](https://github.com/KILLEliteMaste)
+  * Easy to use interaction handler to conveniently work with any Discord interaction (slash, context menu, auto complete...) or component interaction.
 * [**KCommando Framework**](https://github.com/koply/KCommando) by [@koply](https://github.com/koply)
-
-or even write your own!
+  * Annotation-based multifunctional command handler framework for JDA & Javacord.
 
 ### Attach Listeners to Objects 📌
 
