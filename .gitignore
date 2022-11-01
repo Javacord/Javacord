@@ -14,3 +14,6 @@
 *.iml
 *.ipr
 *.iws
+
+# Other
+CHANGELOG.md

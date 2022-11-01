@@ -48,6 +48,7 @@ apply(from = "gradle/listener-manager-generation.gradle")
 apply(from = "gradle/event-dispatcher-generation.gradle")
 apply(from = "gradle/checkstyle.gradle.kts")
 apply(from = "gradle/increment-version.gradle.kts")
+apply(from = "gradle/generate-changelog.gradle.kts")
 
 configure<PublishingExtension> {
     allprojects {
