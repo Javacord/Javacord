@@ -136,6 +136,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "haseeb-xd",
+      "name": "Haseeb Ansari",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47222685?v=4",
+      "profile": "https://www.linkedin.com/in/haseebansari/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "projectName": "Javacord",
