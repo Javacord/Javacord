@@ -4,7 +4,7 @@
 -->
 ## Checklist
 - [ ] I have tested this PR[^1].
-- [ ] I have read the [contributing guidelines](./CONTRIBUTING.md).
+- [ ] I have read the [contributing guidelines](https://github.com/Javacord/Javacord/blob/master/.github/CONTRIBUTING.md).
 
 
 <!-- 
