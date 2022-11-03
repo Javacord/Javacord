@@ -171,9 +171,9 @@ class to stay for at least 6 months before it finally gets removed, but this is 
 Contributions of any kind are welcome. You can start contributing to this library by creating issues, submitting pull requests or improving the [Javacord Wiki](https://github.com/Javacord/Website). 
 
 If you want to submit pull requests you can find a list of good first issues [here](https://github.com/Javacord/Javacord/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). You are not restricted to only these issues, so you can start with any other issue that you would like to do.
-Be sure to read the [Contributing Guidelines](./CONTRIBUTING.md) before you start.
+Be sure to read the [Contributing Guidelines](/.github/CONTRIBUTING.md) before you start.
 
-The awesome people that contributed to Javacord in the past can be found ✨[here](../CONTRIBUTORS.md)✨
+The awesome people that contributed to Javacord in the past can be found ✨[here](./CONTRIBUTORS.md)✨
 
 ## 🥇 Large Bots Using Javacord
 
