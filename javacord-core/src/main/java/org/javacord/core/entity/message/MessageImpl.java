@@ -6,6 +6,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageActivity;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -170,7 +171,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * The sticker items in this message.
      */
     private final Set<StickerItem> stickerItems = new HashSet<>();
-        
+
     /**
      * The approximate position of the message in a thread.
      */
@@ -213,7 +214,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         messageInteraction = data.hasNonNull("interaction")
             ? new MessageInteractionImpl(this, data.get("interaction"))
             : null;
-        
+
         position = data.hasNonNull("position") ? data.get("position").asInt() : null;
 
         setUpdatableFields(data);
@@ -387,7 +388,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                 }
             });
         }
-        
+
         if (data.has("sticker_items")) {
             stickerItems.clear();
             for (JsonNode stickerItemJson : data.get("sticker_items")) {
@@ -441,7 +442,12 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public String getContent() {
-        return content;
+        if (api.getIntents().contains(Intent.MESSAGE_CONTENT) || !content.isEmpty()) {
+            return content;
+        }
+        throw new IllegalStateException("The MESSAGE_CONTENT intent is required to receive the content of a message. "
+                + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent.");
     }
 
     @Override
