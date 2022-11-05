@@ -20,6 +20,7 @@ import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
@@ -441,13 +442,24 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
+    public boolean canYouReadContent() {
+        return api.getIntents().contains(Intent.MESSAGE_CONTENT)
+                || !content.isEmpty()
+                || isPrivateMessage()
+                || author.getId() == api.getYourself().getId()
+                || getMentionedUsers().contains(api.getYourself());
+    }
+
+    @Override
     public String getContent() {
-        if (api.getIntents().contains(Intent.MESSAGE_CONTENT) || !content.isEmpty()) {
+        if (canYouReadContent()) {
             return content;
         }
-        throw new IllegalStateException("The MESSAGE_CONTENT intent is required to receive the content of a message. "
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive the content of a message. "
                 + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
-                + "on how to enable this privileged intent.");
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the content in special cases like: DMs, bot mentions or if it's your own messages");
     }
 
     @Override
@@ -457,7 +469,15 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public List<MessageAttachment> getAttachments() {
-        return Collections.unmodifiableList(attachments);
+        if (canYouReadContent()) {
+            return Collections.unmodifiableList(attachments);
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive attachments of a message. "
+                + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the attachments in special cases like: DMs, "
+                + "bot mentions or if it's your own messages");
     }
 
     @Override
@@ -513,7 +533,14 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public List<Embed> getEmbeds() {
-        return Collections.unmodifiableList(new ArrayList<>(embeds));
+        if (canYouReadContent()) {
+            return Collections.unmodifiableList(new ArrayList<>(embeds));
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive embeds of a message. "
+                + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the embeds in special cases like: DMs, bot mentions or if it's your own messages");
     }
 
     @Override
@@ -565,7 +592,15 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public List<HighLevelComponent> getComponents() {
-        return Collections.unmodifiableList(new ArrayList<>(this.components));
+        if (canYouReadContent()) {
+            return Collections.unmodifiableList(new ArrayList<>(this.components));
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive the components "
+                + "of a message. Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the components in special cases like: DMs, "
+                + "bot mentions or if it's your own messages");
     }
 
     @Override
