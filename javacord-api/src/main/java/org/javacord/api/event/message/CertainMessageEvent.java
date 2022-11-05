@@ -1,9 +1,11 @@
 package org.javacord.api.event.message;
 
 import org.javacord.api.entity.channel.ChannelType;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageAuthor;
+import org.javacord.api.exception.MissingIntentException;
 
 import java.net.URL;
 import java.util.List;
@@ -19,6 +21,15 @@ public interface CertainMessageEvent extends MessageEvent {
      * @return The message of the event.
      */
     Message getMessage();
+
+    /**
+     * Checks if the bot can read the content of the message.
+     *
+     * @return Whether the bot can read the content of the message.
+     */
+    default boolean canYouReadContent() {
+        return getMessage().canYouReadContent();
+    }
 
     /**
      * Checks if the event's message was sent in a {@link ChannelType#PRIVATE_CHANNEL private channel}.
@@ -55,6 +66,14 @@ public interface CertainMessageEvent extends MessageEvent {
      *
      * @return All attachments of the event's message.
      * @see Message#getAttachments()
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     default List<MessageAttachment> getMessageAttachments() {
         return getMessage().getAttachments();
@@ -65,6 +84,14 @@ public interface CertainMessageEvent extends MessageEvent {
      *
      * @return The content of the event's message.
      * @see Message#getContent()
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     default String getMessageContent() {
         return getMessage().getContent();
@@ -75,6 +102,14 @@ public interface CertainMessageEvent extends MessageEvent {
      *
      * @return The readable content of the event's message.
      * @see Message#getReadableContent()
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     default String getReadableMessageContent() {
         return getMessage().getReadableContent();
