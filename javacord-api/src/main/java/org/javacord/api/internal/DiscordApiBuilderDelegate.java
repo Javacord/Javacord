@@ -11,6 +11,7 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -224,9 +225,12 @@ public interface DiscordApiBuilderDelegate {
      *
      * @param listenerClass The listener class.
      * @param listener The listener to add.
+     * @param requiredIntents The required intents for this listener.
      * @param <T> The type of the listener.
      */
-    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener);
+    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass,
+                                                            T listener,
+                                                            Set<Intent> requiredIntents);
 
     /**
      * Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
@@ -248,9 +252,12 @@ public interface DiscordApiBuilderDelegate {
      *
      * @param listenerClass The listener class.
      * @param listenerSupplier The supplier of listeners to add.
+     * @param requiredIntents The required intents for this listener.
      * @param <T> The type of the listener.
      */
-    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, Supplier<T> listenerSupplier);
+    <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass,
+                                                            Supplier<T> listenerSupplier,
+                                                            Set<Intent> requiredIntents);
 
     /**
      * Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created
@@ -274,10 +281,12 @@ public interface DiscordApiBuilderDelegate {
      *
      * @param listenerClass The listener class.
      * @param listenerFunction The function to provide listeners to add.
+     * @param requiredIntents The required intents for this listener.
      * @param <T> The type of the listener.
      */
     <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass,
-                                                            Function<DiscordApi, T> listenerFunction);
+                                                            Function<DiscordApi, T> listenerFunction,
+                                                            Set<Intent> requiredIntents);
 
     /**
      * Adds a listener that implements one or more {@code GloballyAttachableListener}s to all created

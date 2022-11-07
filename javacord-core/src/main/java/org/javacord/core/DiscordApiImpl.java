@@ -42,6 +42,7 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.interaction.ApplicationCommandType;
@@ -639,7 +640,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                                         Class<GloballyAttachableListener> type
                                                 = (Class<GloballyAttachableListener>) clazz;
                                         GloballyAttachableListener listener = listenerSource.apply(this);
-                                        addListener(type, type.cast(listener));
+                                        addListener(type, type.cast(listener), Collections.emptySet());
                                     }));
                             unspecifiedListeners.stream()
                                     .map(source -> source.apply(this))
@@ -2167,6 +2168,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         return messageCacheLock;
     }
 
+
+
     @Override
     @SuppressWarnings("unchecked")
     public Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(
@@ -2175,13 +2178,21 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 .filter(GloballyAttachableListener.class::isAssignableFrom)
                 .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
                 .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
-                .map(listenerClass -> addListener(listenerClass, listener))
+                .map(listenerClass -> addListener(listenerClass, listener, Collections.emptySet()))
                 .collect(Collectors.toList());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
+    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener,
+                                                                                 Set<Intent> requiredIntents) {
+        if (getIntents().stream().noneMatch(requiredIntents::contains)) {
+            logger.error("The listener {} requires one of the following intents {} but the bot only has "
+                    + "the intents {}", listenerClass.getSimpleName(), requiredIntents, getIntents());
+
+            throw new MissingIntentException(String.format("The listener %s requires one of the following intents %s "
+                    + "but the bot only has the intents %s", listenerClass.getSimpleName(), requiredIntents, intents));
+        }
         return (ListenerManager<T>) listeners
                 .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
                 .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));

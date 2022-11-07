@@ -5,6 +5,7 @@ import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -168,7 +169,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * Globally attachable listeners in need of subtype detection.
      */
-    private final List<Function<DiscordApi,GloballyAttachableListener>> unspecifiedListenerFunctions
+    private final List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListenerFunctions
             = new CopyOnWriteArrayList<>();
 
     /**
@@ -180,7 +181,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * Unspecified listener sources for pre-registration, compiled into a single map.
      */
-    private volatile List<Function<DiscordApi,GloballyAttachableListener>> preparedUnspecifiedListeners;
+    private volatile List<Function<DiscordApi, GloballyAttachableListener>> preparedUnspecifiedListeners;
 
 
     @Override
@@ -444,12 +445,29 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
                 .whenComplete((nothing, throwable) -> api.disconnect());
     }
 
+    private void checkRequiredIntentsForListener(Class<?> listenerClass, Set<Intent> requiredIntents) {
+        if (intents.stream().noneMatch(requiredIntents::contains)) {
+            logger.error("The listener {} requires one of the following intents {} but the bot only has the "
+                            + "intents {}. If you believe this is wrong, keep in mind that you have to add the intents "
+                            + "before you add any listeners when building a DiscordApi.",
+                    listenerClass.getSimpleName(), requiredIntents, intents);
+
+            throw new MissingIntentException(String.format(
+                    "The listener %s requires one of the following intents %s but the bot only has the intents %s. "
+                            + "If you believe this is wrong, keep in mind that you have to add the intents before you "
+                            + "add any listeners when building a DiscordApi.",
+                    listenerClass.getName(), requiredIntents, intents));
+        }
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener) {
+    public <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener,
+                                                                   Set<Intent> requiredIntents) {
         this.listeners.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<T> listeners = (List<T>) this.listeners.get(listenerClass);
         if (!listeners.contains(listener)) {
+            checkRequiredIntentsForListener(listenerClass, requiredIntents);
             listeners.add(listener);
         }
     }
@@ -463,7 +481,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void addListener(
-            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier, Set<Intent> requiredIntents) {
         this.listenerSuppliers.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<Supplier<? extends GloballyAttachableListener>> listeners = this.listenerSuppliers.get(listenerClass);
         if (!listeners.contains(listenerSupplier)) {
@@ -480,7 +498,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void addListener(
-            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction, Set<Intent> requiredIntents) {
         this.listenerFunctions.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<Function<DiscordApi, ? extends GloballyAttachableListener>> functions =
                 this.listenerFunctions.get(listenerClass);
