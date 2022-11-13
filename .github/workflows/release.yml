@@ -47,7 +47,6 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.PAT }}
           commit-message: Add Release v${{ steps.read-version.outputs.version }}
           committer: github-actions[bot]
           author: 41898282+github-actions[bot]@users.noreply.github.com
@@ -80,6 +79,5 @@ jobs:
         if: steps.cpr.outputs.pull-request-operation == 'created'
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          token: ${{ secrets.PAT }}
           pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
           merge-method: squash
