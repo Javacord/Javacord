@@ -12,7 +12,8 @@ It has rich [documentation](#-documentation) and an [awesome community on Discor
 
 ## 🎉 Basic Usage
 
-The following example logs the bot in and replies to every "!ping" message with "Pong!". 
+The following example logs the bot in and replies to every "!ping" message with "Pong!". Note that message content is a 
+[privileged Intent](https://javacord.org/wiki/basic-tutorials/gateway-intents.html#privileged-intents) and needs to specifically be enabled.
 
 ```java
 public class MyFirstBot {
@@ -21,7 +22,7 @@ public class MyFirstBot {
         // Insert your bot's token here
         String token = "your token";
 
-        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        DiscordApi api = new DiscordApiBuilder().setToken(token).addIntent(Intent.MESSAGE_CONTENT).login().join();
 
         // Add a listener which answers with "Pong!" if someone writes "!ping"
         api.addMessageCreateListener(event -> {
@@ -96,7 +97,7 @@ If you are not familiar with build managers, you can follow this [setup guide](#
 
 ```gradle
 repositories { mavenCentral() }
-dependencies { implementation 'org.javacord:javacord:3.6.0' }
+dependencies { implementation 'org.javacord:javacord:3.7.0' }
 ```
 
 #### Maven
@@ -105,7 +106,7 @@ dependencies { implementation 'org.javacord:javacord:3.6.0' }
 <dependency>
     <groupId>org.javacord</groupId>
     <artifactId>javacord</artifactId>
-    <version>3.6.0</version>
+    <version>3.7.0</version>
     <type>pom</type>
 </dependency>
 ```
@@ -113,7 +114,7 @@ dependencies { implementation 'org.javacord:javacord:3.6.0' }
 #### Sbt
 
 ```scala
-libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.6.0")
+libraryDependencies ++= Seq("org.javacord" % "javacord" % "3.7.0")
 ```
 
 ### Optional Logger Dependency
@@ -170,9 +171,9 @@ class to stay for at least 6 months before it finally gets removed, but this is 
 Contributions of any kind are welcome. You can start contributing to this library by creating issues, submitting pull requests or improving the [Javacord Wiki](https://github.com/Javacord/Website). 
 
 If you want to submit pull requests you can find a list of good first issues [here](https://github.com/Javacord/Javacord/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22). You are not restricted to only these issues, so you can start with any other issue that you would like to do.
-Be sure to read the [Contributing Guidelines](./CONTRIBUTING.md) before you start.
+Be sure to read the [Contributing Guidelines](/.github/CONTRIBUTING.md) before you start.
 
-The awesome people that contributed to Javacord in the past can be found ✨[here](../CONTRIBUTORS.md)✨
+The awesome people that contributed to Javacord in the past can be found ✨[here](./CONTRIBUTORS.md)✨
 
 ## 🥇 Large Bots Using Javacord
 
@@ -225,13 +226,17 @@ public class MyListener implements MessageCreateListener {
 ```java
 api.addListener(new MyListener());
 ```
+### Libraries compatible with Javacord 📚
+> This is a not exhaustive list of libraries that are compatible with Javacord.
+If you want to add your own library to this list, feel free to open a pull request!
+They are sorted alphabetically that means that the order does not reflect the usage or quality of the library.
 
-For commands, you have the option of using one of the many existing command frameworks such as
 * [**Command Framework**](https://github.com/Vampire/command-framework) by [@Vampire](https://github.com/Vampire)
-* [**Sdcf4j**](https://github.com/Bastian/sdcf4j) by [@Bastian](https://github.com/Bastian)
+  * A generic CDI-based command framework.
+* [**Discord Interaction Handler**](https://github.com/KILLEliteMaste/discord-interaction-handler) by [@KILLEliteMaste](https://github.com/KILLEliteMaste)
+  * Easy to use interaction handler to conveniently work with any Discord interaction (slash, context menu, auto complete...) or component interaction.
 * [**KCommando Framework**](https://github.com/koply/KCommando) by [@koply](https://github.com/koply)
-
-or even write your own!
+  * Annotation-based multifunctional command handler framework for JDA & Javacord.
 
 ### Attach Listeners to Objects 📌
 
