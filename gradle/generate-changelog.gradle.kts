@@ -93,7 +93,7 @@ fun buildChangelog(prs: List<PullRequest>): String {
             } else {
                 addImpBuilder = true
                 impBuilder
-            }.append("- $change (${it.prLink})").appendLine()
+            }.append("- $change (${it.prLink})").append(" by @").append(it.authorName).appendLine()
         }
     }
 
@@ -102,7 +102,7 @@ fun buildChangelog(prs: List<PullRequest>): String {
     prs.forEach {
         it.breakingChanges.forEach { change ->
             addBcBuilder = true
-            bcBuilder.append("- $change (${it.prLink})").appendLine()
+            bcBuilder.append("- $change (${it.prLink})").append(" by @").append(it.authorName).appendLine()
         }
     }
 
@@ -114,11 +114,6 @@ fun buildChangelog(prs: List<PullRequest>): String {
     }
     if (addBcBuilder) {
         docBuilder.appendLine().append(bcBuilder)
-    }
-
-    docBuilder.appendLine().append("## Contributors in this release:").appendLine()
-    prs.groupBy { it.authorName }.entries.sortedBy { it.key }.forEach { (author, prs) ->
-        docBuilder.append("@$author (${prs.joinToString(", ") { it.prLink }})").appendLine()
     }
 
     val noChangelogPrs = prs.filter { it.changes.isEmpty() && it.breakingChanges.isEmpty() }
