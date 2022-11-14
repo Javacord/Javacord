@@ -28,6 +28,7 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
 
     protected Long defaultMemberPermissions = null;
     protected Boolean dmPermission = true;
+    protected Boolean nsfw = false;
 
     @Override
     public void setName(String name) {
@@ -67,6 +68,11 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
     @Override
     public void setEnabledInDms(boolean enabledInDms) {
         this.dmPermission = enabledInDms;
+    }
+
+    @Override
+    public void setNsfw(boolean nsfw) {
+        this.nsfw = nsfw;
     }
 
     @Override
@@ -114,6 +120,8 @@ public abstract class ApplicationCommandBuilderDelegateImpl<T extends Applicatio
                 defaultMemberPermissions != null ? String.valueOf(defaultMemberPermissions) : null);
 
         jsonBody.put("dm_permission", dmPermission);
+
+        jsonBody.put("nsfw", nsfw);
 
         return jsonBody;
     }

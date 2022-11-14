@@ -31,6 +31,7 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     private final Map<DiscordLocale, String> descriptionLocalizations = new HashMap<>();
     private final EnumSet<PermissionType> defaultMemberPermission;
     private final boolean dmPermission;
+    private final boolean nsfw;
 
     private final Server server;
     private final Long serverId;
@@ -64,6 +65,7 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
                 ? api.getPossiblyUnreadyServerById(serverId).orElse(null)
                 : null;
         dmPermission = server == null && (!data.has("dm_permission") || data.get("dm_permission").asBoolean());
+        nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
     }
 
     @Override
@@ -135,6 +137,11 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
     @Override
     public boolean isServerApplicationCommand() {
         return serverId != null;
+    }
+
+    @Override
+    public boolean isNsfw() {
+        return nsfw;
     }
 
     @Override
