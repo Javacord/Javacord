@@ -113,6 +113,13 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     boolean isServerApplicationCommand();
 
     /**
+     * Whether the command is nsfw.
+     *
+     * @return Whether the command is nsfw.
+     */
+    boolean isNsfw();
+
+    /**
      * Deletes this application command.
      *
      * @return A future to check if the deletion was successful.

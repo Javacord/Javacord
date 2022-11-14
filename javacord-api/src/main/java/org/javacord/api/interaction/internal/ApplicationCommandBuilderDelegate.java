@@ -69,6 +69,13 @@ public interface ApplicationCommandBuilderDelegate<T extends ApplicationCommand>
     void setEnabledInDms(boolean enabledInDms);
 
     /**
+     * Sets the slash command as nsfw.
+     *
+     * @param nsfw Whether the command is nsfw.
+     */
+    void setNsfw(boolean nsfw);
+
+    /**
      * Creates a global application command.
      *
      * @param api The discord api instance.

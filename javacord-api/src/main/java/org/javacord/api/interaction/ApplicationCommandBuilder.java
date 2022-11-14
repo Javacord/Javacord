@@ -124,6 +124,17 @@ public abstract class ApplicationCommandBuilder<R extends ApplicationCommand,
     }
 
     /**
+     * Sets the slash command as nsfw.
+     *
+     * @param nsfw Whether the command is nsfw.
+     * @return The current instance in order to chain call methods.
+     */
+    public T setNsfw(boolean nsfw) {
+        delegate.setNsfw(nsfw);
+        return (T) this;
+    }
+
+    /**
      * Gets the delegate used by the application command builder internally.
      *
      * @return The delegate used by this application command builder internally.
