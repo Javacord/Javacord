@@ -15,6 +15,14 @@ public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
     void addComponents(List<LowLevelComponent> components);
 
     /**
+     * Updates a low-level component builder.
+     *
+     * @param customId The custom id of the low-level component to update.
+     * @param component The new low-level component.
+     */
+    void updateComponent(String customId, LowLevelComponent component);
+
+    /**
      * Copy an action row's values into the builder.
      *
      * @param actionRow The action row to copy.

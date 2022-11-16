@@ -31,6 +31,18 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
     }
 
     /**
+     * Updates a low-level component builder.
+     *
+     * @param customId The custom id of the low-level component to update.
+     * @param component The new low-level component.
+     * @return The builder instance to chain methods.
+     */
+    public ActionRowBuilder updateComponent(String customId, LowLevelComponent component) {
+        delegate.updateComponent(customId, component);
+        return this;
+    }
+
+    /**
      * Copy an action row into this action row builder's values.
      *
      * @param actionRow The action row to copy.

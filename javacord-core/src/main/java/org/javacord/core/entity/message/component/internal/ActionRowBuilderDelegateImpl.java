@@ -7,10 +7,13 @@ import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.component.SelectMenu;
 import org.javacord.api.entity.message.component.SelectMenuBuilder;
+import org.javacord.api.entity.message.component.TextInput;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.core.entity.message.component.ActionRowImpl;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
     private final ComponentType type = ComponentType.ACTION_ROW;
@@ -20,6 +23,25 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
     @Override
     public void addComponents(List<LowLevelComponent> components) {
         this.components.addAll(components);
+    }
+
+    @Override
+    public void updateComponent(String customId, LowLevelComponent component) {
+        Optional<String> optionalCustomId;
+        if (component.isButton()) {
+            optionalCustomId = component.asButton().flatMap(Button::getCustomId);
+        } else if (component.isSelectMenu()) {
+            optionalCustomId = component.asSelectMenu().map(SelectMenu::getCustomId);
+        } else if (component.isTextInput()) {
+            optionalCustomId = component.asTextInput().map(TextInput::getCustomId);
+        } else {
+            optionalCustomId = Optional.empty();
+        }
+
+        components.stream()
+                .filter(c -> optionalCustomId.isPresent() && optionalCustomId.get().equals(customId))
+                .findFirst()
+                .ifPresent(c -> components.set(components.indexOf(c), component));
     }
 
     @Override
