@@ -3384,6 +3384,66 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
         return canBanUser(getApi().getYourself(), userToBan);
     }
 
+    /**
+     * Checks if the given user can timeout users from the server.
+     *
+     * @param user The user to check.
+     * @return Whether the given user can timeout users or not.
+     */
+    default boolean canTimeoutUsers(User user) {
+        return hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
+                PermissionType.MODERATE_MEMBERS);
+    }
+
+    /**
+     * Checks if the user of the connected account can timeout users from the server.
+     *
+     * @return Whether the user of the connected account can timeout users or not.
+     */
+    default boolean canYouTimeoutUsers() {
+        return canTimeoutUsers(getApi().getYourself());
+    }
+
+    /**
+     * Check if the user of the connected account can timeout the user.
+     * This method also considers the position of the user roles and the owner.
+     *
+     * @param userToTimeout The user which should be timed out.
+     * @return Whether the user of the connected account can timeout the user or not.
+     */
+    default boolean canYouTimeoutUser(User userToTimeout) {
+        return canTimeoutUser(getApi().getYourself(), userToTimeout);
+    }
+
+    /**
+     * Checks if the given user can timeout the other user.
+     * This method also considers the position of the user roles and the owner.
+     *
+     * @param user          The user which "want" to ban the other user.
+     * @param userToTimeOut The user which should be timed out.
+     * @return Whether the given user can timeout the other user or not.
+     */
+    default boolean canTimeoutUser(User user, User userToTimeOut) {
+        // owner can always timeout, regardless of role for example
+        if (isOwner(user)) {
+            return true;
+        }
+        // user cannot timeout at all
+        if (!canTimeoutUsers(user)) {
+            return false;
+        }
+
+        // only returns empty optional if user is not member of server
+        Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
+        Optional<Role> otherRole = getHighestRole(userToTimeOut);
+
+        // otherRole empty => userToTimeOut is not on the server => timeout is allowed as Discord allows it
+        boolean userToKickOnServer = otherRole.isPresent();
+        return !userToKickOnServer || (ownRole.compareTo(otherRole.get()) > 0);
+    }
+
+
     @Override
     default Optional<Server> getCurrentCachedInstance() {
         return getApi().getServerById(getId());
