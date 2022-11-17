@@ -181,6 +181,15 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         change = new AuditLogChangeImpl<>(
                                 type, oldDefaultMessageNotificationLevel, newDefaultMessageNotificationLevel);
                         break;
+                    case MEMBER_KICK:
+                    case MEMBER_PRUNE:
+                    case MEMBER_BAN_ADD:
+                    case MEMBER_BAN_REMOVE:
+                    case MEMBER_UPDATE:
+                    case MEMBER_ROLE_UPDATE:
+                        change = new AuditLogChangeImpl<>(type, oldValue != null ? oldValue.asInt() : null,
+                                newValue != null ? newValue.asInt() : null);
+                        break;
                     case ROLE_ADD:
                     case ROLE_REMOVE:
                         // TODO Find a way to include role objects, without having duplicates
