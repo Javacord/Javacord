@@ -5,7 +5,12 @@ import org.javacord.api.util.internal.DelegateFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+/**
+ * This class is used to action rows.
+ */
 public class ActionRowBuilder implements HighLevelComponentBuilder {
     private final ActionRowBuilderDelegate delegate = DelegateFactory.createActionRowBuilderDelegate();
 
@@ -31,14 +36,14 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
     }
 
     /**
-     * Updates a low-level component builder.
+     * Updates all components of an action row that satisfy the given predicate using the given updater.
      *
-     * @param customId The custom id of the low-level component to update.
-     * @param component The new low-level component.
-     * @return The builder instance to chain methods.
+     * @param predicate The predicate that components have to satisfy to get updated.
+     * @param updater   The updater for the components.
+     * @return The current instance in order to chain call methods.
      */
-    public ActionRowBuilder updateComponent(String customId, LowLevelComponent component) {
-        delegate.updateComponent(customId, component);
+    public ActionRowBuilder updateComponents(Predicate<LowLevelComponent> predicate, Consumer<LowLevelComponent> updater) {
+        delegate.updateComponents(predicate, updater);
         return this;
     }
 

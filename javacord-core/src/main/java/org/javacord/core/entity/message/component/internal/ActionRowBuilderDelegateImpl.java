@@ -7,14 +7,23 @@ import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.component.SelectMenu;
 import org.javacord.api.entity.message.component.SelectMenuBuilder;
-import org.javacord.api.entity.message.component.TextInput;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.core.entity.message.component.ActionRowImpl;
+import org.javacord.core.entity.message.component.ButtonImpl;
+import org.javacord.core.entity.message.component.EditableButtonImpl;
+import org.javacord.core.entity.message.component.EditableSelectMenuImpl;
+import org.javacord.core.entity.message.component.EditableTextInputImpl;
+import org.javacord.core.entity.message.component.SelectMenuImpl;
+import org.javacord.core.entity.message.component.TextInputImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+/**
+ * The implementation of {@link ActionRowBuilderDelegate}.
+ */
 public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
     private final ComponentType type = ComponentType.ACTION_ROW;
 
@@ -26,22 +35,32 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
     }
 
     @Override
-    public void updateComponent(String customId, LowLevelComponent component) {
-        Optional<String> optionalCustomId;
-        if (component.isButton()) {
-            optionalCustomId = component.asButton().flatMap(Button::getCustomId);
-        } else if (component.isSelectMenu()) {
-            optionalCustomId = component.asSelectMenu().map(SelectMenu::getCustomId);
-        } else if (component.isTextInput()) {
-            optionalCustomId = component.asTextInput().map(TextInput::getCustomId);
-        } else {
-            optionalCustomId = Optional.empty();
-        }
-
+    public void updateComponents(Predicate<LowLevelComponent> predicate, Consumer<LowLevelComponent> updater) {
         components.stream()
-                .filter(c -> optionalCustomId.isPresent() && optionalCustomId.get().equals(customId))
-                .findFirst()
-                .ifPresent(c -> components.set(components.indexOf(c), component));
+                .filter(predicate)
+                .map(lowLevelComponent -> {
+                    if (lowLevelComponent.isButton()) {
+                        return new EditableButtonImpl((ButtonImpl) lowLevelComponent);
+                    } else if (lowLevelComponent.isSelectMenu()) {
+                        return new EditableSelectMenuImpl((SelectMenuImpl) lowLevelComponent);
+                    } else if (lowLevelComponent.isTextInput()) {
+                        return new EditableTextInputImpl((TextInputImpl) lowLevelComponent);
+                    } else {
+                        throw new IllegalStateException("Unknown low-level component type");
+                    }
+                })
+                .forEach(lowLevelComponent -> {
+                    if (lowLevelComponent instanceof EditableButtonImpl) {
+                        updater.andThen(button -> ((EditableButtonImpl) button).clearDelegate())
+                                .accept(lowLevelComponent);
+                    } else if (lowLevelComponent instanceof EditableSelectMenuImpl) {
+                        updater.andThen(selectMenu -> ((EditableSelectMenuImpl) selectMenu).clearDelegate())
+                                .accept(lowLevelComponent);
+                    } else {
+                        updater.andThen(textInput -> ((EditableTextInputImpl) textInput).clearDelegate())
+                                .accept(lowLevelComponent);
+                    }
+                });
     }
 
     @Override

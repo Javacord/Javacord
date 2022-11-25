@@ -1,6 +1,7 @@
 package org.javacord.api.entity.message.component;
 
 import org.javacord.api.util.Specializable;
+
 import java.util.Optional;
 
 public interface LowLevelComponent extends Component, Specializable<LowLevelComponent> {
@@ -24,6 +25,15 @@ public interface LowLevelComponent extends Component, Specializable<LowLevelComp
     }
 
     /**
+     * Gets the component as an EditableButton if it's of that type.
+     *
+     * @return The EditableButton.
+     */
+    default Optional<EditableButton> asEditableButton() {
+        return isButton() ? Optional.of((EditableButton) this) : Optional.empty();
+    }
+
+    /**
      * Whether this component is of this type.
      *
      * @return True if it's of that type.
@@ -42,6 +52,16 @@ public interface LowLevelComponent extends Component, Specializable<LowLevelComp
     }
 
     /**
+     * Gets the component as an EditableSelectMenu if it's of that type.
+     *
+     * @return The EditableSelectMenu.
+     */
+    default Optional<EditableSelectMenu> asEditableSelectMenu() {
+        return isSelectMenu() ? Optional.of((EditableSelectMenu) this) : Optional.empty();
+    }
+
+
+    /**
      * Whether this component is of this type.
      *
      * @return True if it's of that type.
@@ -57,5 +77,14 @@ public interface LowLevelComponent extends Component, Specializable<LowLevelComp
      */
     default Optional<TextInput> asTextInput() {
         return isTextInput() ? Optional.of((TextInput) this) : Optional.empty();
+    }
+
+    /**
+     * Gets the component as an EditableTextInput if it's of that type.
+     *
+     * @return The EditableTextInput.
+     */
+    default Optional<EditableTextInput> asEditableTextInput() {
+        return isTextInput() ? Optional.of((EditableTextInput) this) : Optional.empty();
     }
 }

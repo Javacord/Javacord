@@ -6,25 +6,29 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.TextInput;
 import org.javacord.api.entity.message.component.TextInputStyle;
+
 import java.util.Optional;
 
+/**
+ * The implementation of {@link TextInput}.
+ */
 public class TextInputImpl extends ComponentImpl implements TextInput {
 
-    private final TextInputStyle style;
+    private TextInputStyle style;
 
-    private final String label;
+    private String label;
 
-    private final String customId;
+    private String customId;
 
-    private final String value;
+    private String value;
 
-    private final String placeholder;
+    private String placeholder;
 
-    private final boolean required;
+    private boolean required;
 
-    private final Integer minimumLength;
+    private Integer minimumLength;
 
-    private final Integer maximumLength;
+    private Integer maximumLength;
 
     /**
      * Creates a new text input.
@@ -66,6 +70,78 @@ public class TextInputImpl extends ComponentImpl implements TextInput {
         this.required = required;
         this.minimumLength = minimumLength;
         this.maximumLength = maximumLength;
+    }
+
+    /**
+     * Sets the style of the text input.
+     *
+     * @param style The style of the text input.
+     */
+    void setStyle(TextInputStyle style) {
+        this.style = style;
+    }
+
+    /**
+     * Sets the custom id of the text input.
+     *
+     * @param customId The custom id of the text input.
+     */
+    void setCustomId(String customId) {
+        this.customId = customId;
+    }
+
+    /**
+     * Sets the label of the text input.
+     *
+     * @param label The label of the text input.
+     */
+    void setLabel(String label) {
+        this.label = label;
+    }
+
+    /**
+     * Sets the minimum length of the text input.
+     *
+     * @param minimumLength The minimum length of the text input.
+     */
+    void setMinimumLength(int minimumLength) {
+        this.minimumLength = minimumLength;
+    }
+
+    /**
+     * Sets the maximum length of the text input.
+     *
+     * @param maximumLength The maximum length of the text input.
+     */
+    void setMaximumLength(int maximumLength) {
+        this.maximumLength = maximumLength;
+    }
+
+    /**
+     * Sets whether the text input is required.
+     *
+     * @param required Whether the text input is required.
+     */
+    void setRequired(boolean required) {
+        this.required = required;
+    }
+
+    /**
+     * Sets the value of the text input.
+     *
+     * @param value The value of the text input.
+     */
+    void setValue(String value) {
+        this.value = value;
+    }
+
+    /**
+     * Sets the placeholder of the text input.
+     *
+     * @param placeholder The placeholder of the text input.
+     */
+    void setPlaceholder(String placeholder) {
+        this.placeholder = placeholder;
     }
 
     @Override

@@ -1,11 +1,18 @@
 package org.javacord.api.entity.message.component.internal;
 
 import org.javacord.api.entity.message.component.ActionRow;
+import org.javacord.api.entity.message.component.ActionRowBuilder;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.LowLevelComponent;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+/**
+ * This class is internally used by the {@link ActionRowBuilder} to created action rows.
+ * You usually don't want to interact with this object.
+ */
 public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
     /**
      * Add multiple low-level components to the ActionRow.
@@ -15,12 +22,12 @@ public interface ActionRowBuilderDelegate extends ComponentBuilderDelegate {
     void addComponents(List<LowLevelComponent> components);
 
     /**
-     * Updates a low-level component builder.
+     * Updates all components of an action row that satisfy the given predicate using the given updater.
      *
-     * @param customId The custom id of the low-level component to update.
-     * @param component The new low-level component.
+     * @param predicate The predicate that components have to satisfy to get updated.
+     * @param updater   The updater for the components.
      */
-    void updateComponent(String customId, LowLevelComponent component);
+    void updateComponents(Predicate<LowLevelComponent> predicate, Consumer<LowLevelComponent> updater);
 
     /**
      * Copy an action row's values into the builder.
