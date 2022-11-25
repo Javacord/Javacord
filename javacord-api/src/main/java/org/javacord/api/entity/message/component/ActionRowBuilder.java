@@ -42,7 +42,8 @@ public class ActionRowBuilder implements HighLevelComponentBuilder {
      * @param updater   The updater for the components.
      * @return The current instance in order to chain call methods.
      */
-    public ActionRowBuilder updateComponents(Predicate<LowLevelComponent> predicate, Consumer<LowLevelComponent> updater) {
+    public ActionRowBuilder updateComponents(Predicate<LowLevelComponent> predicate,
+                                             Consumer<LowLevelComponent> updater) {
         delegate.updateComponents(predicate, updater);
         return this;
     }
