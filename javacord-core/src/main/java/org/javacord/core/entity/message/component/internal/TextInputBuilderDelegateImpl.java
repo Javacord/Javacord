@@ -53,7 +53,7 @@ public class TextInputBuilderDelegateImpl implements TextInputBuilderDelegate {
 
     @Override
     public void setValue(String value) {
-        this.value = value;
+        this.value = value == null ? "" : value;
     }
 
     @Override
