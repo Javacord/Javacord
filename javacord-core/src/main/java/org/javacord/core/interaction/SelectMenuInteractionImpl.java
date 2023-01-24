@@ -52,18 +52,27 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
         JsonNode componentsObject = messageObject.get("components");
 
         JsonNode dataObject = jsonData.get("data");
-        for (JsonNode actionRow : componentsObject) {
-            for (JsonNode interaction : actionRow.get("components")) {
+        outerLoop:
+        for (JsonNode highLevelComponent : componentsObject) {
+            for (JsonNode lowLevelComponent : highLevelComponent.get("components")) {
                 if (componentType.isSelectMenuType()
-                        && interaction.get("custom_id").asText().equals(dataObject.get("custom_id").asText())) {
-                    placeholder = interaction.has("placeholder") ? interaction.get("placeholder").asText() : null;
-                    maximumValues = interaction.has("max_value") ? interaction.get("max_value").asInt() : 1;
-                    minimumValues = interaction.has("min_value") ? interaction.get("min_values").asInt() : 1;
-                    if (interaction.hasNonNull("options")) {
-                        for (JsonNode optionObject : interaction.get("options")) {
+                        && lowLevelComponent.has("custom_id")
+                        && lowLevelComponent.get("custom_id").asText().equals(dataObject.get("custom_id").asText())) {
+                    placeholder = lowLevelComponent.has("placeholder")
+                            ? lowLevelComponent.get("placeholder").asText()
+                            : null;
+                    maximumValues = lowLevelComponent.has("max_values")
+                            ? lowLevelComponent.get("max_values").asInt()
+                            : 1;
+                    minimumValues = lowLevelComponent.has("min_values")
+                            ? lowLevelComponent.get("min_values").asInt()
+                            : 1;
+                    if (lowLevelComponent.hasNonNull("options")) {
+                        for (JsonNode optionObject : lowLevelComponent.get("options")) {
                             selectMenuOptions.add(new SelectMenuOptionImpl(optionObject));
                         }
                     }
+                    break outerLoop;
                 }
             }
         }
