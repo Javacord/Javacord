@@ -3392,6 +3392,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      */
     default boolean canTimeoutUsers(User user) {
         return hasAnyPermission(user,
+                PermissionType.ADMINISTRATOR,
                 PermissionType.MODERATE_MEMBERS);
     }
 
@@ -3437,9 +3438,9 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
         Role ownRole = getHighestRole(user).orElseThrow(AssertionError::new);
         Optional<Role> otherRole = getHighestRole(userToTimeOut);
 
-        // otherRole empty => userToBan is not on the server => ban is allowed
-        boolean  userToTimeOutOnServer = otherRole.isPresent();
-        return !userToTimeOutOnServer || (ownRole.compareTo(otherRole.get()) > 0);
+        // otherRole empty => userToTimeOut is not on the server => timeout is allowed as Discord allows it
+        boolean userToKickOnServer = otherRole.isPresent();
+        return !userToKickOnServer || (ownRole.compareTo(otherRole.get()) > 0);
     }
 
 
