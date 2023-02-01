@@ -14,6 +14,7 @@ import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -50,10 +51,11 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     }
 
     @Override
-    public CompletableFuture<Void> deleteInitialResponse(InteractionBase interaction) {
+    public CompletableFuture<Void> deleteInitialResponse(InteractionBase interaction, String reason) {
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.DELETE, RestEndpoint.ORIGINAL_INTERACTION_RESPONSE)
                 .setUrlParameters(Long.toUnsignedString(interaction.getApplicationId()), interaction.getToken())
+                .setAuditLogReason(reason)
                 .consumeGlobalRatelimit(false)
                 .includeAuthorizationHeader(false)
                 .execute(result -> null);
