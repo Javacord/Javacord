@@ -10,9 +10,11 @@ import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.UncachedMessageUtil;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.message.component.ComponentImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
 import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
@@ -169,8 +171,22 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
+    public CompletableFuture<Message> edit(long channelId, long messageId, String content,
+                                           HighLevelComponent... components) {
+        return edit(channelId, messageId, content, true, Collections.emptyList(), false,
+                Arrays.asList(components), true);
+    }
+
+    @Override
     public CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds) {
         return edit(channelId, messageId, null, false, embeds, true);
+    }
+
+    @Override
+    public CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds,
+                                           List<HighLevelComponent> components) {
+        return edit(channelId, messageId, null, false, embeds, true,
+                components, true);
     }
 
     @Override
@@ -185,6 +201,13 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
+    public CompletableFuture<Message> edit(long channelId, long messageId, String content, List<EmbedBuilder> embeds,
+                                           List<HighLevelComponent> components) {
+        return edit(channelId, messageId, content, true, embeds, true,
+                components, true);
+    }
+
+    @Override
     public CompletableFuture<Message> edit(
             String channelId, String messageId, String content, List<EmbedBuilder> embeds) {
         return edit(channelId, messageId, content, true, embeds, true);
@@ -193,6 +216,13 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     @Override
     public CompletableFuture<Message> edit(long channelId, long messageId, String content,
                                            boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed) {
+        return edit(channelId, messageId, content, updateContent, embeds, updateEmbed, Collections.emptyList(), false);
+    }
+
+    @Override
+    public CompletableFuture<Message> edit(long channelId, long messageId, String content,
+                                           boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed,
+                                           List<HighLevelComponent> components, boolean updateComponents) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
         if (updateContent) {
             if (content == null || content.isEmpty()) {
@@ -200,6 +230,11 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
             } else {
                 body.put("content", content);
             }
+        }
+        if (updateComponents) {
+            ArrayNode componentsArray = body.putArray("components");
+            components.forEach(highLevelComponent -> componentsArray.add(((ComponentImpl) highLevelComponent)
+                    .toJsonNode()));
         }
         if (updateEmbed) {
             ArrayNode embedArray = body.putArray("embeds");
