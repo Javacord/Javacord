@@ -1,6 +1,7 @@
 package org.javacord.api.entity.message;
 
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.message.UncachedMessageAttachableListenerManager;
@@ -140,6 +141,17 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     CompletableFuture<Message> edit(String channelId, String messageId, String content);
 
     /**
+     * Updates the content and components of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
+     * @param components    The new components of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> edit(long channelId, long messageId, String content, HighLevelComponent... components);
+
+    /**
      * Updates the embed of the message.
      *
      * @param channelId The id of the message's channel.
@@ -160,6 +172,32 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
      * @return A future to check if the update was successful.
      */
     CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds);
+
+    /**
+     * Updates the embeds and components of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param embeds        The new embeds of the message.
+     * @param components    The new components of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds,
+                                            HighLevelComponent... components) {
+        return edit(channelId, messageId, embeds, Arrays.asList(components));
+    }
+
+    /**
+     * Updates the embeds and components of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param embeds        The new embeds of the message.
+     * @param components    The new components of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> edit(long channelId, long messageId, List<EmbedBuilder> embeds,
+                                    List<HighLevelComponent> components);
 
     /**
      * Updates the embed of the message.
@@ -222,6 +260,34 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
     }
 
     /**
+     * Updates the content, embeds and components of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content   The new content of the message.
+     * @param embeds        The new embeds of the message.
+     * @param components    The new components of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> edit(long channelId, long messageId, String content, List<EmbedBuilder> embeds,
+                                            HighLevelComponent... components) {
+        return edit(channelId, messageId, content, embeds, Arrays.asList(components));
+    }
+
+    /**
+     * Updates the content, embeds and components of the message.
+     *
+     * @param channelId     The id of the message's channel.
+     * @param messageId     The id of the message.
+     * @param content       The new content of the message.
+     * @param embeds        The new embeds of the message.
+     * @param components    The new components of the message.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> edit(long channelId, long messageId, String content, List<EmbedBuilder> embeds,
+                                    List<HighLevelComponent> components);
+
+    /**
      * Updates the content and the embed of the message.
      *
      * @param channelId The id of the message's channel.
@@ -277,6 +343,23 @@ public interface UncachedMessageUtil extends UncachedMessageAttachableListenerMa
                                             EmbedBuilder embed, boolean updateEmbed) {
         return edit(channelId, messageId, content, updateContent, Collections.singletonList(embed), updateEmbed);
     }
+
+    /**
+     * Updates the content, the embed and the components of the message.
+     *
+     * @param channelId         The id of the message's channel.
+     * @param messageId         The id of the message.
+     * @param content           The new content of the message.
+     * @param updateContent     Whether to update or remove the content.
+     * @param embeds            An array of the new embeds of the message.
+     * @param updateEmbed       Whether to update or remove the embed.
+     * @param components        An array of the new components of the message.
+     * @param updateComponents  Whether to update or remove the components.
+     * @return A future to check if the update was successful.
+     */
+    CompletableFuture<Message> edit(long channelId, long messageId, String content,
+                                    boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed,
+                                    List<HighLevelComponent> components, boolean updateComponents);
 
     /**
      * Updates the content and the embed of the message.
