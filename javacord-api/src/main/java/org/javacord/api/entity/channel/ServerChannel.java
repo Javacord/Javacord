@@ -44,8 +44,8 @@ public interface ServerChannel extends Channel, Nameable, Deletable, ServerChann
      *
      * @return An updater for this channel.
      */
-    default ServerChannelUpdater createUpdater() {
-        return new ServerChannelUpdater(this);
+    default ServerChannelUpdater<?> createUpdater() {
+        return new ServerChannelUpdater<>(this);
     }
 
     /**
