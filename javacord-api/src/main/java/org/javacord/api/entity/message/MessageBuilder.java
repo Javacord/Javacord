@@ -49,17 +49,6 @@ public class MessageBuilder extends MessageBuilderBase<MessageBuilder> {
     }
 
     /**
-     * Sets if the message should be text to speech.
-     *
-     * @param tts Whether the message should be text to speech or not.
-     * @return The current instance in order to chain call methods.
-     */
-    public MessageBuilder setTts(boolean tts) {
-        delegate.setTts(tts);
-        return this;
-    }
-
-    /**
      * Adds a sticker to the message. This will only work if the sticker is from the same server as the message will
      * be sent on, or if it is a default sticker.
      *

@@ -12,4 +12,5 @@ public interface InteractionImmediateResponseBuilder
      *     Note that you can only update your response within 15 minutes after receiving the interaction.
      */
     CompletableFuture<InteractionOriginalResponseUpdater> respond();
+
 }

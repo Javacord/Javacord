@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 public class ComponentInteractionOriginalMessageUpdaterImpl
         extends ExtendedInteractionMessageBuilderBaseImpl<ComponentInteractionOriginalMessageUpdater>
         implements ComponentInteractionOriginalMessageUpdater {
+
     private final MessageComponentInteractionImpl interaction;
 
     /**
@@ -16,12 +17,11 @@ public class ComponentInteractionOriginalMessageUpdaterImpl
      * @param interaction The interaction to use.
      */
     public ComponentInteractionOriginalMessageUpdaterImpl(MessageComponentInteraction interaction) {
-        super(ComponentInteractionOriginalMessageUpdater.class);
         this.interaction = (MessageComponentInteractionImpl) interaction;
     }
 
     @Override
     public CompletableFuture<Void> update() {
-        return this.delegate.updateOriginalMessage(interaction);
+        return delegate.updateOriginalMessage(interaction);
     }
 }

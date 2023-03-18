@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 public class InteractionFollowupMessageBuilderImpl
         extends ExtendedInteractionMessageBuilderBaseImpl<InteractionFollowupMessageBuilder>
         implements InteractionFollowupMessageBuilder {
+
     private final InteractionImpl interaction;
 
     /**
@@ -17,13 +18,12 @@ public class InteractionFollowupMessageBuilderImpl
      * @param interaction The interaction to use.
      */
     public InteractionFollowupMessageBuilderImpl(InteractionBase interaction) {
-        super(InteractionFollowupMessageBuilder.class);
         this.interaction = (InteractionImpl) interaction;
     }
 
     @Override
     public CompletableFuture<Message> send() {
-        return this.delegate.sendFollowupMessage(interaction);
+        return delegate.sendFollowupMessage(interaction);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class InteractionFollowupMessageBuilderImpl
 
     @Override
     public CompletableFuture<Message> update(String messageId) {
-        return this.delegate.editFollowupMessage(interaction, messageId);
+        return delegate.editFollowupMessage(interaction, messageId);
     }
 }

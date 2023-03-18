@@ -1,19 +1,10 @@
 package org.javacord.api.entity.message.internal;
 
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.interaction.InteractionBase;
-import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
 public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDelegate {
-
-    /**
-     * Sets the interaction message flags of the message.
-     *
-     * @param messageFlags The message flags of the message.
-     */
-    void setFlags(EnumSet<MessageFlag> messageFlags);
 
     /**
      * Sends the message.

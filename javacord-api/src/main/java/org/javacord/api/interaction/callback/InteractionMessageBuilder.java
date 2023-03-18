@@ -1,23 +1,12 @@
 package org.javacord.api.interaction.callback;
 
-import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.MessageDecoration;
-import org.javacord.api.entity.message.MessageFlag;
-import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegate;
-import org.javacord.api.entity.message.mention.AllowedMentions;
+import org.javacord.api.entity.message.internal.MessageBuilderBaseDelegate;
 import org.javacord.api.interaction.InteractionBase;
 import org.javacord.api.util.internal.DelegateFactory;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -33,8 +22,8 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
      * Sends the first response message.
      * This can only be done once after you want to respond to an interaction the FIRST time.
      * Responding directly to an interaction limits you to not being able to upload anything.
-     * Therefore i.e. {@link EmbedBuilder#setFooter(String, File)} will not work and you have to use the String methods
-     * for attachments like {@link EmbedBuilder#setFooter(String, String)} if available.
+     * Therefore, i.e. {@link EmbedBuilder#setFooter(String, File)} will not work, and you have to use the
+     * String methods for attachments like {@link EmbedBuilder#setFooter(String, String)} if available.
      * If you want to upload attachments use {@link #editOriginalResponse(InteractionBase)} instead.
      *
      * @param interaction The interaction.
@@ -130,134 +119,8 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
     }
 
     @Override
-    public InteractionMessageBuilder appendCode(String language, String code) {
-        delegate.appendCode(language, code);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder append(String message, MessageDecoration... decorations) {
-        delegate.append(message, decorations);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder append(Mentionable entity) {
-        delegate.append(entity);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder append(Object object) {
-        delegate.append(object);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder appendNamedLink(final String name, final String url) {
-        delegate.appendNamedLink(name, url);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder appendNewLine() {
-        delegate.appendNewLine();
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder setContent(String content) {
-        delegate.setContent(content);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addEmbed(EmbedBuilder embed) {
-        delegate.addEmbed(embed);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addEmbeds(EmbedBuilder... embeds) {
-        delegate.addEmbeds(Arrays.asList(embeds));
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addEmbeds(List<EmbedBuilder> embeds) {
-        delegate.addEmbeds(embeds);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addComponents(HighLevelComponent... components) {
-        delegate.addComponents(components);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder removeAllComponents() {
-        delegate.removeAllComponents();
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder removeComponent(int index) {
-        delegate.removeComponent(index);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder removeComponent(HighLevelComponent component) {
-        delegate.removeComponent(component);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder removeEmbed(EmbedBuilder embed) {
-        delegate.removeEmbed(embed);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder removeEmbeds(EmbedBuilder... embeds) {
-        delegate.removeEmbeds(embeds);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder removeAllEmbeds() {
-        delegate.removeAllEmbeds();
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder setTts(boolean tts) {
-        delegate.setTts(tts);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder setAllowedMentions(AllowedMentions allowedMentions) {
-        delegate.setAllowedMentions(allowedMentions);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder setFlags(MessageFlag... messageFlags) {
-        setFlags(EnumSet.copyOf(Arrays.asList(messageFlags)));
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder setFlags(EnumSet<MessageFlag> messageFlags) {
-        delegate.setFlags(messageFlags);
-        return this;
-    }
-
-    @Override
-    public StringBuilder getStringBuilder() {
-        return delegate.getStringBuilder();
+    public MessageBuilderBaseDelegate getDelegate() {
+        return delegate;
     }
 
     @Override
@@ -272,147 +135,4 @@ public class InteractionMessageBuilder implements ExtendedInteractionMessageBuil
         return this;
     }
 
-    @Override
-    public InteractionMessageBuilder addAttachment(BufferedImage image, String fileName) {
-        addAttachment(image, fileName, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(BufferedImage image, String fileName, String description) {
-        delegate.addAttachment(image, fileName,  description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(File file) {
-        addAttachment(file, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(File file, String description) {
-        delegate.addAttachment(file, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(Icon icon) {
-        delegate.addAttachment(icon, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(Icon icon, String description) {
-        delegate.addAttachment(icon, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(URL url) {
-        delegate.addAttachment(url, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(URL url, String description) {
-        delegate.addAttachment(url, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(byte[] bytes, String fileName) {
-        addAttachment(bytes, fileName, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(byte[] bytes, String fileName, String description) {
-        delegate.addAttachment(bytes, fileName, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(InputStream stream, String fileName) {
-        addAttachment(stream, fileName, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachment(InputStream stream, String fileName, String description) {
-        delegate.addAttachment(stream, fileName, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName) {
-        addAttachment(image, "SPOILER_" + fileName, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(BufferedImage image, String fileName, String description) {
-        delegate.addAttachment(image, "SPOILER_" + fileName, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(File file) {
-        addAttachmentAsSpoiler(file, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(File file, String description) {
-        delegate.addAttachmentAsSpoiler(file, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(Icon icon) {
-        addAttachmentAsSpoiler(icon, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(Icon icon, String description) {
-        delegate.addAttachmentAsSpoiler(icon, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(URL url) {
-        addAttachmentAsSpoiler(url, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(URL url, String description) {
-        delegate.addAttachmentAsSpoiler(url, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName) {
-        addAttachment(bytes, "SPOILER_" + fileName, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(byte[] bytes, String fileName, String description) {
-        delegate.addAttachment(bytes, "SPOILER_" + fileName, description);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName) {
-        addAttachment(stream, "SPOILER_" + fileName, null);
-        return this;
-    }
-
-    @Override
-    public InteractionMessageBuilder addAttachmentAsSpoiler(InputStream stream, String fileName, String description) {
-        delegate.addAttachment(stream, "SPOILER_" + fileName, description);
-        return this;
-    }
 }
