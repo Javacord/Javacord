@@ -233,7 +233,7 @@ They are sorted alphabetically that means that the order does not reflect the us
 
 * [**Command Framework**](https://github.com/Vampire/command-framework) by [@Vampire](https://github.com/Vampire)
   * A generic CDI-based command framework.
-* [**Discord Interaction Handler**](https://github.com/KILLEliteMaste/discord-interaction-handler) by [@KILLEliteMaste](https://github.com/KILLEliteMaste)
+* [**Discord Interaction Handler**](https://github.com/felldo/discord-interaction-handler) by [@felldo](https://github.com/felldo)
   * Easy to use interaction handler to conveniently work with any Discord interaction (slash, context menu, auto complete...) or component interaction.
 * [**KCommando Framework**](https://github.com/koply/KCommando) by [@koply](https://github.com/koply)
   * Annotation-based multifunctional command handler framework for JDA & Javacord.
