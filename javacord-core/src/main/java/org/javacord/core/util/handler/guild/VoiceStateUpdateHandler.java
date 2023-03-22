@@ -71,7 +71,9 @@ public class VoiceStateUpdateHandler extends PacketHandler {
             }
         }
 
-        if (api.getYourself().getId() == userId) {
+        // Channel ID can be null in case the bot gets kicked.
+        // In that case the audio remove logic is executed in #handleServerVoiceChannel
+        if (api.getYourself().getId() == userId && packet.hasNonNull("channel_id")) {
             handleSelf(packet);
         }
     }
