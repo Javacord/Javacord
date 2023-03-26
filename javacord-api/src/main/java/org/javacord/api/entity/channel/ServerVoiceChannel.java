@@ -1,8 +1,7 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.audio.AudioConnection;
-import org.javacord.api.entity.member.Member;
-import org.javacord.api.entity.permission.PermissionType;
+import org.javacord.api.entity.channel.internal.permissions.ServerChannelVoicePermissions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelAttachableListenerManager;
 
@@ -15,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a server voice channel.
  */
 public interface ServerVoiceChannel extends VoiceChannel, TextableRegularServerChannel,
-                                            ServerVoiceChannelAttachableListenerManager {
+        ServerChannelVoicePermissions, ServerVoiceChannelAttachableListenerManager {
 
     /**
      * Connects to the voice channel self-deafened and disconnects any existing connections in the server.
@@ -29,7 +28,7 @@ public interface ServerVoiceChannel extends VoiceChannel, TextableRegularServerC
     /**
      * Connects to the voice channel and disconnects any existing connections in the server.
      *
-     * @param muted Whether to connect self-muted.
+     * @param muted    Whether to connect self-muted.
      * @param deafened Whether to connect self-deafened.
      * @return The audio connection.
      */
@@ -92,156 +91,6 @@ public interface ServerVoiceChannel extends VoiceChannel, TextableRegularServerC
      */
     default boolean isConnected(User user) {
         return isConnected(user.getId());
-    }
-
-    /**
-     * Checks if the given member is a priority speaker in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member is a priority speaker or not.
-     */
-    default boolean isPrioritySpeaker(Member member) {
-        return hasAnyPermission(member, PermissionType.ADMINISTRATOR, PermissionType.PRIORITY_SPEAKER)
-                || hasPermissions(member, PermissionType.PRIORITY_SPEAKER, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the given member can connect to the voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can connect or not.
-     */
-    default boolean canConnect(Member member) {
-        return hasAnyPermission(member, PermissionType.ADMINISTRATOR, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can connect to the voice channel.
-     *
-     * @return Whether the user of the connected account can connect or not.
-     */
-    default boolean canYouConnect() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canConnect).orElse(false);
-    }
-
-    /**
-     * Checks if the given member can mute users in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can mute users or not.
-     */
-    default boolean canMuteUsers(Member member) {
-        return hasPermission(member, PermissionType.ADMINISTRATOR)
-                || hasPermissions(member, PermissionType.MUTE_MEMBERS, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can mute users in this voice channel.
-     *
-     * @return Whether the user of the connected account can mute users or not.
-     */
-    default boolean canYouMuteUsers() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canMuteUsers).orElse(false);
-    }
-
-    /**
-     * Checks if the given member can speak in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can speak or not.
-     */
-    default boolean canSpeak(Member member) {
-        return hasPermission(member, PermissionType.ADMINISTRATOR)
-                || hasPermissions(member, PermissionType.SPEAK, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can speak in this voice channel.
-     *
-     * @return Whether the user of the connected account can speak or not.
-     */
-    default boolean canYouSpeak() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canSpeak).orElse(false);
-    }
-
-    /**
-     * Checks if the given member can use video in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can use video or not.
-     */
-    default boolean canUseVideo(Member member) {
-        return hasPermission(member, PermissionType.ADMINISTRATOR)
-                || hasPermissions(member, PermissionType.STREAM, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can use video in this voice channel.
-     *
-     * @return Whether the user of the connected account can use video or not.
-     */
-    default boolean canYouUseVideo() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canUseVideo).orElse(false);
-    }
-
-    /**
-     * Checks if the given member can move users in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can move users or not.
-     */
-    default boolean canMoveUsers(Member member) {
-        return hasPermission(member, PermissionType.ADMINISTRATOR)
-                || hasPermissions(member, PermissionType.MOVE_MEMBERS, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can move users in this voice channel.
-     *
-     * @return Whether the user of the connected account can move users or not.
-     */
-    default boolean canYouMoveUsers() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canMoveUsers).orElse(false);
-    }
-
-    /**
-     * Checks if the given member can use voice activation in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can use voice activation or not.
-     */
-    default boolean canUseVoiceActivation(Member member) {
-        return hasAnyPermission(member, PermissionType.ADMINISTRATOR)
-                || hasPermissions(member, PermissionType.USE_VOICE_ACTIVITY, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can use voice activation in this voice channel.
-     *
-     * @return Whether the user of the connected account can use voice activation or not.
-     */
-    default boolean canYouUseVoiceActivation() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canUseVoiceActivation).orElse(false);
-    }
-
-    /**
-     * Checks if the given member can deafen users in this voice channel.
-     *
-     * @param member The member to check.
-     * @return Whether the given member can deafen users or not.
-     */
-    default boolean canDeafenUsers(Member member) {
-        return hasPermission(member, PermissionType.ADMINISTRATOR)
-                || hasPermissions(member, PermissionType.DEAFEN_MEMBERS, PermissionType.CONNECT);
-    }
-
-    /**
-     * Checks if the user of the connected account can deafen users in this voice channel.
-     *
-     * @return Whether the user of the connected account can deafen users or not.
-     */
-    default boolean canYouDeafenUsers() {
-        return getServer().getMemberById(getApi().getClientId()).map(this::canDeafenUsers).orElse(false);
     }
 
     /**

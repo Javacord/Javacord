@@ -529,7 +529,6 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
 
     /**
      * Gets a user of the connected account.
-     * This may be a bot user (for normal bots), or a regular user (for client-bots).
      *
      * @return The user of the connected account.
      */

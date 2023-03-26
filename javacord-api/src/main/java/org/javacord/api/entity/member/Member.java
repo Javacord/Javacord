@@ -304,8 +304,8 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
     }
 
     /**
-     * Checks if the given user can ban the other user.
-     * This method also considers the position of the user roles and the owner.
+     * Checks if the given member can ban the other member.
+     * This method also considers the position of the member roles and the owner.
      *
      * @param userToBan The user which should be banned.
      * @return Whether the given user can ban the other user or not.

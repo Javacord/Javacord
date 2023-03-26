@@ -3,6 +3,8 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.DiscordEntity;
+import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
@@ -152,5 +154,10 @@ public class ServerVoiceChannelImpl extends TextableRegularServerChannelImpl
     @Override
     public String toString() {
         return String.format("ServerVoiceChannel (id: %s, name: %s)", getIdAsString(), getName());
+    }
+
+    @Override
+    public RegularServerChannel getPermissionableChannel() {
+        return this;
     }
 }

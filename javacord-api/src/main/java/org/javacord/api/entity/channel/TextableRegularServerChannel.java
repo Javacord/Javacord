@@ -1,8 +1,7 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.Mentionable;
-import org.javacord.api.entity.permission.PermissionType;
-import org.javacord.api.entity.user.User;
+import org.javacord.api.entity.channel.internal.permissions.ServerChannelTextPermissions;
 import org.javacord.api.entity.webhook.WebhookBuilder;
 import org.javacord.api.listener.channel.server.textable.TextableRegularServerChannelAttachableListenerManager;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public interface TextableRegularServerChannel extends TextChannel, RegularServerChannel,
-        TextableRegularServerChannelAttachableListenerManager, Mentionable, Categorizable {
+        ServerChannelTextPermissions, TextableRegularServerChannelAttachableListenerManager, Mentionable, Categorizable {
 
     @Override
     default boolean canWrite(User user) {

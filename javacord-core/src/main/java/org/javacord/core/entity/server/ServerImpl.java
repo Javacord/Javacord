@@ -1207,6 +1207,12 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public Member getYourself() {
+        return getMemberById(api.getClientId()).orElseThrow(() ->
+                new IllegalStateException("The member of the bot user is not present in the server cache"));
+    }
+
+    @Override
     public Optional<AudioConnection> getAudioConnection() {
         return Optional.ofNullable(api.getAudioConnectionByServerId(getId()));
     }
