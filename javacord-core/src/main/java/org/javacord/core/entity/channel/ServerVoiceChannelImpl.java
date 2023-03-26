@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.util.cache.MessageCache;
@@ -226,5 +227,10 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     @Override
     public void cleanup() {
         messageCache.cleanup();
+    }
+
+    @Override
+    public RegularServerChannel getPermissionableChannel() {
+        return this;
     }
 }

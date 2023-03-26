@@ -191,13 +191,14 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     @Override
     public Optional<Member> getMemberValue() {
         return Optional.ofNullable(userValue)
-                .map(id -> resolvedMembers.get(userValue).getServer().getMemberById(id).orElseGet(() -> resolvedMembers.get(id)));
+                .map(id -> resolvedMembers.get(userValue).getServer().getMemberById(id)
+                        .orElseGet(() -> resolvedMembers.get(id)));
     }
 
     @Override
     public Optional<CompletableFuture<Member>> requestMemberValue() {
         return Optional.ofNullable(userValue)
-                .map(aLong ->  resolvedMembers.get(aLong).getServer().requestMemberById(aLong));
+                .map(aLong -> resolvedMembers.get(aLong).getServer().requestMemberById(aLong));
     }
 
     @Override

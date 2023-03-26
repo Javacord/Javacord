@@ -14,6 +14,11 @@ public interface ServerTextChannel extends RegularServerChannel, TextableRegular
         ServerTextChannelAttachableListenerManager {
 
     @Override
+    default RegularServerChannel getPermissionableChannel() {
+        return this;
+    }
+
+    @Override
     default String getMentionTag() {
         return "<#" + getIdAsString() + ">";
     }

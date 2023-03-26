@@ -1598,19 +1598,19 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     /**
      * Checks if the given user can delete this message.
      *
-     * @param user The user to check.
+     * @param member The user to check.
      * @return Whether the given user can delete the message or not.
      */
-    default boolean canDelete(User user) {
+    default boolean canDelete(Member member) {
         // You cannot delete messages in channels you cannot see
-        if (!getChannel().canSee(user)) {
+        if (!getChannel().canSee(member.getUser())) {
             return false;
         }
         // The user can see the message and is the author
-        if (getAuthor().asUser().orElse(null) == user) {
+        if (getAuthor().asMember().map(DiscordEntity::getId).orElse(0L) == member.getId()) {
             return true;
         }
-        return getServerTextChannel().map(channel -> channel.canManageMessages(user)).orElse(false);
+        return getServerTextChannel().map(channel -> channel.canManageMessages(member)).orElse(false);
     }
 
     /**
@@ -1664,7 +1664,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return Whether the user of the connected account can delete the message or not.
      */
     default boolean canYouDelete() {
-        return canDelete(getApi().getYourself());
+        return getServer().map(server -> canDelete(server.getYourself())).orElse(false);
     }
 
     @Override

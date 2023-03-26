@@ -1,5 +1,6 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.channel.server.ChannelCategoryAttachableListenerManager;
 
@@ -40,14 +41,14 @@ public interface ChannelCategory extends RegularServerChannel, ChannelCategoryAt
     }
 
     /**
-     * Checks if the given user can see all channels in this category.
+     * Checks if the given member can see all channels in this category.
      *
-     * @param user The user to check.
+     * @param member The member to check.
      * @return Whether the given user can see all channels in this category or not.
      */
-    default boolean canSeeAll(User user) {
+    default boolean canSeeAll(Member member) {
         for (ServerChannel channel : getChannels()) {
-            if (!channel.canSee(user)) {
+            if (!channel.canSee(member.getUser())) {
                 return false;
             }
         }
@@ -60,7 +61,7 @@ public interface ChannelCategory extends RegularServerChannel, ChannelCategoryAt
      * @return Whether the user of the connected account can see all channels in this category or not.
      */
     default boolean canYouSeeAll() {
-        return canSeeAll(getApi().getYourself());
+        return canSeeAll(getServer().getYourself());
     }
 
     /**

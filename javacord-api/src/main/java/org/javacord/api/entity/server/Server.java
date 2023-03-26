@@ -60,6 +60,13 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
         ServerAttachableListenerManager {
 
     /**
+     * Gets a member of the connected account.
+     *
+     * @return The member of the connected account.
+     */
+    Member getYourself();
+
+    /**
      * Gets the audio connection in this server.
      *
      * @return The audio connection in this server.
