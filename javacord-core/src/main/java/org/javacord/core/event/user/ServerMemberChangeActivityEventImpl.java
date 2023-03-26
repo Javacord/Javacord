@@ -2,15 +2,17 @@ package org.javacord.core.event.user;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.activity.Activity;
-import org.javacord.api.event.user.UserChangeActivityEvent;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.event.server.member.ServerMemberChangeActivityEvent;
 
 import java.util.Collections;
 import java.util.Set;
 
 /**
- * The implementation of {@link UserChangeActivityEvent}.
+ * The implementation of {@link ServerMemberChangeActivityEvent}.
  */
-public class UserChangeActivityEventImpl extends OptionalUserEventImpl implements UserChangeActivityEvent {
+public class ServerMemberChangeActivityEventImpl extends OptionalUserEventImpl implements
+        ServerMemberChangeActivityEvent {
 
     /**
      * The new activities of the user.
@@ -30,8 +32,8 @@ public class UserChangeActivityEventImpl extends OptionalUserEventImpl implement
      * @param newActivities The new activities of the user.
      * @param oldActivities The old activities of the user.
      */
-    public UserChangeActivityEventImpl(DiscordApi api, long userId, Set<Activity> newActivities,
-                                       Set<Activity> oldActivities) {
+    public ServerMemberChangeActivityEventImpl(DiscordApi api, long userId, Set<Activity> newActivities,
+                                               Set<Activity> oldActivities) {
         super(api, userId);
         this.newActivities = newActivities;
         this.oldActivities = oldActivities;
@@ -47,4 +49,8 @@ public class UserChangeActivityEventImpl extends OptionalUserEventImpl implement
         return Collections.unmodifiableSet(newActivities);
     }
 
+    @Override
+    public Server getServer() {
+        return null;
+    }
 }
