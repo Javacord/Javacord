@@ -3,6 +3,7 @@ package org.javacord.core.util.handler.interaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.event.interaction.AutocompleteCreateEvent;
@@ -64,7 +65,9 @@ public class InteractionCreateHandler extends PacketHandler {
 
             // Check if this interaction comes from a guild or a DM
             if (packet.hasNonNull("guild_id")) {
-                channel = api.getTextChannelById(channelId).orElse(null);
+                channel = api.getServerChannelById(channelId)
+                        .flatMap(ServerChannel::asTextableRegularServerChannel)
+                        .orElseThrow(AssertionError::new);
             } else {
                 UserImpl user = new UserImpl(api, packet.get("user"), (MemberImpl) null, null);
                 channel = PrivateChannelImpl.getOrCreatePrivateChannel(api, channelId, user.getId(), user);
