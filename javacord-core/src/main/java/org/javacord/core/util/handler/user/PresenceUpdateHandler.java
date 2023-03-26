@@ -7,12 +7,12 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordClient;
 import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.user.UserStatus;
-import org.javacord.api.event.user.UserChangeActivityEvent;
+import org.javacord.api.event.server.member.ServerMemberChangeActivityEvent;
 import org.javacord.api.event.user.UserChangeStatusEvent;
 import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.entity.user.UserPresence;
-import org.javacord.core.event.user.UserChangeActivityEventImpl;
+import org.javacord.core.event.user.ServerMemberChangeActivityEventImpl;
 import org.javacord.core.event.user.UserChangeStatusEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
@@ -76,10 +76,13 @@ public class PresenceUpdateHandler extends PacketHandler {
         } else {
             newStatus = oldStatus;
         }
+
         Map<DiscordClient, UserStatus> oldClientStatus = api.getEntityCache().get().getUserPresenceCache()
                 .getPresenceByUserId(userId)
                 .map(UserPresence::getClientStatus)
+                .map(HashMap::ofEntries)
                 .orElse(HashMap.empty());
+
         for (DiscordClient client : DiscordClient.values()) {
             if (packet.has("client_status")) {
                 JsonNode clientStatus = packet.get("client_status");
@@ -92,12 +95,13 @@ public class PresenceUpdateHandler extends PacketHandler {
                 }
             }
         }
+
+        api.updateUserPresence(userId, p -> presence.get());
+
         Map<DiscordClient, UserStatus> newClientStatus = api.getEntityCache().get().getUserPresenceCache()
                 .getPresenceByUserId(userId)
                 .map(UserPresence::getClientStatus)
                 .orElse(HashMap.empty());
-
-        api.updateUserPresence(userId, p -> presence.get());
 
         dispatchUserStatusChangeEventIfChangeDetected(userId, newStatus, oldStatus, newClientStatus, oldClientStatus);
     }
@@ -105,9 +109,10 @@ public class PresenceUpdateHandler extends PacketHandler {
     private void dispatchUserActivityChangeEvent(long userId, Set<Activity> newActivities,
                                                  Set<Activity> oldActivities) {
         UserImpl user = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
-        UserChangeActivityEvent event = new UserChangeActivityEventImpl(api, userId, newActivities, oldActivities);
+        ServerMemberChangeActivityEvent
+                event = new ServerMemberChangeActivityEventImpl(api, userId, newActivities, oldActivities);
 
-        api.getEventDispatcher().dispatchUserChangeActivityEvent(
+        api.getEventDispatcher().dispatchServerMemberChangeActivityEvent(
                 api,
                 user == null ? Collections.emptySet() : user.getMutualServers(),
                 user == null ? Collections.emptySet() : Collections.singleton(user),
@@ -121,11 +126,11 @@ public class PresenceUpdateHandler extends PacketHandler {
         UserImpl user = api.getCachedUserById(userId).map(UserImpl.class::cast).orElse(null);
         // Only dispatch the event if something changed
         boolean shouldDispatch = false;
-        if (newClientStatus != oldClientStatus) {
-            shouldDispatch = true;
-        }
+
         for (DiscordClient client : DiscordClient.values()) {
-            if (newClientStatus.get(client) != oldClientStatus.get(client)) {
+            if (newClientStatus.get(client)
+                    .filter(userStatus -> oldClientStatus.get(client).getOrElse(() -> null) != userStatus)
+                    .isDefined()) {
                 shouldDispatch = true;
             }
         }
