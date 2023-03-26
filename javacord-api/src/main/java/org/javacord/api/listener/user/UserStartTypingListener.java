@@ -1,10 +1,11 @@
-package org.javacord.api.listener.server.member;
+package org.javacord.api.listener.user;
 
-import org.javacord.api.event.server.member.ServerMemberUserStartTypingEvent;
+import org.javacord.api.event.server.member.UserStartTypingEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.channel.TextChannelAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
+import org.javacord.api.listener.server.member.ServerMemberAttachableListener;
 import org.javacord.api.listener.user.UserAttachableListener;
 
 /**
@@ -13,7 +14,7 @@ import org.javacord.api.listener.user.UserAttachableListener;
  * It also stops if the user sent a message.
  */
 @FunctionalInterface
-public interface ServerMemberStartTypingListener extends ServerMemberAttachableListener, ServerAttachableListener,
+public interface UserStartTypingListener extends ServerMemberAttachableListener, ServerAttachableListener,
         UserAttachableListener, TextChannelAttachableListener, GloballyAttachableListener,
         ObjectAttachableListener {
 
@@ -22,5 +23,5 @@ public interface ServerMemberStartTypingListener extends ServerMemberAttachableL
      *
      * @param event The event.
      */
-    void onUserStartTyping(ServerMemberUserStartTypingEvent event);
+    void onUserStartTyping(UserStartTypingEvent event);
 }

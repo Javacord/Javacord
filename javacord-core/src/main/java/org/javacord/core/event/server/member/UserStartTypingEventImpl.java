@@ -3,14 +3,14 @@ package org.javacord.core.event.server.member;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.event.server.member.ServerMemberUserStartTypingEvent;
+import org.javacord.api.event.server.member.UserStartTypingEvent;
 import org.javacord.core.event.EventImpl;
 import java.util.Optional;
 
 /**
- * The implementation of {@link ServerMemberUserStartTypingEvent}.
+ * The implementation of {@link UserStartTypingEvent}.
  */
-public class ServerMemberUserStartTypingEventImpl extends EventImpl implements ServerMemberUserStartTypingEvent {
+public class UserStartTypingEventImpl extends EventImpl implements UserStartTypingEvent {
 
     private final TextChannel channel;
     private final long userId;
@@ -23,7 +23,7 @@ public class ServerMemberUserStartTypingEventImpl extends EventImpl implements S
      * @param userId  The id of the user of the event.
      * @param member  The member of the event.
      */
-    public ServerMemberUserStartTypingEventImpl(TextChannel channel, long userId, Member member) {
+    public UserStartTypingEventImpl(TextChannel channel, long userId, Member member) {
         super(channel.getApi());
         this.channel = channel;
         this.userId = userId;
@@ -44,4 +44,10 @@ public class ServerMemberUserStartTypingEventImpl extends EventImpl implements S
     public Optional<User> getUser() {
         return Optional.ofNullable(member).map(Member::getUser);
     }
+
+    @Override
+    public Optional<Member> getMember() {
+        return Optional.ofNullable(member);
+    }
+
 }
