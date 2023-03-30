@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      - uses: gradle/gradle-build-action@v2
       - name: Read Version
         id: read-version
         run: |

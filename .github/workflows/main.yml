@@ -20,6 +20,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11
+      - uses: gradle/gradle-build-action@v2
       - name: Build project
         run: ./gradlew build -x test
       - name: Run tests
