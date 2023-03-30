@@ -11,7 +11,7 @@ jobs:
     name : Prepare Release - Update Readme and Remove Snapshot Suffix
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Remove Snapshot Suffix
       run: |
         sed -i -E "s/(version \= .*)-SNAPSHOT/\1/g" gradle.properties
