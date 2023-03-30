@@ -15,7 +15,7 @@ jobs:
     - uses: gradle/gradle-build-action@v2
     - name: Remove Snapshot Suffix
       run: |
-        sed -i -E "s/(version \= .*)-SNAPSHOT/\1/g" gradle.
+        sed -i -E "s/(version \= .*)-SNAPSHOT/\1/g" gradle.properties
     - name: Update Readme File
       run: |
         ./gradlew updateReadme
