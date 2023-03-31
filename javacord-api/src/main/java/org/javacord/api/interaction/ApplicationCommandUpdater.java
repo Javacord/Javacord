@@ -124,7 +124,7 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
     }
 
     /**
-     * Sets the slash command as nsfw.
+     * Sets whether the command is nsfw.
      *
      * @param nsfw Whether the command is nsfw.
      * @return The current instance in order to chain call methods.
