@@ -111,7 +111,7 @@ public abstract class ApplicationCommandImpl implements ApplicationCommand {
 
     @Override
     public boolean isDisabledByDefault() {
-        return defaultMemberPermission.isEmpty();
+        return defaultMemberPermission != null && defaultMemberPermission.isEmpty();
     }
 
     @Override
