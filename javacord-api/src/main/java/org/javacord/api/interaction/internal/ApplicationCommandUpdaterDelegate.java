@@ -69,6 +69,13 @@ public interface ApplicationCommandUpdaterDelegate<T extends ApplicationCommand>
     void setEnabledInDms(boolean enabledInDms);
 
     /**
+     * Sets whether the command is nsfw.
+     *
+     * @param nsfw Whether the command is nsfw.
+     */
+    void setNsfw(boolean nsfw);
+
+    /**
      * Performs the queued update.
      *
      * @param api The DiscordApi.
