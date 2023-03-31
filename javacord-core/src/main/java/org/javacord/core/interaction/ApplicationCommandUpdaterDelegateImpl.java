@@ -27,7 +27,7 @@ public abstract class ApplicationCommandUpdaterDelegateImpl<T extends Applicatio
 
     protected Boolean dmPermission = null;
 
-    protected Boolean nsfw = false;
+    protected Boolean nsfw = null;
 
     @Override
     public void setName(String name) {
@@ -105,6 +105,8 @@ public abstract class ApplicationCommandUpdaterDelegateImpl<T extends Applicatio
             body.put("dm_permission", dmPermission);
         }
 
-        body.put("nsfw", nsfw);
+        if (nsfw != null) {
+            body.put("nsfw", nsfw);
+        }
     }
 }
