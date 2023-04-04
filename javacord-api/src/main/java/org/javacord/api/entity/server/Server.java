@@ -3167,7 +3167,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     default boolean canManageEmojis(User user) {
         return hasAnyPermission(user,
                 PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_EMOJIS);
+                PermissionType.MANAGE_GUILD_EXPRESSIONS);
     }
 
     /**
