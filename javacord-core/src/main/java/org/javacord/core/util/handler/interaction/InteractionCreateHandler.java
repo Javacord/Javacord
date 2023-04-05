@@ -59,8 +59,8 @@ public class InteractionCreateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         TextChannel channel = null;
-        if (packet.hasNonNull("channel_id")) {
-            long channelId = packet.get("channel_id").asLong();
+        if (packet.hasNonNull("channel")) {
+            long channelId = packet.get("channel").get("id").asLong();
 
             // Check if this interaction comes from a guild or a DM
             if (packet.hasNonNull("guild_id")) {
