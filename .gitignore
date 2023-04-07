@@ -17,3 +17,6 @@
 
 # Other
 CHANGELOG.md
+
+# Test files
+/javacord-core/src/test/java/org/javacord/testing/

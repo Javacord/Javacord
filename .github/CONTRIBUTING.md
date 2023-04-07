@@ -17,7 +17,7 @@ While there are no strict rules for commit messages, it is strongly recommended 
 When you create pull requests, make sure your changes work by testing them.
 If your PR is untested, please mark it as a draft.
 There are 2 easy ways to test your changes:
-1. Create a Test file in the Javacord project `./javacord-core/src/main/java/org/javacord/core/Testfile.java` and put your code in a main method(Be careful to **NOT** add the file to your VCS and commit it!). Then you just need to log in with a bot, and you can verify if your changes are working properly by using your changes.
+1. Create a Test class with any name in the Javacord core test folder.  `./javacord-core/src/test/java/org/javacord/testing`. A sample class can be seen in the class SampleTestBot in the same folder, please don't edit. Then you just need to log in with a bot, and you can verify if your changes are working properly by using your changes.
 2. Create a composite build with Gradle.
    1. Create a new Gradle project in the same directory as the Javacord project.
    2. Add `includeBuild("../Javacord")` to you `settings.gradle` in your created project.
