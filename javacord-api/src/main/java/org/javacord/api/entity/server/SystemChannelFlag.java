@@ -20,7 +20,15 @@ public enum SystemChannelFlag {
     /**
      * Hide member join sticker reply buttons.
      */
-    SUPPRESS_JOIN_NOTIFICATION_REPLIES(1 << 3);
+    SUPPRESS_JOIN_NOTIFICATION_REPLIES(1 << 3),
+    /**
+     * Suppress role subscription purchase and renewal notifications.
+     */
+    SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATIONS(1 << 4),
+    /**
+     * Hide role subscription sticker reply buttons.
+     */
+    SUPPRESS_ROLE_SUBSCRIPTION_PURCHASE_NOTIFICATION_REPLIES(1 << 5);
 
     private final int flag;
 
