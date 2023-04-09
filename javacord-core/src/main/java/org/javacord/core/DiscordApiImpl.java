@@ -42,7 +42,6 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.user.UserStatus;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
-import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.interaction.ApplicationCommand;
 import org.javacord.api.interaction.ApplicationCommandBuilder;
 import org.javacord.api.interaction.ApplicationCommandType;
@@ -2168,8 +2167,6 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         return messageCacheLock;
     }
 
-
-
     @Override
     @SuppressWarnings("unchecked")
     public Collection<ListenerManager<? extends GloballyAttachableListener>> addListener(
@@ -2186,13 +2183,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @SuppressWarnings("unchecked")
     public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener,
                                                                                  Set<Intent> requiredIntents) {
-        if (getIntents().stream().noneMatch(requiredIntents::contains)) {
-            logger.error("The listener {} requires one of the following intents {} but the bot only has "
-                    + "the intents {}", listenerClass.getSimpleName(), requiredIntents, getIntents());
+        LoggerUtil.logMissingRequiredIntentIfNotPresent(logger, listenerClass, requiredIntents, intents);
 
-            throw new MissingIntentException(String.format("The listener %s requires one of the following intents %s "
-                    + "but the bot only has the intents %s", listenerClass.getSimpleName(), requiredIntents, intents));
-        }
         return (ListenerManager<T>) listeners
                 .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
                 .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));

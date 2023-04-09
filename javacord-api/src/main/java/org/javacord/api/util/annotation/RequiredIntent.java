@@ -6,13 +6,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Specifies the intents that are required for the listeners and methods to work.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface RequiredIntent {
     /**
-     * The intent that is required.
+     * The intents that are required.
      *
-     * @return The intent that is required.
+     * @return The intents that are required.
      */
     Intent[] value();
 }

@@ -7,7 +7,7 @@ import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.util.annotation.RequiredIntent;
 
 /**
- * This listener listens to server nswf level changes.
+ * This listener listens to server nsfw level changes.
  */
 @FunctionalInterface
 @RequiredIntent({Intent.GUILDS})

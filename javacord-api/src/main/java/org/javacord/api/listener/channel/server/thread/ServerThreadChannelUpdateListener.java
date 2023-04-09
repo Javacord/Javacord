@@ -10,7 +10,6 @@ import org.javacord.api.listener.server.ServerAttachableListener;
  * This listener listens to thread updates.
  */
 @FunctionalInterface
-
 public interface ServerThreadChannelUpdateListener
         extends ServerAttachableListener, ServerThreadChannelAttachableListener,
         GloballyAttachableListener, ObjectAttachableListener {

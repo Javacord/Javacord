@@ -5,9 +5,9 @@ import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.intent.Intent;
-import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
+import org.javacord.api.util.annotation.RequiredIntent;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
@@ -134,6 +134,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private boolean userCacheEnabled = true;
 
     /**
+     * Whether warning for required intents for added listeners have already been dispatched.
+     */
+    private boolean alreadyDispatchedListenerWarning = false;
+
+    /**
      * The globally attachable listeners to register for every created DiscordApi instance.
      */
     private final Map<Class<? extends GloballyAttachableListener>,
@@ -208,6 +213,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      */
     @SuppressWarnings("unchecked")
     private void prepareListeners() {
+        if (!alreadyDispatchedListenerWarning) {
+            this.listeners.forEach((clazz, listenerList) -> {
+                if (clazz.isAnnotationPresent(RequiredIntent.class)) {
+                    LoggerUtil.logMissingRequiredIntentIfNotPresent(logger, clazz, intents,
+                            new HashSet<>(Arrays.asList(clazz.getAnnotation(RequiredIntent.class).value())));
+                }
+            });
+            alreadyDispatchedListenerWarning = true;
+        }
+
         if (preparedListeners != null && preparedUnspecifiedListeners != null) {
             // Already created, skip
             return;
@@ -445,21 +460,6 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
                 .whenComplete((nothing, throwable) -> api.disconnect());
     }
 
-    private void checkRequiredIntentsForListener(Class<?> listenerClass, Set<Intent> requiredIntents) {
-        if (intents.stream().noneMatch(requiredIntents::contains)) {
-            logger.error("The listener {} requires one of the following intents {} but the bot only has the "
-                            + "intents {}. If you believe this is wrong, keep in mind that you have to add the intents "
-                            + "before you add any listeners when building a DiscordApi.",
-                    listenerClass.getSimpleName(), requiredIntents, intents);
-
-            throw new MissingIntentException(String.format(
-                    "The listener %s requires one of the following intents %s but the bot only has the intents %s. "
-                            + "If you believe this is wrong, keep in mind that you have to add the intents before you "
-                            + "add any listeners when building a DiscordApi.",
-                    listenerClass.getName(), requiredIntents, intents));
-        }
-    }
-
     @Override
     @SuppressWarnings("unchecked")
     public <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener,
@@ -467,7 +467,6 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
         this.listeners.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<T> listeners = (List<T>) this.listeners.get(listenerClass);
         if (!listeners.contains(listener)) {
-            checkRequiredIntentsForListener(listenerClass, requiredIntents);
             listeners.add(listener);
         }
     }
