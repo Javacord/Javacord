@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -75,6 +76,16 @@ public class AttachmentImpl implements Attachment {
      * Whether this attachment is ephemeral.
      */
     private final Boolean ephemeral;
+    
+    /**
+     * The duration of the audio file.
+     */
+    private final Double durationSeconds;
+
+    /**
+     * The base64 encoded bytearray representing a sampled waveform.
+     */
+    private final String waveform;
 
     /**
      * Creates a new attachment.
@@ -93,6 +104,8 @@ public class AttachmentImpl implements Attachment {
         height = data.hasNonNull("height") ? data.get("height").asInt() : null;
         width = data.hasNonNull("width") ? data.get("width").asInt() : null;
         ephemeral = data.hasNonNull("ephemeral") ? data.get("ephemeral").asBoolean() : null;
+        durationSeconds = data.hasNonNull("duration_secs") ? data.get("duration_secs").doubleValue() : null;
+        waveform = data.hasNonNull("waveform") ? data.get("waveform").asText() : null;
     }
 
     @Override
@@ -153,6 +166,21 @@ public class AttachmentImpl implements Attachment {
     @Override
     public Optional<Boolean> isEphemeral() {
         return Optional.ofNullable(ephemeral);
+    }
+
+    @Override
+    public Optional<Double> getDurationSeconds() {
+        return Optional.ofNullable(durationSeconds);
+    }
+
+    @Override
+    public Optional<byte[]> getWaveForm() {
+        return Optional.ofNullable(waveform).map(Base64.getDecoder()::decode);
+    }
+
+    @Override
+    public Optional<String> getWaveFormBase64() {
+        return Optional.ofNullable(waveform);
     }
 
     @Override
