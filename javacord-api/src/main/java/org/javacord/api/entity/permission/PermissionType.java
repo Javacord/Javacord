@@ -181,7 +181,11 @@ public enum PermissionType {
     /**
      * Allows for using soundboard in a voice channel.
      */
-    USE_SOUNDBOARD(1L << 42);
+    USE_SOUNDBOARD(1L << 42),
+    /**
+     * Allows for sending voice messages in text channels.
+     */
+    SEND_VOICE_MESSAGES(1L << 46);
 
     /**
      * The value of the permission. A long where only one bit is set (e.g. <code>0b1000</code>).

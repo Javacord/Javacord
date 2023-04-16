@@ -56,6 +56,11 @@ public enum MessageFlag {
     SUPPRESS_NOTIFICATIONS(1 << 12),
 
     /**
+     * This message is a voice message.
+     */
+    IS_VOICE_MESSAGE(1 << 13),
+
+    /**
      * An unknown flag.
      */
     UNKNOWN(-1);

@@ -1,5 +1,7 @@
 package org.javacord.api.entity;
 
+import org.javacord.api.entity.message.MessageFlag;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,6 +80,30 @@ public interface Attachment extends DiscordEntity {
      * @return True if the attachment is ephemeral.
      */
     Optional<Boolean> isEphemeral();
+
+    /**
+     * Gets the duration of the audio file in seconds
+     * Only present if the message is of type {@link MessageFlag#IS_VOICE_MESSAGE}.
+     *
+     * @return The duration of the audio file in seconds.
+     */
+    Optional<Double> getDurationSeconds();
+
+    /**
+     * Gets the waveform data of this attachment.
+     * Only present if the message is of type {@link MessageFlag#IS_VOICE_MESSAGE}.
+     *
+     * @return A byte array of the waveform of the audio file.
+     */
+    Optional<byte[]> getWaveForm();
+
+    /**
+     * Gets the base64 encoded string of the waveform of the audio file
+     * Only present if the message is of type {@link MessageFlag#IS_VOICE_MESSAGE}.
+     * 
+     * @return The base64 encoded string of the waveform of the audio file.
+     */
+    Optional<String> getWaveFormBase64();
 
     /**
      * Downloads the attachment as an input stream.
