@@ -7,6 +7,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
+import org.javacord.api.util.annotation.RequiredIntent;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.util.gateway.DiscordWebSocketAdapter;
@@ -133,6 +134,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private boolean userCacheEnabled = true;
 
     /**
+     * Whether warning for required intents for added listeners have already been dispatched.
+     */
+    private boolean alreadyDispatchedListenerWarning = false;
+
+    /**
      * The globally attachable listeners to register for every created DiscordApi instance.
      */
     private final Map<Class<? extends GloballyAttachableListener>,
@@ -168,7 +174,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * Globally attachable listeners in need of subtype detection.
      */
-    private final List<Function<DiscordApi,GloballyAttachableListener>> unspecifiedListenerFunctions
+    private final List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListenerFunctions
             = new CopyOnWriteArrayList<>();
 
     /**
@@ -180,7 +186,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     /**
      * Unspecified listener sources for pre-registration, compiled into a single map.
      */
-    private volatile List<Function<DiscordApi,GloballyAttachableListener>> preparedUnspecifiedListeners;
+    private volatile List<Function<DiscordApi, GloballyAttachableListener>> preparedUnspecifiedListeners;
 
 
     @Override
@@ -207,6 +213,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
      */
     @SuppressWarnings("unchecked")
     private void prepareListeners() {
+        if (!alreadyDispatchedListenerWarning) {
+            this.listeners.forEach((clazz, listenerList) -> {
+                if (clazz.isAnnotationPresent(RequiredIntent.class)) {
+                    LoggerUtil.logMissingRequiredIntentIfNotPresent(logger, clazz, intents,
+                            new HashSet<>(Arrays.asList(clazz.getAnnotation(RequiredIntent.class).value())));
+                }
+            });
+            alreadyDispatchedListenerWarning = true;
+        }
+
         if (preparedListeners != null && preparedUnspecifiedListeners != null) {
             // Already created, skip
             return;
@@ -446,7 +462,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener) {
+    public <T extends GloballyAttachableListener> void addListener(Class<T> listenerClass, T listener,
+                                                                   Set<Intent> requiredIntents) {
         this.listeners.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<T> listeners = (List<T>) this.listeners.get(listenerClass);
         if (!listeners.contains(listener)) {
@@ -463,7 +480,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void addListener(
-            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier, Set<Intent> requiredIntents) {
         this.listenerSuppliers.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<Supplier<? extends GloballyAttachableListener>> listeners = this.listenerSuppliers.get(listenerClass);
         if (!listeners.contains(listenerSupplier)) {
@@ -480,7 +497,7 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
 
     @Override
     public <T extends GloballyAttachableListener> void addListener(
-            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction, Set<Intent> requiredIntents) {
         this.listenerFunctions.computeIfAbsent(listenerClass, clazz -> new CopyOnWriteArrayList<>());
         List<Function<DiscordApi, ? extends GloballyAttachableListener>> functions =
                 this.listenerFunctions.get(listenerClass);

@@ -1,11 +1,13 @@
 package org.javacord.api.listener.server.member;
 
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.event.server.member.ServerMemberLeaveEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.ObjectAttachableListener;
 import org.javacord.api.listener.server.ServerAttachableListener;
 import org.javacord.api.listener.server.ServerLeaveListener;
 import org.javacord.api.listener.user.UserAttachableListener;
+import org.javacord.api.util.annotation.RequiredIntent;
 
 /**
  * This listener listens to server member leaves.
@@ -13,6 +15,7 @@ import org.javacord.api.listener.user.UserAttachableListener;
  * {@code ServerMemberLeaveListener} is for other users and {@code ServerLeaveListener} is for yourself!
  */
 @FunctionalInterface
+@RequiredIntent({Intent.GUILD_MEMBERS})
 public interface ServerMemberLeaveListener extends ServerAttachableListener, UserAttachableListener,
         GloballyAttachableListener, ObjectAttachableListener {
 

@@ -15,6 +15,7 @@ import java.net.ProxySelector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
@@ -485,8 +486,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     @Override
-    public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(Class<T> listenerClass, T listener) {
-        delegate.addListener(listenerClass, listener);
+    public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(Class<T> listenerClass, T listener,
+                                                                                Set<Intent> requiredIntents) {
+        delegate.addListener(listenerClass, listener, requiredIntents);
         return this;
     }
 
@@ -498,8 +500,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(
-                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
-        delegate.addListener(listenerClass, listenerSupplier);
+                                            Class<T> listenerClass, Supplier<T> listenerSupplier,
+                                            Set<Intent> requiredIntents) {
+        delegate.addListener(listenerClass, listenerSupplier, requiredIntents);
         return this;
     }
 
@@ -511,8 +514,8 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(
-                                Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
-        delegate.addListener(listenerClass, listenerFunction);
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction, Set<Intent> requiredIntents) {
+        delegate.addListener(listenerClass, listenerFunction, requiredIntents);
         return this;
     }
 
@@ -542,7 +545,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder removeListenerSupplier(
-                                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier) {
         delegate.removeListenerSupplier(listenerClass, listenerSupplier);
         return this;
     }
@@ -555,7 +558,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder removeListenerFunction(
-                                                    Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
         delegate.removeListenerFunction(listenerClass, listenerFunction);
         return this;
     }

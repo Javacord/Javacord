@@ -12,8 +12,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        "classpath"(group = "com.fasterxml.jackson.core", name = "jackson-databind", version = "2.12.6")
-        "classpath"(group = "com.squareup.okhttp3", name = "okhttp", version = "4.9.3")
+        classpath("com.fasterxml.jackson.core:jackson-databind:2.12.6")
+        classpath("com.squareup.okhttp3:okhttp:4.9.3")
     }
 }
 

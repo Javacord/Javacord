@@ -1,8 +1,10 @@
 package org.javacord.api.listener.server;
 
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.event.server.ServerJoinEvent;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.listener.server.member.ServerMemberJoinListener;
+import org.javacord.api.util.annotation.RequiredIntent;
 
 /**
  * This listener listens to server joins.
@@ -10,6 +12,7 @@ import org.javacord.api.listener.server.member.ServerMemberJoinListener;
  * {@code ServerMemberJoinListener} is for other users and {@code ServerJoinListener} is for yourself!
  */
 @FunctionalInterface
+@RequiredIntent({Intent.GUILDS})
 public interface ServerJoinListener extends GloballyAttachableListener {
 
     /**

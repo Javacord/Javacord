@@ -639,7 +639,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                                         Class<GloballyAttachableListener> type
                                                 = (Class<GloballyAttachableListener>) clazz;
                                         GloballyAttachableListener listener = listenerSource.apply(this);
-                                        addListener(type, type.cast(listener));
+                                        addListener(type, type.cast(listener), Collections.emptySet());
                                     }));
                             unspecifiedListeners.stream()
                                     .map(source -> source.apply(this))
@@ -2175,13 +2175,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 .filter(GloballyAttachableListener.class::isAssignableFrom)
                 .filter(listenerClass -> listenerClass != GloballyAttachableListener.class)
                 .map(listenerClass -> (Class<GloballyAttachableListener>) listenerClass)
-                .map(listenerClass -> addListener(listenerClass, listener))
+                .map(listenerClass -> addListener(listenerClass, listener, Collections.emptySet()))
                 .collect(Collectors.toList());
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener) {
+    public <T extends GloballyAttachableListener> ListenerManager<T> addListener(Class<T> listenerClass, T listener,
+                                                                                 Set<Intent> requiredIntents) {
+        LoggerUtil.logMissingRequiredIntentIfNotPresent(logger, listenerClass, requiredIntents, intents);
+
         return (ListenerManager<T>) listeners
                 .computeIfAbsent(listenerClass, key -> Collections.synchronizedMap(new LinkedHashMap<>()))
                 .computeIfAbsent(listener, key -> new ListenerManagerImpl<>(this, listener, listenerClass));

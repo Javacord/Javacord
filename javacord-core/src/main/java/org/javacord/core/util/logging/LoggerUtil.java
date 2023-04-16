@@ -6,10 +6,13 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.simple.SimpleLogger;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.apache.logging.log4j.util.ProviderUtil;
+import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,7 +48,7 @@ public class LoggerUtil {
                         ? Level.TRACE
                         : (FallbackLoggerConfiguration.isDebugEnabled() ? Level.DEBUG : Level.INFO);
                 Logger logger = new SimpleLogger(name, level, true, false, true, true, "yyyy-MM-dd HH:mm:ss.SSSZ", null,
-                                                 new PropertiesUtil(new Properties()), System.out);
+                        new PropertiesUtil(new Properties()), System.out);
                 if (logWarning.get()) {
                     logger.info("No Log4j2 compatible logger was found. Using default Javacord implementation!");
                 }
@@ -69,7 +72,7 @@ public class LoggerUtil {
     /**
      * Logs if a channel is missing for a specific event.
      *
-     * @param logger The logger of the event.
+     * @param logger    The logger of the event.
      * @param channelId The id of the missing channel.
      */
     public static void logMissingChannel(Logger logger, long channelId) {
@@ -77,5 +80,25 @@ public class LoggerUtil {
                 + "Javacord version or create an issue on the Javacord GitHub page if you are already "
                 + "on the latest version.", channelId, logger.getName());
     }
+
+
+    /**
+     * Logs if the required intent are not present.
+     *
+     * @param logger          The logger of the event.
+     * @param listenerClass   The id of the missing channel.
+     * @param intents         The intents the bot has.
+     * @param requiredIntents The intents the listener requires.
+     */
+    public static void logMissingRequiredIntentIfNotPresent(Logger logger, Class<?> listenerClass, Set<Intent> intents,
+                                                            Set<Intent> requiredIntents) {
+        if (!requiredIntents.isEmpty() && intents.stream().noneMatch(requiredIntents::contains)) {
+            logger.error("The listener {} requires one of the following intents {} but the bot only has "
+                    + "the intents {}", listenerClass.getSimpleName(), requiredIntents, intents);
+            throw new MissingIntentException(String.format("The listener %s requires one of the following intents %s "
+                    + "but the bot only has the intents %s", listenerClass.getSimpleName(), requiredIntents, intents));
+        }
+    }
+
 
 }

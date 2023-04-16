@@ -3,6 +3,7 @@ import com.github.javaparser.ParserConfiguration.LanguageLevel
 import com.github.javaparser.ast.CompilationUnit
 import com.github.javaparser.ast.Modifier
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration
+import com.github.javaparser.ast.expr.NormalAnnotationExpr
 import com.github.javaparser.printer.PrettyPrinter
 import com.github.javaparser.printer.PrettyPrinterConfiguration
 import com.github.javaparser.symbolsolver.JavaSymbolSolver
@@ -13,6 +14,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import javax.annotation.Generated
 import javax.naming.ConfigurationException
+import java.util.Optional
 import java.util.function.Function
 import java.util.function.Supplier
 import java.util.stream.Collectors
@@ -118,6 +120,8 @@ task generateListenerManagers {
                 typeSolver.solveType('org.javacord.api.DiscordApi').qualifiedName
         def discordApiBuilderName =
                 typeSolver.solveType('org.javacord.api.DiscordApiBuilder').qualifiedName
+        def intentName =
+                typeSolver.solveType('org.javacord.api.entity.intent.Intent').qualifiedName
         def discordApiImplName =
                 typeSolver.solveType('org.javacord.core.DiscordApiImpl').qualifiedName
         def listenerManagerName =
@@ -139,6 +143,7 @@ task generateListenerManagers {
                     .addImport(List)
                     .addImport(Map)
                     .addImport(listenerManagerName)
+
             def attachableListenerManagerInterface = attachableListenerManagerFile
                     .addInterface("${attachableInterface.name}Manager")
                     .addSingleMemberAnnotation(Generated, '"listener-manager-generation.gradle"')
@@ -157,8 +162,11 @@ task generateListenerManagers {
                         'ChainableGloballyAttachableListenerManager.java').toPath())
                         .addImport(Function)
                         .addImport(Supplier)
+                        .addImport(Collections)
+                        .addImport(Set)
                         .addImport(discordApiName)
                         .addImport(discordApiBuilderName)
+                        .addImport(intentName)
                 chainableGloballyAttachableListenerManagerInterface = chainableGloballyAttachableListenerManagerFile
                         .addInterface('ChainableGloballyAttachableListenerManager')
                         .addSingleMemberAnnotation(Generated, '"listener-manager-generation.gradle"')
@@ -268,7 +276,14 @@ task generateListenerManagers {
                         internalAttachableListenerManagerFile, internalAttachableListenerManagerInterface
             }
 
+            if (attachableInterface.equals("ChainableGloballyAttachableListener")) {
+                attachableListenerManagerFile.addImport(Set)
+            }
+
             if (attachableInterface.equals(globallyAttachableListener)) {
+                attachableListenerManagerFile.addImport(intentName)
+                attachableListenerManagerFile.addImport(Collections)
+                attachableListenerManagerFile.addImport(Set)
                 addGenericGloballyAttachableListenerMethods attachableListenerManagerInterface,
                         chainableGloballyAttachableListenerManagerInterface
             } else {
@@ -367,6 +382,24 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
     }
     internalAttachableListenerManagerFile?.addImport listener.qualifiedName
 
+    def intentCollection = listener.getWrappedNode().getAnnotationByName("RequiredIntent")
+            .collect {
+                def values = it.getMemberValue().asArrayInitializerExpr().getValues()
+                def intentString = values.stream()
+                        .map(expression -> expression.toString())
+                        .collect(Collectors.joining(", "))
+
+                //TODO: Change to Set.of() when we switch to Java 9+
+                if (values.size() > 1) {
+
+                    chainableGloballyAttachableListenerManagerFile?.addImport Arrays
+                    chainableGloballyAttachableListenerManagerFile?.addImport HashSet
+
+                    return "Collections.unmodifiableSet(new HashSet<>(Arrays.asList($intentString)))"
+                }
+                return "Collections.singleton($intentString)"
+            }.orOptional(() -> Optional.of("Collections.emptySet()")).get()
+
     if (specialMessageAttachable) {
         addMessageSpecificConcreteListenerMethods typeSolver, attachableInterface, listener,
                 attachableListenerManagerFile, attachableListenerManagerInterface
@@ -401,9 +434,13 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
             .addParameter(listener.name, 'listener')
 
     if (globallyAttachable) {
+        //Add import statements for required intent
+        attachableListenerManagerFile.addImport Arrays
+        attachableListenerManagerFile.addImport HashSet
+
         addListenerMethod
                 .createBody()
-                .addStatement("return addListener(${listener.name}.class, listener);")
+                .addStatement("return addListener(${listener.name}.class, listener, ${intentCollection});")
 
         chainableGloballyAttachableListenerManagerInterface
                 .addMethod("add$listener.name", Modifier.DEFAULT)
@@ -416,7 +453,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
                 .setType("DiscordApiBuilder")
                 .addParameter(listener.name, 'listener')
                 .createBody()
-                .addStatement("return addListener(${listener.name}.class, listener);")
+                .addStatement("return addListener(${listener.name}.class, listener, ${intentCollection});")
 
         chainableGloballyAttachableListenerManagerInterface
                 .addMethod("add$listener.name", Modifier.DEFAULT)
@@ -432,7 +469,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
                 .setType("DiscordApiBuilder")
                 .addParameter("Supplier<$listener.name>", 'listenerSupplier')
                 .createBody()
-                .addStatement("return addListener(${listener.name}.class, listenerSupplier);")
+                .addStatement("return addListener(${listener.name}.class, listenerSupplier, ${intentCollection});")
 
         chainableGloballyAttachableListenerManagerInterface
                 .addMethod("add$listener.name", Modifier.DEFAULT)
@@ -448,7 +485,7 @@ def addConcreteListenerMethods(typeSolver, attachableInterface, listener, object
                 .setType("DiscordApiBuilder")
                 .addParameter("Function<DiscordApi, $listener.name>", 'listenerFunction')
                 .createBody()
-                .addStatement("return addListener(${listener.name}.class, listenerFunction);")
+                .addStatement("return addListener(${listener.name}.class, listenerFunction, ${intentCollection});")
     } else {
         addListenerMethod.removeBody()
     }
@@ -617,6 +654,7 @@ def addGenericGloballyAttachableListenerMethods(
 
                 @param listenerClass The listener class.
                 @param listener The listener to add.
+                @param requiredIntents The required intents for this listener.
                 @param <T> The type of the listener.
                 @return The manager for the added listener.
             '''.stripIndent())
@@ -624,6 +662,7 @@ def addGenericGloballyAttachableListenerMethods(
             .setType('ListenerManager<T>')
             .addParameter('Class<T>', 'listenerClass')
             .addParameter('T', 'listener')
+            .addParameter('Set<Intent>', 'requiredIntents')
             .removeBody()
 
     attachableListenerManagerInterface
@@ -650,6 +689,7 @@ def addGenericGloballyAttachableListenerMethods(
 
                 @param listenerClass The listener class.
                 @param listener The listener to add.
+                @param requiredIntents The required intents for this listener.
                 @param <T> The type of the listener.
                 @return The current instance in order to chain call methods.
             '''.stripIndent())
@@ -657,6 +697,7 @@ def addGenericGloballyAttachableListenerMethods(
             .setType('DiscordApiBuilder')
             .addParameter('Class<T>', 'listenerClass')
             .addParameter('T', 'listener')
+            .addParameter('Set<Intent>', 'requiredIntents')
             .removeBody()
 
     chainableGloballyAttachableListenerManagerInterface
@@ -686,6 +727,7 @@ def addGenericGloballyAttachableListenerMethods(
 
                 @param listenerClass The listener class.
                 @param listenerSupplier The supplier of listeners to add.
+                @param requiredIntents The required intents for this listener.
                 @param <T> The type of the listener.
                 @return The current instance in order to chain call methods.
             '''.stripIndent())
@@ -693,6 +735,7 @@ def addGenericGloballyAttachableListenerMethods(
             .setType('DiscordApiBuilder')
             .addParameter('Class<T>', 'listenerClass')
             .addParameter('Supplier<T>', 'listenerSupplier')
+            .addParameter('Set<Intent>', 'requiredIntents')
             .removeBody()
 
     chainableGloballyAttachableListenerManagerInterface
@@ -724,6 +767,7 @@ def addGenericGloballyAttachableListenerMethods(
 
                 @param listenerClass The listener class.
                 @param listenerFunction The function to provide listeners to add.
+                @param requiredIntents The required intents for this listener.
                 @param <T> The type of the listener.
                 @return The current instance in order to chain call methods.
             '''.stripIndent())
@@ -731,6 +775,7 @@ def addGenericGloballyAttachableListenerMethods(
             .setType('DiscordApiBuilder')
             .addParameter('Class<T>', 'listenerClass')
             .addParameter('Function<DiscordApi, T>', 'listenerFunction')
+            .addParameter('Set<Intent>', 'requiredIntents')
             .removeBody()
 
     chainableGloballyAttachableListenerManagerInterface

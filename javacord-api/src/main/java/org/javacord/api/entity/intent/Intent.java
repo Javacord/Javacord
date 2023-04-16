@@ -20,6 +20,15 @@ public enum Intent {
      *     <li>CHANNEL_UPDATE</li>
      *     <li>CHANNEL_DELETE</li>
      *     <li>CHANNEL_PINS_UPDATE</li>
+     *     <li>THREAD_CREATE</li>
+     *     <li>THREAD_UPDATE</li>
+     *     <li>THREAD_DELETE</li>
+     *     <li>THREAD_LIST_SYNC</li>
+     *     <li>THREAD_MEMBER_UPDATE (not implemented)</li>
+     *     <li>THREAD_MEMBERS_UPDATE</li>
+     *     <li>STAGE_INSTANCE_CREATE (not implemented)</li>
+     *     <li>STAGE_INSTANCE_UPDATE (not implemented)</li>
+     *     <li>STAGE_INSTANCE_DELETE (not implemented)</li>
      * </ul>
      */
     GUILDS(0, false),
@@ -30,6 +39,7 @@ public enum Intent {
      *     <li>GUILD_MEMBER_ADD</li>
      *     <li>GUILD_MEMBER_UPDATE</li>
      *     <li>GUILD_MEMBER_REMOVE</li>
+     *     <li>THREAD_MEMBERS_UPDATE (adds additional information to the members when using the GUILDS intent)</li>
      * </ul>
      *
      * <p>Note: This is a privileged intent which must be enabled in the bots application page in the Developer portal
@@ -41,24 +51,28 @@ public enum Intent {
     /**
      * The following events are received.
      * <ul>
+     *     <li>GUILD_AUDIT_LOG_ENTRY_CREATE (not implemented)</li>
      *     <li>GUILD_BAN_ADD</li>
      *     <li>GUILD_BAN_REMOVE</li>
      * </ul>
      */
-    GUILD_BANS(2, false),
+    GUILD_MODERATION(2, false),
 
     /**
      * The following events are received.
      * <ul>
      *     <li>GUILD_EMOJIS_UPDATE</li>
+     *     <li>GUILD_STICKERS_UPDATE</li>
      * </ul>
      */
-    GUILD_EMOJIS(3, false),
+    GUILD_EMOJIS_AND_STICKERS(3, false),
 
     /**
      * The following events are received.
      * <ul>
+     *     <li>INTEGRATION_CREATE (not implemented)</li>
      *     <li>GUILD_INTEGRATIONS_UPDATE</li>
+     *     <li>INTEGRATION_DELETE (not implemented)</li>
      * </ul>
      */
     GUILD_INTEGRATIONS(4, false),
@@ -117,7 +131,7 @@ public enum Intent {
      *     <li>MESSAGE_REACTION_ADD</li>
      *     <li>MESSAGE_REACTION_REMOVE</li>
      *     <li>MESSAGE_REACTION_REMOVE_ALL</li>
-     *     <li>MESSAGE_REACTION_REMOVE_EMOJI</li>
+     *     <li>MESSAGE_REACTION_REMOVE_EMOJI (not implemented)</li>
      * </ul>
      */
     GUILD_MESSAGE_REACTIONS(10, false),
@@ -148,7 +162,7 @@ public enum Intent {
      *     <li>MESSAGE_REACTION_ADD</li>
      *     <li>MESSAGE_REACTION_REMOVE</li>
      *     <li>MESSAGE_REACTION_REMOVE_ALL</li>
-     *     <li>MESSAGE_REACTION_REMOVE_EMOJI</li>
+     *     <li>MESSAGE_REACTION_REMOVE_EMOJI (not implemented)</li>
      * </ul>
      */
     DIRECT_MESSAGE_REACTIONS(13, false),
@@ -170,7 +184,37 @@ public enum Intent {
      *
      * @see <a href="https://discord.com/developers/applications">Discord developer portal</a>
      */
-    MESSAGE_CONTENT(15, true);
+    MESSAGE_CONTENT(15, true),
+
+    /**
+     * The following events are received.
+     * <ul>
+     *     <li>GUILD_SCHEDULED_EVENT_CREATE (not implemented)</li>
+     *     <li>GUILD_SCHEDULED_EVENT_UPDATE (not implemented)</li>
+     *     <li>GUILD_SCHEDULED_EVENT_DELETE (not implemented)</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_ADD (not implemented)</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_REMOVE (not implemented)</li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENTS(16, false),
+
+    /**
+     * The following events are received.
+     * <ul>
+     *     <li>AUTO_MODERATION_RULE_CREATE (not implemented)</li>
+     *     <li>AUTO_MODERATION_RULE_UPDATE (not implemented)</li>
+     *     <li>AUTO_MODERATION_RULE_DELETE (not implemented)</li>
+     * </ul>
+     */
+    AUTO_MODERATION_CONFIGURATION(20, false),
+
+    /**
+     * The following events are received.
+     * <ul>
+     *     <li>AUTO_MODERATION_ACTION_EXECUTION (not implemented)</li>
+     * </ul>
+     */
+    AUTO_MODERATION_EXECUTION(21, false);
 
     private final int id;
 
