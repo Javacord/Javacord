@@ -133,7 +133,7 @@ public interface ServerChannelVoicePermissions extends ServerChannelPermissions 
      */
     default boolean canUseVoiceActivation(Member member) {
         return getPermissionableChannel().hasAnyPermission(member, PermissionType.ADMINISTRATOR)
-                || getPermissionableChannel().hasPermissions(member, PermissionType.USE_VOICE_ACTIVITY,
+                || getPermissionableChannel().hasPermissions(member, PermissionType.USE_VAD,
                 PermissionType.CONNECT);
     }
 

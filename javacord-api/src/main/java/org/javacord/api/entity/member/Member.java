@@ -400,7 +400,7 @@ public interface Member extends DiscordEntity, Messageable, Mentionable, Permiss
      * @return Whether the given user can manage emojis or not.
      */
     default boolean canManageEmojis() {
-        return hasAnyPermission(PermissionType.ADMINISTRATOR, PermissionType.MANAGE_EMOJIS);
+        return hasAnyPermission(PermissionType.ADMINISTRATOR, PermissionType.MANAGE_SERVER_EXPRESSIONS);
     }
 
     /**

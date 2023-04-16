@@ -133,7 +133,7 @@ public interface ServerChannelTextPermissions extends ServerChannelPermissions, 
      */
     default boolean canAttachFiles(Member member) {
         return getPermissionableChannel().hasPermission(member, PermissionType.ADMINISTRATOR)
-                || (getPermissionableChannel().hasPermission(member, PermissionType.ATTACH_FILE)
+                || (getPermissionableChannel().hasPermission(member, PermissionType.ATTACH_FILES)
                 && canWrite(member));
     }
 
