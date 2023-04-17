@@ -53,6 +53,7 @@ public class GuildDeleteHandler extends PacketHandler {
                 msg -> api.removeMessageFromCache(msg.getId())
         );
         api.removeServerFromCache(serverId);
+        api.removeUnavailableServerFromCache(serverId);
     }
 
 }

@@ -23,6 +23,11 @@ public enum StickerFormatType {
     LOTTIE(3),
 
     /**
+     * A GIF image.
+     */
+    GIF(4),
+
+    /**
      * An unknown image. Most likely something new added by Discord.
      */
     UNKNOWN(-1);

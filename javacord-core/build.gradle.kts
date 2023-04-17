@@ -2,7 +2,7 @@ import aQute.bnd.version.MavenVersion.parseMavenString
 
 plugins {
     `java-library`
-    id("biz.aQute.bnd.builder") version "6.2.0"
+    id("biz.aQute.bnd.builder") version "6.3.1"
 }
 
 repositories {
@@ -24,7 +24,7 @@ dependencies {
     // the JSON-lib because Discord returns in JSON format
     // Update when upgrading to Java 11+
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.6")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.12.7.1")
 
     // the web socket
     implementation("com.neovisionaries:nv-websocket-client:2.14")

@@ -124,6 +124,17 @@ public abstract class ApplicationCommandUpdater<T extends ApplicationCommand,
     }
 
     /**
+     * Sets whether the command is nsfw.
+     *
+     * @param nsfw Whether the command is nsfw.
+     * @return The current instance in order to chain call methods.
+     */
+    public B setNsfw(boolean nsfw) {
+        delegate.setNsfw(nsfw);
+        return (B) this;
+    }
+
+    /**
      * Updates a global application command.
      * When used to update multiple global application commands at once
      * {@link DiscordApi#bulkOverwriteGlobalApplicationCommands(Set)} should be used instead.

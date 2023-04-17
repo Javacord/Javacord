@@ -5,11 +5,14 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.interaction.ApplicationCommandInteraction;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.core.DiscordApiImpl;
+import java.util.Optional;
 
 public class ApplicationCommandInteractionImpl extends InteractionImpl implements ApplicationCommandInteraction {
 
     protected final long commandId;
     protected final String commandName;
+
+    protected final Long registeredCommandServerId;
 
     /**
      * Class constructor.
@@ -24,6 +27,7 @@ public class ApplicationCommandInteractionImpl extends InteractionImpl implement
         JsonNode data = jsonData.get("data");
         commandId = data.get("id").asLong();
         commandName = data.get("name").asText();
+        registeredCommandServerId = data.hasNonNull("guild_id") ? data.get("guild_id").asLong() : null;
     }
 
     @Override
@@ -44,5 +48,10 @@ public class ApplicationCommandInteractionImpl extends InteractionImpl implement
     @Override
     public String getCommandName() {
         return commandName;
+    }
+
+    @Override
+    public Optional<Long> getRegisteredCommandServerId() {
+        return Optional.ofNullable(registeredCommandServerId);
     }
 }

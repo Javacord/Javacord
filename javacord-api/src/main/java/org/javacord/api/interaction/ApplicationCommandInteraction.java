@@ -1,5 +1,8 @@
 package org.javacord.api.interaction;
 
+import org.javacord.api.entity.server.Server;
+import java.util.Optional;
+
 public interface ApplicationCommandInteraction extends InteractionBase {
 
     /**
@@ -22,4 +25,20 @@ public interface ApplicationCommandInteraction extends InteractionBase {
      * @return The name of the invoked command.
      */
     String getCommandName();
+
+    /**
+     * Gets the id of the server the command was registered on.
+     *
+     * @return The id of the server the command was registered on.
+     */
+    Optional<Long> getRegisteredCommandServerId();
+
+    /**
+     * Gets the server the command was registered on.
+     *
+     * @return The server the command was registered on.
+     */
+    default Optional<Server> getRegisteredCommandServer() {
+        return getRegisteredCommandServerId().flatMap(getApi()::getServerById);
+    }
 }

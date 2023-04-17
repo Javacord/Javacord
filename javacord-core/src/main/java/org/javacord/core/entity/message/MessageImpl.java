@@ -6,6 +6,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageActivity;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -19,6 +20,7 @@ import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.core.DiscordApiImpl;
@@ -170,7 +172,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * The sticker items in this message.
      */
     private final Set<StickerItem> stickerItems = new HashSet<>();
-        
+
     /**
      * The approximate position of the message in a thread.
      */
@@ -213,7 +215,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         messageInteraction = data.hasNonNull("interaction")
             ? new MessageInteractionImpl(this, data.get("interaction"))
             : null;
-        
+
         position = data.hasNonNull("position") ? data.get("position").asInt() : null;
 
         setUpdatableFields(data);
@@ -387,7 +389,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                 }
             });
         }
-        
+
         if (data.has("sticker_items")) {
             stickerItems.clear();
             for (JsonNode stickerItemJson : data.get("sticker_items")) {
@@ -440,8 +442,24 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     }
 
     @Override
+    public boolean canYouReadContent() {
+        return api.getIntents().contains(Intent.MESSAGE_CONTENT)
+                || !content.isEmpty()
+                || isPrivateMessage()
+                || author.getId() == api.getYourself().getId()
+                || getMentionedUsers().contains(api.getYourself());
+    }
+
+    @Override
     public String getContent() {
-        return content;
+        if (canYouReadContent()) {
+            return content;
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive the content of a message. "
+                + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the content in special cases like: DMs, bot mentions or if it's your own messages");
     }
 
     @Override
@@ -451,7 +469,15 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public List<MessageAttachment> getAttachments() {
-        return Collections.unmodifiableList(attachments);
+        if (canYouReadContent()) {
+            return Collections.unmodifiableList(attachments);
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive attachments of a message. "
+                + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the attachments in special cases like: DMs, "
+                + "bot mentions or if it's your own messages");
     }
 
     @Override
@@ -507,7 +533,14 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public List<Embed> getEmbeds() {
-        return Collections.unmodifiableList(new ArrayList<>(embeds));
+        if (canYouReadContent()) {
+            return Collections.unmodifiableList(new ArrayList<>(embeds));
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive embeds of a message. "
+                + "Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the embeds in special cases like: DMs, bot mentions or if it's your own messages");
     }
 
     @Override
@@ -559,7 +592,15 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
 
     @Override
     public List<HighLevelComponent> getComponents() {
-        return Collections.unmodifiableList(new ArrayList<>(this.components));
+        if (canYouReadContent()) {
+            return Collections.unmodifiableList(new ArrayList<>(this.components));
+        }
+
+        throw new MissingIntentException("The MESSAGE_CONTENT intent is required to receive the components "
+                + "of a message. Please see https://javacord.org/wiki/basic-tutorials/gateway-intents.html "
+                + "on how to enable this privileged intent or check with the method Message#canYouReadContent if you "
+                + "have received the components in special cases like: DMs, "
+                + "bot mentions or if it's your own messages");
     }
 
     @Override

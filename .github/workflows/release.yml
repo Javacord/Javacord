@@ -19,6 +19,11 @@ jobs:
         run: |
           version=`cat gradle.properties | sed -n "s/^.*version\s*=\s*\(\S*\).*$/\1/p"`
           echo "::set-output name=version::$version"
+      - name: Generate Changelog
+        id: generate-changelog
+        run: |
+          changelog=`./gradlew generateChangelog`
+          echo "::set-output name=changelog::$changelog"
       - name: Create Release
         if: ${{ !endsWith(steps.read-version.outputs.version, 'SNAPSHOT') }}
         id: create_release
@@ -29,7 +34,7 @@ jobs:
           tag_name: v${{ steps.read-version.outputs.version }}
           release_name: v${{ steps.read-version.outputs.version }}
           body: |
-            Version ${{ steps.read-version.outputs.version }}
+            ${{ steps.generate-changelog.outputs.changelog }}
           draft: true
           prerelease: false
       - name: Update Release Version
@@ -41,13 +46,12 @@ jobs:
           git checkout -b release-v${{ steps.read-version.outputs.version }}
           git add gradle.properties
           git commit -am "Increment patch version and append -SNAPSHOT suffix"
-          git push
+          git push --set-upstream origin release-v${{ steps.read-version.outputs.version }}
       - name: Create Release Pull Request
         if: ${{ !endsWith(steps.read-version.outputs.version, 'SNAPSHOT') }}
         id: cpr
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.PAT }}
           commit-message: Add Release v${{ steps.read-version.outputs.version }}
           committer: github-actions[bot]
           author: 41898282+github-actions[bot]@users.noreply.github.com
@@ -80,6 +84,5 @@ jobs:
         if: steps.cpr.outputs.pull-request-operation == 'created'
         uses: peter-evans/enable-pull-request-automerge@v2
         with:
-          token: ${{ secrets.PAT }}
           pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
           merge-method: squash

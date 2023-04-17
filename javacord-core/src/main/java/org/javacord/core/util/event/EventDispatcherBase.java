@@ -283,10 +283,14 @@ public abstract class EventDispatcherBase {
                             } catch (InterruptedException ignored) { }
                         }
                     }
+                    Runnable task = taskQueue.poll();
+                    if (task == null) {
+                        return;
+                    }
                     // Add the future to the list of active listeners
                     activeListeners.put(activeListener, new Object[]{System.nanoTime(), finalQueueSelector});
                     try {
-                        taskQueue.poll().run();
+                        task.run();
                     } catch (Throwable t) {
                         logger.error("Unhandled exception in {}!", () -> getThreadType(finalQueueSelector), () -> t);
                     }

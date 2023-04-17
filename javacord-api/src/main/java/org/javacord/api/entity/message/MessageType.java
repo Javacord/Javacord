@@ -36,6 +36,14 @@ public enum MessageType {
     THREAD_STARTER_MESSAGE(21),
     GUILD_INVITE_REMINDER(22),
     CONTEXT_MENU_COMMAND(23),
+    AUTO_MODERATION_ACTION(24),
+    ROLE_SUBSCRIPTION_PURCHASE(25),
+    INTERACTION_PREMIUM_UPSELL(26),
+    STAGE_START(27),
+    STAGE_END(28),
+    STAGE_SPEAKER_JOIN(29),
+    STAGE_TOPIC_CHANGE(31),
+    SERVER_APPLICATION_PREMIUM_SUBSCRIPTION(32),
 
     /**
      * An unknown message type.
@@ -64,48 +72,15 @@ public enum MessageType {
      * @return The message type.
      */
     public static MessageType byType(int type, boolean webhook) {
-        switch (type) {
-            case 0:
-                return webhook ? NORMAL_WEBHOOK : NORMAL;
-            case 1:
-                return RECIPIENT_ADD;
-            case 2:
-                return RECIPIENT_REMOVE;
-            case 3:
-                return CALL;
-            case 4:
-                return CHANNEL_NAME_CHANGE;
-            case 5:
-                return CHANNEL_ICON_CHANGE;
-            case 6:
-                return CHANNEL_PINNED_MESSAGE;
-            case 7:
-                return SERVER_MEMBER_JOIN;
-            case 8:
-                return USER_PREMIUM_SERVER_SUBSCRIPTION;
-            case 9:
-                return USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_1;
-            case 10:
-                return USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_2;
-            case 11:
-                return USER_PREMIUM_SERVER_SUBSCRIPTION_TIER_3;
-            case 12:
-                return CHANNEL_FOLLOW_ADD;
-            case 14:
-                return SERVER_DISCOVERY_DISQUALIFIED;
-            case 15:
-                return SERVER_DISCOVERY_REQUALIFIED;
-            case 16:
-                return SERVER_DISCOVERY_GRACE_PERIOD_INITIAL_WARNING;
-            case 17:
-                return SERVER_DISCOVERY_GRACE_PERIOD_FINAL_WARNING;
-            case 19:
-                return REPLY;
-            case 20:
-                return SLASH_COMMAND;
-            default:
-                return UNKNOWN;
+        if (type == 0 && webhook) {
+            return NORMAL_WEBHOOK;
         }
+        for (MessageType value : values()) {
+            if (value.type == type) {
+                return value;
+            }
+        }
+        return UNKNOWN;
     }
 
 }

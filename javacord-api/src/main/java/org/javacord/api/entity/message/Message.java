@@ -12,9 +12,11 @@ import org.javacord.api.entity.channel.PrivateChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -23,10 +25,10 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.sticker.StickerItem;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.interaction.MessageInteraction;
 import org.javacord.api.listener.message.MessageAttachableListenerManager;
 import org.javacord.api.util.DiscordRegexPattern;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
@@ -507,7 +509,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Message> removeEmbed() {
-        return new MessageUpdater(this).addEmbeds(Collections.emptyList()).applyChanges();
+        return new MessageUpdater(this).removeAllEmbeds().applyChanges();
     }
 
     /**
@@ -720,9 +722,24 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     }
 
     /**
+     * Checks if the bot can read the content of the message.
+     *
+     * @return Whether the bot can read the content of the message.
+     */
+    boolean canYouReadContent();
+
+    /**
      * Gets the content of the message.
      *
      * @return The content of the message.
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     String getContent();
 
@@ -737,6 +754,14 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * Gets the attachments of the message.
      *
      * @return The attachments of the message.
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     List<MessageAttachment> getAttachments();
 
@@ -756,6 +781,14 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * </ul>
      *
      * @return The readable content of the message.
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     default String getReadableContent() {
         return getApi().makeMentionsReadable(getContent(), getServer().orElse(null));
@@ -840,6 +873,14 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * Gets all embeds of the message.
      *
      * @return All embeds of the message.
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     List<Embed> getEmbeds();
 
@@ -920,6 +961,14 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * Gets all components of the message.
      *
      * @return All components of the message.
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     List<HighLevelComponent> getComponents();
 
@@ -965,6 +1014,14 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * Gets all channels mentioned in this message.
      *
      * @return All channels mentioned in this message.
+     * @throws MissingIntentException If not a single of the following requirements is met:
+     *                                <ul>
+     *                                 <li>The bot has been mentioned in the message.</li>
+     *                                 <li>Your are the author of the message.</li>
+     *                                 <li>The message is a DM.</li>
+     *                                 <li>The {@link Intent#MESSAGE_CONTENT} has been enabled in your code and
+     *                                 Discord Developer dashboard</li>
+     *                                 </ul>
      */
     default List<ServerChannel> getMentionedChannels() {
         List<ServerChannel> mentionedChannels = new ArrayList<>();
@@ -1180,6 +1237,16 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     }
 
     /**
+     * Gets the server voice channel of the message.
+     * Only present if the message was sent in a server.
+     *
+     * @return The server voice channel.
+     */
+    default Optional<ServerVoiceChannel> getServerVoiceChannel() {
+        return getChannel().asServerVoiceChannel();
+    }
+
+    /**
      * Gets the server thread channel of the message.
      * Only present if the message was sent in a thread in a server.
      *
@@ -1205,7 +1272,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return The server of the message.
      */
     default Optional<Server> getServer() {
-        return getServerTextChannel()
+        return Optional.of(getChannel())
                 .map(Channel::asServerChannel)
                 .orElseGet(() -> getServerThreadChannel().flatMap(Channel::asServerChannel))
                 .map(ServerChannel::getServer);
@@ -1556,7 +1623,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     /**
      * Replies to this message with the given text.
      *
-     * @param messageContent The text to reply with.
+     * @param messageContent        The text to reply with.
      * @param assertReferenceExists If true, throw an error if the message you are replying to does not exist otherwise,
      *                              if false send the message regardless without a reference to a message.
      * @return The message that was sent.
@@ -1579,7 +1646,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     /**
      * Replies to this message with the given embed.
      *
-     * @param embed The EmbedBuilder to reply with.
+     * @param embed                 The EmbedBuilder to reply with.
      * @param assertReferenceExists If true, throw an error if the message you are replying to does not exist otherwise,
      *                              if false send the message regardless without a reference to a message.
      * @return The message that was sent.

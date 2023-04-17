@@ -79,7 +79,7 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     boolean isDisabledByDefault();
 
     /**
-     * Gets whether this command is able to be used in DMs.
+     * Gets whether this command can be used in DMs.
      * Will always return {@code false} for server commands.
      *
      * @return Whether the command is enabled in DMs
@@ -113,10 +113,26 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
     boolean isServerApplicationCommand();
 
     /**
-     * Deletes this application command globally.
+     * Whether the command is nsfw.
+     *
+     * @return Whether the command is nsfw.
+     */
+    boolean isNsfw();
+
+    /**
+     * Deletes this application command.
      *
      * @return A future to check if the deletion was successful.
      */
+    CompletableFuture<Void> delete();
+
+    /**
+     * Deletes this application command globally.
+     *
+     * @return A future to check if the deletion was successful.
+     * @deprecated Use {@link #delete()} instead.
+     */
+    @Deprecated
     CompletableFuture<Void> deleteGlobal();
 
     /**
@@ -124,7 +140,9 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
      *
      * @param server The server where the command should be deleted from.
      * @return A future to check if the deletion was successful.
+     * @deprecated Use {@link #delete()} instead.
      */
+    @Deprecated
     default CompletableFuture<Void> deleteForServer(Server server) {
         return deleteForServer(server.getId());
     }
@@ -134,6 +152,8 @@ public interface ApplicationCommand extends DiscordEntity, Specializable<Applica
      *
      * @param server The server where the command should be deleted from.
      * @return A future to check if the deletion was successful.
+     * @deprecated Use {@link #delete()} instead.
      */
+    @Deprecated
     CompletableFuture<Void> deleteForServer(long server);
 }

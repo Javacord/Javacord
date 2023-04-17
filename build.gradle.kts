@@ -6,8 +6,8 @@ plugins {
     `java-library`
     `maven-publish`
     signing
-    id("com.github.johnrengelman.shadow") version "2.0.4" apply false
-    id("net.researchgate.release") version "2.7.0" apply false
+    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
+    id("net.researchgate.release") version "3.0.2" apply false
 }
 
 repositories {
@@ -48,6 +48,7 @@ apply(from = "gradle/listener-manager-generation.gradle")
 apply(from = "gradle/event-dispatcher-generation.gradle")
 apply(from = "gradle/checkstyle.gradle.kts")
 apply(from = "gradle/increment-version.gradle.kts")
+apply(from = "gradle/generate-changelog.gradle.kts")
 
 configure<PublishingExtension> {
     allprojects {

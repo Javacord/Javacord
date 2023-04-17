@@ -1,17 +1,39 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.server.ArchivedThreads;
 import org.javacord.api.listener.channel.server.text.ServerTextChannelAttachableListenerManager;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class represents a server text channel.
  */
-public interface ServerTextChannel extends ServerMessageChannel, ServerTextChannelAttachableListenerManager {
+public interface ServerTextChannel extends ServerMessageChannel, RegularServerChannel, TextableRegularServerChannel,
+        ServerTextChannelAttachableListenerManager {
+
+    @Override
+    default String getMentionTag() {
+        return "<#" + getIdAsString() + ">";
+    }
 
     /**
-     * Gets the type of channel.
+     * Gets the default auto archive duration for threads that will be created in this channel.
      *
-     * @return The type of channel.
+     * @return The default auto archive duration for this channel.
+     */
+    int getDefaultAutoArchiveDuration();
+
+    /**
+     * Gets the topic of the channel.
+     *
+     * @return The topic of the channel.
+     */
+    String getTopic();
+
+    /**
+     * Creates an updater for this channel.
+     *
+     * @return An updater for this channel.
      */
     @Override
     default ChannelType getType() {

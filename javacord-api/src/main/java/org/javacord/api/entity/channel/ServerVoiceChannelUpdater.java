@@ -84,7 +84,7 @@ public class ServerVoiceChannelUpdater extends RegularServerChannelUpdater<Serve
      *             or not.
      * @return The current instance in order to chain call methods.
      */
-    public ServerVoiceChannelUpdater setNsfw(boolean nsfw) {
+    public ServerVoiceChannelUpdater setNsfw(Boolean nsfw) {
         delegate.setNsfw(nsfw);
         return this;
     }

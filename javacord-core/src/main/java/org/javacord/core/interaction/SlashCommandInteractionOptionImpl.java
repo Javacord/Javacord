@@ -242,4 +242,21 @@ public class SlashCommandInteractionOptionImpl implements SlashCommandInteractio
     public List<SlashCommandInteractionOption> getOptions() {
         return Collections.unmodifiableList(options);
     }
+
+    // TODO: Move the implementation to the SlashCommandInteractionOptionsProvider once we upgraded to Java 9+
+    // because interfaces currently do not support private methods
+    @Override
+    public List<SlashCommandInteractionOption> getArguments() {
+        return getArgumentsRecursive(getOptions());
+    }
+
+    private List<SlashCommandInteractionOption> getArgumentsRecursive(List<SlashCommandInteractionOption> options) {
+        if (options.isEmpty()) {
+            return Collections.emptyList();
+        } else if (options.get(0).isSubcommandOrGroup()) {
+            return getArgumentsRecursive(options.get(0).getOptions());
+        } else {
+            return options;
+        }
+    }
 }

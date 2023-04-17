@@ -9,6 +9,7 @@ import org.javacord.api.entity.message.internal.WebhookMessageBuilderDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
+import org.javacord.api.exception.MissingIntentException;
 import org.javacord.api.util.DiscordRegexPattern;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -35,11 +36,13 @@ public class WebhookMessageBuilder {
      *
      * @param message The message to copy.
      * @return A webhook message builder which would produce the same text as the given message.
+     * @throws MissingIntentException See Javadoc of {@link Message#getContent()} for further explanation.
      */
     public static WebhookMessageBuilder fromMessage(Message message) {
         WebhookMessageBuilder builder = new WebhookMessageBuilder()
                 .setDisplayAvatar(message.getAuthor().getAvatar())
                 .setDisplayName(message.getAuthor().getDisplayName());
+
         builder.getStringBuilder().append(message.getContent());
         if (!message.getEmbeds().isEmpty()) {
             message.getEmbeds().forEach(embed -> builder.addEmbed(embed.toBuilder()));

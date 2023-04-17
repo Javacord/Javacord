@@ -4,7 +4,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.Messageable;
-import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
@@ -865,18 +864,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can write messages or not.
      */
-    default boolean canWrite(User user) {
-        Optional<PrivateChannel> privateChannel = asPrivateChannel();
-        if (privateChannel.isPresent()) {
-            return user.isYourself() || privateChannel.get().getRecipient()
-                    .map(recipient -> recipient.equals(user)).orElse(false);
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
-               || severTextChannel.get()
-                       .hasPermissions(user, PermissionType.VIEW_CHANNEL, PermissionType.SEND_MESSAGES);
-    }
+    boolean canWrite(User user);
 
     /**
      * Checks if the user of the connected account can send messages in this channel.
@@ -898,16 +886,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can use external emojis or not.
      */
-    default boolean canUseExternalEmojis(User user) {
-        if (!canWrite(user)) {
-            return false;
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasAnyPermission(user,
-                                                          PermissionType.ADMINISTRATOR,
-                                                          PermissionType.USE_EXTERNAL_EMOJIS);
-    }
+    boolean canUseExternalEmojis(User user);
 
     /**
      * Checks if the user of the connected account can use external emojis in this channel.
@@ -929,16 +908,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can embed links or not.
      */
-    default boolean canEmbedLinks(User user) {
-        if (!canWrite(user)) {
-            return false;
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasAnyPermission(user,
-                                                          PermissionType.ADMINISTRATOR,
-                                                          PermissionType.EMBED_LINKS);
-    }
+    boolean canEmbedLinks(User user);
 
     /**
      * Checks if the user of the connected account can use embed links in this channel.
@@ -958,16 +928,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can read the message history or not.
      */
-    default boolean canReadMessageHistory(User user) {
-        if (!canSee(user)) {
-            return false;
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasAnyPermission(user,
-                                                          PermissionType.ADMINISTRATOR,
-                                                          PermissionType.READ_MESSAGE_HISTORY);
-    }
+    boolean canReadMessageHistory(User user);
 
     /**
      * Checks if the user of the connected account can read the message history of this channel.
@@ -987,16 +948,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can use tts or not.
      */
-    default boolean canUseTts(User user) {
-        if (!canWrite(user)) {
-            return false;
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasAnyPermission(user,
-                                                          PermissionType.ADMINISTRATOR,
-                                                          PermissionType.SEND_TTS_MESSAGES);
-    }
+    boolean canUseTts(User user);
 
     /**
      * Checks if the user of the connected account can use tts (text to speech) in this channel.
@@ -1015,18 +967,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can attach files or not.
      */
-    default boolean canAttachFiles(User user) {
-        Optional<PrivateChannel> privateChannel = asPrivateChannel();
-        if (privateChannel.isPresent()) {
-            return user.isYourself() || privateChannel.get().getRecipient()
-                    .map(recipient -> recipient.equals(user)).orElse(false);
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
-               || (severTextChannel.get().hasPermission(user, PermissionType.ATTACH_FILE)
-                   && severTextChannel.get().canWrite(user));
-    }
+    boolean canAttachFiles(User user);
 
     /**
      * Checks if the user of the connected account can attach files in this channel.
@@ -1043,20 +984,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user is allowed to add <b>new</b> reactions to messages in this channel or not.
      */
-    default boolean canAddNewReactions(User user) {
-        Optional<PrivateChannel> privateChannel = asPrivateChannel();
-        if (privateChannel.isPresent()) {
-            return user.isYourself() || privateChannel.get().getRecipient()
-                    .map(recipient -> recipient.equals(user)).orElse(false);
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
-               || severTextChannel.get().hasPermissions(user,
-                                                        PermissionType.VIEW_CHANNEL,
-                                                        PermissionType.READ_MESSAGE_HISTORY,
-                                                        PermissionType.ADD_REACTIONS);
-    }
+    boolean canAddNewReactions(User user);
 
     /**
      * Checks if the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel.
@@ -1075,16 +1003,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can manage messages or not.
      */
-    default boolean canManageMessages(User user) {
-        if (!canSee(user)) {
-            return false;
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasAnyPermission(user,
-                                                          PermissionType.ADMINISTRATOR,
-                                                          PermissionType.MANAGE_MESSAGES);
-    }
+    boolean canManageMessages(User user);
 
     /**
      * Checks if the user of the connected account can manage messages (delete or pin them or remove reactions of
@@ -1126,16 +1045,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @param user The user to check.
      * @return Whether the given user can mention everyone (@everyone) or not.
      */
-    default boolean canMentionEveryone(User user) {
-        if (!canSee(user)) {
-            return false;
-        }
-        Optional<ServerTextChannel> severTextChannel = asServerTextChannel();
-        return !severTextChannel.isPresent()
-               || severTextChannel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
-               || (severTextChannel.get().hasPermission(user, PermissionType.MENTION_EVERYONE)
-                   && severTextChannel.get().canWrite(user));
-    }
+    boolean canMentionEveryone(User user);
 
     /**
      * Checks if the user of the connected account can mention everyone (@everyone) in this channel.

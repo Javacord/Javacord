@@ -15,6 +15,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
+import org.javacord.api.exception.MissingIntentException;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -92,6 +93,7 @@ public interface MessageBuilderBaseDelegate {
      * Fill the builder's values with a given message.
      *
      * @param message The message to copy from.
+     * @throws MissingIntentException See Javadoc of {@link Message#getContent()} for further explanation.
      */
     void copy(Message message);
 

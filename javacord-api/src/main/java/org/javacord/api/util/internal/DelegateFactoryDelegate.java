@@ -9,6 +9,7 @@ import org.javacord.api.entity.channel.ServerMessageChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.channel.internal.ChannelCategoryBuilderDelegate;
 import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
@@ -185,10 +186,10 @@ public interface DelegateFactoryDelegate {
     /**
      * Creates a new webhook builder delegate.
      *
-     * @param channel The server text channel of the webhook.
+     * @param channel The textable server channel of the webhook.
      * @return A new webhook builder delegate.
      */
-    WebhookBuilderDelegate createWebhookBuilderDelegate(ServerMessageChannel channel);
+    WebhookBuilderDelegate createWebhookBuilderDelegate(TextableRegularServerChannel channel);
 
     /**
      * Creates a new server builder delegate.
