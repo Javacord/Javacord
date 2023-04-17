@@ -3,7 +3,7 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.ServerMessageChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
 import org.javacord.api.entity.message.Message;
@@ -42,16 +42,16 @@ public class ServerThreadChannelBuilderDelegateImpl extends ServerChannelBuilder
     /**
      * The server thread channel his thread should be created in. Either this is set or the Message property.
      */
-    private ServerTextChannel serverTextChannel = null;
+    private ServerMessageChannel serverMessageChannel = null;
 
     /**
      * Creates a new server thread channel builder delegate.
      *
      * @param serverTextChannel The server text channel where the thread will be created in.
      */
-    public ServerThreadChannelBuilderDelegateImpl(ServerTextChannel serverTextChannel) {
+    public ServerThreadChannelBuilderDelegateImpl(ServerMessageChannel serverTextChannel) {
         super((ServerImpl) serverTextChannel.getServer());
-        this.serverTextChannel = serverTextChannel;
+        this.serverMessageChannel = serverTextChannel;
     }
 
     /**
@@ -116,10 +116,10 @@ public class ServerThreadChannelBuilderDelegateImpl extends ServerChannelBuilder
                     message.getIdAsString()).setBody(body).execute(result -> ((ServerImpl) message.getServer().get())
                     .getOrCreateServerThreadChannel(result.getJsonBody()));
         } else {
-            return new RestRequest<ServerThreadChannel>(serverTextChannel.getApi(), RestMethod.POST,
-                    RestEndpoint.START_THREAD_WITHOUT_MESSAGE).setUrlParameters(serverTextChannel.getIdAsString())
+            return new RestRequest<ServerThreadChannel>(serverMessageChannel.getApi(), RestMethod.POST,
+                    RestEndpoint.START_THREAD_WITHOUT_MESSAGE).setUrlParameters(serverMessageChannel.getIdAsString())
                     .setBody(body).execute(
-                            result -> ((ServerImpl) serverTextChannel.getServer()).getOrCreateServerThreadChannel(
+                            result -> ((ServerImpl) serverMessageChannel.getServer()).getOrCreateServerThreadChannel(
                                     result.getJsonBody()));
         }
     }

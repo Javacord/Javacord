@@ -13,7 +13,6 @@ public enum ChannelType {
     GROUP_CHANNEL(3, true, true, false, false),
     CHANNEL_CATEGORY(4, false, false, true, true),
     SERVER_NEWS_CHANNEL(5, true, false, true, true),
-    SERVER_STORE_CHANNEL(6, true, false, true, true),
     SERVER_NEWS_THREAD(10, true, false, true, false),
     SERVER_PUBLIC_THREAD(11, true, false, true, false),
     SERVER_PRIVATE_THREAD(12, true, false, true, false),

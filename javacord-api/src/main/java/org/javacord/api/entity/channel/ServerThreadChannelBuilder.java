@@ -22,7 +22,7 @@ public class ServerThreadChannelBuilder extends ServerChannelBuilder<ServerThrea
      * @param threadType        The ChannelType of the thread.
      * @param name              The name of the thread.
      */
-    public ServerThreadChannelBuilder(ServerTextChannel serverTextChannel, ChannelType threadType, String name) {
+    public ServerThreadChannelBuilder(ServerMessageChannel serverTextChannel, ChannelType threadType, String name) {
         super(ServerThreadChannelBuilder.class,
                 DelegateFactory.createServerThreadChannelBuilderDelegate(serverTextChannel));
         delegate = (ServerThreadChannelBuilderDelegate) super.delegate;

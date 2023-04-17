@@ -22,6 +22,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerNewsChannel;
 import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
@@ -59,6 +60,7 @@ import org.javacord.core.entity.auditlog.AuditLogImpl;
 import org.javacord.core.entity.channel.ChannelCategoryImpl;
 import org.javacord.core.entity.channel.RegularServerChannelImpl;
 import org.javacord.core.entity.channel.ServerForumChannelImpl;
+import org.javacord.core.entity.channel.ServerNewsChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelImpl;
@@ -285,32 +287,32 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
      * True if the server widget is enabled.
      */
     private volatile boolean widgetEnabled;
-    
+
     /**
      * The channel id that the widget will generate an invite to, or null if set to no invite.
      */
     private volatile Long widgetChannelId;
-    
+
     /**
      * The maximum number of presences for the guild (null is always returned, apart from the largest of guilds).
      */
     private volatile Integer maxPresences;
-    
+
     /**
      * The maximum number of members for the guild.
      */
     private volatile Integer maxMembers;
-    
+
     /**
      * The maximum amount of users in a video channel.
      */
     private volatile Integer maxVideoChannelUsers;
-    
+
     /**
      * The welcome screen of a community server, shown to new members.
      */
     private volatile WelcomeScreen welcomeScreen;
-    
+
     /**
      * Whether the server's boost progress bar is enabled or not.
      */
@@ -319,10 +321,10 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     /**
      * The enum set of all server system channel flags.
      */
-    private final EnumSet<SystemChannelFlag> systemChannelFlags = 
+    private final EnumSet<SystemChannelFlag> systemChannelFlags =
             EnumSet.noneOf(SystemChannelFlag.class);
-    
-    
+
+
     /**
      * Creates a new server object.
      *
@@ -411,15 +413,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                         getOrCreateChannelCategory(channel);
                         break;
                     case SERVER_NEWS_CHANNEL:
-                        // TODO Handle server news channel differently
-                        logger.debug("{} has a news channel. In this Javacord version it is treated as a normal "
-                                + "text channel!", this);
-                        getOrCreateServerTextChannel(channel);
-                        break;
-                    case SERVER_STORE_CHANNEL:
-                        // TODO Handle store channels
-                        logger.debug("{} has a store channel. These are not supported in this Javacord version"
-                                + " and get ignored!", this);
+                        getOrCreateServerNewsChannel(channel);
                         break;
                     default: {
                         try {
@@ -557,16 +551,16 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         this.widgetEnabled = data.path("widget_enabled").asBoolean(false);
-        this.widgetChannelId = data.hasNonNull("widget_channel_id") 
-                            ? data.get("widget_channel_id").asLong() : null;
-        this.maxPresences = data.hasNonNull("max_presences") 
-                            ? data.get("max_presences").asInt() : null;
-        this.maxMembers = data.hasNonNull("max_members") 
-                            ? data.get("max_members").asInt() : null;
-        this.maxVideoChannelUsers = data.hasNonNull("max_video_channel_users") 
-                            ? data.get("max_video_channel_users").asInt() : null;
+        this.widgetChannelId = data.hasNonNull("widget_channel_id")
+                ? data.get("widget_channel_id").asLong() : null;
+        this.maxPresences = data.hasNonNull("max_presences")
+                ? data.get("max_presences").asInt() : null;
+        this.maxMembers = data.hasNonNull("max_members")
+                ? data.get("max_members").asInt() : null;
+        this.maxVideoChannelUsers = data.hasNonNull("max_video_channel_users")
+                ? data.get("max_video_channel_users").asInt() : null;
         this.premiumProgressBarEnabled = data.path("premium_progress_bar_enabled").asBoolean(false);
-        
+
         api.addServerToCache(this);
     }
 
@@ -828,15 +822,29 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         long id = Long.parseLong(data.get("id").asText());
         ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            switch (type) {
-                case SERVER_TEXT_CHANNEL:
-                case SERVER_NEWS_CHANNEL: // TODO Treat news channels differently
-                    return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
-                default:
-                    // Invalid channel type
-                    return null;
+            if (type == ChannelType.SERVER_TEXT_CHANNEL) {
+                return getTextChannelById(id).orElseGet(() -> new ServerTextChannelImpl(api, this, data));
+            } // Invalid channel type
+            return null;
+        }
+    }
+
+    /**
+     * Gets or creates a server news channel.
+     *
+     * @param data The json data of the channel.
+     * @return The server news channel.
+     */
+    public ServerNewsChannel getOrCreateServerNewsChannel(JsonNode data) {
+        long id = Long.parseLong(data.get("id").asText());
+        ChannelType type = ChannelType.fromId(data.get("type").asInt());
+        synchronized (this) {
+            if (type == ChannelType.SERVER_NEWS_CHANNEL) {
+                return getNewsChannelById(id).orElseGet(() -> new ServerNewsChannelImpl(api, this, data));
             }
         }
+        // Invalid channel type
+        return null;
     }
 
     /**
@@ -2064,7 +2072,7 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     public String toString() {
         return String.format("Server (id: %s, name: %s)", getIdAsString(), getName());
     }
-    
+
     @Override
     public EnumSet<SystemChannelFlag> getSystemChannelFlags() {
         return EnumSet.copyOf(systemChannelFlags);

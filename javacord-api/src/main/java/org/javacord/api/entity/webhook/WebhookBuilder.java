@@ -1,6 +1,7 @@
 package org.javacord.api.entity.webhook;
 
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.channel.ServerMessageChanne
 import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;

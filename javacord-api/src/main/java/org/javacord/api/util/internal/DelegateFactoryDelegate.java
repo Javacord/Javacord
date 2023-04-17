@@ -5,6 +5,7 @@ import org.javacord.api.audio.internal.AudioSourceBaseDelegate;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerForumChannel;
+import org.javacord.api.entity.channel.ServerMessageChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -14,6 +15,7 @@ import org.javacord.api.entity.channel.internal.RegularServerChannelUpdaterDeleg
 import org.javacord.api.entity.channel.internal.ServerChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerForumChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerForumChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.ServerMessageChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerTextChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelegate;
@@ -155,7 +157,7 @@ public interface DelegateFactoryDelegate {
      * @return A new server thread channel builder delegate.
      */
     ServerThreadChannelBuilderDelegate createServerThreadChannelBuilderDelegate(
-            ServerTextChannel serverTextChannel);
+            ServerMessageChannel serverTextChannel);
 
     /**
      * Creates a new server thread channel builder delegate.
@@ -269,6 +271,14 @@ public interface DelegateFactoryDelegate {
      * @return A new server text channel updater delegate.
      */
     ServerTextChannelUpdaterDelegate createServerTextChannelUpdaterDelegate(ServerTextChannel channel);
+
+    /**
+     * Creates a new server message channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new server message channel updater delegate.
+     */
+    ServerMessageChannelUpdaterDelegate createServerMessageChannelUpdaterDelegate(ServerMessageChannel channel);
 
     /**
      * Creates a new server forum channel updater delegate.
