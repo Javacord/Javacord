@@ -43,6 +43,9 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.internal.ServerBuilderDelegate;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.server.invite.internal.InviteBuilderDelegate;
+import org.javacord.api.entity.server.scheduledevent.ServerScheduledEvent;
+import org.javacord.api.entity.server.scheduledevent.internal.ServerScheduledEventBuilderDelegate;
+import org.javacord.api.entity.server.scheduledevent.internal.ServerScheduledEventUpdaterDelegate;
 import org.javacord.api.entity.sticker.internal.StickerBuilderDelegate;
 import org.javacord.api.entity.sticker.internal.StickerUpdaterDelegate;
 import org.javacord.api.entity.webhook.Webhook;
@@ -206,6 +209,14 @@ public interface DelegateFactoryDelegate {
     RoleBuilderDelegate createRoleBuilderDelegate(Server server);
 
     /**
+     * Creates a new server scheduled event builder delegate.
+     *
+     * @param server The server for which the server scheduled event should be created.
+     * @return A new server scheduled event builder delegate.
+     */
+    ServerScheduledEventBuilderDelegate createServerScheduledEventBuilderDelegate(Server server);
+
+    /**
      * Creates a new invite builder delegate.
      *
      * @param channel The channel for the invite.
@@ -309,6 +320,14 @@ public interface DelegateFactoryDelegate {
      * @return A new role updater delegate.
      */
     RoleUpdaterDelegate createRoleUpdaterDelegate(Role role);
+
+    /**
+     * Creates a new server scheduled event updater delegate.
+     *
+     * @param scheduledEvent The server scheduled event to update.
+     * @return A new server scheduled event updater delegate.
+     */
+    ServerScheduledEventUpdaterDelegate createServerScheduledEventUpdaterDelegate(ServerScheduledEvent scheduledEvent);
 
     /**
      * Creates a new server updater delegate.

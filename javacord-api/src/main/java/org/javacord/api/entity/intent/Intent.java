@@ -170,7 +170,19 @@ public enum Intent {
      *
      * @see <a href="https://discord.com/developers/applications">Discord developer portal</a>
      */
-    MESSAGE_CONTENT(15, true);
+    MESSAGE_CONTENT(15, true),
+
+    /**
+     * The following events are received.
+     * <ul>
+     *     <li>GUILD_SCHEDULED_EVENT_CREATE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_UPDATE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_DELETE</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_ADD</li>
+     *     <li>GUILD_SCHEDULED_EVENT_USER_REMOVE</li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENTS(16, false);
 
     private final int id;
 
