@@ -62,6 +62,11 @@ import org.javacord.core.util.handler.guild.VoiceStateUpdateHandler;
 import org.javacord.core.util.handler.guild.role.GuildRoleCreateHandler;
 import org.javacord.core.util.handler.guild.role.GuildRoleDeleteHandler;
 import org.javacord.core.util.handler.guild.role.GuildRoleUpdateHandler;
+import org.javacord.core.util.handler.guild.scheduledevent.GuildScheduledEventCreateHandler;
+import org.javacord.core.util.handler.guild.scheduledevent.GuildScheduledEventDeleteHandler;
+import org.javacord.core.util.handler.guild.scheduledevent.GuildScheduledEventUpdateHandler;
+import org.javacord.core.util.handler.guild.scheduledevent.GuildScheduledEventUserAddHandler;
+import org.javacord.core.util.handler.guild.scheduledevent.GuildScheduledEventUserRemoveHandler;
 import org.javacord.core.util.handler.interaction.InteractionCreateHandler;
 import org.javacord.core.util.handler.message.MessageCreateHandler;
 import org.javacord.core.util.handler.message.MessageDeleteBulkHandler;
@@ -874,6 +879,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
 
         // command
         addHandler(new InteractionCreateHandler(api));
+
+        // scheduled event
+        addHandler(new GuildScheduledEventCreateHandler(api));
+        addHandler(new GuildScheduledEventDeleteHandler(api));
+        addHandler(new GuildScheduledEventUpdateHandler(api));
+        addHandler(new GuildScheduledEventUserAddHandler(api));
+        addHandler(new GuildScheduledEventUserRemoveHandler(api));
     }
 
     /**
