@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.Categorizable;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.ChannelFlag;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -13,6 +14,10 @@ import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.forum.AvailableTag;
+import org.javacord.api.entity.channel.forum.DefaultReaction;
+import org.javacord.api.entity.channel.forum.PermissionOverwrite;
+import org.javacord.api.entity.channel.forum.SortOrderType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
@@ -20,6 +25,17 @@ import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeNsfwFlagEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangeOverwrittenPermissionsEvent;
 import org.javacord.api.event.channel.server.ServerChannelChangePositionEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeAvailableTagsEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeDefaultReactionEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeDefaultSortTypeEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeDefaultThreadRateLimitPerUserEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeFlagsEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeLastMessageIdEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangePermissionOverwritesEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangePositionEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeRateLimitPerUserEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeTemplateEvent;
+import org.javacord.api.event.channel.server.forum.ServerForumChannelChangeTopicEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeSlowmodeEvent;
 import org.javacord.api.event.channel.server.text.ServerTextChannelChangeTopicEvent;
@@ -34,12 +50,26 @@ import org.javacord.core.entity.channel.ServerForumChannelImpl;
 import org.javacord.core.entity.channel.ServerStageVoiceChannelImpl;
 import org.javacord.core.entity.channel.ServerTextChannelImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelImpl;
+import org.javacord.core.entity.channel.forum.AvailableTagImpl;
+import org.javacord.core.entity.channel.forum.DefaultReactionImpl;
+import org.javacord.core.entity.channel.forum.PermissionOverwriteImpl;
 import org.javacord.core.entity.permission.PermissionsImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNameEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeNsfwFlagEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangeOverwrittenPermissionsEventImpl;
 import org.javacord.core.event.channel.server.ServerChannelChangePositionEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeAvailableTagsEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeDefaultReactionEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeDefaultSortTypeEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeDefaultThreadRateLimitPerUserEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeFlagsEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeLastMessageIdEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangePermissionOverwritesEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangePositionEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeRateLimitPerUserEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeTemplateEventImpl;
+import org.javacord.core.event.channel.server.forum.ServerForumChannelChangeTopicEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeDefaultAutoArchiveDurationEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeSlowmodeEventImpl;
 import org.javacord.core.event.channel.server.text.ServerTextChannelChangeTopicEventImpl;
@@ -52,9 +82,12 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -100,7 +133,7 @@ public class ChannelUpdateHandler extends PacketHandler {
             case SERVER_FORUM_CHANNEL:
                 handleServerChannel(packet);
                 handleRegularServerChannel(packet);
-                //handleServerForumChannel(packet);
+                handleServerForumChannel(packet);
                 break;
             case SERVER_NEWS_CHANNEL:
                 logger.debug("Received CHANNEL_UPDATE packet for a news channel. In this Javacord version it is "
@@ -197,6 +230,9 @@ public class ChannelUpdateHandler extends PacketHandler {
                         newCategory == null ? -1 : newCategory.getId());
             } else if (regularServerChannel instanceof ServerVoiceChannelImpl) {
                 ((ServerVoiceChannelImpl) regularServerChannel).setParentId(
+                        newCategory == null ? -1 : newCategory.getId());
+            } else if (regularServerChannel instanceof ServerForumChannelImpl) {
+                ((ServerForumChannelImpl) regularServerChannel).setParentId(
                         newCategory == null ? -1 : newCategory.getId());
             }
             regularServerChannel.setRawPosition(newRawPosition);
@@ -331,7 +367,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                         new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
                 api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                        (DispatchQueueSelector) channel.getServer(), channel, channel.getServer(), null, event);
+                        (DispatchQueueSelector) channel.getServer(), channel, channel.getServer(), null, null,
+                        event);
             }
         });
     }
@@ -372,7 +409,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                     new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
 
             api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
-                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, event);
+                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), null, channel,
+                    event);
         }
 
         int oldSlowmodeDelay = channel.getSlowmodeDelayInSeconds();
@@ -421,6 +459,181 @@ public class ChannelUpdateHandler extends PacketHandler {
         }
 
         ServerForumChannelImpl channel = (ServerForumChannelImpl) optionalChannel.get();
+
+        String oldTopic = channel.getTopic().orElse(null);
+        String newTopic = jsonChannel.has("topic") && !jsonChannel.get("topic").isNull()
+                ? jsonChannel.get("topic").asText() : null;
+        if (!Objects.equals(oldTopic, newTopic)) {
+            channel.setTopic(newTopic);
+
+            ServerForumChannelChangeTopicEvent event =
+                    new ServerForumChannelChangeTopicEventImpl(channel, newTopic, oldTopic);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeTopicEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        int oldRateLimitPerUser = channel.getRateLimitPerUser();
+        int newRateLimitPerUser = jsonChannel.has("rate_limit_per_user")
+                ? jsonChannel.get("rate_limit_per_user").asInt(0) : 0;
+        if (oldRateLimitPerUser != newRateLimitPerUser) {
+            channel.setRateLimitPerUser(newRateLimitPerUser);
+
+            ServerForumChannelChangeRateLimitPerUserEvent event =
+                    new ServerForumChannelChangeRateLimitPerUserEventImpl(channel,
+                            oldRateLimitPerUser, newRateLimitPerUser);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeRateLimitPerUserEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        int oldPosition = channel.getRawPosition();
+        int newPosition = jsonChannel.has("position")
+                ? jsonChannel.get("position").asInt(0) : 0;
+        if (oldPosition != newPosition) {
+            channel.setRawPosition(newPosition);
+
+            ServerForumChannelChangePositionEvent event =
+                    new ServerForumChannelChangePositionEventImpl(channel, oldPosition, newPosition);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangePositionEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        List<PermissionOverwrite> oldPermissionOverwrites = channel.getPermissionOverwrites();
+        List<PermissionOverwrite> newPermissionOverwrites = new ArrayList<>();
+        if (jsonChannel.has("permission_overwrites")) {
+            for (JsonNode overwrite : jsonChannel.get("permission_overwrites")) {
+                newPermissionOverwrites.add(new PermissionOverwriteImpl(api, overwrite));
+            }
+        }
+
+        if (!oldPermissionOverwrites.equals(newPermissionOverwrites)) {
+            channel.setPermissionOverwrites(newPermissionOverwrites);
+
+            ServerForumChannelChangePermissionOverwritesEvent event =
+                    new ServerForumChannelChangePermissionOverwritesEventImpl(channel,
+                            oldPermissionOverwrites, newPermissionOverwrites);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangePermissionOverwritesEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        boolean oldNsfwFlag = channel.isNsfw();
+        boolean newNsfwFlag = jsonChannel.get("nsfw").asBoolean();
+        if (oldNsfwFlag != newNsfwFlag) {
+            channel.setNsfw(newNsfwFlag);
+
+            ServerChannelChangeNsfwFlagEvent event =
+                    new ServerChannelChangeNsfwFlagEventImpl(channel, newNsfwFlag, oldNsfwFlag);
+
+            api.getEventDispatcher().dispatchServerChannelChangeNsfwFlagEvent(
+                    (DispatchQueueSelector) channel.getServer(), null, channel.getServer(), channel, null, event);
+        }
+
+        Long oldMessageId = channel.getLastMessageId().orElse(null);
+        Long newMessageId = jsonChannel.has("last_message_id") && !jsonChannel.get("last_message_id").isNull()
+                ? jsonChannel.get("last_message_id").asLong() : null;
+        if (!Objects.equals(oldMessageId, newMessageId)) {
+            channel.setLastMessageId(newMessageId);
+
+            ServerForumChannelChangeLastMessageIdEvent event =
+                    new ServerForumChannelChangeLastMessageIdEventImpl(channel, newMessageId, oldMessageId);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeLastMessageIdEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        EnumSet<ChannelFlag> oldFlags = channel.getFlags();
+        EnumSet<ChannelFlag> newFlags = EnumSet.noneOf(ChannelFlag.class);
+        if (jsonChannel.hasNonNull("flags")) {
+            for (JsonNode flag : jsonChannel.get("flags")) {
+                newFlags.add(ChannelFlag.getByValue(flag.asInt()));
+            }
+        }
+
+        if (!oldFlags.equals(newFlags)) {
+            channel.setFlags(newFlags);
+            ServerForumChannelChangeFlagsEvent event =
+                    new ServerForumChannelChangeFlagsEventImpl(channel, newFlags, oldFlags);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeFlagsEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        List<AvailableTag> oldAvailableTags = channel.getAvailableTags();
+        List<AvailableTag> newAvailableTags = new ArrayList<>();
+        if (jsonChannel.hasNonNull("available_tags")) {
+            for (JsonNode tag : jsonChannel.get("available_tags")) {
+                newAvailableTags.add(new AvailableTagImpl(api, tag));
+            }
+        }
+
+        if (!oldAvailableTags.equals(newAvailableTags)) {
+            channel.setAvailableTags(newAvailableTags);
+            ServerForumChannelChangeAvailableTagsEvent event =
+                    new ServerForumChannelChangeAvailableTagsEventImpl(channel, newAvailableTags, oldAvailableTags);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeAvailableTagsEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        String oldTemplate = channel.getTemplate().orElse(null);
+        String newTemplate = jsonChannel.hasNonNull("template")
+                ? jsonChannel.get("template").asText()
+                : null;
+        if (!Objects.equals(oldTemplate, newTemplate)) {
+            channel.setTemplate(newTemplate);
+            ServerForumChannelChangeTemplateEvent event =
+                    new ServerForumChannelChangeTemplateEventImpl(channel, newTemplate, oldTemplate);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeTemplateEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        SortOrderType oldDefaultSortType = channel.getDefaultSortType().orElse(null);
+        SortOrderType newDefaultSortType = jsonChannel.hasNonNull("default_sort_type")
+                ? SortOrderType.getByValue(jsonChannel.get("default_sort_type").asInt())
+                : null;
+        if (!Objects.equals(oldDefaultSortType, newDefaultSortType)) {
+            channel.setDefaultSortOrder(newDefaultSortType);
+            ServerForumChannelChangeDefaultSortTypeEvent event =
+                    new ServerForumChannelChangeDefaultSortTypeEventImpl(channel,
+                            newDefaultSortType, oldDefaultSortType);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeDefaultSortTypeEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        DefaultReaction oldDefaultReaction = !channel.getDefaultReaction().isPresent()
+                ? null : channel.getDefaultReaction().get();
+        DefaultReaction newDefaultReaction = jsonChannel.hasNonNull("default_reaction_emoji")
+                ? new DefaultReactionImpl(jsonChannel.get("default_reaction_emoji"))
+                : null;
+
+        if (!Objects.equals(oldDefaultReaction, newDefaultReaction)) {
+            channel.setDefaultReaction(newDefaultReaction);
+            ServerForumChannelChangeDefaultReactionEvent event =
+                    new ServerForumChannelChangeDefaultReactionEventImpl(channel, newDefaultReaction,
+                            oldDefaultReaction);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeDefaultReactionEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
+
+        int oldDefaultThreadRateLimitPerUser = channel.getDefaultThreadRateLimitPerUser();
+        int newDefaultThreadRateLimitPerUser = jsonChannel.hasNonNull("default_auto_archive_duration")
+                ? jsonChannel.get("default_auto_archive_duration").asInt()
+                : 0;
+        if (oldDefaultThreadRateLimitPerUser != newDefaultThreadRateLimitPerUser) {
+            channel.setDefaultThreadRateLimitPerUser(newDefaultThreadRateLimitPerUser);
+            ServerForumChannelChangeDefaultThreadRateLimitPerUserEvent event =
+                    new ServerForumChannelChangeDefaultThreadRateLimitPerUserEventImpl(channel,
+                            newDefaultThreadRateLimitPerUser, oldDefaultThreadRateLimitPerUser);
+
+            api.getEventDispatcher().dispatchServerForumChannelChangeDefaultThreadRateLimitPerUserEvent(
+                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+        }
     }
 
     /**
