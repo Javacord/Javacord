@@ -14,6 +14,54 @@ import java.util.concurrent.CompletableFuture;
 public interface PrivateChannel extends TextChannel, VoiceChannel, PrivateChannelAttachableListenerManager {
 
     @Override
+    default boolean canWrite(User user) {
+        return user.isYourself() || getRecipient()
+                .map(recipient -> recipient.equals(user)).orElse(false);
+    }
+
+    @Override
+    default boolean canUseExternalEmojis(User user) {
+        return canWrite(user);
+    }
+
+    @Override
+    default boolean canEmbedLinks(User user) {
+        return canWrite(user);
+    }
+
+    @Override
+    default boolean canReadMessageHistory(User user) {
+        return canSee(user);
+    }
+
+    @Override
+    default boolean canUseTts(User user) {
+        return canWrite(user);
+    }
+
+    @Override
+    default boolean canAttachFiles(User user) {
+        return user.isYourself() || getRecipient()
+                .map(recipient -> recipient.equals(user)).orElse(false);
+    }
+
+    @Override
+    default boolean canAddNewReactions(User user) {
+        return user.isYourself() || getRecipient()
+                .map(recipient -> recipient.equals(user)).orElse(false);
+    }
+
+    @Override
+    default boolean canManageMessages(User user) {
+        return canSee(user);
+    }
+
+    @Override
+    default boolean canMentionEveryone(User user) {
+        return canSee(user);
+    }
+
+    @Override
     default ChannelType getType() {
         return ChannelType.PRIVATE_CHANNEL;
     }

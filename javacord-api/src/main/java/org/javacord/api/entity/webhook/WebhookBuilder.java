@@ -1,7 +1,7 @@
 package org.javacord.api.entity.webhook;
 
 import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.webhook.internal.WebhookBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
@@ -24,9 +24,9 @@ public class WebhookBuilder {
     /**
      * Creates a new webhook builder.
      *
-     * @param channel The server text channel of the webhook.
+     * @param channel The textable regular server channel of the webhook.
      */
-    public WebhookBuilder(ServerTextChannel channel) {
+    public WebhookBuilder(TextableRegularServerChannel channel) {
         delegate = DelegateFactory.createWebhookBuilderDelegate(channel);
     }
 

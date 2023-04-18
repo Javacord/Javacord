@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public enum DiscordLocale {
 
+    INDONESIAN("id"),
     DANISH("da"),
     GERMAN("de"),
     ENGLISH_UK("en-GB"),
