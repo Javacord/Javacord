@@ -3,7 +3,10 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.AutoArchiveDuration;
 import org.javacord.api.entity.channel.ServerThreadChannel;
+import org.javacord.api.entity.channel.forum.ForumTag;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelUpdaterDelegate;
+
+import java.util.Set;
 
 /**
  * The implementation of {@link ServerThreadChannelUpdaterDelegate}.
@@ -35,6 +38,11 @@ public class ServerThreadChannelUpdaterDelegateImpl extends ServerChannelUpdater
      * The slowmode delay.
      */
     private Integer delay = null;
+
+    /**
+     * The forum tags to update.
+     */
+    private Set<ForumTag> forumTags = null;
 
     /**
      * Creates a new server thread channel delegate.
@@ -71,6 +79,19 @@ public class ServerThreadChannelUpdaterDelegateImpl extends ServerChannelUpdater
     }
 
     @Override
+    public void setForumTags(Set<ForumTag> forumTags) {
+        channel.asServerForumChannel().ifPresent(serverForumChannel -> {
+            for (ForumTag tag : forumTags) {
+                if (!serverForumChannel.getForumTags().contains(tag)) {
+                    throw new IllegalArgumentException("The tag " + tag.getName() + " is not a valid forum tag");
+                }
+            }
+
+            this.forumTags = forumTags;
+        });
+    }
+
+    @Override
     protected boolean prepareUpdateBody(ObjectNode body) {
         boolean patchThread = super.prepareUpdateBody(body);
 
@@ -97,6 +118,11 @@ public class ServerThreadChannelUpdaterDelegateImpl extends ServerChannelUpdater
         if (delay != null) {
             body.put("rate_limit_per_user", delay);
             patchThread = true;
+        }
+        if (forumTags != null && !forumTags.isEmpty()) {
+            for (ForumTag tag : forumTags) {
+                body.putArray("forum_tags").add(tag.getId());
+            }
         }
         return patchThread;
     }
