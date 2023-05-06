@@ -10,7 +10,6 @@ import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,15 +49,15 @@ public class ActivityImpl implements Activity {
     public ActivityImpl(DiscordApiImpl api, JsonNode data) {
         this.type = ActivityType.getActivityTypeById(data.get("type").asInt());
         this.name = data.get("name").asText();
-        this.streamingUrl = data.has("url") ? data.get("url").asText(null) : null;
-        this.details = data.has("details") ? data.get("details").asText(null) : null;
-        this.state = data.has("state") ? data.get("state").asText(null) : null;
-        this.party = data.has("party") ? new ActivityPartyImpl(data.get("party")) : null;
-        this.assets = data.has("assets") ? new ActivityAssetsImpl(this, data.get("assets")) : null;
-        this.secrets = data.has("secrets") ? new ActivitySecretsImpl(data.get("secrets")) : null;
-        this.applicationId = data.has("application_id") ? data.get("application_id").asLong() : null;
+        this.streamingUrl = data.hasNonNull("url") ? data.get("url").asText() : null;
+        this.details = data.hasNonNull("details") ? data.get("details").asText() : null;
+        this.state = data.hasNonNull("state") ? data.get("state").asText() : null;
+        this.party = data.hasNonNull("party") ? new ActivityPartyImpl(data.get("party")) : null;
+        this.assets = data.hasNonNull("assets") ? new ActivityAssetsImpl(this, data.get("assets")) : null;
+        this.secrets = data.hasNonNull("secrets") ? new ActivitySecretsImpl(data.get("secrets")) : null;
+        this.applicationId = data.hasNonNull("application_id") ? data.get("application_id").asLong() : null;
         this.createdAt = Instant.ofEpochMilli(data.get("created_at").asLong());
-        this.instance = data.has("instance") && data.get("instance").asBoolean();
+        this.instance = data.hasNonNull("instance") && data.get("instance").asBoolean();
 
         if (data.has("timestamps")) {
             JsonNode timestamps = data.get("timestamps");

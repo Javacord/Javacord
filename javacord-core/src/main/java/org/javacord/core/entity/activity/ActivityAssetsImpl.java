@@ -5,7 +5,6 @@ import org.javacord.api.Javacord;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.activity.ActivityAssets;
 import org.javacord.core.entity.IconImpl;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Objects;
@@ -28,15 +27,20 @@ public class ActivityAssetsImpl implements ActivityAssets {
      * Creates a new activity assets object.
      *
      * @param activity The associated activity.
-     * @param data The json data of the assets party.
+     * @param data     The json data of the assets party.
      */
     public ActivityAssetsImpl(ActivityImpl activity, JsonNode data) {
         this.activity = activity;
 
-        this.largeImage = data.has("large_image") ? data.get("large_image").asText(null) : null;
-        this.largeText = data.has("large_text") ? data.get("large_text").asText(null) : null;
-        this.smallImage = data.has("small_image") ? data.get("small_image").asText(null) : null;
-        this.smallText = data.has("small_text") ? data.get("small_text").asText(null) : null;
+        this.largeImage = data.hasNonNull("large_image") ? data.get("large_image").asText() : null;
+        this.largeText = data.hasNonNull("large_text") ? data.get("large_text").asText() : null;
+        this.smallImage = data.hasNonNull("small_image") ? data.get("small_image").asText() : null;
+        this.smallText = data.hasNonNull("small_text") ? data.get("small_text").asText() : null;
+    }
+
+    @Override
+    public Optional<String> getLargeImageValue() {
+        return Optional.ofNullable(largeImage);
     }
 
     @Override
@@ -57,6 +61,11 @@ public class ActivityAssetsImpl implements ActivityAssets {
     @Override
     public Optional<String> getLargeText() {
         return Optional.ofNullable(largeText);
+    }
+
+    @Override
+    public Optional<String> getSmallImageValue() {
+        return Optional.ofNullable(smallImage);
     }
 
     @Override

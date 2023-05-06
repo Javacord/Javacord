@@ -21,7 +21,7 @@ public class ActivityPartyImpl implements ActivityParty {
      * @param data The json data of the activity party.
      */
     public ActivityPartyImpl(JsonNode data) {
-        this.id = data.has("id") ? data.get("id").asText(null) : null;
+        this.id = data.hasNonNull("id") ? data.get("id").asText() : null;
         if (data.has("size")) {
             // The size is an array with two integers
             this.currentSize = data.get("size").get(0).asInt();
