@@ -4,6 +4,8 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.MessageDecoration;
 import org.javacord.api.entity.message.TimestampStyle;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("unchecked")
 public interface MessageBuilderContent<T extends MessageBuilderContent<T>> {
@@ -159,6 +161,136 @@ public interface MessageBuilderContent<T extends MessageBuilderContent<T>> {
      */
     default T removeContent() {
         return setContent(null);
+    }
+
+    /**
+     * Appends a masked link "<a href="https://javacord.org/">Javacord</a>" to the message.
+     *
+     * @param text The text of the link.
+     * @param url  The url.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendMaskedLink(String text, String url) {
+        return append("[").append(text).append("](").append(url).append(")");
+    }
+
+    /**
+     * Appends a string as a header to the message.
+     *
+     * @param header The header to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendLargeHeader(String header) {
+        return appendNewLine().append("#").append(header).appendNewLine();
+    }
+
+    /**
+     * Appends a string as a header to the message.
+     *
+     * @param header The header to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendMediumHeader(String header) {
+        return appendNewLine().append("##").append(header).appendNewLine();
+    }
+
+    /**
+     * Appends a string as a header to the message.
+     *
+     * @param header The header to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendSmallHeader(String header) {
+        return appendNewLine().append("###").append(header).appendNewLine();
+    }
+
+    /**
+     * Append a list element to the message.
+     *
+     * @param listElement The list element to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendListElement(String listElement) {
+        if (!getStringBuilder().toString().endsWith("\n")) {
+            appendNewLine();
+        }
+        return append("- ").append(listElement).appendNewLine();
+    }
+
+    /**
+     * Append a nested list element to the message.
+     *
+     * @param nestedListElement The nested list element to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendNestedListElement(String nestedListElement) {
+        if (!getStringBuilder().toString().endsWith("\n")) {
+            appendNewLine();
+        }
+        return append(" - ").append(nestedListElement).appendNewLine();
+    }
+
+    /**
+     * Appends a list to the message.
+     *
+     * @param list The list to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendList(List<String> list) {
+        list.forEach(this::appendListElement);
+        return (T) this;
+    }
+
+    /**
+     * Appends a list to the message.
+     *
+     * @param list The list to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendList(String... list) {
+        return appendList(Arrays.asList(list));
+    }
+
+    /**
+     * Appends a nested list to the message.
+     * The structure will look like this:
+     * <ul>
+     *     <li>outerListName</li>
+     *     <li><ul>
+     *         <li>list[0]</li>
+     *         <li>list[1]</li>
+     *         <li>list[...]</li>
+     *     </ul></li>
+     * </ul>
+     *
+     * @param outerListName The outer list name to append.
+     * @param list          The list to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendNestedList(String outerListName, List<String> list) {
+        appendListElement(outerListName);
+        list.forEach(this::appendNestedListElement);
+        return (T) this;
+    }
+
+    /**
+     * Appends a nested list to the message.
+     * The structure will look like this:
+     * <ul>
+     *     <li>outerListName</li>
+     *     <li><ul>
+     *         <li>list[0]</li>
+     *         <li>list[1]</li>
+     *         <li>list[...]</li>
+     *     </ul></li>
+     * </ul>
+     *
+     * @param outerListName The outer list name to append.
+     * @param list          The list to append.
+     * @return The current instance in order to chain call methods.
+     */
+    default T appendNestedList(String outerListName, String... list) {
+        return appendNestedList(outerListName, Arrays.asList(list));
     }
 
 }
