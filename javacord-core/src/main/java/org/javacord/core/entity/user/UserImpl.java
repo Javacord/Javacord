@@ -225,7 +225,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/");
         if (avatarHash == null) {
             url.append("embed/avatars/")
-                    .append(Integer.parseInt(discriminator) % 5)
+                    .append(discriminator.equals("0") ? (userId >> 22) % 6 : Integer.parseInt(discriminator) % 5)
                     .append(".png");
         } else {
             url.append("avatars/")
