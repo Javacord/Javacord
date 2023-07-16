@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.ServerChannel;
-import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.channel.TextableRegularServerChannel;
@@ -59,7 +58,8 @@ public class MessageCreateHandler extends PacketHandler {
         if (!packet.hasNonNull("guild_id")) {
             // Check for EPHEMERAL messages as they do NOT include a guild_id when the EPHEMERAL flag is set.
             if (packet.hasNonNull("flags") && (packet.get("flags").asInt() & MessageFlag.EPHEMERAL.getId()) > 0) {
-                Optional<TextableRegularServerChannel> textableRegularServerChannel = api.getServerChannelById(channelId).flatMap(Channel::asTextableRegularServerChannel);
+                Optional<TextableRegularServerChannel> textableRegularServerChannel =
+                        api.getServerChannelById(channelId).flatMap(Channel::asTextableRegularServerChannel);
                 if (textableRegularServerChannel.isPresent()) {
                     handle(textableRegularServerChannel.get(), packet);
                     return;
