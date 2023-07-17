@@ -145,11 +145,21 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "shuen4",
+      "name": "sotzaii_shuen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38818683?v=4",
+      "profile": "http://shuen.ddns.net",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
   "projectOwner": "Javacord",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
