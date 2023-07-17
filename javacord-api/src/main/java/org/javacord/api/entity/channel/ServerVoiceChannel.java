@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class represents a server voice channel.
  */
-public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, TextableRegularServerChannel,
+public interface ServerVoiceChannel extends VoiceChannel, TextableRegularServerChannel,
                                             ServerVoiceChannelAttachableListenerManager {
 
     /**
@@ -295,31 +295,6 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
      */
     default CompletableFuture<Void> removeUserLimit() {
         return createUpdater().removeUserLimit().update();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param category The new category of the channel.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateCategory(ChannelCategory category) {
-        return createUpdater().setCategory(category).update();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerVoiceChannelUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> removeCategory() {
-        return createUpdater().removeCategory().update();
     }
 
     /**

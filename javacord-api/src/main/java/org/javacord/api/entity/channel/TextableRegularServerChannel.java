@@ -4,8 +4,14 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.WebhookBuilder;
+import org.javacord.api.listener.channel.server.textable.TextableRegularServerChannelAttachableListenerManager;
 
-public interface TextableRegularServerChannel extends TextChannel, Mentionable, Categorizable {
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+public interface TextableRegularServerChannel extends TextChannel, RegularServerChannel,
+        TextableRegularServerChannelAttachableListenerManager, Mentionable, Categorizable {
 
     @Override
     default boolean canWrite(User user) {
@@ -97,6 +103,53 @@ public interface TextableRegularServerChannel extends TextChannel, Mentionable, 
                 regularServerChannel.hasPermission(user, PermissionType.ADMINISTRATOR)
                         || (regularServerChannel.hasPermission(user, PermissionType.MENTION_EVERYONE)
                         && canWrite(user))).orElse(false);
+    }
+
+    @Override
+    default TextableRegularServerChannelUpdater createUpdater() {
+        return new TextableRegularServerChannelUpdater(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link TextableRegularServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param category The new category of the channel.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateCategory(ChannelCategory category) {
+        return createUpdater().setCategory(category).update();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link TextableRegularServerChannelUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeCategory() {
+        return createUpdater().removeCategory().update();
+    }
+
+    @Override
+    default Optional<? extends TextableRegularServerChannel> getCurrentCachedInstance() {
+        return getApi().getServerChannelById(getId()).flatMap(Channel::asTextableRegularServerChannel);
+    }
+
+    @Override
+    default CompletableFuture<? extends TextableRegularServerChannel> getLatestInstance() {
+        Optional<? extends TextableRegularServerChannel> currentCachedInstance = getCurrentCachedInstance();
+        if (currentCachedInstance.isPresent()) {
+            return CompletableFuture.completedFuture(currentCachedInstance.get());
+        } else {
+            CompletableFuture<? extends TextableRegularServerChannel> result = new CompletableFuture<>();
+            result.completeExceptionally(new NoSuchElementException());
+            return result;
+        }
     }
 
     @Override

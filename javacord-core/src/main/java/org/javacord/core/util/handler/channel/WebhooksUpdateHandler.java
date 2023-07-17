@@ -3,7 +3,8 @@ package org.javacord.core.util.handler.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.Channel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.event.channel.server.text.WebhooksUpdateEvent;
 import org.javacord.core.event.channel.server.text.WebhooksUpdateEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
@@ -34,13 +35,19 @@ public class WebhooksUpdateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         long channelId = packet.get("channel_id").asLong();
-        Optional<ServerTextChannel> optionalChannel =  api.getServerTextChannelById(channelId);
+        Optional<TextableRegularServerChannel> optionalChannel =  api.getServerChannelById(channelId)
+                .flatMap(Channel::asTextableRegularServerChannel);
         if (optionalChannel.isPresent()) {
-            ServerTextChannel channel = optionalChannel.get();
+            TextableRegularServerChannel channel = optionalChannel.get();
             WebhooksUpdateEvent event = new WebhooksUpdateEventImpl(channel);
 
             api.getEventDispatcher().dispatchWebhooksUpdateEvent(
-                    (DispatchQueueSelector) channel.getServer(), channel.getServer(), channel, event);
+                    (DispatchQueueSelector) channel.getServer(),
+                    channel.getServer(),
+                    channel.asServerTextChannel().orElse(null),
+                    channel.asServerVoiceChannel().orElse(null),
+                    channel,
+                    event);
         } else {
             LoggerUtil.logMissingChannel(logger, channelId);
         }

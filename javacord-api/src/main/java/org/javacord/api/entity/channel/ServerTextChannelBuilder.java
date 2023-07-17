@@ -37,17 +37,6 @@ public class ServerTextChannelBuilder extends RegularServerChannelBuilder<Server
     }
 
     /**
-     * Sets the category of the channel.
-     *
-     * @param category The category of the channel.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerTextChannelBuilder setCategory(ChannelCategory category) {
-        delegate.setCategory(category);
-        return this;
-    }
-
-    /**
      * Sets the slowmode of the channel.
      *
      * @param delay The delay in seconds.

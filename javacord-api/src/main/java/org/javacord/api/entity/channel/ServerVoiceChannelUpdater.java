@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * This class can be used to update server voice channels.
  */
-public class ServerVoiceChannelUpdater extends RegularServerChannelUpdater<ServerVoiceChannelUpdater> {
+public class ServerVoiceChannelUpdater extends TextableRegularServerChannelUpdater<ServerVoiceChannelUpdater> {
 
     /**
      * The server voice channel delegate used by this instance.
@@ -21,7 +21,7 @@ public class ServerVoiceChannelUpdater extends RegularServerChannelUpdater<Serve
      */
     public ServerVoiceChannelUpdater(ServerVoiceChannel channel) {
         super(DelegateFactory.createServerVoiceChannelUpdaterDelegate(channel));
-        delegate = (ServerVoiceChannelUpdaterDelegate) super.regularServerChannelUpdaterDelegate;
+        delegate = (ServerVoiceChannelUpdaterDelegate) super.textableRegularServerChannelUpdaterDelegate;
     }
 
     /**
@@ -53,39 +53,6 @@ public class ServerVoiceChannelUpdater extends RegularServerChannelUpdater<Serve
      */
     public ServerVoiceChannelUpdater removeUserLimit() {
         delegate.removeUserLimit();
-        return this;
-    }
-
-    /**
-     * Queues the category to be updated.
-     *
-     * @param category The new category of the channel.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerVoiceChannelUpdater setCategory(ChannelCategory category) {
-        delegate.setCategory(category);
-        return this;
-    }
-
-    /**
-     * Queues the category to be removed.
-     *
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerVoiceChannelUpdater removeCategory() {
-        delegate.removeCategory();
-        return this;
-    }
-
-    /**
-     * Queues the nsfw flag to be updated.
-     *
-     * @param nsfw Whether the channel should be marked as 'not safe for work'
-     *             or not.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerVoiceChannelUpdater setNsfw(Boolean nsfw) {
-        delegate.setNsfw(nsfw);
         return this;
     }
 

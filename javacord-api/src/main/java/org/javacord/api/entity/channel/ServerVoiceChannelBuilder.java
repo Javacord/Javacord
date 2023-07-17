@@ -26,17 +26,6 @@ public class ServerVoiceChannelBuilder extends RegularServerChannelBuilder<Serve
     }
 
     /**
-     * Sets the category of the channel.
-     *
-     * @param category The category of the channel.
-     * @return The current instance in order to chain call methods.
-     */
-    public ServerVoiceChannelBuilder setCategory(ChannelCategory category) {
-        delegate.setCategory(category);
-        return this;
-    }
-
-    /**
      * Sets the bitrate of the channel.
      *
      * @param bitrate The bitrate of the channel.
