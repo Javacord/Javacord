@@ -1,10 +1,15 @@
 package org.javacord.api.entity.permission;
 
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.internal.RoleBuilderDelegate;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -92,6 +97,111 @@ public class RoleBuilder {
      */
     public RoleBuilder setDisplaySeparately(boolean displaySeparately) {
         delegate.setDisplaySeparately(displaySeparately);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(BufferedImage icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     *
+     * @param icon The icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(BufferedImage icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     *
+     * @param icon The icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(File icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     *
+     * @param icon The icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(Icon icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     *
+     * @param icon The icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(URL icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(byte[] icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     *
+     * @param icon The icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(byte[] icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(InputStream icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Sets the icon of the role.
+     *
+     * @param icon The icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleBuilder setIcon(InputStream icon, String fileType) {
+        delegate.setIcon(icon, fileType);
         return this;
     }
 
