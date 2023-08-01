@@ -1,9 +1,14 @@
 package org.javacord.api.entity.permission;
 
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.internal.RoleUpdaterDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -91,6 +96,121 @@ public class RoleUpdater {
         return this;
     }
 
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(BufferedImage icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(BufferedImage icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(File icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(Icon icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(URL icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(byte[] icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(byte[] icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the role.
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(InputStream icon) {
+        delegate.setIcon(icon);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater setIcon(InputStream icon, String fileType) {
+        delegate.setIcon(icon, fileType);
+        return this;
+    }
+
+    /**
+     * Queues the icon to be removed.
+     *
+     * @return The current instance in order to chain call methods.
+     */
+    public RoleUpdater removeIcon() {
+        delegate.removeIcon();
+        return this;
+    }
+    
     /**
      * Performs the queued updates.
      *
