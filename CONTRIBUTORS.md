@@ -25,6 +25,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/haseebansari/"><img src="https://avatars.githubusercontent.com/u/47222685?v=4?s=100" width="100px;" alt="Haseeb Ansari"/><br /><sub><b>Haseeb Ansari</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=haseeb-xd" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://shuen.ddns.net"><img src="https://avatars.githubusercontent.com/u/38818683?v=4?s=100" width="100px;" alt="sotzaii_shuen"/><br /><sub><b>sotzaii_shuen</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=shuen4" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://discord.gg/mw27xdA3wh"><img src="https://avatars.githubusercontent.com/u/92883017?v=4?s=100" width="100px;" alt="Blast"/><br /><sub><b>Blast</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=ReBlast" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
