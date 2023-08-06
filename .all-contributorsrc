@@ -154,6 +154,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ReBlast",
+      "name": "Blast",
+      "avatar_url": "https://avatars.githubusercontent.com/u/92883017?v=4",
+      "profile": "https://discord.gg/mw27xdA3wh",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
