@@ -1,9 +1,14 @@
 package org.javacord.api.entity.permission.internal;
 
+import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.RoleUpdater;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -53,6 +58,80 @@ public interface RoleUpdaterDelegate {
      * @param mentionable The new mentionable flag of the role.
      */
     void setMentionableFlag(boolean mentionable);
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the role.
+     */
+    void setIcon(BufferedImage icon);
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     */
+    void setIcon(BufferedImage icon, String fileType);
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     */
+    void setIcon(File icon);
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     */
+    void setIcon(Icon icon);
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     */
+    void setIcon(URL icon);
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the role.
+     */
+    void setIcon(byte[] icon);
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     */
+    void setIcon(byte[] icon, String fileType);
+
+    /**
+     * Queues the icon to be updated.
+     * This method assumes the file type is "png"!
+     *
+     * @param icon The new icon of the role.
+     */
+    void setIcon(InputStream icon);
+
+    /**
+     * Queues the icon to be updated.
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     */
+    void setIcon(InputStream icon, String fileType);
+
+    /**
+     * Queues the icon to be removed.
+     */
+    void removeIcon();
 
     /**
      * Performs the queued updates.
