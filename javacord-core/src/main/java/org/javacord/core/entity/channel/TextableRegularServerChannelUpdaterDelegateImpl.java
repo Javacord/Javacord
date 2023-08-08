@@ -17,7 +17,6 @@ public class TextableRegularServerChannelUpdaterDelegateImpl extends RegularServ
      */
     protected final TextableRegularServerChannel channel;
 
-
     /**
      * The nsfw flag to update.
      */

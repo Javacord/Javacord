@@ -35,7 +35,6 @@ public class TextableRegularServerChannelImpl extends RegularServerChannelImpl
      */
     private volatile long parentId;
 
-
     /**
      * Creates a new server channel object.
      *

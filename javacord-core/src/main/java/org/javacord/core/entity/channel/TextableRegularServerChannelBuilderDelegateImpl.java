@@ -7,7 +7,7 @@ import org.javacord.api.entity.channel.internal.TextableRegularServerChannelBuil
 import org.javacord.core.entity.server.ServerImpl;
 
 /**
- * The implementation of {@link ServerTextChannelBuilderDelegate}.
+ * The implementation of {@link TextableRegularServerChannelBuilderDelegate}.
  */
 public class TextableRegularServerChannelBuilderDelegateImpl extends RegularServerChannelBuilderDelegateImpl
         implements TextableRegularServerChannelBuilderDelegate {
@@ -58,6 +58,4 @@ public class TextableRegularServerChannelBuilderDelegateImpl extends RegularServ
             body.put("rate_limit_per_user", delay);
         }
     }
-
-
 }

@@ -34,4 +34,16 @@ public class TextableRegularServerChannelBuilder<T> extends RegularServerChannel
         delegate.setCategory(category);
         return this;
     }
+
+
+    /**
+     * Sets the slowmode of the channel.
+     *
+     * @param delay The delay in seconds.
+     * @return The current instance in order to chain call methods.
+     */
+    public TextableRegularServerChannelBuilder<T> setSlowmodeDelayInSeconds(int delay) {
+        delegate.setSlowmodeDelayInSeconds(delay);
+        return this;
+    }
 }

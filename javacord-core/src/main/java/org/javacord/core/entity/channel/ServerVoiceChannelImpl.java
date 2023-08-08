@@ -22,8 +22,7 @@ import java.util.stream.Collectors;
  * The implementation of {@link ServerVoiceChannel}.
  */
 public class ServerVoiceChannelImpl extends TextableRegularServerChannelImpl
-        implements ServerVoiceChannel, InternalTextChannel,
-        InternalServerVoiceChannelAttachableListenerManager {
+        implements ServerVoiceChannel, InternalServerVoiceChannelAttachableListenerManager {
 
     /**
      * The bitrate of the channel.
@@ -43,9 +42,9 @@ public class ServerVoiceChannelImpl extends TextableRegularServerChannelImpl
     /**
      * Creates a new server voice channel object.
      *
-     * @param api The discord api instance.
+     * @param api    The discord api instance.
      * @param server The server of the channel.
-     * @param data The json data of the channel.
+     * @param data   The json data of the channel.
      */
     public ServerVoiceChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         super(api, server, data);
@@ -140,9 +139,9 @@ public class ServerVoiceChannelImpl extends TextableRegularServerChannelImpl
     @Override
     public boolean equals(Object o) {
         return (this == o)
-               || !((o == null)
-                    || (getClass() != o.getClass())
-                    || (getId() != ((DiscordEntity) o).getId()));
+                || !((o == null)
+                || (getClass() != o.getClass())
+                || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override

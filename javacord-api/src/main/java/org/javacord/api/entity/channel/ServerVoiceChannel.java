@@ -48,13 +48,6 @@ public interface ServerVoiceChannel extends VoiceChannel, TextableRegularServerC
     }
 
     /**
-     * Checks if the channel is "not safe for work".
-     *
-     * @return Whether the channel is "not safe for work" or not.
-     */
-    boolean isNsfw();
-
-    /**
      * Gets the bitrate (int bits) of the channel.
      *
      * @return The bitrate of the channel.
@@ -297,18 +290,6 @@ public interface ServerVoiceChannel extends VoiceChannel, TextableRegularServerC
         return createUpdater().removeUserLimit().update();
     }
 
-    /**
-     * Updates the nsfw flag of the channel.
-     *
-     * <p>If you want to update several settings at once, it's recommended to use the
-     * {@link ServerTextChannelUpdater} from {@link #createUpdater()} which provides a better performance!
-     *
-     * @param nsfw The new nsfw flag of the channel.
-     * @return A future to check if the update was successful.
-     */
-    default CompletableFuture<Void> updateNsfwFlag(boolean nsfw) {
-        return createUpdater().setNsfw(nsfw).update();
-    }
 
     @Override
     default Optional<? extends ServerVoiceChannel> getCurrentCachedInstance() {

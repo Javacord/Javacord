@@ -55,10 +55,6 @@ public class ServerVoiceChannelUpdaterDelegateImpl extends TextableRegularServer
             body.put("user_limit", userLimit.intValue());
             patchChannel = true;
         }
-        if (modifyCategory) {
-            body.put("parent_id", category == null ? null : category.getIdAsString());
-            patchChannel = true;
-        }
         return patchChannel;
     }
 

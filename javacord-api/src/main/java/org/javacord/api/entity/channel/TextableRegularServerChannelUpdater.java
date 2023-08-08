@@ -6,7 +6,6 @@ import org.javacord.api.util.internal.DelegateFactory;
 public class TextableRegularServerChannelUpdater<T extends TextableRegularServerChannelUpdater<T>>
         extends RegularServerChannelUpdater<T> {
 
-
     /**
      * The channel delegate used by this instance.
      */
@@ -31,7 +30,6 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
         this(DelegateFactory.createTextableRegularServerChannelUpdaterDelegate(channel));
     }
 
-
     /**
      * Queues the category to be updated.
      *
@@ -53,7 +51,6 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
         return this;
     }
 
-
     /**
      * Queues the nsfw to be updated.
      *
@@ -64,8 +61,6 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
         textableRegularServerChannelUpdaterDelegate.setNsfw(nsfw);
         return this;
     }
-
-
 
     /**
      * Set the delay for slowmode.
