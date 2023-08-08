@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -57,7 +58,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     /**
      * A map with all user roles to update.
      */
-    private final Map<User, Collection<Role>> userRoles = new HashMap<>();
+    private final Map<User, Set<Role>> userRoles = new HashMap<>();
 
     /**
      * A map with all user nicknames to update.
@@ -516,31 +517,31 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
 
     @Override
     public void addRoleToUser(User user, Role role) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
         userRoles.add(role);
     }
 
     @Override
     public void addRolesToUser(User user, Collection<Role> roles) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
         userRoles.addAll(roles);
     }
 
     @Override
     public void removeRoleFromUser(User user, Role role) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
         userRoles.remove(role);
     }
 
     @Override
     public void removeRolesFromUser(User user, Collection<Role> roles) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
         userRoles.removeAll(roles);
     }
 
     @Override
     public void removeAllRolesFromUser(User user) {
-        Collection<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
         userRoles.clear();
     }
 
@@ -561,7 +562,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
             boolean patchMember = false;
             ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
 
-            Collection<Role> roles = userRoles.get(member);
+            Set<Role> roles = userRoles.get(member);
             if (roles != null) {
                 ArrayNode rolesJson = updateNode.putArray("roles");
                 roles.stream()
