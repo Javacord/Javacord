@@ -26,6 +26,7 @@ import org.javacord.api.entity.channel.ServerStageVoiceChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.channel.UnknownRegularServerChannel;
 import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -1969,6 +1970,17 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public List<TextableRegularServerChannel> getTextableRegularChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(TextableRegularServerChannel.class::isInstance)
+                .map(Channel::asTextableRegularServerChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public List<ChannelCategory> getChannelCategories() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(ChannelCategory.class::isInstance)
@@ -2035,6 +2047,13 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         return api.getEntityCache().get().getChannelCache().getChannelById(id)
                 .filter(RegularServerChannel.class::isInstance)
                 .map(RegularServerChannel.class::cast);
+    }
+
+    @Override
+    public Optional<TextableRegularServerChannel> getTextableRegularChannelById(long id) {
+        return api.getEntityCache().get().getChannelCache().getChannelById(id)
+                .filter(TextableRegularServerChannel.class::isInstance)
+                .map(TextableRegularServerChannel.class::cast);
     }
 
     @Override

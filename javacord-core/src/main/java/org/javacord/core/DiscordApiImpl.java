@@ -2103,7 +2103,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
 
     @Override
     public Set<TextableRegularServerChannel> getTextableRegularServerChannels() {
-        return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getTextableRegularServerChannelTypes());
+        return entityCache.get().getChannelCache()
+                .getChannelsWithTypes(ChannelType.getTextableRegularServerChannelTypes());
     }
 
     @Override

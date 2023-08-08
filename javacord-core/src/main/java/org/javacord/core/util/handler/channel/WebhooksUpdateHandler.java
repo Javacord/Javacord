@@ -3,7 +3,6 @@ package org.javacord.core.util.handler.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.event.channel.server.text.WebhooksUpdateEvent;
 import org.javacord.core.event.channel.server.text.WebhooksUpdateEventImpl;
