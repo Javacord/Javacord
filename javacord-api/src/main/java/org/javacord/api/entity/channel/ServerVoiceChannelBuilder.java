@@ -3,12 +3,13 @@ package org.javacord.api.entity.channel;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.util.internal.DelegateFactory;
+
 import java.util.concurrent.CompletableFuture;
 
 /**
  * This class is used to create new server voice channels.
  */
-public class ServerVoiceChannelBuilder extends RegularServerChannelBuilder<ServerVoiceChannelBuilder> {
+public class ServerVoiceChannelBuilder extends TextableRegularServerChannelBuilder<ServerVoiceChannelBuilder> {
 
     /**
      * The server text channel delegate used by this instance.
