@@ -22,6 +22,7 @@ import org.javacord.api.entity.channel.ServerTextChannelBuilder;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.channel.UnknownRegularServerChannel;
 import org.javacord.api.entity.channel.UnknownServerChannel;
 import org.javacord.api.entity.emoji.CustomEmojiBuilder;
@@ -45,6 +46,7 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -2593,6 +2595,13 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     List<RegularServerChannel> getRegularChannels();
 
     /**
+     * Gets an unordered collection with all textable regular channels in the server.
+     *
+     * @return An unordered collection with all textable regular channels in the server.
+     */
+    List<TextableRegularServerChannel> getTextableRegularChannels();
+
+    /**
      * Gets a sorted list (by position) with all channel categories of the server.
      *
      * @return A sorted list (by position) with all channel categories of the server.
@@ -2723,6 +2732,56 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     default List<RegularServerChannel> getRegularChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getRegularChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a textable regular channel by its id.
+     *
+     * @param id The id of the regular channel.
+     * @return The textable regular channel with the given id.
+     */
+    Optional<TextableRegularServerChannel> getTextableRegularChannelById(long id);
+
+    /**
+     * Gets a textable regular channel by its id.
+     *
+     * @param id The id of the textable regular channel.
+     * @return The textable regular channel with the given id.
+     */
+    default Optional<TextableRegularServerChannel> getTextableRegularChannelById(String id) {
+        try {
+            return getTextableRegularChannelById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Gets a sorted list (by position) with all textable regular channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the textable regular channels.
+     * @return A sorted list (by position) with all textable regular channels with the given name.
+     */
+    default List<TextableRegularServerChannel> getTextableRegularChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getTextableRegularChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all textable regular channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the textable regular channels.
+     * @return A sorted list (by position) with all textable regular channels with the given name.
+     */
+    default List<TextableRegularServerChannel> getTextableRegularChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getTextableRegularChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }

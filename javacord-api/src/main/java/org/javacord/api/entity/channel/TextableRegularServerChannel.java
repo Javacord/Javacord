@@ -198,7 +198,7 @@ public interface TextableRegularServerChannel extends TextChannel, RegularServer
 
     @Override
     default Optional<? extends TextableRegularServerChannel> getCurrentCachedInstance() {
-        return getApi().getServerChannelById(getId()).flatMap(Channel::asTextableRegularServerChannel);
+        return getApi().getTextableRegularServerChannelById(getId());
     }
 
     @Override

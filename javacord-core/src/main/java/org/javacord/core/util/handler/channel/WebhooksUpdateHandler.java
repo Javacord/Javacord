@@ -35,8 +35,8 @@ public class WebhooksUpdateHandler extends PacketHandler {
     @Override
     public void handle(JsonNode packet) {
         long channelId = packet.get("channel_id").asLong();
-        Optional<TextableRegularServerChannel> optionalChannel =  api.getServerChannelById(channelId)
-                .flatMap(Channel::asTextableRegularServerChannel);
+        Optional<TextableRegularServerChannel> optionalChannel =  api.getTextableRegularServerChannelById(channelId);
+
         if (optionalChannel.isPresent()) {
             TextableRegularServerChannel channel = optionalChannel.get();
             WebhooksUpdateEvent event = new WebhooksUpdateEventImpl(channel);

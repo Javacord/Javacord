@@ -58,8 +58,7 @@ public class MessageCreateHandler extends PacketHandler {
         if (!packet.hasNonNull("guild_id")) {
             // Check for EPHEMERAL messages as they do NOT include a guild_id when the EPHEMERAL flag is set.
             if (packet.hasNonNull("flags") && (packet.get("flags").asInt() & MessageFlag.EPHEMERAL.getId()) > 0) {
-                Optional<TextableRegularServerChannel> textableRegularServerChannel =
-                        api.getServerChannelById(channelId).flatMap(Channel::asTextableRegularServerChannel);
+                Optional<TextableRegularServerChannel> textableRegularServerChannel = api.getTextableRegularServerChannelById(channelId);
                 if (textableRegularServerChannel.isPresent()) {
                     handle(textableRegularServerChannel.get(), packet);
                     return;
