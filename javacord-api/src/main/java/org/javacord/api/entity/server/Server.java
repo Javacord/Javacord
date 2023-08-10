@@ -34,6 +34,10 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleBuilder;
 import org.javacord.api.entity.server.invite.RichInvite;
 import org.javacord.api.entity.server.invite.WelcomeScreen;
+import org.javacord.api.entity.server.scheduledevent.ServerScheduledEvent;
+import org.javacord.api.entity.server.scheduledevent.ServerScheduledEventBuilder;
+import org.javacord.api.entity.server.scheduledevent.ServerScheduledEventPrivacyLevel;
+import org.javacord.api.entity.server.scheduledevent.ServerScheduledEventType;
 import org.javacord.api.entity.sticker.Sticker;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
@@ -41,7 +45,6 @@ import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.event.server.member.ServerMembersChunkEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.listener.server.ServerAttachableListenerManager;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -519,6 +522,108 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @return The invites of the server.
      */
     CompletableFuture<Set<RichInvite>> getInvites();
+
+    /**
+     * Gets the scheduled events of the server.
+     * Contains events only if the {@link org.javacord.api.entity.intent.Intent#GUILD_SCHEDULED_EVENTS} is set.
+     *
+     * @return The scheduled events of the server.
+     */
+    Set<ServerScheduledEvent> getScheduledEvents();
+
+    /**
+     * Gets the scheduled event by it's id of the server.
+     * Contains events only if the {@link org.javacord.api.entity.intent.Intent#GUILD_SCHEDULED_EVENTS} is set.
+     *
+     * @param eventId The id of the event.
+     * @return The scheduled events of the server.
+     */
+    Optional<ServerScheduledEvent> getScheduledEventById(final long eventId);
+
+    /**
+     * Requests the scheduled event with its user count from the server.
+     *
+     * @param eventId The id of the event.
+     * @return The scheduled event of the server.
+     */
+    default CompletableFuture<ServerScheduledEvent> requestScheduledEventById(final long eventId) {
+        return requestScheduledEventById(eventId, true);
+    }
+
+    /**
+     * Requests the scheduled event of the server.
+     *
+     * @param eventId          The id of the event.
+     * @param includeUserCount Whether to include the user count in the response.
+     * @return The scheduled event of the server.
+     */
+    CompletableFuture<ServerScheduledEvent> requestScheduledEventById(final long eventId,
+                                                                      final boolean includeUserCount);
+
+    /**
+     * Requests the scheduled events with their user count from the server.
+     *
+     * @return The scheduled events of the server.
+     */
+    default CompletableFuture<Set<ServerScheduledEvent>> requestScheduledEvents() {
+        return requestScheduledEvents(true);
+    }
+
+    /**
+     * Requests the scheduled events of the server.
+     *
+     * @param includeUserCount Whether to include the user count in the response.
+     * @return The scheduled events of the server.
+     */
+    CompletableFuture<Set<ServerScheduledEvent>> requestScheduledEvents(boolean includeUserCount);
+
+
+    /**
+     * Creates a scheduled event on the server.
+     *
+     * @param name        The name of the event.
+     * @param description The description of the event.
+     * @param startTime   The start time of the event.
+     * @param endTime     The end time of the event.
+     * @param location    The location of the event.
+     * @return The scheduled event of the server.
+     */
+    default ServerScheduledEventBuilder createScheduledExternalEventBuilder(String name, String description,
+                                                                            Instant startTime, Instant endTime,
+                                                                            String location) {
+        return new ServerScheduledEventBuilder(this)
+                .setPrivacyLevel(ServerScheduledEventPrivacyLevel.SERVER_ONLY)
+                .setName(name)
+                .setDescription(description)
+                .setScheduledStartTime(startTime)
+                .setScheduledEndTime(endTime)
+                .setEntityType(ServerScheduledEventType.EXTERNAL)
+                .setEntityMetadataLocation(location);
+    }
+
+    /**
+     * Creates a scheduled event on the server.
+     *
+     * @param channel     A server voice or server voice stage channel the event will take place.
+     * @param name        The name of the event.
+     * @param description The description of the event.
+     * @param startTime   The start time of the event.
+     * @return The scheduled event of the server.
+     */
+    default ServerScheduledEventBuilder createScheduledVoiceEventBuilder(
+            ServerVoiceChannel channel, String name, String description, Instant startTime) {
+        return new ServerScheduledEventBuilder(this)
+                .setChannelId(channel.getId())
+                .setPrivacyLevel(ServerScheduledEventPrivacyLevel.SERVER_ONLY)
+                .setName(name)
+                .setDescription(description)
+                .setScheduledStartTime(startTime)
+                .setEntityType(
+                        channel.asServerStageVoiceChannel().isPresent()
+                                ? ServerScheduledEventType.STAGE_INSTANCE
+                                : ServerScheduledEventType.VOICE);
+    }
+
 
     /**
      * Checks if all members of the server are in the cache.
@@ -3167,7 +3272,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     default boolean canManageEmojis(User user) {
         return hasAnyPermission(user,
                 PermissionType.ADMINISTRATOR,
-                PermissionType.MANAGE_EMOJIS);
+                PermissionType.MANAGE_SERVER_EXPRESSIONS);
     }
 
     /**

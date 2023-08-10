@@ -13,6 +13,10 @@ import org.javacord.api.entity.user.User;
 import org.javacord.api.listener.server.role.RoleAttachableListenerManager;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -218,6 +222,141 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, P
      */
     default CompletableFuture<Void> updateMentionableFlag(boolean mentionable) {
         return createUpdater().setMentionableFlag(mentionable).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     * This method assumes the file type is "png"!
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(BufferedImage icon) {
+        return createUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(BufferedImage icon, String fileType) {
+        return createUpdater().setIcon(icon, fileType).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(File icon) {
+        return createUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(Icon icon) {
+        return createUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(URL icon) {
+        return createUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     * This method assumes the file type is "png"!
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(byte[] icon) {
+        return createUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(byte[] icon, String fileType) {
+        return createUpdater().setIcon(icon, fileType).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     * This method assumes the file type is "png"!
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(InputStream icon) {
+        return createUpdater().setIcon(icon).update();
+    }
+
+    /**
+     * Updates the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @param icon The new icon of the role.
+     * @param fileType The type of the icon, e.g. "png" or "jpg".
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> updateIcon(InputStream icon, String fileType) {
+        return createUpdater().setIcon(icon, fileType).update();
+    }
+
+    /**
+     * Removes the icon of the role.
+     *
+     * <p>If you want to update several settings at once, it's recommended to use the
+     * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
+     *
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Void> removeIcon() {
+        return createUpdater().removeIcon().update();
     }
 
     /**

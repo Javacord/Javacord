@@ -1,6 +1,10 @@
 package org.javacord.core.util.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Base64;
 
 /**
  * Some utilities for files.
@@ -32,6 +36,29 @@ public class FileUtils {
             return fileName.substring(fileName.lastIndexOf(".") + 1);
         }
         return "png";
+    }
+
+    /**
+     * Converts a file to the data URI scheme.
+     *
+     * @param file The file to convert.
+     * @return The data URI.
+     * @throws IOException If the file could not be read.
+     */
+    public static String convertFileToDataUri(File file) throws IOException {
+        String contentType = Files.probeContentType(file.toPath());
+
+        byte[] data = Files.readAllBytes(file.toPath());
+
+        String base64str = new String(Base64.getEncoder().encode(Files.readAllBytes(file.toPath())),
+                StandardCharsets.UTF_8);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("data:");
+        sb.append(contentType);
+        sb.append(";base64,");
+        sb.append(base64str);
+        return sb.toString();
     }
 
 }

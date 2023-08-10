@@ -509,7 +509,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return A future to check if the removal was successful.
      */
     default CompletableFuture<Message> removeEmbed() {
-        return new MessageUpdater(this).addEmbeds(Collections.emptyList()).applyChanges();
+        return new MessageUpdater(this).removeAllEmbeds().applyChanges();
     }
 
     /**

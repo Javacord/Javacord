@@ -16,7 +16,8 @@ public enum UserFlag {
     VERIFIED_BOT(1 << 16, "Verified Bot"),
     VERIFIED_DEVELOPER(1 << 17, "Early Verified Bot Developer"),
     CERTIFIED_MODERATOR(1 << 18, "Discord Certified Moderator"),
-    BOT_HTTP_INTERACTIONS(1 << 19, "Bot uses only HTTP interactions and is shown in the online member list");
+    BOT_HTTP_INTERACTIONS(1 << 19, "Bot uses only HTTP interactions and is shown in the online member list"),
+    ACTIVE_DEVELOPER(1 << 22, "User is an active Developer");
 
     private final int flag;
     private final String description;

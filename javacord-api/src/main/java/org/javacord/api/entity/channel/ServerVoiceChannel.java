@@ -218,7 +218,7 @@ public interface ServerVoiceChannel extends RegularServerChannel, VoiceChannel, 
      */
     default boolean canUseVoiceActivation(User user) {
         return hasAnyPermission(user, PermissionType.ADMINISTRATOR)
-                || hasPermissions(user, PermissionType.USE_VOICE_ACTIVITY, PermissionType.CONNECT);
+                || hasPermissions(user, PermissionType.USE_VAD, PermissionType.CONNECT);
     }
 
     /**

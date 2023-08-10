@@ -64,7 +64,7 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
     default boolean canAttachFiles(User user) {
         return canWrite(user) && getParent().hasAnyPermission(user,
                 PermissionType.ADMINISTRATOR,
-                PermissionType.ATTACH_FILE);
+                PermissionType.ATTACH_FILES);
     }
 
     @Override

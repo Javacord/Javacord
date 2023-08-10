@@ -123,7 +123,7 @@
       "login": "RealYusufIsmail",
       "name": "Yusuf Arfan Ismail",
       "avatar_url": "https://avatars.githubusercontent.com/u/67903886?v=4",
-      "profile": "http://realyusufismail-github-io.vercel.app",
+      "profile": "https://github.com/RealYusufIsmail",
       "contributions": [
         "code"
       ]
@@ -145,11 +145,30 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "shuen4",
+      "name": "sotzaii_shuen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38818683?v=4",
+      "profile": "http://shuen.ddns.net",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ReBlast",
+      "name": "Blast",
+      "avatar_url": "https://avatars.githubusercontent.com/u/92883017?v=4",
+      "profile": "https://discord.gg/mw27xdA3wh",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
   "projectOwner": "Javacord",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }

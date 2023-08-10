@@ -63,7 +63,7 @@ public interface TextableRegularServerChannel extends TextChannel, Mentionable, 
     default boolean canAttachFiles(User user) {
         return asRegularServerChannel().map(regularServerChannel ->
                 regularServerChannel.hasPermission(user, PermissionType.ADMINISTRATOR)
-                        || (regularServerChannel.hasPermission(user, PermissionType.ATTACH_FILE)
+                        || (regularServerChannel.hasPermission(user, PermissionType.ATTACH_FILES)
                         && canWrite(user))).orElse(false);
     }
 
