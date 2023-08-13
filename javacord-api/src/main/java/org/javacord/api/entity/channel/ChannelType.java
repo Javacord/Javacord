@@ -17,7 +17,7 @@ public enum ChannelType {
     SERVER_NEWS_THREAD(10, true, false, true, false, false),
     SERVER_PUBLIC_THREAD(11, true, false, true, false, false),
     SERVER_PRIVATE_THREAD(12, true, false, true, false, false),
-    SERVER_STAGE_VOICE_CHANNEL(13, false, true, true, true, false),
+    SERVER_STAGE_VOICE_CHANNEL(13, false, true, true, true, true),
     SERVER_DIRECTORY_CHANNEL(14, false, false, true, true, false),
     SERVER_FORUM_CHANNEL(15, false, false, true, true, false),
     UNKNOWN(-1, false, false, false, false, false);

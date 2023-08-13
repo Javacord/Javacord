@@ -30,9 +30,9 @@ public class TextableRegularServerChannelBuilder<T> extends RegularServerChannel
      * @param category The category of the channel.
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelBuilder<T> setCategory(ChannelCategory category) {
+    public T setCategory(ChannelCategory category) {
         delegate.setCategory(category);
-        return this;
+        return myClass.cast(this);
     }
 
 
@@ -42,8 +42,8 @@ public class TextableRegularServerChannelBuilder<T> extends RegularServerChannel
      * @param delay The delay in seconds.
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelBuilder<T> setSlowmodeDelayInSeconds(int delay) {
+    public T setSlowmodeDelayInSeconds(int delay) {
         delegate.setSlowmodeDelayInSeconds(delay);
-        return this;
+        return myClass.cast(this);
     }
 }

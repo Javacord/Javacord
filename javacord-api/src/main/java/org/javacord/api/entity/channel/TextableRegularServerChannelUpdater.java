@@ -36,9 +36,9 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
      * @param category The new category of the channel.
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelUpdater<T> setCategory(ChannelCategory category) {
+    public T setCategory(ChannelCategory category) {
         textableRegularServerChannelUpdaterDelegate.setCategory(category);
-        return this;
+        return (T) this;
     }
 
     /**
@@ -46,9 +46,9 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
      *
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelUpdater<T> removeCategory() {
+    public T removeCategory() {
         textableRegularServerChannelUpdaterDelegate.removeCategory();
-        return this;
+        return (T) this;
     }
 
     /**
@@ -57,9 +57,9 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
      * @param nsfw The new nsfw flag of the channel.
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelUpdater<T> setNsfw(boolean nsfw) {
+    public T setNsfw(boolean nsfw) {
         textableRegularServerChannelUpdaterDelegate.setNsfw(nsfw);
-        return this;
+        return (T) this;
     }
 
     /**
@@ -68,9 +68,9 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
      * @param delay The delay in seconds.
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelUpdater<T> setSlowmodeDelayInSeconds(int delay) {
+    public T setSlowmodeDelayInSeconds(int delay) {
         textableRegularServerChannelUpdaterDelegate.setSlowmodeDelayInSeconds(delay);
-        return this;
+        return (T) this;
     }
 
     /**
@@ -78,7 +78,7 @@ public class TextableRegularServerChannelUpdater<T extends TextableRegularServer
      *
      * @return The current instance in order to chain call methods.
      */
-    public TextableRegularServerChannelUpdater<T> unsetSlowmode() {
+    public T unsetSlowmode() {
         return this.setSlowmodeDelayInSeconds(0);
     }
 }
