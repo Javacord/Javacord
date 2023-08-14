@@ -1,6 +1,5 @@
 package org.javacord.api.entity.channel.internal;
 
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 
@@ -10,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
  * This class is internally used by the {@link ServerVoiceChannelBuilder} to create server voice channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerVoiceChannelBuilderDelegate extends RegularServerChannelBuilderDelegate {
+public interface ServerVoiceChannelBuilderDelegate extends TextableRegularServerChannelBuilderDelegate {
 
     /**
      * Sets the bitrate of the channel.
@@ -25,13 +24,6 @@ public interface ServerVoiceChannelBuilderDelegate extends RegularServerChannelB
      * @param userlimit The user limit of the channel.
      */
     void setUserlimit(int userlimit);
-
-    /**
-     * Sets the category of the channel.
-     *
-     * @param category The category of the channel.
-     */
-    void setCategory(ChannelCategory category);
 
     /**
      * Creates the server voice channel.

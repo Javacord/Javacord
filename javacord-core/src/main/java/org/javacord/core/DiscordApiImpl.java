@@ -27,6 +27,7 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
@@ -2098,6 +2099,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public Set<RegularServerChannel> getRegularServerChannels() {
         return entityCache.get().getChannelCache().getChannelsWithTypes(ChannelType.getRegularServerChannelTypes());
+    }
+
+    @Override
+    public Set<TextableRegularServerChannel> getTextableRegularServerChannels() {
+        return entityCache.get().getChannelCache()
+                .getChannelsWithTypes(ChannelType.getTextableRegularServerChannelTypes());
     }
 
     @Override
