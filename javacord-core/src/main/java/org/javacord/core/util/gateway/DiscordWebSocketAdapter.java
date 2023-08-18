@@ -2,6 +2,7 @@ package org.javacord.core.util.gateway;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.neovisionaries.ws.client.ProxySettings;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.server.Server;
@@ -746,6 +748,24 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("browser", "Javacord")
                 .put("device", "Javacord");
 
+        ObjectNode presence = JsonNodeFactory.instance.objectNode();
+
+        if (api.getActivity().isPresent()) {
+            ArrayNode activitiesPayload = JsonNodeFactory.instance.arrayNode();
+            ObjectNode activitiesPayloadArray = JsonNodeFactory.instance.objectNode();
+            Activity apiActivity = api.getActivity().get();
+            ActivityType activityType = apiActivity.getType();
+            String activityName = apiActivity.getName();
+            String state = apiActivity.getState().orElse(null);
+            String streamingUrl = apiActivity.getStreamingUrl().orElse(null);
+
+            setStatus(activitiesPayloadArray, activityType, activityName, state, streamingUrl);
+            activitiesPayload.add(activitiesPayloadArray);
+
+            presence.set("activities", activitiesPayload);
+        }
+
+        data.set("presence", presence);
         data.put("intents", Intent.calculateBitmask(api.getIntents().toArray(new Intent[0])));
 
         if (api.getTotalShards() > 1) {
@@ -927,21 +947,35 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .put("afk", false)
                 .putNull("since");
 
-        ObjectNode activityJson = data.putObject("game");
-        activityJson.put("name", activity.map(Nameable::getName).orElse(null));
-        activityJson.put("type", activity.flatMap(g -> {
-            int type = g.getType().getId();
-            if (type == 4) {
-                logger.warn("Can't set the activity to ActivityType.CUSTOM"
-                        + ", using ActivityType.PLAYING instead");
-                return Optional.empty();
-            } else {
-                return Optional.of(type);
-            }
-        }).orElse(0));
-        activity.flatMap(Activity::getStreamingUrl).ifPresent(url -> activityJson.put("url", url));
+        ArrayNode activitiesPayload = JsonNodeFactory.instance.arrayNode();
+        ObjectNode activitiesPayloadArray = JsonNodeFactory.instance.objectNode();
+
+        ActivityType activityType = activity.map(Activity::getType).orElse(ActivityType.PLAYING);
+        String activityName = activity.map(Nameable::getName).orElse(null);
+        String state = activity.flatMap(Activity::getState).orElse(null);
+        String streamingUrl = activity.flatMap(Activity::getStreamingUrl).orElse(null);
+
+        setStatus(activitiesPayloadArray, activityType, activityName, state, streamingUrl);
+        activitiesPayload.add(activitiesPayloadArray);
+        data.set("activities", activitiesPayload);
+
         logger.debug("Updating status (content: {})", updateStatus);
         sendTextFrame(updateStatus.toString());
+    }
+
+    private void setStatus(ObjectNode activitiesPayloadArray, ActivityType activityType, String activityName,
+                           String state, String streamingUrl) {
+
+        if (activityType == ActivityType.CUSTOM) {
+            activitiesPayloadArray.put("name", "Custom Status");
+            activitiesPayloadArray.put("state", activityName);
+        } else {
+            activitiesPayloadArray.put("name", activityName);
+            activitiesPayloadArray.put("state", state);
+        }
+
+        activitiesPayloadArray.put("type", activityType.getId());
+        activitiesPayloadArray.put("url", streamingUrl);
     }
 
     /**

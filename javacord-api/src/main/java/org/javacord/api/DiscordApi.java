@@ -521,6 +521,15 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     void updateActivity(ActivityType type, String name);
 
     /**
+     * Updates the activity of this bot with any type.
+     *
+     * @param type The type of the activity.
+     * @param name The name of the activity.
+     * @param state The state of the activity.
+     */
+    void updateActivity(ActivityType type, String name, String state);
+
+    /**
      * Updates the activity of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
      * The update might not be visible immediately as it's through the websocket and only a limited amount of
      * activity status changes is allowed per minute.
@@ -529,6 +538,17 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @param streamingUrl The streaming url of the activity.
      */
     void updateActivity(String name, String streamingUrl);
+
+    /**
+     * Updates the activity of this bot with a streaming url, represented as "Streaming Half-Life 3" for example.
+     * The update might not be visible immediately as it's through the websocket and only a limited amount of
+     * activity status changes is allowed per minute.
+     *
+     * @param name The name of the activity.
+     * @param streamingUrl The streaming url of the activity.
+     * @param state The state of the activity.
+     */
+    void updateActivity(String name, String streamingUrl, String state);
 
     /**
      * Unsets the activity of this bot.
