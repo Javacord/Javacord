@@ -1,12 +1,15 @@
 package org.javacord.core.entity.server;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
@@ -14,6 +17,7 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.VerificationLevel;
 import org.javacord.api.entity.server.internal.ServerUpdaterDelegate;
 import org.javacord.api.entity.user.User;
+import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
@@ -22,8 +26,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,7 +59,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     /**
      * A map with all user roles to update.
      */
-    private final Map<User, Set<Role>> userRoles = new HashMap<>();
+    private final Map<User, Set<Role>> memberRoles = new HashMap<>();
 
     /**
      * A map with all user nicknames to update.
@@ -481,37 +492,45 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
-    public void addRoleToUser(User user, Role role) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void addRoleToMember(Member member, Role role) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.add(role);
     }
 
     @Override
-    public void addRolesToUser(User user, Collection<Role> roles) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void addRolesToMember(Member member, Collection<Role> roles) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.addAll(roles);
     }
 
     @Override
-    public void removeRoleFromUser(User user, Role role) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void removeRoleFromMember(Member member, Role role) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.remove(role);
     }
 
     @Override
-    public void removeRolesFromUser(User user, Collection<Role> roles) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void removeRolesFromMember(Member member, Collection<Role> roles) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.removeAll(roles);
     }
 
     @Override
-    public void removeAllRolesFromUser(User user) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void removeAllRolesFromMember(Member member) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.clear();
     }
 
     @Override
     public CompletableFuture<Void> update() {
+        // All members that get updates
+        HashSet<User> members = new HashSet<>(memberRoles.keySet());
+        members.addAll(userNicknames.keySet());
+        members.addAll(userMuted.keySet());
+        members.addAll(userDeafened.keySet());
+        members.addAll(userMoveTargets.keySet());
+        members.addAll(userTimeouts.keySet());
+
         // All tasks
         List<CompletableFuture<?>> tasks = new ArrayList<>();
 
@@ -519,7 +538,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
             boolean patchMember = false;
             ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
 
-            Set<Role> roles = userRoles.get(member);
+            Set<Role> roles = memberRoles.get(member);
             if (roles != null) {
                 ArrayNode rolesJson = updateNode.putArray("roles");
                 roles.stream()

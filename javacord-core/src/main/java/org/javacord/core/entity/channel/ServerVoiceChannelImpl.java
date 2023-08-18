@@ -3,7 +3,6 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
@@ -11,7 +10,6 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.voice.InternalServerVoiceChannelAttachableListenerManager;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;

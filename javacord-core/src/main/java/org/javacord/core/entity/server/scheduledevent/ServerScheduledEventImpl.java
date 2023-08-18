@@ -14,7 +14,6 @@ import org.javacord.api.entity.server.scheduledevent.ServerScheduledEventUser;
 import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
@@ -80,8 +79,7 @@ public class ServerScheduledEventImpl implements ServerScheduledEvent {
                 data.hasNonNull("entity_metadata")
                         ? new ServerScheduledEventMetadataImpl(data.get("entity_metadata"))
                         : null;
-        this.creator =
-                data.hasNonNull("creator") ? new UserImpl(api, data.get("creator"), (MemberImpl) null, null) : null;
+        this.creator = data.hasNonNull("creator") ? new UserImpl(api, data.get("creator")) : null;
         this.image = data.path("image").textValue();
         this.userCount = data.path("user_count").intValue();
     }

@@ -4,6 +4,7 @@ import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
@@ -14,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
@@ -364,6 +366,45 @@ public interface ServerUpdaterDelegate {
      * @param roles An ordered list with the new role positions.
      */
     void reorderRoles(List<Role> roles);
+
+    /**
+     * Queues a role to be assigned to the member.
+     *
+     * @param member The member to whom the role should be assigned.
+     * @param role The role to be assigned.
+     */
+    void addRoleToMember(Member member, Role role);
+
+    /**
+     * Queues a collection of roles to be assigned to the member.
+     *
+     * @param member The member to whom the roles should be assigned.
+     * @param roles The collection of roles to be assigned.
+     */
+    void addRolesToMember(Member member, Collection<Role> roles);
+
+    /**
+     * Queues a role to be removed from the member.
+     *
+     * @param member The member who should lose the role.
+     * @param role The role to be removed.
+     */
+    void removeRoleFromMember(Member member, Role role);
+
+    /**
+     * Queues a collection of roles to be removed from the member.
+     *
+     * @param member The member who should lose the roles.
+     * @param roles The collection of roles to be removed.
+     */
+    void removeRolesFromMember(Member member, Collection<Role> roles);
+
+    /**
+     * Queues all roles to be removed from the member.
+     *
+     * @param member The member who should lose the roles.
+     */
+    void removeAllRolesFromMember(Member member);
 
     /**
      * Performs the queued updates.
