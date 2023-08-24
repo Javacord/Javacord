@@ -10,6 +10,7 @@ import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.server.role.UserRoleRemoveEvent;
 import org.javacord.api.event.user.UserChangeAvatarEvent;
 import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
+import org.javacord.api.event.user.UserChangeGlobalNameEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 import org.javacord.api.event.user.UserChangePendingEvent;
@@ -23,6 +24,7 @@ import org.javacord.core.event.server.role.UserRoleAddEventImpl;
 import org.javacord.core.event.server.role.UserRoleRemoveEventImpl;
 import org.javacord.core.event.user.UserChangeAvatarEventImpl;
 import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
+import org.javacord.core.event.user.UserChangeGlobalNameEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
 import org.javacord.core.event.user.UserChangePendingEventImpl;
@@ -202,6 +204,15 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                             }
                         }
 
+                        if (packet.get("user").has("global_name")) {
+                            String newGlobalName = packet.get("user").get("global_name").asText(null);
+                            String oldGlobalName = oldUser.getGlobalName().orElse(null);
+                            if (!Objects.deepEquals(newGlobalName, oldGlobalName)) {
+                                dispatchUserChangeGlobalNameEvent(updatedUser, newGlobalName, oldGlobalName);
+                                userChanged = true;
+                            }
+                        }
+
                         if (userChanged) {
                             api.updateUserOfAllMembers(updatedUser);
                         }
@@ -236,6 +247,17 @@ public class GuildMemberUpdateHandler extends PacketHandler {
         UserChangeAvatarEvent event = new UserChangeAvatarEventImpl(user, newAvatarHash, oldAvatarHash);
 
         api.getEventDispatcher().dispatchUserChangeAvatarEvent(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
+    }
+
+    private void dispatchUserChangeGlobalNameEvent(User user, String newGlobalName, String oldGlobalName) {
+        UserChangeGlobalNameEvent event = new UserChangeGlobalNameEventImpl(user, newGlobalName, oldGlobalName);
+
+        api.getEventDispatcher().dispatchUserChangeGlobalNameEvent(
                 api,
                 user.getMutualServers(),
                 Collections.singleton(user),
