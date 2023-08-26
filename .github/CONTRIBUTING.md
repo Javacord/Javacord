@@ -147,3 +147,31 @@ public Foo getFooByBar(Bar bar) {
 ```
 
 It is a good idea to familiarize yourself with the style of the code by browsing the code a bit, especially looking for classes or methods that are similar to the ones you are working on.
+
+## Bounties
+
+Bounties serve as a dynamic avenue to engage and inspire our community in resolving specific issues.
+
+A few notes about bounties:
+- Issues eligible for bounties will be marked with the bounty label.
+- If you're interested in working on a bounty, please comment on the respective issue to let us know. This helps us avoid duplicate efforts.
+- Bounties remain distinct from events like Hacktoberfest. We believe in their significance in nurturing the open-source community. If you choose to contribute during these events, you can decide whether your effort should count towards the bounty or the event.
+- Bug bounties generally will have to be fixed with a pull request if not otherwise stated in the issue. If only the cause of a bug is required, we need an explanation of the bug why it happens, how it can be reproduced and how it can (potentially) be fixed.
+- If the bounty requires code which will be merged (feature/enhancement/bug request), the code must be **high quality and follow our code conventions**. To ensure the **quality and completeness** of the code, please consult these sources, depending on the type of contribution:
+  - [Javacord GitHub](https://github.com/Javacord/Javacord)
+  - [Javacord Docs](https://javacord.org/)
+  - [Discord Docs](https://discord.com/developers/docs/intro) 
+  
+  <br>If you find yourself uncertain or in need of assistance, don't hesitate to reach out.
+  You can ask questions directly within the issue or, even better,
+  join our Discord server for more interactive discussions.
+  Our aim is to streamline contributions,
+  ensuring that the review process is efficient and avoids delays due to issues with quality or completeness.
+
+In a nutshell,
+our bounties provide a collaborative platform for the community to make a significant impact on the project's progress.
+By embracing these opportunities, you're not only aiding the project but also alleviating the burden on maintainers.
+Your contributions are the driving force behind this initiative.
+However, please note that if a contribution requires extensive review due to quality or completeness concerns,
+it might be excluded from the bounty,
+even if it's merged afterward.
