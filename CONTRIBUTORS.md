@@ -27,6 +27,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://discord.gg/mw27xdA3wh"><img src="https://avatars.githubusercontent.com/u/92883017?v=4?s=100" width="100px;" alt="Blast"/><br /><sub><b>Blast</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=ReBlast" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Goooler"><img src="https://avatars.githubusercontent.com/u/10363352?v=4?s=100" width="100px;" alt="Goooler"/><br /><sub><b>Goooler</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=Goooler" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
