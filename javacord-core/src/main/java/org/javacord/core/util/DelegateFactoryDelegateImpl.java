@@ -20,6 +20,7 @@ import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelega
 import org.javacord.api.entity.channel.internal.ServerThreadChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.TextableRegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
@@ -79,6 +80,7 @@ import org.javacord.core.entity.channel.ServerThreadChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerThreadChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelBuilderDelegateImpl;
 import org.javacord.core.entity.channel.ServerVoiceChannelUpdaterDelegateImpl;
+import org.javacord.core.entity.channel.TextableRegularServerChannelUpdaterDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiBuilderDelegateImpl;
 import org.javacord.core.entity.emoji.CustomEmojiUpdaterDelegateImpl;
 import org.javacord.core.entity.message.InteractionMessageBuilderDelegateImpl;
@@ -250,6 +252,13 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     public RegularServerChannelUpdaterDelegate createRegularServerChannelUpdaterDelegate(
             RegularServerChannel channel) {
         return new RegularServerChannelUpdaterDelegateImpl(channel);
+    }
+
+    @Override
+    public TextableRegularServerChannelUpdaterDelegate createTextableRegularServerChannelUpdaterDelegate(
+            TextableRegularServerChannel channel
+    ) {
+        return new TextableRegularServerChannelUpdaterDelegateImpl(channel);
     }
 
     @Override

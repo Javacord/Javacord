@@ -33,7 +33,7 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
         } else {
             stringValue = null;
         }
-        if (data.get("value").isLong()) {
+        if (data.get("value").canConvertToLong()) {
             longValue = data.get("value").asLong();
         } else {
             longValue = null;

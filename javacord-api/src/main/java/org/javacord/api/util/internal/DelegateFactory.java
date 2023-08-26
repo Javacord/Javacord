@@ -20,6 +20,7 @@ import org.javacord.api.entity.channel.internal.ServerThreadChannelBuilderDelega
 import org.javacord.api.entity.channel.internal.ServerThreadChannelUpdaterDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelBuilderDelegate;
 import org.javacord.api.entity.channel.internal.ServerVoiceChannelUpdaterDelegate;
+import org.javacord.api.entity.channel.internal.TextableRegularServerChannelUpdaterDelegate;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
@@ -406,6 +407,17 @@ public class DelegateFactory {
     public static RegularServerChannelUpdaterDelegate createRegularServerChannelUpdaterDelegate(
             RegularServerChannel channel) {
         return delegateFactoryDelegate.createRegularServerChannelUpdaterDelegate(channel);
+    }
+
+    /**
+     * Creates a new textable regular server channel updater delegate.
+     *
+     * @param channel The channel to update.
+     * @return A new textable regular server channel updater delegate.
+     */
+    public static TextableRegularServerChannelUpdaterDelegate createTextableRegularServerChannelUpdaterDelegate(
+            TextableRegularServerChannel channel) {
+        return delegateFactoryDelegate.createTextableRegularServerChannelUpdaterDelegate(channel);
     }
 
     /**

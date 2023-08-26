@@ -113,7 +113,6 @@ task generateListenerManagers {
                     }.join('\n\t- '))
         }
         def objectClassByAttachableListenerManager = objectClassByAttachableListenerManagerEntries.collectEntries { it }
-
         def discordApiName =
                 typeSolver.solveType('org.javacord.api.DiscordApi').qualifiedName
         def discordApiBuilderName =

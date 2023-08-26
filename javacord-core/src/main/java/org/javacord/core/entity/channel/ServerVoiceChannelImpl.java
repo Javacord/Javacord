@@ -3,16 +3,12 @@ package org.javacord.core.entity.channel;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.audio.AudioConnection;
 import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
-import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.voice.InternalServerVoiceChannelAttachableListenerManager;
-import org.javacord.core.util.Cleanupable;
-import org.javacord.core.util.cache.MessageCacheImpl;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,14 +21,8 @@ import java.util.stream.Collectors;
 /**
  * The implementation of {@link ServerVoiceChannel}.
  */
-public class ServerVoiceChannelImpl extends RegularServerChannelImpl
-        implements ServerVoiceChannel, Cleanupable, InternalTextChannel,
-        InternalServerVoiceChannelAttachableListenerManager {
-
-    /**
-     * The message cache of the server text channel.
-     */
-    private final MessageCacheImpl messageCache;
+public class ServerVoiceChannelImpl extends TextableRegularServerChannelImpl
+        implements ServerVoiceChannel, InternalServerVoiceChannelAttachableListenerManager {
 
     /**
      * The bitrate of the channel.
@@ -45,16 +35,6 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     private volatile int userLimit;
 
     /**
-     * The parent id of the channel.
-     */
-    private volatile long parentId;
-
-    /**
-     * Whether the channel is "not safe for work" or not.
-     */
-    private volatile boolean nsfw;
-
-    /**
      * The ids of the connected users of this server voice channel.
      */
     private final Set<Long> connectedUsers = new HashSet<>();
@@ -62,22 +42,14 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     /**
      * Creates a new server voice channel object.
      *
-     * @param api The discord api instance.
+     * @param api    The discord api instance.
      * @param server The server of the channel.
-     * @param data The json data of the channel.
+     * @param data   The json data of the channel.
      */
     public ServerVoiceChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         super(api, server, data);
-
-        nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
         bitrate = data.get("bitrate").asInt();
         userLimit = data.get("user_limit").asInt();
-        parentId = Long.parseLong(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
-        nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
-
-        messageCache = new MessageCacheImpl(
-                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
-                api.isDefaultAutomaticMessageCacheCleanupEnabled());
     }
 
     /**
@@ -98,23 +70,6 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
         this.userLimit = userLimit;
     }
 
-    /**
-     * Sets the parent id of the channel.
-     *
-     * @param parentId The parent id to set.
-     */
-    public void setParentId(long parentId) {
-        this.parentId = parentId;
-    }
-
-    /**
-     * Sets the nsfw flag.
-     *
-     * @param nsfw The nsfw flag.
-     */
-    public void setNsfwFlag(boolean nsfw) {
-        this.nsfw = nsfw;
-    }
 
     /**
      * Adds the user with the given id to the list of connected users.
@@ -132,25 +87,6 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
      */
     public void removeConnectedUser(long userId) {
         connectedUsers.remove(userId);
-    }
-
-    /**
-     * Sets the nsfw flag of the channel.
-     *
-     * @param nsfw The new nsfw flag of the channel.
-     */
-    public void setNsfw(boolean nsfw) {
-        this.nsfw = nsfw;
-    }
-
-    @Override
-    public boolean isNsfw() {
-        return nsfw;
-    }
-
-    @Override
-    public Optional<ChannelCategory> getCategory() {
-        return getServer().getChannelCategoryById(parentId);
     }
 
     @Override
@@ -203,9 +139,9 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     @Override
     public boolean equals(Object o) {
         return (this == o)
-               || !((o == null)
-                    || (getClass() != o.getClass())
-                    || (getId() != ((DiscordEntity) o).getId()));
+                || !((o == null)
+                || (getClass() != o.getClass())
+                || (getId() != ((DiscordEntity) o).getId()));
     }
 
     @Override
@@ -216,15 +152,5 @@ public class ServerVoiceChannelImpl extends RegularServerChannelImpl
     @Override
     public String toString() {
         return String.format("ServerVoiceChannel (id: %s, name: %s)", getIdAsString(), getName());
-    }
-
-    @Override
-    public MessageCache getMessageCache() {
-        return messageCache;
-    }
-
-    @Override
-    public void cleanup() {
-        messageCache.cleanup();
     }
 }

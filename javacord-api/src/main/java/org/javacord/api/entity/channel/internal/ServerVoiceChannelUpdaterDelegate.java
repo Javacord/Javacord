@@ -1,13 +1,12 @@
 package org.javacord.api.entity.channel.internal;
 
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannelUpdater;
 
 /**
  * This class is internally used by the {@link ServerVoiceChannelUpdater} to update server voice channels.
  * You usually don't want to interact with this object.
  */
-public interface ServerVoiceChannelUpdaterDelegate extends RegularServerChannelUpdaterDelegate {
+public interface ServerVoiceChannelUpdaterDelegate extends TextableRegularServerChannelUpdaterDelegate {
 
     /**
      * Queues the bitrate to be updated.
@@ -27,24 +26,4 @@ public interface ServerVoiceChannelUpdaterDelegate extends RegularServerChannelU
      * Queues the user limit to be removed.
      */
     void removeUserLimit();
-
-    /**
-     * Queues the category to be updated.
-     *
-     * @param category The new category of the channel.
-     */
-    void setCategory(ChannelCategory category);
-
-    /**
-     * Queues the category to be removed.
-     */
-    void removeCategory();
-
-    /**
-     * Queues the nsfw flag to be updated.
-     *
-     * @param nsfw Whether the channel should be marked as 'not safe for work'
-     *             or not.
-     */
-    void setNsfw(Boolean nsfw);
 }

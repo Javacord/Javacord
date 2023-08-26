@@ -4,54 +4,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.DiscordEntity;
-import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.server.ArchivedThreads;
-import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ArchivedThreadsImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.text.InternalServerTextChannelAttachableListenerManager;
-import org.javacord.core.util.Cleanupable;
-import org.javacord.core.util.cache.MessageCacheImpl;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
+
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
  * The implementation of {@link ServerTextChannel}.
  */
-public class ServerTextChannelImpl extends RegularServerChannelImpl
-        implements ServerTextChannel, Cleanupable, InternalTextChannel,
-        InternalServerTextChannelAttachableListenerManager {
-
-    /**
-     * The message cache of the server text channel.
-     */
-    private final MessageCacheImpl messageCache;
-
-    /**
-     * Whether the channel is "not safe for work" or not.
-     */
-    private volatile boolean nsfw;
-
-    /**
-     * The parent id of the channel.
-     */
-    private volatile long parentId;
+public class ServerTextChannelImpl extends TextableRegularServerChannelImpl
+        implements ServerTextChannel, InternalServerTextChannelAttachableListenerManager {
 
     /**
      * The topic of the channel.
      */
     private volatile String topic;
-
-    /**
-     * The slowmode delay of the channel.
-     */
-    private volatile int delay;
 
     /**
      * The default auto archive duration for this channel.
@@ -67,17 +42,10 @@ public class ServerTextChannelImpl extends RegularServerChannelImpl
      */
     public ServerTextChannelImpl(DiscordApiImpl api, ServerImpl server, JsonNode data) {
         super(api, server, data);
-        nsfw = data.has("nsfw") && data.get("nsfw").asBoolean();
-        parentId = Long.parseLong(data.has("parent_id") ? data.get("parent_id").asText("-1") : "-1");
         topic = data.has("topic") && !data.get("topic").isNull() ? data.get("topic").asText() : "";
-        delay = data.has("rate_limit_per_user") ? data.get("rate_limit_per_user").asInt(0) : 0;
         defaultAutoArchiveDuration = data.has("default_auto_archive_duration")
                 ? data.get("default_auto_archive_duration").asInt()
                 : 1440;
-
-        messageCache = new MessageCacheImpl(
-                api, api.getDefaultMessageCacheCapacity(), api.getDefaultMessageCacheStorageTimeInSeconds(),
-                api.isDefaultAutomaticMessageCacheCleanupEnabled());
     }
 
     /**
@@ -87,38 +55,6 @@ public class ServerTextChannelImpl extends RegularServerChannelImpl
      */
     public void setTopic(String topic) {
         this.topic = topic;
-    }
-
-    /**
-     * Sets the nsfw flag.
-     *
-     * @param nsfw The nsfw flag.
-     */
-    public void setNsfwFlag(boolean nsfw) {
-        this.nsfw = nsfw;
-    }
-
-    /**
-     * Sets the parent id of the channel.
-     *
-     * @param parentId The parent id to set.
-     */
-    public void setParentId(long parentId) {
-        this.parentId = parentId;
-    }
-
-    /**
-     * Sets the slowmode delay of the channel.
-     *
-     * @param delay The delay in seconds.
-     */
-    public void setSlowmodeDelayInSeconds(int delay) {
-        this.delay = delay;
-    }
-
-    @Override
-    public int getSlowmodeDelayInSeconds() {
-        return delay;
     }
 
     @Override
@@ -185,28 +121,8 @@ public class ServerTextChannelImpl extends RegularServerChannelImpl
     }
 
     @Override
-    public boolean isNsfw() {
-        return nsfw;
-    }
-
-    @Override
-    public Optional<ChannelCategory> getCategory() {
-        return getServer().getChannelCategoryById(parentId);
-    }
-
-    @Override
     public String getTopic() {
         return topic;
-    }
-
-    @Override
-    public MessageCache getMessageCache() {
-        return messageCache;
-    }
-
-    @Override
-    public void cleanup() {
-        messageCache.cleanup();
     }
 
     @Override
