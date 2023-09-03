@@ -32,25 +32,25 @@ public interface ListenerManager<T> {
     T getListener();
 
     /**
-     * Gets the class of the object, the listener was added to.
+     * Gets the class of the object the listener was added to.
      * For global listeners, it returns an empty {@code Optional}.
      *
-     * @return The class of the object, the listener was added to.
+     * @return The class of the object the listener was added to.
      */
     Optional<Class<?>> getAssignedObjectClass();
 
     /**
-     * Gets the id of the object, the listener as added to.
+     * Gets the id of the object the listener was added to.
      * Empty for global listeners.
      *
-     * @return The id of the object, the listener was added to.
+     * @return The id of the object the listener was added to.
      */
     Optional<Long> getAssignedObjectId();
 
     /**
      * Removes the listener.
      *
-     * @return The current instance in order to chain call methods.
+     * @return The current instance in order to chain method calls.
      */
     ListenerManager<T> remove();
 
@@ -59,14 +59,14 @@ public interface ListenerManager<T> {
      *
      * @param delay The time to wait before removing the listener.
      * @param timeUnit The time unit of the delay.
-     * @return The current instance in order to chain call methods.
+     * @return The current instance in order to chain method calls.
      */
     ListenerManager<T> removeAfter(long delay, TimeUnit timeUnit);
 
     /**
      * Adds a runnable which gets called when the listener gets removed.
      *
-     * @param removeHandler The handler which gets called when the listener gets remove.
+     * @param removeHandler The handler which gets called when the listener gets removed.
      */
     void addRemoveHandler(Runnable removeHandler);
 
