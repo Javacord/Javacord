@@ -6,8 +6,10 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.event.channel.thread.ThreadCreateEvent;
+import org.javacord.api.event.channel.thread.ThreadJoinEvent;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.event.channel.thread.ThreadCreateEventImpl;
+import org.javacord.core.event.channel.thread.ThreadJoinEventImpl;
 import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -52,10 +54,17 @@ public class ThreadCreateHandler extends PacketHandler {
         api.getPossiblyUnreadyServerById(serverId).ifPresent(server -> {
             final ServerThreadChannel serverThreadChannel =
                     ((ServerImpl) server).getOrCreateServerThreadChannel(channel);
-            final ThreadCreateEvent event = new ThreadCreateEventImpl(serverThreadChannel);
 
-            api.getEventDispatcher()
-                    .dispatchThreadCreateEvent((DispatchQueueSelector) server, serverThreadChannel, event);
+
+            if (channel.hasNonNull("newly_created") && channel.get("newly_created").asBoolean()) {
+                final ThreadCreateEvent event = new ThreadCreateEventImpl(serverThreadChannel);
+                api.getEventDispatcher()
+                        .dispatchThreadCreateEvent((DispatchQueueSelector) server, serverThreadChannel, event);
+            } else {
+                final ThreadJoinEvent event = new ThreadJoinEventImpl(serverThreadChannel);
+                api.getEventDispatcher()
+                        .dispatchThreadJoinEvent((DispatchQueueSelector) server, serverThreadChannel, event);
+            }
         });
     }
 }
