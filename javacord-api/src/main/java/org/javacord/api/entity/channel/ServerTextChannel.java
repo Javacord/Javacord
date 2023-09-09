@@ -191,7 +191,7 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires the READ_MESSAGE_HISTORY permission.
      *
-     * @param before Get public archived threads before the thread with this id.
+     * @param before Get public archived threads archived before this timestamp (in seconds).
      * @return The ArchivedThreads.
      */
     default CompletableFuture<ArchivedThreads> getPublicArchivedThreads(long before) {
@@ -223,7 +223,7 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires the READ_MESSAGE_HISTORY permission.
      *
-     * @param before Get public archived threads before the thread with this id.
+     * @param before Get public archived threads archived before this timestamp (in seconds).
      * @param limit  The maximum amount of public archived threads.
      * @return The ArchivedThreads.
      */
@@ -249,7 +249,7 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires both the READ_MESSAGE_HISTORY and MANAGE_THREADS permissions.
      *
-     * @param before Get private archived threads before the thread with this id.
+     * @param before Get private archived threads archived before this timestamp (in seconds).
      * @return The ArchivedThreads.
      */
     default CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(long before) {
@@ -277,7 +277,7 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires both the READ_MESSAGE_HISTORY and MANAGE_THREADS permissions.
      *
-     * @param before Get private archived threads before the thread with this id.
+     * @param before Get private archived threads archived before this timestamp (in seconds).
      * @param limit  The maximum amount of private archived threads.
      * @return The ArchivedThreads.
      */
