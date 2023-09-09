@@ -1,8 +1,6 @@
 package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.server.ArchivedThreads;
@@ -14,6 +12,10 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,52 +60,50 @@ public class ServerTextChannelImpl extends TextableRegularServerChannelImpl
     }
 
     @Override
-    public CompletableFuture<ArchivedThreads> getPublicArchivedThreads(Long before, Integer limit) {
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+    public CompletableFuture<ArchivedThreads> getPublicArchivedThreads(Instant before, Integer limit) {
+        RestRequest<ArchivedThreads> request =
+                new RestRequest<ArchivedThreads>(getApi(), RestMethod.GET, RestEndpoint.LIST_PUBLIC_ARCHIVED_THREADS)
+                    .setUrlParameters(getIdAsString());
         if (before != null) {
-            body.put("before", before);
+            request.addQueryParameter("before",
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(before));
         }
         if (limit != null) {
-            body.put("limit", limit);
+            request.addQueryParameter("limit", limit.toString());
         }
-        return new RestRequest<ArchivedThreads>(getApi(), RestMethod.GET, RestEndpoint.LIST_PUBLIC_ARCHIVED_THREADS)
-                .setUrlParameters(getIdAsString())
-                .setBody(body)
-                .execute(result -> new ArchivedThreadsImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
-                        result.getJsonBody()));
+        return request.execute(result -> new ArchivedThreadsImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
+            result.getJsonBody()));
     }
 
     @Override
-    public CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(Long before, Integer limit) {
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+    public CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(Instant before, Integer limit) {
+        RestRequest<ArchivedThreads> request =
+                new RestRequest<ArchivedThreads>(getApi(), RestMethod.GET, RestEndpoint.LIST_PRIVATE_ARCHIVED_THREADS)
+                    .setUrlParameters(getIdAsString());
         if (before != null) {
-            body.put("before", before);
+            request.addQueryParameter("before",
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneId.from(ZoneOffset.UTC)).format(before));
         }
         if (limit != null) {
-            body.put("limit", limit);
+            request.addQueryParameter("limit", limit.toString());
         }
-        return new RestRequest<ArchivedThreads>(getApi(), RestMethod.GET, RestEndpoint.LIST_PRIVATE_ARCHIVED_THREADS)
-                .setUrlParameters(getIdAsString())
-                .setBody(body)
-                .execute(result -> new ArchivedThreadsImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
-                        result.getJsonBody()));
+        return request.execute(result -> new ArchivedThreadsImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
+            result.getJsonBody()));
     }
 
     @Override
     public CompletableFuture<ArchivedThreads> getJoinedPrivateArchivedThreads(Long before, Integer limit) {
-        final ObjectNode body = JsonNodeFactory.instance.objectNode();
+        RestRequest<ArchivedThreads> request = new RestRequest<ArchivedThreads>(
+                getApi(), RestMethod.GET, RestEndpoint.LIST_JOINED_PRIVATE_ARCHIVED_THREADS)
+                    .setUrlParameters(getIdAsString());
         if (before != null) {
-            body.put("before", before);
+            request.addQueryParameter("before", before.toString());
         }
         if (limit != null) {
-            body.put("limit", limit);
+            request.addQueryParameter("limit", limit.toString());
         }
-        return new RestRequest<ArchivedThreads>(getApi(), RestMethod.GET,
-                RestEndpoint.LIST_JOINED_PRIVATE_ARCHIVED_THREADS)
-                .setUrlParameters(getIdAsString())
-                .setBody(body)
-                .execute(result -> new ArchivedThreadsImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
-                        result.getJsonBody()));
+        return request.execute(result -> new ArchivedThreadsImpl((DiscordApiImpl) getApi(), (ServerImpl) getServer(),
+            result.getJsonBody()));
     }
 
     /**

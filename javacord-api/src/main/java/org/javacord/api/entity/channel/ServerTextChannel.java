@@ -3,6 +3,8 @@ package org.javacord.api.entity.channel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.server.ArchivedThreads;
 import org.javacord.api.listener.channel.server.text.ServerTextChannelAttachableListenerManager;
+
+import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -191,10 +193,10 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires the READ_MESSAGE_HISTORY permission.
      *
-     * @param before Get public archived threads before the thread with this id.
+     * @param before Get public archived threads archived before this timestamp.
      * @return The ArchivedThreads.
      */
-    default CompletableFuture<ArchivedThreads> getPublicArchivedThreads(long before) {
+    default CompletableFuture<ArchivedThreads> getPublicArchivedThreads(Instant before) {
         return getPublicArchivedThreads(before, null);
     }
 
@@ -223,11 +225,11 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires the READ_MESSAGE_HISTORY permission.
      *
-     * @param before Get public archived threads before the thread with this id.
+     * @param before Get public archived threads archived before this timestamp.
      * @param limit  The maximum amount of public archived threads.
      * @return The ArchivedThreads.
      */
-    CompletableFuture<ArchivedThreads> getPublicArchivedThreads(Long before, Integer limit);
+    CompletableFuture<ArchivedThreads> getPublicArchivedThreads(Instant before, Integer limit);
 
     /**
      * Gets the private archived threads.
@@ -249,10 +251,10 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires both the READ_MESSAGE_HISTORY and MANAGE_THREADS permissions.
      *
-     * @param before Get private archived threads before the thread with this id.
+     * @param before Get private archived threads archived before this timestamp.
      * @return The ArchivedThreads.
      */
-    default CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(long before) {
+    default CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(Instant before) {
         return getPrivateArchivedThreads(before, null);
     }
 
@@ -277,11 +279,11 @@ public interface ServerTextChannel extends TextableRegularServerChannel, ServerT
      * Threads are ordered by archive_timestamp, in descending order.
      * Requires both the READ_MESSAGE_HISTORY and MANAGE_THREADS permissions.
      *
-     * @param before Get private archived threads before the thread with this id.
+     * @param before Get private archived threads archived before this timestamp.
      * @param limit  The maximum amount of private archived threads.
      * @return The ArchivedThreads.
      */
-    CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(Long before, Integer limit);
+    CompletableFuture<ArchivedThreads> getPrivateArchivedThreads(Instant before, Integer limit);
 
     /**
      * Gets the joined private archived threads.
