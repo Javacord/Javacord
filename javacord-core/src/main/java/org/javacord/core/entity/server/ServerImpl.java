@@ -2025,6 +2025,17 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
     }
 
     @Override
+    public List<ServerStageVoiceChannel> getStageVoiceChannels() {
+        return Collections.unmodifiableList(getUnorderedChannels().stream()
+                .filter(ServerStageVoiceChannel.class::isInstance)
+                .map(Channel::asServerStageVoiceChannel)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(RegularServerChannelImpl.COMPARE_BY_RAW_POSITION)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public List<ServerThreadChannel> getThreadChannels() {
         return Collections.unmodifiableList(getUnorderedChannels().stream()
                 .filter(ServerThreadChannel.class::isInstance)
