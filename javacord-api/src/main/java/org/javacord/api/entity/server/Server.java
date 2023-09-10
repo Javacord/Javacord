@@ -2630,9 +2630,9 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     List<ServerVoiceChannel> getVoiceChannels();
 
     /**
-     * Gets a sorted list (by archive timestamp from old to new) with all stage voice channels of the server.
+     * Gets a sorted list (by position) with all stage voice channels of the server.
      *
-     * @return A sorted list (by archive timestamp from old to new) with all stage voice channels of the server.
+     * @return A sorted list (by position) with all stage voice channels of the server.
      */
     List<ServerStageVoiceChannel> getStageVoiceChannels();
 
