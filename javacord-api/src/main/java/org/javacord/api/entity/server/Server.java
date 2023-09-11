@@ -2630,6 +2630,13 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     List<ServerVoiceChannel> getVoiceChannels();
 
     /**
+     * Gets a sorted list (by position) with all stage voice channels of the server.
+     *
+     * @return A sorted list (by position) with all stage voice channels of the server.
+     */
+    List<ServerStageVoiceChannel> getStageVoiceChannels();
+
+    /**
      * Gets a sorted list (by archive timestamp from old to new) with all thread channels of the server.
      *
      * @return A sorted list (by archive timestamp from old to new) with all thread channels of the server.
@@ -3063,10 +3070,10 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     }
 
     /**
-     * Gets a voice channel by its id.
+     * Gets a stage voice channel by its id.
      *
-     * @param id The id of the voice channel.
-     * @return The voice channel with the given id.
+     * @param id The id of the stage voice channel.
+     * @return The stage voice channel with the given id.
      */
     default Optional<ServerStageVoiceChannel> getStageVoiceChannelById(String id) {
         try {
@@ -3100,6 +3107,34 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     default List<ServerVoiceChannel> getVoiceChannelsByNameIgnoreCase(String name) {
         return Collections.unmodifiableList(
                 getVoiceChannels().stream()
+                        .filter(channel -> channel.getName().equalsIgnoreCase(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all stage voice channels with the given name.
+     * This method is case-sensitive!
+     *
+     * @param name The name of the stage voice channels.
+     * @return A sorted list (by position) with all stage voice channels with the given name.
+     */
+    default List<ServerStageVoiceChannel> getStageVoiceChannelsByName(String name) {
+        return Collections.unmodifiableList(
+                getStageVoiceChannels().stream()
+                        .filter(channel -> channel.getName().equals(name))
+                        .collect(Collectors.toList()));
+    }
+
+    /**
+     * Gets a sorted list (by position) with all voice channels with the given name.
+     * This method is case-insensitive!
+     *
+     * @param name The name of the voice channels.
+     * @return A sorted list (by position) with all voice channels with the given name.
+     */
+    default List<ServerStageVoiceChannel> getStageVoiceChannelsByNameIgnoreCase(String name) {
+        return Collections.unmodifiableList(
+                getStageVoiceChannels().stream()
                         .filter(channel -> channel.getName().equalsIgnoreCase(name))
                         .collect(Collectors.toList()));
     }
