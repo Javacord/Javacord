@@ -264,7 +264,7 @@ public abstract class EventDispatcherBase {
             DispatchQueueSelector finalQueueSelector = queueSelector;
             Queue<Runnable> taskQueue = queue;
             // if there is something to execute and there is task running already
-            if (!queue.isEmpty() && runningListeners.add(finalQueueSelector)) {
+            if (runningListeners.add(finalQueueSelector) && !queue.isEmpty()) {
                 AtomicReference<Future<?>> activeListener = new AtomicReference<>();
                 activeListener.set(api.getThreadPool().getExecutorService().submit(() -> {
                     if (finalQueueSelector instanceof ServerImpl) {
@@ -283,14 +283,10 @@ public abstract class EventDispatcherBase {
                             } catch (InterruptedException ignored) { }
                         }
                     }
-                    Runnable task = taskQueue.poll();
-                    if (task == null) {
-                        return;
-                    }
                     // Add the future to the list of active listeners
                     activeListeners.put(activeListener, new Object[]{System.nanoTime(), finalQueueSelector});
                     try {
-                        task.run();
+                        taskQueue.poll().run();
                     } catch (Throwable t) {
                         logger.error("Unhandled exception in {}!", () -> getThreadType(finalQueueSelector), () -> t);
                     }
