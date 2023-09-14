@@ -2,6 +2,7 @@ package org.javacord.core.util.event;
 
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.server.Server;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -9,6 +10,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -19,6 +21,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class is the base for the class used to dispatch events.
@@ -92,6 +96,45 @@ public abstract class EventDispatcherBase {
      */
     protected EventDispatcherBase(DiscordApiImpl api) {
         this.api = api;
+
+        api.getThreadPool().getScheduler().scheduleWithFixedDelay(() -> {
+            try {
+                synchronized (queuedListenerTasks) {
+                    Set<Long> currentServerIds = Stream.concat(
+                            api.getServers().stream().map(Server::getId),
+                            api.getUnavailableServers().stream()
+                    ).collect(Collectors.toSet());
+
+                    Iterator<DispatchQueueSelector> iterator = queuedListenerTasks.keySet().iterator();
+                    while (iterator.hasNext()) {
+                        DispatchQueueSelector queueSelector = iterator.next();
+                        // never clean up the object-independent queue
+                        if (queueSelector == null) {
+                            continue;
+                        }
+                        Queue<Runnable> queue = queuedListenerTasks.get(queueSelector);
+                        // queue cannot be null here or there is another bug somewhere
+                        // never clean up queues that still have entries
+                        if (!queue.isEmpty()) {
+                            continue;
+                        }
+                        if (queueSelector instanceof ServerImpl) {
+                            // clean up queues for servers the bot left
+                            Server serverSelector = (Server) queueSelector;
+                            if (!currentServerIds.contains(serverSelector.getId())) {
+                                iterator.remove();
+                            }
+                        } else if (!(queueSelector instanceof DiscordApiImpl)) {
+                            // make sure there are not new queue selector types introduced that are not cleaned up
+                            throw new AssertionError("Unexpected queue selector type");
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                logger.error("Failed to clean up listener queues!", t);
+            }
+        }, 10, 10, TimeUnit.SECONDS);
+
         queuedListenerTasks.put(null, new ConcurrentLinkedQueue<>());
         api.getThreadPool().getScheduler().scheduleAtFixedRate(() -> {
             try {
@@ -195,6 +238,10 @@ public abstract class EventDispatcherBase {
             return;
         }
 
+        if (listeners.isEmpty()) {
+            return;
+        }
+
         api.getThreadPool().getSingleThreadExecutorService("Event Dispatch Queues Manager").submit(() -> {
             if (queueSelector != null) { // Object dependent listeners
                 // Don't allow adding of more events while there are unfinished object independent tasks
@@ -208,12 +255,10 @@ public abstract class EventDispatcherBase {
                     } catch (InterruptedException ignored) { }
                 }
             }
-            if (!listeners.isEmpty()) {
-                synchronized (queuedListenerTasks) {
-                    Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(
-                            queueSelector, o -> new ConcurrentLinkedQueue<>());
-                    listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
-                }
+            synchronized (queuedListenerTasks) {
+                Queue<Runnable> queue = queuedListenerTasks.computeIfAbsent(
+                        queueSelector, o -> new ConcurrentLinkedQueue<>());
+                listeners.forEach(listener -> queue.add(() -> consumer.accept(listener)));
             }
             checkRunningListenersAndStartIfPossible(queueSelector);
         });
@@ -237,10 +282,6 @@ public abstract class EventDispatcherBase {
             // - running for object-dependent tasks, but queue is empty or not present
             Queue<Runnable> queue = queueSelector == null ? null : queuedListenerTasks.get(queueSelector);
             if (queue == null || queue.isEmpty()) {
-                if (queueSelector != null) {
-                    // Remove the entry for the queue selector, so that it eventually can be garbage collected
-                    queuedListenerTasks.remove(queueSelector);
-                }
                 // if no object-independent tasks to be processed everything is fine, return
                 if (queuedListenerTasks.get(null).isEmpty()) {
                     return;
@@ -293,15 +334,8 @@ public abstract class EventDispatcherBase {
                     activeListeners.remove(activeListener);
                     alreadyCanceledListeners.remove(activeListener);
                     runningListeners.remove(finalQueueSelector);
+                    // Inform the dispatchEvent method that it maybe can queue new listeners now
                     synchronized (queuedListenerTasks) {
-                        // Remove the entry for the queue selector, so that it eventually can be garbage collected
-                        if (finalQueueSelector != null) {
-                            Queue<Runnable> remainingQueue = queuedListenerTasks.get(finalQueueSelector);
-                            if (remainingQueue != null && remainingQueue.isEmpty()) {
-                                queuedListenerTasks.remove(finalQueueSelector);
-                            }
-                        }
-                        // Inform the dispatchEvent method that it maybe can queue new listeners now
                         queuedListenerTasks.notifyAll();
                     }
                     checkRunningListenersAndStartIfPossible(finalQueueSelector);
