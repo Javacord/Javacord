@@ -237,6 +237,8 @@ They are sorted alphabetically that means that the order does not reflect the us
   * Easy to use interaction handler to conveniently work with any Discord interaction (slash, context menu, auto complete...) or component interaction.
 * [**KCommando Framework**](https://github.com/koply/KCommando) by [@koply](https://github.com/koply)
   * Annotation-based multifunctional command handler framework for JDA & Javacord.
+* [**Nexus Framework**](https://github.com/ShindouMihou/Nexus) by [@shindoumihou](https://github.com/ShindouMihou)
+  * Object-based framework for Javacord.
 
 ### Attach Listeners to Objects 📌
 
