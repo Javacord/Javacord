@@ -304,42 +304,52 @@ public abstract class EventDispatcherBase {
             }
             DispatchQueueSelector finalQueueSelector = queueSelector;
             Queue<Runnable> taskQueue = queue;
-            // if there is something to execute and there is task running already
-            if (runningListeners.add(finalQueueSelector) && !queue.isEmpty()) {
-                AtomicReference<Future<?>> activeListener = new AtomicReference<>();
-                activeListener.set(api.getThreadPool().getExecutorService().submit(() -> {
-                    if (finalQueueSelector instanceof ServerImpl) {
-                        Object serverReadyNotifier = new Object();
-                        ((ServerImpl) finalQueueSelector)
-                                .addServerReadyConsumer(s -> {
-                                    synchronized (serverReadyNotifier) {
-                                        serverReadyNotifier.notifyAll();
-                                    }
-                                });
-                        while (!((ServerImpl) finalQueueSelector).isReady()) {
-                            try {
-                                synchronized (serverReadyNotifier) {
-                                    serverReadyNotifier.wait(5000);
-                                }
-                            } catch (InterruptedException ignored) { }
-                        }
-                    }
-                    // Add the future to the list of active listeners
-                    activeListeners.put(activeListener, new Object[]{System.nanoTime(), finalQueueSelector});
-                    try {
-                        taskQueue.poll().run();
-                    } catch (Throwable t) {
-                        logger.error("Unhandled exception in {}!", () -> getThreadType(finalQueueSelector), () -> t);
-                    }
-                    activeListeners.remove(activeListener);
-                    alreadyCanceledListeners.remove(activeListener);
+            // if there is no task running already for the queue
+            if (runningListeners.add(finalQueueSelector)) {
+                // check whether there is something to do for the queue
+                // if not, free the runningListeners synchronizer
+                // otherwise schedule the task to do
+                if (queue.isEmpty()) {
                     runningListeners.remove(finalQueueSelector);
-                    // Inform the dispatchEvent method that it maybe can queue new listeners now
-                    synchronized (queuedListenerTasks) {
-                        queuedListenerTasks.notifyAll();
-                    }
-                    checkRunningListenersAndStartIfPossible(finalQueueSelector);
-                }));
+                } else {
+                    AtomicReference<Future<?>> activeListener = new AtomicReference<>();
+                    activeListener.set(api.getThreadPool().getExecutorService().submit(() -> {
+                        if (finalQueueSelector instanceof ServerImpl) {
+                            Object serverReadyNotifier = new Object();
+                            ((ServerImpl) finalQueueSelector)
+                                    .addServerReadyConsumer(s -> {
+                                        synchronized (serverReadyNotifier) {
+                                            serverReadyNotifier.notifyAll();
+                                        }
+                                    });
+                            while (!((ServerImpl) finalQueueSelector).isReady()) {
+                                try {
+                                    synchronized (serverReadyNotifier) {
+                                        serverReadyNotifier.wait(5000);
+                                    }
+                                } catch (InterruptedException ignored) { }
+                            }
+                        }
+                        // Add the future to the list of active listeners
+                        activeListeners.put(activeListener, new Object[]{System.nanoTime(), finalQueueSelector});
+                        try {
+                            taskQueue.poll().run();
+                        } catch (Throwable t) {
+                            logger.error(
+                                    "Unhandled exception in {}!",
+                                    () -> getThreadType(finalQueueSelector),
+                                    () -> t);
+                        }
+                        activeListeners.remove(activeListener);
+                        alreadyCanceledListeners.remove(activeListener);
+                        runningListeners.remove(finalQueueSelector);
+                        // Inform the dispatchEvent method that it maybe can queue new listeners now
+                        synchronized (queuedListenerTasks) {
+                            queuedListenerTasks.notifyAll();
+                        }
+                        checkRunningListenersAndStartIfPossible(finalQueueSelector);
+                    }));
+                }
             }
         }
     }
