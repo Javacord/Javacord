@@ -744,7 +744,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
             body.put("content", strBuilder.toString());
         }
         prepareAllowedMentions(body);
-        prepareEmbeds(body, false);
+        prepareEmbeds(body, embedsChanged);
     }
 
     private void prepareEmbeds(ObjectNode body, boolean evenIfEmpty) {
