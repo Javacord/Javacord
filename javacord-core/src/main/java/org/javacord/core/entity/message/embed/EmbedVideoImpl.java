@@ -7,6 +7,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * The implementation of {@link EmbedVideo}.
@@ -19,8 +20,8 @@ public class EmbedVideoImpl implements EmbedVideo {
     private static final Logger logger = LoggerUtil.getLogger(EmbedVideoImpl.class);
 
     private final String url;
-    private final int height;
-    private final int width;
+    private final Integer height;
+    private final Integer width;
 
     /**
      * Creates a new embed video.
@@ -29,31 +30,31 @@ public class EmbedVideoImpl implements EmbedVideo {
      */
     public EmbedVideoImpl(JsonNode data) {
         url = data.has("url") ? data.get("url").asText() : null;
-        height = data.has("height") ? data.get("height").asInt() : -1;
-        width = data.has("width") ? data.get("width").asInt() : -1;
+        height = data.has("height") ? data.get("height").asInt() : null;
+        width = data.has("width") ? data.get("width").asInt() : null;
     }
 
     @Override
-    public URL getUrl() {
+    public Optional<URL> getUrl() {
         if (url == null) {
-            return null;
+            return Optional.empty();
         }
         try {
-            return new URL(url);
+            return Optional.of(new URL(url));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the embed video is malformed! Please contact the developer!", e);
-            return null;
+            return Optional.empty();
         }
     }
 
     @Override
-    public int getHeight() {
-        return height;
+    public Optional<Integer> getHeight() {
+        return Optional.ofNullable(height);
     }
 
     @Override
-    public int getWidth() {
-        return width;
+    public Optional<Integer> getWidth() {
+        return Optional.ofNullable(width);
     }
 
 }
