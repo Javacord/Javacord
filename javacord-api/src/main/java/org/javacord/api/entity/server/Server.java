@@ -487,6 +487,17 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     Set<Member> getMembers();
 
     /**
+     * Gets all members of the server with the given role.
+     *
+     * @param role The role all members have that should be rturned.
+     * @return All members of the server with the given role.
+     */
+    default Set<Member> getMembersbyRole(Role role) {
+        return getMembers().stream().filter(member -> member.getRoles().contains(role))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    /**
      * Gets a member by its id.
      *
      * @param id The id of the member.
