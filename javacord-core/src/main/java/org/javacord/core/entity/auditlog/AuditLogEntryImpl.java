@@ -26,6 +26,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -221,6 +222,13 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                             logger.warn("Seems like the icon's url is malformed! Please contact the developer!", e);
                             change = new AuditLogChangeImpl<>(AuditLogChangeType.UNKNOWN, oldValue, newValue);
                         }
+                        break;
+                    case COMMUNICATION_DISABLED_UNTIL:
+                        change = new AuditLogChangeImpl<>(
+                                type,
+                                oldValue != null ? OffsetDateTime.parse(oldValue.asText()).toInstant() : null,
+                                newValue != null ? OffsetDateTime.parse(newValue.asText()).toInstant() : null
+                        );
                         break;
                     case TYPE:
                         // TODO Find a good way to both handle integers (channel type) and strings
