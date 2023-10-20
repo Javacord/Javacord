@@ -274,6 +274,11 @@ public class AuditLogEntryImpl implements AuditLogEntry {
     }
 
     @Override
+    public long getUserId() {
+        return userId;
+    }
+
+    @Override
     public CompletableFuture<User> getUser() {
         return getApi().getUserById(userId);
     }
