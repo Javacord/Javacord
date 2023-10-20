@@ -20,6 +20,13 @@ public interface AuditLogEntry extends DiscordEntity {
     AuditLog getAuditLog();
 
     /**
+     * Gets the id of the user who made the changes.
+     *
+     * @return The id of the user who made the changes.
+     */
+    long getUserId();
+
+    /**
      * Gets the user who made the changes.
      *
      * @return The user who made the changes.
