@@ -238,7 +238,10 @@ public class FileContainer {
         fileAsUrl = file;
         fileAsByteArray = null;
         fileAsInputStream = null;
-        fileTypeOrName = (isSpoiler ? "SPOILER_" : "") + new File(file.getFile()).getName();
+        fileTypeOrName = (isSpoiler ? "SPOILER_" : "")
+                + (null == file.getQuery()
+                ? new File(file.getFile()).getName()
+                : new File(file.getFile().replace("?" + file.getQuery(), "")).getName());
         fileDescription = description;
     }
 
