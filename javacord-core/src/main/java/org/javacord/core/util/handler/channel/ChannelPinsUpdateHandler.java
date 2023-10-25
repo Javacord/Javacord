@@ -52,7 +52,7 @@ public class ChannelPinsUpdateHandler extends PacketHandler {
                     channel,
                     event);
         } else {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, packet);
         }
     }
 

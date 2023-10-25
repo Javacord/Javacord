@@ -1,5 +1,6 @@
 package org.javacord.api.entity.server.scheduledevent;
 
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.user.User;
 import java.util.Optional;
 
@@ -27,6 +28,6 @@ public interface ServerScheduledEventUser {
      *
      * @return The member.
      */
-    Optional<User> getMember();
+    Optional<Member> getMember();
 
 }

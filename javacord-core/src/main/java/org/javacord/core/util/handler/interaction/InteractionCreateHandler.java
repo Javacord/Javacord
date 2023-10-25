@@ -18,7 +18,6 @@ import org.javacord.api.interaction.ApplicationCommandType;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.core.entity.channel.PrivateChannelImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.event.interaction.AutocompleteCreateEventImpl;
 import org.javacord.core.event.interaction.ButtonClickEventImpl;
@@ -66,7 +65,7 @@ public class InteractionCreateHandler extends PacketHandler {
             if (packet.hasNonNull("guild_id")) {
                 channel = api.getTextChannelById(channelId).orElse(null);
             } else {
-                UserImpl user = new UserImpl(api, packet.get("user"), (MemberImpl) null, null);
+                UserImpl user = new UserImpl(api, packet.get("user"));
                 channel = PrivateChannelImpl.getOrCreatePrivateChannel(api, channelId, user.getId(), user);
             }
         }
@@ -129,6 +128,7 @@ public class InteractionCreateHandler extends PacketHandler {
         api.getEventDispatcher().dispatchInteractionCreateEvent(
                 server == null ? api : server,
                 server,
+                interaction.getMember().orElse(null),
                 interaction.getChannel().orElse(null),
                 interaction.getUser(),
                 event);
@@ -145,6 +145,7 @@ public class InteractionCreateHandler extends PacketHandler {
                         api.getEventDispatcher().dispatchSlashCommandCreateEvent(
                                 server == null ? api : server,
                                 server,
+                                interaction.getMember().orElse(null),
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
                                 slashCommandCreateEvent);
@@ -155,6 +156,7 @@ public class InteractionCreateHandler extends PacketHandler {
                         api.getEventDispatcher().dispatchUserContextMenuCommandEvent(
                                 server,
                                 server,
+                                interaction.getMember().orElse(null),
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
                                 userContextMenuCommandEvent);
@@ -167,6 +169,7 @@ public class InteractionCreateHandler extends PacketHandler {
                                 interaction.asMessageContextMenuInteraction().orElseThrow(AssertionError::new)
                                         .getTarget().getId(),
                                 server,
+                                interaction.getMember().orElse(null),
                                 interaction.getChannel().orElse(null),
                                 interaction.getUser(),
                                 messageContextMenuCommandEvent);
@@ -186,6 +189,7 @@ public class InteractionCreateHandler extends PacketHandler {
                         server == null ? api : server,
                         messageId,
                         server,
+                        interaction.getMember().orElse(null),
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
                         messageComponentCreateEvent);
@@ -196,6 +200,7 @@ public class InteractionCreateHandler extends PacketHandler {
                             server == null ? api : server,
                             messageId,
                             server,
+                            interaction.getMember().orElse(null),
                             interaction.getChannel().orElse(null),
                             interaction.getUser(),
                             buttonClickEvent);
@@ -205,6 +210,7 @@ public class InteractionCreateHandler extends PacketHandler {
                             server == null ? api : server,
                             messageId,
                             server,
+                            interaction.getMember().orElse(null),
                             interaction.getChannel().orElse(null),
                             interaction.getUser(),
                             selectMenuChooseEvent);
@@ -215,6 +221,7 @@ public class InteractionCreateHandler extends PacketHandler {
                 api.getEventDispatcher().dispatchAutocompleteCreateEvent(
                         server == null ? api : server,
                         server,
+                        interaction.getMember().orElse(null),
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
                         autocompleteCreateEvent);
@@ -224,6 +231,7 @@ public class InteractionCreateHandler extends PacketHandler {
                 api.getEventDispatcher().dispatchModalSubmitEvent(
                         server == null ? api : server,
                         server,
+                        interaction.getMember().orElse(null),
                         interaction.getChannel().orElse(null),
                         interaction.getUser(),
                         modalSubmitEvent);

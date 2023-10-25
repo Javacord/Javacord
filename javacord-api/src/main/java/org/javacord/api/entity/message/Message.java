@@ -17,6 +17,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.component.HighLevelComponent;
 import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -1568,16 +1569,16 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
     }
 
     /**
-     * Checks if the given user is allowed to add <b>new</b> reactions to the message.
+     * Checks if the given member is allowed to add <b>new</b> reactions to the message.
      *
-     * @param user The user to check.
-     * @return Whether the given user is allowed to add <b>new</b> reactions to the message or not.
+     * @param member The member to check.
+     * @return Whether the given member is allowed to add <b>new</b> reactions to the message or not.
      */
-    default boolean canAddNewReactions(User user) {
+    default boolean canAddNewReactions(Member member) {
         Optional<ServerTextChannel> channel = getServerTextChannel();
         return !channel.isPresent()
-                || channel.get().hasPermission(user, PermissionType.ADMINISTRATOR)
-                || channel.get().hasPermissions(user,
+                || channel.get().hasPermission(member, PermissionType.ADMINISTRATOR)
+                || channel.get().hasPermissions(member,
                 PermissionType.VIEW_CHANNEL,
                 PermissionType.READ_MESSAGE_HISTORY,
                 PermissionType.ADD_REACTIONS);
@@ -1589,25 +1590,27 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to the message or not.
      */
     default boolean canYouAddNewReactions() {
-        return canAddNewReactions(getApi().getYourself());
+        return getServer()
+                .flatMap(server -> server.getMemberById(getApi().getClientId()))
+                .map(this::canAddNewReactions).orElse(false);
     }
 
     /**
      * Checks if the given user can delete this message.
      *
-     * @param user The user to check.
+     * @param member The user to check.
      * @return Whether the given user can delete the message or not.
      */
-    default boolean canDelete(User user) {
+    default boolean canDelete(Member member) {
         // You cannot delete messages in channels you cannot see
-        if (!getChannel().canSee(user)) {
+        if (!getChannel().canSee(member.getUser())) {
             return false;
         }
         // The user can see the message and is the author
-        if (getAuthor().asUser().orElse(null) == user) {
+        if (getAuthor().asMember().map(DiscordEntity::getId).orElse(0L) == member.getId()) {
             return true;
         }
-        return getServerTextChannel().map(channel -> channel.canManageMessages(user)).orElse(false);
+        return getServerTextChannel().map(channel -> channel.canManageMessages(member)).orElse(false);
     }
 
     /**
@@ -1661,7 +1664,7 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @return Whether the user of the connected account can delete the message or not.
      */
     default boolean canYouDelete() {
-        return canDelete(getApi().getYourself());
+        return getServer().map(server -> canDelete(server.getYourself())).orElse(false);
     }
 
     @Override

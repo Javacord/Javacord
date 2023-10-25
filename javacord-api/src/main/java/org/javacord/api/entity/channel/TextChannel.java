@@ -4,7 +4,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.Messageable;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.entity.webhook.Webhook;
 import org.javacord.api.listener.channel.TextChannelAttachableListenerManager;
@@ -116,7 +115,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * <p>Any occurring exceptions including ratelimit exceptions are suppressed. If you want to handle exceptions, use
      * {@link #typeContinuously(Consumer)} or {@link #typeContinuouslyAfter(long, TimeUnit, Consumer)}.
      *
-     * @param delay The delay to wait until the first typing indicator is sent.
+     * @param delay    The delay to wait until the first typing indicator is sent.
      * @param timeUnit The time unit of the delay value.
      * @return An auto-closable to stop sending the typing indicator.
      * @see #type()
@@ -147,8 +146,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * ignored if it is {@code null}.
      *
      * @param exceptionHandler The handler that exceptions are given to.
-     * @param delay The delay to wait until the first typing indicator is sent.
-     * @param timeUnit The time unit of the delay value.
+     * @param delay            The delay to wait until the first typing indicator is sent.
+     * @param timeUnit         The time unit of the delay value.
      * @return An auto-closable to stop sending the typing indicator.
      * @see #type()
      * @see #typeContinuously()
@@ -387,7 +386,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     /**
      * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param before Get messages before the message with this id.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(long)
@@ -397,7 +396,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
     /**
      * Gets up to a given amount of messages in this channel before a given message in any channel.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param before Get messages before this message.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(Message)
@@ -412,7 +411,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param before Get messages before the message with this id.
+     * @param before    Get messages before the message with this id.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(long)
      */
@@ -424,7 +423,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param before Get messages before this message.
+     * @param before    Get messages before this message.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(Message)
      */
@@ -438,7 +437,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param before Get messages before the message with this id.
+     * @param before    Get messages before the message with this id.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(long)
      */
@@ -449,7 +448,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param before Get messages before this message.
+     * @param before    Get messages before this message.
      * @return The messages.
      * @see #getMessagesBeforeAsStream(Message)
      */
@@ -511,7 +510,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param after Get messages after the message with this id.
+     * @param after     Get messages after the message with this id.
      * @return The messages.
      * @see #getMessagesAfterAsStream(long)
      */
@@ -523,7 +522,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param after Get messages after this message.
+     * @param after     Get messages after this message.
      * @return The messages.
      * @see #getMessagesAfterAsStream(Message)
      */
@@ -536,7 +535,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param after Get messages after the message with this id.
+     * @param after     Get messages after the message with this id.
      * @return The messages.
      * @see #getMessagesAfterAsStream(long)
      */
@@ -547,7 +546,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param after Get messages after this message.
+     * @param after     Get messages after this message.
      * @return The messages.
      * @see #getMessagesAfterAsStream(Message)
      */
@@ -589,7 +588,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param around Get messages around the message with this id.
      * @return The messages.
      * @see #getMessagesAroundAsStream(long)
@@ -604,7 +603,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If there aren't enough older or newer messages, the actual amount of messages will be less than the given limit.
      * It's also not guaranteed to be perfectly balanced.
      *
-     * @param limit The limit of messages to get.
+     * @param limit  The limit of messages to get.
      * @param around Get messages around this message.
      * @return The messages.
      * @see #getMessagesAroundAsStream(Message)
@@ -623,7 +622,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param around Get messages around the message with this id.
+     * @param around    Get messages around the message with this id.
      * @return The messages.
      * @see #getMessagesAroundAsStream(long)
      */
@@ -639,7 +638,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param around Get messages around this message.
+     * @param around    Get messages around this message.
      * @return The messages.
      * @see #getMessagesAroundAsStream(Message)
      */
@@ -657,7 +656,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The condition that has to be met.
-     * @param around Get messages around the message with this id.
+     * @param around    Get messages around the message with this id.
      * @return The messages.
      * @see #getMessagesAroundAsStream(long)
      */
@@ -673,7 +672,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * It's also not guaranteed to be perfectly balanced.
      *
      * @param condition The condition that has to be met.
-     * @param around Get messages around this message.
+     * @param around    Get messages around this message.
      * @return The messages.
      * @see #getMessagesAroundAsStream(Message)
      */
@@ -720,7 +719,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * any channel, excluding the boundaries.
      *
      * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param to   The id of the other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -731,7 +730,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * any channel, excluding the boundaries.
      *
      * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param to   The other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -745,8 +744,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param from      The id of the start boundary messages.
+     * @param to        The id of the other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -758,8 +757,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If no message matches the condition, an empty set is returned.
      *
      * @param condition The abort condition for when to stop retrieving messages.
-     * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param from      The start boundary messages.
+     * @param to        The other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -774,8 +773,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param from      The id of the start boundary messages.
+     * @param to        The id of the other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -787,8 +786,8 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * If the first message does not match the condition, an empty set is returned.
      *
      * @param condition The condition that has to be met.
-     * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param from      The start boundary messages.
+     * @param to        The other boundary messages.
      * @return The messages.
      * @see #getMessagesBetweenAsStream(long, long)
      */
@@ -805,7 +804,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * so consider not using this method from a listener directly.
      *
      * @param from The id of the start boundary messages.
-     * @param to The id of the other boundary messages.
+     * @param to   The id of the other boundary messages.
      * @return The stream.
      * @see #getMessagesBetween(long, long)
      */
@@ -819,7 +818,7 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * so consider not using this method from a listener directly.
      *
      * @param from The start boundary messages.
-     * @param to The other boundary messages.
+     * @param to   The other boundary messages.
      * @return The stream.
      * @see #getMessagesBetween(long, long)
      */
@@ -855,207 +854,6 @@ public interface TextChannel extends Channel, Messageable, TextChannelAttachable
      * @return All incoming webhooks in this channel.
      */
     CompletableFuture<List<IncomingWebhook>> getIncomingWebhooks();
-
-    /**
-     * Checks if the given user can send messages in this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     *
-     * @param user The user to check.
-     * @return Whether the given user can write messages or not.
-     */
-    boolean canWrite(User user);
-
-    /**
-     * Checks if the user of the connected account can send messages in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     *
-     * @return Whether the user of the connected account can write messages or not.
-     */
-    default boolean canYouWrite() {
-        return canWrite(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can use external emojis in this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     * It also doesn't check if the user is even able to send any external emojis (twitch subscription or nitro).
-     *
-     * @param user The user to check.
-     * @return Whether the given user can use external emojis or not.
-     */
-    boolean canUseExternalEmojis(User user);
-
-    /**
-     * Checks if the user of the connected account can use external emojis in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     * It also doesn't check if the user is even able to send any external emojis (twitch subscription or nitro).
-     *
-     * @return Whether the user of the connected account can use external emojis or not.
-     */
-    default boolean canYouUseExternalEmojis() {
-        return canUseExternalEmojis(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can use embed links in this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     *
-     * @param user The user to check.
-     * @return Whether the given user can embed links or not.
-     */
-    boolean canEmbedLinks(User user);
-
-    /**
-     * Checks if the user of the connected account can use embed links in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     *
-     * @return Whether the user of the connected account can embed links or not.
-     */
-    default boolean canYouEmbedLinks() {
-        return canEmbedLinks(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can read the message history of this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can read the message history or not.
-     */
-    boolean canReadMessageHistory(User user);
-
-    /**
-     * Checks if the user of the connected account can read the message history of this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     *
-     * @return Whether the user of the connected account can read the message history or not.
-     */
-    default boolean canYouReadMessageHistory() {
-        return canReadMessageHistory(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can use tts (text to speech) in this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     *
-     * @param user The user to check.
-     * @return Whether the given user can use tts or not.
-     */
-    boolean canUseTts(User user);
-
-    /**
-     * Checks if the user of the connected account can use tts (text to speech) in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     * Please notice, this does not check if a user has blocked private messages!
-     *
-     * @return Whether the user of the connected account can use tts or not.
-     */
-    default boolean canYouUseTts() {
-        return canUseTts(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can attach files in this channel.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can attach files or not.
-     */
-    boolean canAttachFiles(User user);
-
-    /**
-     * Checks if the user of the connected account can attach files in this channel.
-     *
-     * @return Whether the user of the connected account can attach files or not.
-     */
-    default boolean canYouAttachFiles() {
-        return canAttachFiles(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user is allowed to add <b>new</b> reactions to messages in this channel.
-     *
-     * @param user The user to check.
-     * @return Whether the given user is allowed to add <b>new</b> reactions to messages in this channel or not.
-     */
-    boolean canAddNewReactions(User user);
-
-    /**
-     * Checks if the user of the connected account is allowed to add <b>new</b> reactions to messages in this channel.
-     *
-     * @return Whether the user of the connected account is allowed to add <b>new</b> reactions to messages in this
-     *     channel or not.
-     */
-    default boolean canYouAddNewReactions() {
-        return canAddNewReactions(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can manage messages (delete or pin them or remove reactions of others) in this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can manage messages or not.
-     */
-    boolean canManageMessages(User user);
-
-    /**
-     * Checks if the user of the connected account can manage messages (delete or pin them or remove reactions of
-     * others) in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     *
-     * @return Whether the user of the connected account can manage messages or not.
-     */
-    default boolean canYouManageMessages() {
-        return canManageMessages(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can remove reactions of other users in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     * This method just forwards to {@link #canManageMessages(User)} as it is the same permission that is needed.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can remove reactions of others or not.
-     */
-    default boolean canRemoveReactionsOfOthers(User user) {
-        return canManageMessages(user);
-    }
-
-    /**
-     * Checks if the user of the connected account can remove reactions of other users in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     *
-     * @return Whether the user of the connected account can remove reactions of others or not.
-     */
-    default boolean canYouRemoveReactionsOfOthers() {
-        return canRemoveReactionsOfOthers(getApi().getYourself());
-    }
-
-    /**
-     * Checks if the given user can mention everyone (@everyone) in this channel.
-     * In private channels this always returns <code>true</code> if the user is part of the chat.
-     *
-     * @param user The user to check.
-     * @return Whether the given user can mention everyone (@everyone) or not.
-     */
-    boolean canMentionEveryone(User user);
-
-    /**
-     * Checks if the user of the connected account can mention everyone (@everyone) in this channel.
-     * In private channels this always returns {@code true} if the user is part of the chat.
-     *
-     * @return Whether the user of the connected account can mention everyone (@everyone) or not.
-     */
-    default boolean canYouMentionEveryone() {
-        return canMentionEveryone(getApi().getYourself());
-    }
 
     @Override
     default Optional<? extends TextChannel> getCurrentCachedInstance() {

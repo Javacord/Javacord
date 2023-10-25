@@ -19,7 +19,7 @@ public abstract class ServerUserEventImpl extends ServerEventImpl implements Use
     /**
      * Creates a new server user event.
      *
-     * @param user The user of the event.
+     * @param user   The user of the event.
      * @param server The server of the event.
      */
     public ServerUserEventImpl(User user, Server server) {

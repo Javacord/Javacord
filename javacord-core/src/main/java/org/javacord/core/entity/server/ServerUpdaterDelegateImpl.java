@@ -9,6 +9,7 @@ import org.javacord.api.entity.Region;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
@@ -58,7 +59,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     /**
      * A map with all user roles to update.
      */
-    private final Map<User, Set<Role>> userRoles = new HashMap<>();
+    private final Map<User, Set<Role>> memberRoles = new HashMap<>();
 
     /**
      * A map with all user nicknames to update.
@@ -486,69 +487,44 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
     }
 
     @Override
-    public void setNickname(User user, String nickname) {
-        userNicknames.put(user, nickname);
-    }
-
-    @Override
-    public void setUserTimeout(User user, Instant timeout) {
-        userTimeouts.put(user, timeout);
-    }
-
-    @Override
-    public void setMuted(User user, boolean muted) {
-        userMuted.put(user, muted);
-    }
-
-    @Override
-    public void setDeafened(User user, boolean deafened) {
-        userDeafened.put(user, deafened);
-    }
-
-    @Override
-    public void setVoiceChannel(User user, ServerVoiceChannel channel) {
-        userMoveTargets.put(user, channel);
-    }
-
-    @Override
     public void reorderRoles(List<Role> roles) {
         newRolesOrder = roles;
     }
 
     @Override
-    public void addRoleToUser(User user, Role role) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void addRoleToMember(Member member, Role role) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.add(role);
     }
 
     @Override
-    public void addRolesToUser(User user, Collection<Role> roles) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void addRolesToMember(Member member, Collection<Role> roles) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.addAll(roles);
     }
 
     @Override
-    public void removeRoleFromUser(User user, Role role) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void removeRoleFromMember(Member member, Role role) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.remove(role);
     }
 
     @Override
-    public void removeRolesFromUser(User user, Collection<Role> roles) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void removeRolesFromMember(Member member, Collection<Role> roles) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.removeAll(roles);
     }
 
     @Override
-    public void removeAllRolesFromUser(User user) {
-        Set<Role> userRoles = this.userRoles.computeIfAbsent(user, u -> new HashSet<>(server.getRoles(u)));
+    public void removeAllRolesFromMember(Member member) {
+        Set<Role> userRoles = this.memberRoles.computeIfAbsent(member.getUser(), u -> new HashSet<>(member.getRoles()));
         userRoles.clear();
     }
 
     @Override
     public CompletableFuture<Void> update() {
         // All members that get updates
-        HashSet<User> members = new HashSet<>(userRoles.keySet());
+        HashSet<User> members = new HashSet<>(memberRoles.keySet());
         members.addAll(userNicknames.keySet());
         members.addAll(userMuted.keySet());
         members.addAll(userDeafened.keySet());
@@ -562,7 +538,7 @@ public class ServerUpdaterDelegateImpl implements ServerUpdaterDelegate {
             boolean patchMember = false;
             ObjectNode updateNode = JsonNodeFactory.instance.objectNode();
 
-            Set<Role> roles = userRoles.get(member);
+            Set<Role> roles = memberRoles.get(member);
             if (roles != null) {
                 ArrayNode rolesJson = updateNode.putArray("roles");
                 roles.stream()

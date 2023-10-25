@@ -3,14 +3,16 @@ package org.javacord.core.interaction;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.member.Member;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.InteractionType;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.AttachmentImpl;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,28 +36,32 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
 
         JsonNode data = jsonData.get("data");
         Map<Long, User> resolvedUsers = new HashMap<>();
+        Map<Long, Member> resolvedMembers = new HashMap<>();
+        Map<Long, Message> resolvedMessages = new HashMap<>();
         Map<Long, Attachment> resolvedAttachments = new HashMap<>();
         if (data.has("resolved")) {
             JsonNode resolved = data.get("resolved");
+            if (resolved.has("users")) {
+                resolved.get("users").fields().forEachRemaining(userNode -> {
+                    JsonNode userData = userNode.getValue();
+                    Long id = Long.parseLong(userNode.getKey());
+                    if (!resolvedUsers.containsKey(id)) {
+                        resolvedUsers.put(id, new UserImpl(api, userData));
+                    }
+                });
+            }
             if (jsonData.has("guild_id")) {
                 ServerImpl server = (ServerImpl) api.getServerById(jsonData.get("guild_id").asLong())
                         .orElseThrow(AssertionError::new);
                 if (resolved.has("members")) {
                     resolved.get("members").fields().forEachRemaining(memberNode -> {
                         Long id = Long.parseLong(memberNode.getKey());
-                        JsonNode userData = resolved.get("users").get(String.valueOf(id));
-                        resolvedUsers.put(id, new UserImpl(api, userData, memberNode.getValue(), server));
+
+                        resolvedMembers.put(id, server.getMemberById(id).orElseGet(
+                                () -> new MemberImpl(api, server, memberNode.getValue(),
+                                        (UserImpl) resolvedUsers.get(id))));
                     });
                 }
-            }
-            if (resolved.has("users")) {
-                resolved.get("users").fields().forEachRemaining(userNode -> {
-                    JsonNode userData = userNode.getValue();
-                    Long id = Long.parseLong(userNode.getKey());
-                    if (!resolvedUsers.containsKey(id)) {
-                        resolvedUsers.put(id, new UserImpl(api, userData, (MemberImpl) null, null));
-                    }
-                });
             }
 
             if (resolved.has("attachments")) {
@@ -70,7 +76,8 @@ public class SlashCommandInteractionImpl extends ApplicationCommandInteractionIm
         options = new ArrayList<>();
         if (data.has("options") && data.get("options").isArray()) {
             for (JsonNode optionJson : data.get("options")) {
-                options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers, resolvedAttachments));
+                options.add(new SlashCommandInteractionOptionImpl(api, optionJson, resolvedUsers, resolvedMembers,
+                        resolvedAttachments));
             }
         }
     }

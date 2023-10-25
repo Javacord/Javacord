@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -39,7 +38,7 @@ public class ReadyHandler extends PacketHandler {
             new ServerImpl(api, guildJson);
         }
 
-        api.setYourself(new UserImpl(api, packet.get("user"), (MemberImpl) null, null));
+        api.setYourself(new UserImpl(api, packet.get("user")));
     }
 
 }

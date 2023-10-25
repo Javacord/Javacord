@@ -1,9 +1,9 @@
 package org.javacord.core.event.user;
 
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.user.TextChannelUserEvent;
-import org.javacord.core.entity.user.Member;
 
 /**
  * The implementation of {@link TextChannelUserEvent}.

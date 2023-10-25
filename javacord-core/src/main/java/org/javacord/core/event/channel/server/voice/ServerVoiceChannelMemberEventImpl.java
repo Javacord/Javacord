@@ -1,8 +1,7 @@
 package org.javacord.core.event.channel.server.voice;
 
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.user.User;
-import org.javacord.core.entity.user.Member;
+import org.javacord.api.entity.member.Member;
 
 /**
  * The implementation of {@link ServerVoiceChannelEventImpl}.
@@ -30,8 +29,8 @@ public abstract class ServerVoiceChannelMemberEventImpl extends ServerVoiceChann
      *
      * @return The user of the event.
      */
-    public User getUser() {
-        return member.getUser();
+    public Member getMember() {
+        return member;
     }
 
 }

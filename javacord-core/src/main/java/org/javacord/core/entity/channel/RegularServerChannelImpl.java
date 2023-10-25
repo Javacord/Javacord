@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Permissionable;
 import org.javacord.api.entity.channel.RegularServerChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
@@ -120,7 +121,7 @@ public class RegularServerChannelImpl extends ServerChannelImpl implements Regul
     }
 
     @Override
-    public Permissions getEffectiveOverwrittenPermissions(User user) {
+    public Permissions getEffectiveOverwrittenPermissions(Member member) {
         PermissionsBuilder builder = new PermissionsBuilder(PermissionsImpl.EMPTY_PERMISSIONS);
         Server server = getServer();
         Role everyoneRole = server.getEveryoneRole();
@@ -133,7 +134,7 @@ public class RegularServerChannelImpl extends ServerChannelImpl implements Regul
                 builder.setState(type, PermissionState.ALLOWED);
             }
         }
-        List<Role> rolesOfUser = new ArrayList<>(server.getRoles(user));
+        List<Role> rolesOfUser = new ArrayList<>(member.getRoles());
         rolesOfUser.remove(everyoneRole);
         List<Permissions> permissionOverwrites = rolesOfUser.stream()
                 .map(this::getOverwrittenPermissions)
@@ -154,7 +155,7 @@ public class RegularServerChannelImpl extends ServerChannelImpl implements Regul
         }
         for (PermissionType type : PermissionType.values()) {
             Permissions permissions = overwrittenUserPermissions
-                    .getOrDefault(user.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
+                    .getOrDefault(member.getId(), PermissionsImpl.EMPTY_PERMISSIONS);
             if (permissions.getState(type) == PermissionState.DENIED) {
                 builder.setState(type, PermissionState.DENIED);
             }

@@ -13,6 +13,7 @@ import org.javacord.api.entity.channel.ServerForumChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
@@ -172,7 +173,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         long channelId = jsonChannel.get("id").asLong();
         Optional<RegularServerChannel> optionalChannel = api.getRegularServerChannelById(channelId);
         if (!optionalChannel.isPresent()) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, jsonChannel);
             return;
         }
 
@@ -261,7 +262,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                         entity.filter(e -> e instanceof Role)
                                 .map(Role.class::cast)
                                 .ifPresent(role -> areYouAffected
-                                        .compareAndSet(false, role.getUsers().stream().anyMatch(User::isYourself)));
+                                        .compareAndSet(false, role.getMembers().stream().map(Member::getUser)
+                                                .anyMatch(User::isYourself)));
                     }
                 }
             }
@@ -299,7 +301,8 @@ public class ChannelUpdateHandler extends PacketHandler {
                 if (server.isReady()) {
                     dispatchServerChannelChangeOverwrittenPermissionsEvent(
                             channel, PermissionsImpl.EMPTY_PERMISSIONS, oldPermissions, role.getId(), role);
-                    areYouAffected.compareAndSet(false, role.getUsers().stream().anyMatch(User::isYourself));
+                    areYouAffected.compareAndSet(false, role.getMembers().stream().map(Member::getUser)
+                            .anyMatch(User::isYourself));
                 }
             });
         }
@@ -345,7 +348,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         long channelId = jsonChannel.get("id").asLong();
         Optional<ServerTextChannel> optionalChannel = api.getServerTextChannelById(channelId);
         if (!optionalChannel.isPresent()) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, jsonChannel);
             return;
         }
 
@@ -416,7 +419,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         long channelId = jsonChannel.get("id").asLong();
         Optional<ServerForumChannel> optionalChannel = api.getServerForumChannelById(channelId);
         if (!optionalChannel.isPresent()) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, jsonChannel);
             return;
         }
 
@@ -432,7 +435,7 @@ public class ChannelUpdateHandler extends PacketHandler {
         long channelId = jsonChannel.get("id").asLong();
         Optional<ServerVoiceChannel> optionalChannel = api.getServerVoiceChannelById(channelId);
         if (!optionalChannel.isPresent()) {
-            LoggerUtil.logMissingChannel(logger, channelId);
+            LoggerUtil.logMissingChannel(logger, channelId, jsonChannel);
             return;
         }
 

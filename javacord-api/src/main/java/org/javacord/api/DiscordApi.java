@@ -21,6 +21,7 @@ import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
@@ -528,7 +529,6 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
 
     /**
      * Gets a user of the connected account.
-     * This may be a bot user (for normal bots), or a regular user (for client-bots).
      *
      * @return The user of the connected account.
      */
@@ -973,10 +973,10 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
         Matcher userMention = DiscordRegexPattern.USER_MENTION.matcher(content);
         while (userMention.find()) {
             String userId = userMention.group("id");
-            Optional<User> userOptional = getCachedUserById(userId);
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                String userName = server == null ? user.getName() : server.getDisplayName(user);
+            Optional<Member> memberOptional = server.getMemberById(userId);
+            if (memberOptional.isPresent()) {
+                Member member = memberOptional.get();
+                String userName = server == null ? member.getUser().getName() : member.getDisplayName();
                 content = userMention.replaceFirst(Matcher.quoteReplacement("@" + userName));
                 userMention.reset(content);
             }
@@ -1110,62 +1110,62 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
-     * Gets all users with the given nickname on the given server.
+     * Gets all members with the given nickname on the given server.
      * This method is case-sensitive!
      *
-     * @param nickname The nickname of the users.
+     * @param nickname The nickname of the members.
      * @param server The server where to lookup the nickname.
-     * @return All users with the given nickname on the given server.
+     * @return All members with the given nickname on the given server.
      */
-    default Set<User> getCachedUsersByNickname(String nickname, Server server) {
+    default Set<Member> getCachedMembersByNickname(String nickname, Server server) {
         return Collections.unmodifiableSet(
-                getCachedUsers().stream()
-                        .filter(user -> user.getNickname(server).map(nickname::equals).orElse(false))
+                server.getMembers().stream()
+                        .filter(member -> member.getNickname().map(nickname::equals).orElse(false))
                         .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets all users with the given nickname on the given server.
+     * Gets all members with the given nickname on the given server.
      * This method is case-insensitive!
      *
-     * @param nickname The nickname of the users.
+     * @param nickname The nickname of the members.
      * @param server The server where to lookup the nickname.
-     * @return All users with the given nickname on the given server.
+     * @return All members with the given nickname on the given server.
      */
-    default Set<User> getCachedUsersByNicknameIgnoreCase(String nickname, Server server) {
+    default Set<Member> getCachedMembersByNicknameIgnoreCase(String nickname, Server server) {
         return Collections.unmodifiableSet(
-                getCachedUsers().stream()
-                        .filter(user -> user.getNickname(server).map(nickname::equalsIgnoreCase).orElse(false))
+                server.getMembers().stream()
+                        .filter(member -> member.getNickname().map(nickname::equalsIgnoreCase).orElse(false))
                         .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets all users with the given display name on the given server.
+     * Gets all members with the given display name on the given server.
      * This method is case-sensitive!
      *
-     * @param displayName The display name of the users.
+     * @param displayName The display name of the members.
      * @param server The server where to lookup the display name.
-     * @return All users with the given display name on the given server.
+     * @return All members with the given display name on the given server.
      */
-    default Set<User> getCachedUsersByDisplayName(String displayName, Server server) {
+    default Set<Member> getCachedMembersByDisplayName(String displayName, Server server) {
         return Collections.unmodifiableSet(
-                getCachedUsers().stream()
-                        .filter(user -> user.getDisplayName(server).equals(displayName))
+                server.getMembers().stream()
+                        .filter(user -> user.getDisplayName().equals(displayName))
                         .collect(Collectors.toSet()));
     }
 
     /**
-     * Gets all users with the given display name on the given server.
+     * Gets all members with the given display name on the given server.
      * This method is case-insensitive!
      *
-     * @param displayName The display name of the users.
+     * @param displayName The display name of the members.
      * @param server The server where to lookup the display name.
-     * @return All users with the given display name on the given server.
+     * @return All members with the given display name on the given server.
      */
-    default Set<User> getCachedUsersByDisplayNameIgnoreCase(String displayName, Server server) {
+    default Set<Member> getCachedMembersByDisplayNameIgnoreCase(String displayName, Server server) {
         return Collections.unmodifiableSet(
-                getCachedUsers().stream()
-                        .filter(user -> user.getDisplayName(server).equalsIgnoreCase(displayName))
+                server.getMembers().stream()
+                        .filter(user -> user.getDisplayName().equalsIgnoreCase(displayName))
                         .collect(Collectors.toSet()));
     }
 

@@ -14,7 +14,7 @@ public interface ServerMemberUnbanListener extends ServerAttachableListener, Use
         GloballyAttachableListener, ObjectAttachableListener {
 
     /**
-     * This method is called every time a user got unbanned from a server.
+     * This method is called every time a member got unbanned from a server.
      *
      * @param event The event.
      */

@@ -1,11 +1,12 @@
 package org.javacord.api.event.user;
 
 import org.javacord.api.entity.Icon;
+import org.javacord.api.event.server.member.ServerMemberEvent;
 
 /**
  * A user change avatar event.
  */
-public interface UserChangeAvatarEvent extends UserEvent {
+public interface UserChangeAvatarEvent extends ServerMemberEvent {
 
     /**
      * Gets the new avatar of the user.

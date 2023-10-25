@@ -17,7 +17,7 @@ public interface ServerMemberLeaveListener extends ServerAttachableListener, Use
         GloballyAttachableListener, ObjectAttachableListener {
 
     /**
-     * This method is called every time a user leaves a server.
+     * This method is called every time a member leaves a server.
      *
      * @param event the event.
      */

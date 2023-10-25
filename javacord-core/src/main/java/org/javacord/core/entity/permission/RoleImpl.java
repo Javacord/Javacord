@@ -5,21 +5,18 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
+import org.javacord.api.entity.member.Member;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.permission.RoleTags;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.IconImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.Member;
-import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.listener.server.role.InternalRoleAttachableListenerManager;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -271,27 +268,14 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     @Override
-    public Set<User> getUsers() {
+    public Set<Member> getMembers() {
         if (isEveryoneRole()) {
             return getServer().getMembers();
         }
 
-        return server.getRealMembers().stream()
+        return server.getMembers().stream()
                 .filter(member -> member.hasRole(this))
-                .map(Member::getUser)
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public boolean hasUser(User user) {
-        return ((UserImpl) user).getMember()
-                .filter(member -> member.getServer().equals(server))
-                .map(Member.class::cast)
-                // TODO Replace with Optional#or when we upgrade to Java 9+
-                .map(Optional::of)
-                .orElseGet(() -> server.getRealMemberById(user.getId()))
-                .map(member -> member.hasRole(this))
-                .orElse(false);
     }
 
     @Override

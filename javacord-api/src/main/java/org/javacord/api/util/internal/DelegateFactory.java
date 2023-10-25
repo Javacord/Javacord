@@ -24,6 +24,7 @@ import org.javacord.api.entity.channel.internal.TextableRegularServerChannelUpda
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.emoji.internal.CustomEmojiBuilderDelegate;
 import org.javacord.api.entity.emoji.internal.CustomEmojiUpdaterDelegate;
+import org.javacord.api.entity.member.internal.MemberUpdaterDelegate;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
@@ -503,6 +504,16 @@ public class DelegateFactory {
      */
     public static ServerUpdaterDelegate createServerUpdaterDelegate(Server server) {
         return delegateFactoryDelegate.createServerUpdaterDelegate(server);
+    }
+
+    /**
+     * Creates a new member updater delegate.
+     *
+     * @param server The server the member belongs to.
+     * @return A new member updater delegate.
+     */
+    public static MemberUpdaterDelegate createMemberUpdaterDelegate(Server server) {
+        return delegateFactoryDelegate.createMemberUpdaterDelegate(server);
     }
 
     /**

@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * A server member ban event.
  */
-public interface ServerMemberBanEvent extends ServerMemberEvent {
+public interface ServerMemberBanEvent extends ServerUserEvent {
 
     /**
      * Requests the Ban object of the event.

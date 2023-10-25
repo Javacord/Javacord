@@ -17,7 +17,7 @@ public interface ServerMemberJoinListener extends ServerAttachableListener, User
         GloballyAttachableListener, ObjectAttachableListener {
 
     /**
-     * This method is called every time a user joins a server.
+     * This method is called every time a member joins a server.
      *
      * @param event The event.
      */

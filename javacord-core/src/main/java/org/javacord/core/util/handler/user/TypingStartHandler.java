@@ -3,10 +3,10 @@ package org.javacord.core.util.handler.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.event.user.UserStartTypingEvent;
+import org.javacord.api.event.server.member.UserStartTypingEvent;
+import org.javacord.core.entity.member.MemberImpl;
 import org.javacord.core.entity.server.ServerImpl;
-import org.javacord.core.entity.user.MemberImpl;
-import org.javacord.core.event.user.UserStartTypingEventImpl;
+import org.javacord.core.event.server.member.UserStartTypingEventImpl;
 import org.javacord.core.util.gateway.PacketHandler;
 
 /**
@@ -45,6 +45,7 @@ public class TypingStartHandler extends PacketHandler {
             api.getEventDispatcher().dispatchUserStartTypingEvent(
                     server != null ? server : api,
                     server,
+                    member,
                     channel,
                     userId,
                     event);

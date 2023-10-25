@@ -2,6 +2,7 @@ package org.javacord.core.entity.channel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.ChannelCategory;
+import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.TextableRegularServerChannel;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
@@ -106,5 +107,10 @@ public class TextableRegularServerChannelImpl extends RegularServerChannelImpl
     @Override
     public void cleanup() {
         messageCache.cleanup();
+    }
+
+    @Override
+    public RegularServerChannel getPermissionableChannel() {
+        return this;
     }
 }

@@ -27,14 +27,11 @@ import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 import org.javacord.core.entity.message.component.ActionRowImpl;
 import org.javacord.core.entity.message.embed.EmbedImpl;
-import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.sticker.StickerItemImpl;
-import org.javacord.core.entity.user.MemberImpl;
 import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.interaction.MessageInteractionImpl;
 import org.javacord.core.listener.message.InternalMessageAttachableListenerManager;
 import org.javacord.core.util.cache.MessageCacheImpl;
-
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -375,8 +372,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         if (data.has("mentions")) {
             mentions.clear();
             for (JsonNode mentionJson : data.get("mentions")) {
-                User user = new UserImpl(api, mentionJson, (MemberImpl) null,
-                        getServer().map(ServerImpl.class::cast).orElse(null));
+                User user = new UserImpl(api, mentionJson);
                 mentions.add(user);
             }
         }
