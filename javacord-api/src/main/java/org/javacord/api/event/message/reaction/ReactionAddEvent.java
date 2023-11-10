@@ -14,4 +14,11 @@ public interface ReactionAddEvent extends SingleReactionEvent {
      */
     CompletableFuture<Void> removeReaction();
 
+    /**
+     * Gets the message author id.
+     *
+     * @return The message author id.
+     */
+    long getMessageAuthorId();
+
 }

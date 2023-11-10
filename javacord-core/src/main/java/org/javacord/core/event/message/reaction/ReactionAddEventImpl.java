@@ -15,6 +15,11 @@ import java.util.concurrent.CompletableFuture;
 public class ReactionAddEventImpl extends SingleReactionEventImpl implements ReactionAddEvent {
 
     /**
+     * The id of the user that sent the message.
+     */
+    private final long messageAuthorId;
+
+    /**
      * Creates a new reaction add event.
      *
      * @param api The discord api instance.
@@ -23,10 +28,12 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
      * @param emoji The emoji.
      * @param userId The id of the user who added the reaction.
      * @param member The member if it happened in a server.
+     * @param messageAuthorId The id of the user that sent the message
      */
-    public ReactionAddEventImpl(
-            DiscordApi api, long messageId, TextChannel channel, Emoji emoji, long userId, Member member) {
+    public ReactionAddEventImpl(DiscordApi api, long messageId, TextChannel channel, Emoji emoji,
+                                long userId, Member member, long messageAuthorId) {
         super(api, messageId, channel, emoji, userId);
+        this.messageAuthorId = messageAuthorId;
     }
 
     @Override
@@ -34,4 +41,8 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
         return Reaction.removeUser(getApi(), getChannel().getId(), getMessageId(), getEmoji(), getUserId());
     }
 
+    @Override
+    public long getMessageAuthorId() {
+        return messageAuthorId;
+    }
 }
