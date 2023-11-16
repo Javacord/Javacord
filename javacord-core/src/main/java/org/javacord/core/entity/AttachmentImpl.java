@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Attachment;
+import org.javacord.api.entity.AttachmentFlag;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -16,6 +17,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -76,7 +78,7 @@ public class AttachmentImpl implements Attachment {
      * Whether this attachment is ephemeral.
      */
     private final Boolean ephemeral;
-    
+
     /**
      * The duration of the audio file.
      */
@@ -86,6 +88,11 @@ public class AttachmentImpl implements Attachment {
      * The base64 encoded bytearray representing a sampled waveform.
      */
     private final String waveform;
+
+    /**
+     * Attachment flags computed from the bitfield.
+     */
+    private final EnumSet<AttachmentFlag> attachmentFlags = EnumSet.noneOf(AttachmentFlag.class);
 
     /**
      * Creates a new attachment.
@@ -106,6 +113,14 @@ public class AttachmentImpl implements Attachment {
         ephemeral = data.hasNonNull("ephemeral") ? data.get("ephemeral").asBoolean() : null;
         durationSeconds = data.hasNonNull("duration_secs") ? data.get("duration_secs").doubleValue() : null;
         waveform = data.hasNonNull("waveform") ? data.get("waveform").asText() : null;
+        if (data.has("flags")) {
+            int flags = data.get("flags").asInt();
+            for (AttachmentFlag flag : AttachmentFlag.values()) {
+                if ((flag.getId() & flags) == flag.getId()) {
+                    attachmentFlags.add(flag);
+                }
+            }
+        }
     }
 
     @Override
@@ -181,6 +196,11 @@ public class AttachmentImpl implements Attachment {
     @Override
     public Optional<String> getWaveFormBase64() {
         return Optional.ofNullable(waveform);
+    }
+
+    @Override
+    public EnumSet<AttachmentFlag> getFlags() {
+        return attachmentFlags;
     }
 
     @Override
