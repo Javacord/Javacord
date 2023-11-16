@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Attachment;
+import org.javacord.api.entity.AttachmentFlags;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.core.util.FileContainer;
 import org.javacord.core.util.logging.LoggerUtil;
@@ -76,7 +77,7 @@ public class AttachmentImpl implements Attachment {
      * Whether this attachment is ephemeral.
      */
     private final Boolean ephemeral;
-    
+
     /**
      * The duration of the audio file.
      */
@@ -86,6 +87,11 @@ public class AttachmentImpl implements Attachment {
      * The base64 encoded bytearray representing a sampled waveform.
      */
     private final String waveform;
+
+    /**
+     * Attachment flags combined as a bitfield.
+     */
+    private final AttachmentFlags flags;
 
     /**
      * Creates a new attachment.
@@ -106,6 +112,8 @@ public class AttachmentImpl implements Attachment {
         ephemeral = data.hasNonNull("ephemeral") ? data.get("ephemeral").asBoolean() : null;
         durationSeconds = data.hasNonNull("duration_secs") ? data.get("duration_secs").doubleValue() : null;
         waveform = data.hasNonNull("waveform") ? data.get("waveform").asText() : null;
+        Integer bitfield = data.hasNonNull("flags") ? data.get("flags").asInt() : null;
+        flags = bitfield != null ? AttachmentFlags.getFlagTypeByBitfield(bitfield): null;
     }
 
     @Override
@@ -181,6 +189,11 @@ public class AttachmentImpl implements Attachment {
     @Override
     public Optional<String> getWaveFormBase64() {
         return Optional.ofNullable(waveform);
+    }
+
+    @Override
+    public Optional<AttachmentFlags> getFlags() {
+        return Optional.ofNullable(flags);
     }
 
     @Override
