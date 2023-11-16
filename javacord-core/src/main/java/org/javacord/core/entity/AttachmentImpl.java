@@ -113,7 +113,7 @@ public class AttachmentImpl implements Attachment {
         durationSeconds = data.hasNonNull("duration_secs") ? data.get("duration_secs").doubleValue() : null;
         waveform = data.hasNonNull("waveform") ? data.get("waveform").asText() : null;
         Integer bitfield = data.hasNonNull("flags") ? data.get("flags").asInt() : null;
-        flags = bitfield != null ? AttachmentFlags.getFlagTypeByBitfield(bitfield): null;
+        flags = bitfield != null ? AttachmentFlags.getFlagTypeByBitfield(bitfield) : null;
     }
 
     @Override
