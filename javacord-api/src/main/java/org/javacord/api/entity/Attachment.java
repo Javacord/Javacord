@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -100,10 +101,17 @@ public interface Attachment extends DiscordEntity {
     /**
      * Gets the base64 encoded string of the waveform of the audio file
      * Only present if the message is of type {@link MessageFlag#IS_VOICE_MESSAGE}.
-     * 
+     *
      * @return The base64 encoded string of the waveform of the audio file.
      */
     Optional<String> getWaveFormBase64();
+
+    /**
+     * Gets the flags of the attachment.
+     *
+     * @return The flags of the attachment.
+     */
+    EnumSet<AttachmentFlag> getFlags();
 
     /**
      * Downloads the attachment as an input stream.
