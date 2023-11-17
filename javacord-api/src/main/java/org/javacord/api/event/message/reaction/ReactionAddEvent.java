@@ -1,5 +1,6 @@
 package org.javacord.api.event.message.reaction;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -19,6 +20,6 @@ public interface ReactionAddEvent extends SingleReactionEvent {
      *
      * @return The message author id.
      */
-    long getMessageAuthorId();
+    Optional<Long> getMessageAuthorId();
 
 }

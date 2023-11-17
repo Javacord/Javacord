@@ -7,6 +7,7 @@ import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.core.entity.user.Member;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -17,7 +18,7 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
     /**
      * The id of the user that sent the message.
      */
-    private final long messageAuthorId;
+    private final Long messageAuthorId;
 
     /**
      * Creates a new reaction add event.
@@ -31,7 +32,7 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
      * @param messageAuthorId The id of the user that sent the message
      */
     public ReactionAddEventImpl(DiscordApi api, long messageId, TextChannel channel, Emoji emoji,
-                                long userId, Member member, long messageAuthorId) {
+                                long userId, Member member, Long messageAuthorId) {
         super(api, messageId, channel, emoji, userId);
         this.messageAuthorId = messageAuthorId;
     }
@@ -42,7 +43,7 @@ public class ReactionAddEventImpl extends SingleReactionEventImpl implements Rea
     }
 
     @Override
-    public long getMessageAuthorId() {
-        return messageAuthorId;
+    public Optional<Long> getMessageAuthorId() {
+        return Optional.ofNullable(messageAuthorId);
     }
 }

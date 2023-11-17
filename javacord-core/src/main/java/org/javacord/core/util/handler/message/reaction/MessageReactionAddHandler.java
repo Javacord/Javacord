@@ -45,7 +45,8 @@ public class MessageReactionAddHandler extends PacketHandler {
         long channelId = packet.get("channel_id").asLong();
         long messageId = packet.get("message_id").asLong();
         long userId = packet.get("user_id").asLong();
-        long messageAuthorId = packet.get("message_author_id").asLong();
+        Long messageAuthorId = packet.hasNonNull("message_author_id")
+                ? packet.get("message_author_id").asLong() : null;
         String serverId = packet.hasNonNull("guild_id") ? packet.get("guild_id").asText() : null;
 
         TextChannel channel;
