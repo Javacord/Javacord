@@ -3,6 +3,8 @@ package org.javacord.api.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
 import org.javacord.api.util.ratelimit.Ratelimiter;
@@ -176,6 +178,22 @@ public interface DiscordApiBuilderDelegate {
      * @param condition Whether the intent should be added or not.
      */
     void setAllIntentsWhere(Predicate<Intent> condition);
+
+    /**
+     * Controls who will be mentioned if mentions exist in a message.
+     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
+     *
+     * @param allowedMentions The mention object.
+     */
+    void setAllowedMentions(AllowedMentions mentions);
+
+    /**
+     * Controls who will be mentioned if mentions exist in a message.
+     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
+     *
+     * @return The mention object.
+     */
+    Optional<AllowedMentions> getAllowedMentions();
 
     /**
      * Sets whether the user cache should be enabled.

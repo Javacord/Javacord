@@ -22,8 +22,10 @@ import org.javacord.api.entity.emoji.CustomEmoji;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
@@ -114,6 +116,22 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      * @return Whether events can be dispatched.
      */
     boolean canDispatchEvents();
+
+    /**
+     * Controls who will be mentioned if mentions exist in a message.
+     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
+     *
+     * @param allowedMentions The mention object.
+     */
+    void setAllowedMentions(AllowedMentions allowedMentions);
+
+    /**
+     * Controls who will be mentioned if mentions exist in a message.
+     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
+     *
+     * @return The mention object.
+     */
+    AllowedMentions getAllowedMentions();
 
     /**
      * Gets all global commands for the application.

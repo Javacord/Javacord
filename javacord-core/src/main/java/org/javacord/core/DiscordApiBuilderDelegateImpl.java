@@ -5,6 +5,7 @@ import org.apache.logging.log4j.CloseableThreadContext;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.GloballyAttachableListener;
 import org.javacord.api.util.auth.Authenticator;
@@ -133,6 +134,11 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     private boolean userCacheEnabled = true;
 
     /**
+     * Controls who will be mentioned if mentions exist in a message.
+     */
+    private AllowedMentions allowedMentions;
+
+    /**
      * The globally attachable listeners to register for every created DiscordApi instance.
      */
     private final Map<Class<? extends GloballyAttachableListener>,
@@ -197,7 +203,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
             new DiscordApiImpl(token, currentShard.get(), totalShards.get(), intents,
                     waitForServersOnStartup, waitForUsersOnStartup, registerShutdownHook, globalRatelimiter,
                     gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates,
-                    future, null, preparedListeners, preparedUnspecifiedListeners, userCacheEnabled, dispatchEvents);
+                    future, null, preparedListeners, preparedUnspecifiedListeners, userCacheEnabled, dispatchEvents,
+                    allowedMentions);
         }
         return future;
     }
@@ -396,6 +403,16 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
                 intents.add(value);
             }
         }
+    }
+
+    @Override
+    public void setAllowedMentions(AllowedMentions allowedMentions) {
+        this.allowedMentions = allowedMentions;
+    }
+
+    @Override
+    public Optional<AllowedMentions> getAllowedMentions() {
+        return Optional.ofNullable(allowedMentions);
     }
 
     @Override

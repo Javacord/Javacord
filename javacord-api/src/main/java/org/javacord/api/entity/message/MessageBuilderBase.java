@@ -1,5 +1,6 @@
 package org.javacord.api.entity.message;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.component.HighLevelComponent;
@@ -518,6 +519,7 @@ abstract class MessageBuilderBase<T> {
 
     /**
      * Controls who will be mentioned if mentions exist in the message.
+     * Defaults to {@link DiscordApi#getAllowedMentions()}.
      *
      * @param allowedMentions The mention object.
      * @return The current instance in order to chain call methods.
