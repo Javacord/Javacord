@@ -131,7 +131,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @return The mention object.
      */
-    AllowedMentions getAllowedMentions();
+    Optional<AllowedMentions> getAllowedMentions();
 
     /**
      * Gets all global commands for the application.

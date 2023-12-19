@@ -675,7 +675,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     private void prepareAllowedMentions(ObjectNode body, DiscordApi api) {
         AllowedMentions value = allowedMentions;
         if (value == null) {
-            value = api.getAllowedMentions();
+            value = api.getAllowedMentions().orElse(null);
         }
         if (value != null) {
             ((AllowedMentionsImpl) value).toJsonNode(body.putObject("allowed_mentions"));

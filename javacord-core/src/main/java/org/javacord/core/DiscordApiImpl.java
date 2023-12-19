@@ -751,8 +751,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public AllowedMentions getAllowedMentions() {
-        return allowedMentions;
+    public Optional<AllowedMentions> getAllowedMentions() {
+        return Optional.ofNullable(allowedMentions);
     }
 
     /**
