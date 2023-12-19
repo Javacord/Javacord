@@ -185,7 +185,7 @@ public interface DiscordApiBuilderDelegate {
      *
      * @param allowedMentions The mention object.
      */
-    void setAllowedMentions(AllowedMentions mentions);
+    void setAllowedMentions(AllowedMentions allowedMentions);
 
     /**
      * Controls who will be mentioned if mentions exist in a message.
