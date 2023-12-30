@@ -7,6 +7,7 @@ import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.permission.RoleFlag;
 import org.javacord.api.entity.permission.RoleTags;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -24,6 +25,7 @@ import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -107,6 +109,11 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     private final boolean managed;
 
     /**
+     * The flags of the role.
+     */
+    private final Set<RoleFlag> flags = EnumSet.noneOf(RoleFlag.class);
+
+    /**
      * Creates a new role object.
      *
      * @param api    The discord api instance.
@@ -127,6 +134,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         this.permissions = new PermissionsImpl(data.get("permissions").asLong(), 0);
         this.managed = data.get("managed").asBoolean(false);
         this.roleTags = data.has("tags") ? new RoleTagsImpl(data.get("tags")) : null;
+        setRoleFlag(data.get("flags").asInt());
     }
 
     /**
@@ -300,6 +308,11 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     @Override
+    public Set<RoleFlag> getFlags() {
+        return flags;
+    }
+
+    @Override
     public boolean isManaged() {
         return managed;
     }
@@ -310,6 +323,19 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
                 .setAuditLogReason(reason)
                 .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .execute(result -> null);
+    }
+
+    /**
+     * Sets the role flags.
+     *
+     * @param roleFlag The role flag.
+     */
+    public void setRoleFlag(int roleFlag) {
+        for (RoleFlag flag : RoleFlag.values()) {
+            if ((flag.asInt() & roleFlag) == flag.asInt()) {
+                flags.add(flag);
+            }
+        }
     }
 
     /**

@@ -135,6 +135,13 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, P
     Permissions getPermissions();
 
     /**
+     * Gets the flags of the role.
+     *
+     * @return The flags of the role.
+     */
+    Set<RoleFlag> getFlags();
+
+    /**
      * Checks if this role is managed by an integration.
      *
      * @return Whether this role is managed by an integration or not.
