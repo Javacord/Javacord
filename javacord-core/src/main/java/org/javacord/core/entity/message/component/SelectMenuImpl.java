@@ -7,13 +7,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.SelectMenuDefaultValue;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
 
@@ -24,6 +27,7 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
     private final int minimumValues;
     private final int maximumValues;
     private final boolean isDisabled;
+    private final Set<SelectMenuDefaultValue> defaultValues;
 
     /**
      * Creates a new select menu.
@@ -33,6 +37,7 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
     public SelectMenuImpl(JsonNode data) {
         super(ComponentType.fromId(data.get("type").asInt()));
         options = new ArrayList<>();
+        defaultValues = new HashSet<>();
         channelTypes = EnumSet.noneOf(ChannelType.class);
 
         this.customId = data.get("custom_id").asText();
@@ -40,6 +45,12 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
         if (data.hasNonNull("options")) {
             for (JsonNode optionData : data.get("options")) {
                 options.add(new SelectMenuOptionImpl(optionData));
+            }
+        }
+
+        if (data.hasNonNull("default_values")) {
+            for (JsonNode defaultValueObject : data.get("default_values")) {
+                defaultValues.add(new SelectMenuDefaultValueImpl(defaultValueObject));
             }
         }
 
@@ -51,6 +62,8 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
         this.minimumValues = data.has("min_values") ? data.get("min_values").asInt() : 1;
         this.maximumValues = data.has("max_values") ? data.get("max_values").asInt() : 1;
         this.isDisabled = data.has("disabled") && data.get("disabled").asBoolean();
+
+        validateDefaultValuesSize();
     }
 
     /**
@@ -64,10 +77,11 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
      * @param maximumValues     The select menu's maximum values.
      * @param isDisabled        If the select menu should be disabled.
      * @param channelTypes      The channel types of the select menu.
+     * @param defaultValues     The select menu's default values.
      */
     public SelectMenuImpl(ComponentType type, List<SelectMenuOption> selectMenuOptions, String placeholder,
                           String customId, int minimumValues, int maximumValues, boolean isDisabled,
-                          EnumSet<ChannelType> channelTypes) {
+                          EnumSet<ChannelType> channelTypes, Set<SelectMenuDefaultValue> defaultValues) {
         super(type);
         this.options = selectMenuOptions;
         this.placeholder = placeholder;
@@ -76,6 +90,9 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
         this.maximumValues = maximumValues;
         this.isDisabled = isDisabled;
         this.channelTypes = channelTypes;
+        this.defaultValues = defaultValues;
+
+        validateDefaultValuesSize();
     }
 
     @Override
@@ -106,6 +123,11 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
     @Override
     public List<SelectMenuOption> getOptions() {
         return Collections.unmodifiableList(options);
+    }
+
+    @Override
+    public Set<SelectMenuDefaultValue> getDefaultValues() {
+        return defaultValues;
     }
 
     @Override
@@ -149,6 +171,24 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
             object.put("placeholder", this.placeholder);
         }
 
+        ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+        defaultValues.forEach(defaultValue -> arrayNode.add(((SelectMenuDefaultValueImpl) defaultValue).toJson()));
+        object.set("default_values", arrayNode);
+
         return object;
+    }
+
+    /**
+     * Validate if number of default values is in the range defined by minimumValues and maximumValues.
+     *
+     * @throws IllegalArgumentException If number of default values is lower than minimumValues or
+     *      bigger than maximumValues.
+     */
+    private void validateDefaultValuesSize() {
+        if (minimumValues > getDefaultValues().size() || maximumValues < getDefaultValues().size()) {
+            throw new IllegalArgumentException(
+                    "Number of default values must be in the range defined by minimumValues and maximumValues."
+            );
+        }
     }
 }
