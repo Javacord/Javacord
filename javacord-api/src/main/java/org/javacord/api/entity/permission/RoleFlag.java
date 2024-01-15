@@ -24,8 +24,8 @@ public enum RoleFlag {
     }
 
     /**
-     * Gets the integer value of the activity flag.
-     * @return Gets the integer value of the activity flag.
+     * Gets the integer value of the role flag.
+     * @return Gets the integer value of the role flag.
      */
     public int asInt() {
         return flag;
