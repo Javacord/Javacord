@@ -30,4 +30,18 @@ public enum RoleFlag {
     public int asInt() {
         return flag;
     }
+
+    /**
+     * Gets the role flag of the given integer value.
+     * @param flags The integer value of the flag.
+     * @return The role flag of the given integer value.
+     */
+    public static RoleFlag getRoleFlagById(int flags) {
+        for (RoleFlag roleFlag : values()) {
+            if (roleFlag.flag == flags) {
+                return roleFlag;
+            }
+        }
+        return UNKNOWN;
+    }
 }
