@@ -1,6 +1,10 @@
 package org.javacord.api.entity.permission;
 
 public enum RoleFlag {
+
+    /**
+     * Role can be selected by members in an onboarding prompt.
+     */
     IN_PROMPT(1 << 0);
 
     private final int flag;
