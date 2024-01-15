@@ -5,7 +5,12 @@ public enum RoleFlag {
     /**
      * Role can be selected by members in an onboarding prompt.
      */
-    IN_PROMPT(1 << 0);
+    IN_PROMPT(1 << 0),
+
+    /**
+     * An unknown flag.
+     */
+    UNKNOWN(-1);
 
     private final int flag;
 
