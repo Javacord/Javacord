@@ -134,7 +134,13 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
         this.permissions = new PermissionsImpl(data.get("permissions").asLong(), 0);
         this.managed = data.get("managed").asBoolean(false);
         this.roleTags = data.has("tags") ? new RoleTagsImpl(data.get("tags")) : null;
-        setRoleFlag(data.get("flags").asInt());
+
+        int roleFlag = data.get("flags").asInt();
+        for (RoleFlag flag : RoleFlag.values()) {
+            if ((flag.asInt() & roleFlag) == flag.asInt()) {
+                this.flags.add(flag);
+            }
+        }
     }
 
     /**
@@ -323,19 +329,6 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
                 .setAuditLogReason(reason)
                 .setUrlParameters(getServer().getIdAsString(), getIdAsString())
                 .execute(result -> null);
-    }
-
-    /**
-     * Sets the role flags.
-     *
-     * @param roleFlag The role flag.
-     */
-    public void setRoleFlag(int roleFlag) {
-        for (RoleFlag flag : RoleFlag.values()) {
-            if ((flag.asInt() & roleFlag) == flag.asInt()) {
-                flags.add(flag);
-            }
-        }
     }
 
     /**
