@@ -111,7 +111,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     /**
      * The flags of the role.
      */
-    private final Set<RoleFlag> flags = EnumSet.noneOf(RoleFlag.class);
+    private final EnumSet<RoleFlag> flags = EnumSet.noneOf(RoleFlag.class);
 
     /**
      * Creates a new role object.
@@ -308,7 +308,7 @@ public class RoleImpl implements Role, InternalRoleAttachableListenerManager {
     }
 
     @Override
-    public Set<RoleFlag> getFlags() {
+    public EnumSet<RoleFlag> getFlags() {
         return flags;
     }
 
