@@ -17,7 +17,7 @@ public enum RoleFlag {
     /**
      * Class constructor.
      *
-     * @param flag The bitmask of the flag.
+     * @param flag The id of the flag.
      */
     RoleFlag(int flag) {
         this.flag = flag;
@@ -25,6 +25,7 @@ public enum RoleFlag {
 
     /**
      * Gets the integer value of the role flag.
+     
      * @return Gets the integer value of the role flag.
      */
     public int asInt() {
@@ -33,6 +34,7 @@ public enum RoleFlag {
 
     /**
      * Gets the role flag of the given integer value.
+     
      * @param flags The integer value of the flag.
      * @return The role flag of the given integer value.
      */
