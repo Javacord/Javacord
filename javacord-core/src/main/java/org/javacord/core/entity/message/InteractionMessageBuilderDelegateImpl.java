@@ -39,7 +39,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         topBody.put("type", InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE.getId());
         ObjectNode body = topBody.putObject("data");
-        prepareInteractionWebhookBodyParts(body, interaction.getApi());
+        prepareInteractionWebhookBodyParts(interaction.getApi(), body);
 
         return new RestRequest<Void>(interaction.getApi(),
                 RestMethod.POST, RestEndpoint.INTERACTION_RESPONSE)
@@ -86,7 +86,7 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
     public CompletableFuture<Void> updateOriginalMessage(InteractionBase interaction) {
         ObjectNode topBody = JsonNodeFactory.instance.objectNode();
         ObjectNode data = JsonNodeFactory.instance.objectNode();
-        prepareCommonWebhookMessageBodyParts(data, interaction.getApi());
+        prepareCommonWebhookMessageBodyParts(interaction.getApi(), data);
         prepareComponents(data, true);
         topBody.put("type", InteractionCallbackType.UPDATE_MESSAGE.getId());
         topBody.set("data", data);
@@ -132,13 +132,13 @@ public class InteractionMessageBuilderDelegateImpl extends MessageBuilderBaseDel
 
     private CompletableFuture<Message> executeResponse(RestRequest<Message> request) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
-        prepareInteractionWebhookBodyParts(body, request.getApi());
+        prepareInteractionWebhookBodyParts(request.getApi(), body);
 
         return checkForAttachmentsAndExecuteRequest(request, body);
     }
 
-    private void prepareInteractionWebhookBodyParts(ObjectNode body, DiscordApi api) {
-        prepareCommonWebhookMessageBodyParts(body, api);
+    private void prepareInteractionWebhookBodyParts(DiscordApi api, ObjectNode body) {
+        prepareCommonWebhookMessageBodyParts(api, body);
         prepareComponents(body, true);
         if (null != messageFlags) {
             body.put("flags", messageFlags.stream()

@@ -463,7 +463,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                 .put("tts", tts);
         body.putArray("mentions");
 
-        prepareAllowedMentions(body, channel.getApi());
+        prepareAllowedMentions(channel.getApi(), body);
 
         prepareEmbeds(body, false);
 
@@ -512,7 +512,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     protected CompletableFuture<Message> send(String webhookId, String webhookToken, String displayName, URL avatarUrl,
                                               boolean wait, DiscordApi api) {
         ObjectNode body = JsonNodeFactory.instance.objectNode();
-        prepareCommonWebhookMessageBodyParts(body, api);
+        prepareCommonWebhookMessageBodyParts(api, body);
 
         if (displayName != null) {
             body.put("username", displayName);
@@ -603,7 +603,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
             body.put("content", strBuilder.toString());
         }
 
-        prepareAllowedMentions(body, message.getApi());
+        prepareAllowedMentions(message.getApi(), body);
 
         prepareEmbeds(body, updateAll || embedsChanged);
 
@@ -672,7 +672,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                 result -> ((DiscordApiImpl) channel.getApi()).getOrCreateMessage(channel, result.getJsonBody()));
     }
 
-    private void prepareAllowedMentions(ObjectNode body, DiscordApi api) {
+    private void prepareAllowedMentions(DiscordApi api, ObjectNode body) {
         AllowedMentions value = allowedMentions;
         if (value == null) {
             value = api.getAllowedMentions().orElse(null);
@@ -742,12 +742,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         request.setMultipartBody(multipartBodyBuilder.build());
     }
 
-    protected void prepareCommonWebhookMessageBodyParts(ObjectNode body, DiscordApi api) {
+    protected void prepareCommonWebhookMessageBodyParts(DiscordApi api, ObjectNode body) {
         body.put("tts", this.tts);
         if (strBuilder.length() != 0) {
             body.put("content", strBuilder.toString());
         }
-        prepareAllowedMentions(body, api);
+        prepareAllowedMentions(api, body);
         prepareEmbeds(body, embedsChanged);
     }
 
