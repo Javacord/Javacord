@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -133,6 +134,13 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, P
      * @return The permissions of the role.
      */
     Permissions getPermissions();
+
+    /**
+     * Gets the flags of the role.
+     *
+     * @return The flags of the role.
+     */
+    EnumSet<RoleFlag> getFlags();
 
     /**
      * Checks if this role is managed by an integration.
