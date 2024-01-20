@@ -45,6 +45,8 @@ public class MessageReactionAddHandler extends PacketHandler {
         long channelId = packet.get("channel_id").asLong();
         long messageId = packet.get("message_id").asLong();
         long userId = packet.get("user_id").asLong();
+        Long messageAuthorId = packet.hasNonNull("message_author_id")
+                ? packet.get("message_author_id").asLong() : null;
         String serverId = packet.hasNonNull("guild_id") ? packet.get("guild_id").asText() : null;
 
         TextChannel channel;
@@ -77,7 +79,8 @@ public class MessageReactionAddHandler extends PacketHandler {
 
         message.ifPresent(msg -> ((MessageImpl) msg).addReaction(emoji, userId == api.getYourself().getId()));
 
-        ReactionAddEvent event = new ReactionAddEventImpl(api, messageId, channel, emoji, userId, member);
+        ReactionAddEvent event =
+                new ReactionAddEventImpl(api, messageId, channel, emoji, userId, member, messageAuthorId);
 
         api.getEventDispatcher().dispatchReactionAddEvent(
                 server.map(DispatchQueueSelector.class::cast).orElse(api),
