@@ -558,7 +558,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param unspecifiedListeners       The listeners of unspecified types to pre-register.
      * @param userCacheEnabled           Whether the user cache should be enabled.
      * @param dispatchEvents             Whether events can be dispatched.
-     * @param defaultAllowedMentions            Controls who will be mentioned if mentions exist in a message.
+     * @param defaultAllowedMentions     Controls who will be mentioned if mentions exist in a message.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
