@@ -3,25 +3,23 @@ package org.javacord.api.entity.message.internal;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.MessageDecoration;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.component.HighLevelComponent;
-import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.entity.webhook.IncomingWebhook;
 import org.javacord.api.exception.MissingIntentException;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,131 +30,25 @@ import java.util.concurrent.CompletableFuture;
 public interface MessageBuilderBaseDelegate {
 
     /**
+     * Sets the interaction message flags of the message.
+     *
+     * @param messageFlags The message flags of the message.
+     */
+    void setFlags(EnumSet<MessageFlag> messageFlags);
+
+    /**
+     * Adds the interaction message flag to the message.
+     *
+     * @param messageFlag The message flag of the message.
+     */
+    void addFlag(MessageFlag messageFlag);
+
+    /**
      * Add high-level components to the message.
      *
      * @param highLevelComponents The high-level components.
      */
-    void addComponents(HighLevelComponent... highLevelComponents);
-
-    /**
-     * Add low-level components to the message, wrapped in an ActionRow.
-     *
-     * @param lowLevelComponents The low level components.
-     */
-    void addActionRow(LowLevelComponent... lowLevelComponents);
-
-    /**
-     * Appends code to the message.
-     *
-     * @param language The language, e.g. "java".
-     * @param code The code.
-     */
-    void appendCode(String language, String code);
-
-    /**
-     * Appends a sting with or without decoration to the message.
-     *
-     * @param message The string to append.
-     * @param decorations The decorations of the string.
-     */
-    void append(String message, MessageDecoration... decorations);
-
-    /**
-     * Appends a mentionable entity (usually a user or channel) to the message.
-     *
-     * @param entity The entity to mention.
-     */
-    void append(Mentionable entity);
-
-    /**
-     * Appends the string representation of the object (calling {@link String#valueOf(Object)} method) to the message.
-     *
-     * @param object The object to append.
-     * @see StringBuilder#append(Object)
-     */
-    void append(Object object);
-
-    /**
-     * Appends a named link to the message.
-     *
-     * @param name The name of the link.
-     * @param url  The URL of the link.
-     */
-    void appendNamedLink(String name, String url);
-
-    /**
-     * Appends a new line to the message.
-     */
-    void appendNewLine();
-
-    /**
-     * Fill the builder's values with a given message.
-     *
-     * @param message The message to copy from.
-     * @throws MissingIntentException See Javadoc of {@link Message#getContent()} for further explanation.
-     */
-    void copy(Message message);
-
-    /**
-     * Sets the content of the message.
-     * This method overwrites all previous content changes
-     * (using {@link #append(String, MessageDecoration...)} for example).
-     *
-     * @param content The new content of the message.
-     */
-    void setContent(String content);
-
-    /**
-     * Removes an attachment from the message.
-     *
-     * @param attachment The attachment to remove.
-     */
-    void removeExistingAttachment(Attachment attachment);
-
-    /**
-     * Removes all the attachments from the message.
-     */
-    void removeExistingAttachments();
-
-    /**
-     * Removes multiple attachments from the message.
-     *
-     * @param attachments The attachments to remove.
-     */
-    void removeExistingAttachments(Collection<Attachment> attachments);
-
-    /**
-     * Adds the embed to the message.
-     *
-     * @param embed The embed to add.
-     */
-    void addEmbed(EmbedBuilder embed);
-
-    /**
-     * Removes all embeds from the message.
-     */
-    void removeAllEmbeds();
-
-    /**
-     * Adds the embeds to the message.
-     *
-     * @param embeds The embeds to add.
-     */
-    void addEmbeds(List<EmbedBuilder> embeds);
-
-    /**
-     * Removes the embed from the message.
-     *
-     * @param embed The embed to remove.
-     */
-    void removeEmbed(EmbedBuilder embed);
-
-    /**
-     * Removes the embeds from the message.
-     *
-     * @param embeds The embeds to remove.
-     */
-    void removeEmbeds(EmbedBuilder... embeds);
+    void addComponents(List<HighLevelComponent> highLevelComponents);
 
     /**
      * Remove a high-level component from the message.
@@ -178,6 +70,49 @@ public interface MessageBuilderBaseDelegate {
     void removeAllComponents();
 
     /**
+     * Appends a string to the StringBuilder.
+     *
+     * @param content The string to append.
+     * @return The StringBuilder to call more modifying methods on it.
+     */
+    StringBuilder appendToStringBuilder(String content);
+
+    /**
+     * Appends a named link to the message.
+     *
+     * @param name The name of the link.
+     * @param url  The URL of the link.
+     */
+    void appendNamedLink(String name, String url);
+
+    /**
+     * Adds the embed to the message.
+     *
+     * @param embed The embed to add.
+     */
+    void addEmbed(EmbedBuilder embed);
+
+    /**
+     * Removes all embeds from the message.
+     */
+    void removeAllEmbeds();
+
+    /**
+     * Removes the embed from the message.
+     *
+     * @param embed The embed to remove.
+     */
+    void removeEmbed(EmbedBuilder embed);
+
+    /**
+     * Fill the builder's values with a given message.
+     *
+     * @param message The message to copy from.
+     * @throws MissingIntentException See Javadoc of {@link Message#getContent()} for further explanation.
+     */
+    void copy(Message message);
+
+    /**
      * Sets if the message should be text to speech.
      *
      * @param tts Whether the message should be text to speech or not.
@@ -185,10 +120,29 @@ public interface MessageBuilderBaseDelegate {
     void setTts(boolean tts);
 
     /**
+     * Removes an attachment from the message.
+     *
+     * @param attachment The attachment to remove.
+     */
+    void removeExistingAttachment(Attachment attachment);
+
+    /**
+     * Removes all the attachments from the message.
+     */
+    void removeExistingAttachments();
+
+    /**
+     * Removes multiple attachments from the message.
+     *
+     * @param attachments The attachments to remove.
+     */
+    void removeExistingAttachments(Collection<Attachment> attachments);
+
+    /**
      * Adds an attachment to the message.
      *
-     * @param image The image to add as an attachment.
-     * @param fileName The file name of the image.
+     * @param image       The image to add as an attachment.
+     * @param fileName    The file name of the image.
      * @param description The description of the image.
      */
     void addAttachment(BufferedImage image, String fileName, String description);
@@ -196,32 +150,35 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds an attachment to the message.
      *
-     * @param file The file to add as an attachment.
+     * @param file        The file to add as an attachment.
      * @param description The description of the file.
+     * @param spoiler     Whether the attachment should be marked as a spoiler.
      */
-    void addAttachment(File file, String description);
+    void addAttachment(File file, String description, boolean spoiler);
 
     /**
      * Adds an attachment to the message.
      *
-     * @param icon The icon to add as an attachment.
+     * @param icon        The icon to add as an attachment.
      * @param description The description of the icon.
+     * @param spoiler     Whether the attachment should be marked as a spoiler.
      */
-    void addAttachment(Icon icon, String description);
+    void addAttachment(Icon icon, String description, boolean spoiler);
 
     /**
      * Adds an attachment to the message.
      *
-     * @param url The url of the attachment.
+     * @param url         The url of the attachment.
      * @param description The description of the attachment.
+     * @param spoiler     Whether the attachment should be marked as a spoiler.
      */
-    void addAttachment(URL url, String description);
+    void addAttachment(URL url, String description, boolean spoiler);
 
     /**
      * Adds an attachment to the message.
      *
-     * @param bytes The bytes of the file.
-     * @param fileName The name of the file.
+     * @param bytes       The bytes of the file.
+     * @param fileName    The name of the file.
      * @param description The description of the file.
      */
     void addAttachment(byte[] bytes, String fileName, String description);
@@ -229,36 +186,12 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Adds an attachment to the message.
      *
-     * @param stream The stream of the file.
-     * @param fileName The name of the file.
+     * @param stream      The stream of the file.
+     * @param fileName    The name of the file.
      * @param description The description of the file.
      */
     void addAttachment(InputStream stream, String fileName, String description);
 
-    /**
-     * Adds a spoiler attachment to the message.
-     *
-     * @param file The file to add as an attachment.
-     * @param description The description of the file.
-     */
-    void addAttachmentAsSpoiler(File file, String description);
-
-    /**
-     * Adds a spoiler attachment to the message.
-     *
-     * @param icon The icon to add as an attachment.
-     * @param description The description of the icon.
-     */
-    void addAttachmentAsSpoiler(Icon icon, String description);
-
-    /**
-     * Adds a spoiler attachment to the message.
-     *
-     * @param url The url of the attachment.
-     * @param description The description of the url.
-     */
-    void addAttachmentAsSpoiler(URL url, String description);
-    
     /**
      * Controls the mention behavior.
      *
@@ -269,7 +202,7 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Sets the message to reply to.
      *
-     * @param messageId The id of the message to reply to.
+     * @param messageId             The id of the message to reply to.
      * @param assertReferenceExists Used to tell discord if you want to check if the message exists.
      */
     void replyTo(long messageId, boolean assertReferenceExists);
@@ -340,7 +273,7 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Edits the message.
      *
-     * @param message The message to edit.
+     * @param message   The message to edit.
      * @param allFields True if all fields should be included in the patch request, even if not changed; False if
      *                  only changed fields should be patched
      * @return The edited message.
@@ -350,8 +283,8 @@ public interface MessageBuilderBaseDelegate {
     /**
      * Sends the message.
      *
-     * @param api The api instance needed to send and return the message.
-     * @param webhookId The id of the webhook from which the message should be sent.
+     * @param api          The api instance needed to send and return the message.
+     * @param webhookId    The id of the webhook from which the message should be sent.
      * @param webhookToken The token of the webhook from which the message should be sent.
      * @return The message that has been sent.
      */

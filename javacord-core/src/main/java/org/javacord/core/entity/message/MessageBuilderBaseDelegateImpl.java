@@ -11,17 +11,15 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Attachment;
 import org.javacord.api.entity.Icon;
-import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageAttachment;
-import org.javacord.api.entity.message.MessageDecoration;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.Messageable;
 import org.javacord.api.entity.message.component.ActionRow;
 import org.javacord.api.entity.message.component.ActionRowBuilder;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.HighLevelComponent;
-import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.message.internal.MessageBuilderBaseDelegate;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -38,20 +36,20 @@ import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * The implementation of {@link MessageBuilderBaseDelegate}.
@@ -143,77 +141,47 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      */
     protected Set<Long> stickerIds = new HashSet<>();
 
+    /**
+     * The message flags of the message.
+     */
+    private EnumSet<MessageFlag> messageFlags = null;
+
     @Override
-    public void addComponents(HighLevelComponent... highLevelComponents) {
-        this.components.addAll(Arrays.asList(highLevelComponents));
+    public void setFlags(EnumSet<MessageFlag> messageFlags) {
+        this.messageFlags = messageFlags;
+    }
+
+    @Override
+    public void addFlag(MessageFlag messageFlag) {
+        if (null != messageFlags) {
+            messageFlags.add(messageFlag);
+        } else {
+            messageFlags = EnumSet.of(messageFlag);
+        }
+    }
+
+    @Override
+    public void addComponents(List<HighLevelComponent> highLevelComponents) {
+        this.components.addAll(highLevelComponents);
         componentsChanged = true;
     }
 
     @Override
-    public void addActionRow(LowLevelComponent... lowLevelComponents) {
-        this.addComponents(ActionRow.of(lowLevelComponents));
+    public void removeComponent(int index) {
+        components.remove(index);
         componentsChanged = true;
     }
 
     @Override
-    public void appendCode(String language, String code) {
-        strBuilder
-                .append("\n")
-                .append(MessageDecoration.CODE_LONG.getPrefix())
-                .append(language)
-                .append("\n")
-                .append(code)
-                .append(MessageDecoration.CODE_LONG.getSuffix());
-        contentChanged = true;
+    public void removeComponent(HighLevelComponent component) {
+        components.remove(component);
+        componentsChanged = true;
     }
 
     @Override
-    public void append(String message, MessageDecoration... decorations) {
-        for (MessageDecoration decoration : decorations) {
-            strBuilder.append(decoration.getPrefix());
-        }
-        strBuilder.append(message);
-        for (int i = decorations.length - 1; i >= 0; i--) {
-            strBuilder.append(decorations[i].getSuffix());
-        }
-        contentChanged = true;
-    }
-
-    @Override
-    public void append(Mentionable entity) {
-        strBuilder.append(entity.getMentionTag());
-        contentChanged = true;
-    }
-
-    @Override
-    public void append(Object object) {
-        strBuilder.append(object);
-        contentChanged = true;
-    }
-
-    @Override
-    public void appendNamedLink(final String name, final String url) {
-        strBuilder
-                .append("[")
-                .append(name)
-                .append("]")
-                .append("(")
-                .append(url)
-                .append(")");
-        contentChanged = true;
-    }
-
-    @Override
-    public void appendNewLine() {
-        strBuilder.append("\n");
-        contentChanged = true;
-    }
-
-    @Override
-    public void setContent(String content) {
-        strBuilder.setLength(0);
-        strBuilder.append(content);
-        contentChanged = true;
+    public void removeAllComponents() {
+        components.clear();
+        componentsChanged = true;
     }
 
     @Override
@@ -239,6 +207,18 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         }
     }
 
+    @Override
+    public void removeAllEmbeds() {
+        embeds.clear();
+        embedsChanged = true;
+    }
+
+    @Override
+    public void removeEmbed(EmbedBuilder embed) {
+        this.embeds.remove(embed);
+        embedsChanged = true;
+    }
+
     /**
      * Fill the builder's values with a message.
      *
@@ -252,14 +232,14 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         for (MessageAttachment attachment : message.getAttachments()) {
             // Since spoiler status is encoded in the file name, it is copied automatically.
-            this.addAttachment(attachment.getUrl(), attachment.getDescription().orElse(null));
+            this.addAttachment(attachment.getUrl(), attachment.getDescription().orElse(null), attachment.isSpoiler());
         }
 
         for (HighLevelComponent component : message.getComponents()) {
             if (component.getType() == ComponentType.ACTION_ROW) {
                 ActionRowBuilder builder = new ActionRowBuilder();
                 builder.copy((ActionRow) component);
-                this.addComponents(builder.build());
+                this.addComponents(Collections.singletonList(builder.build()));
             }
         }
 
@@ -270,44 +250,21 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void removeAllEmbeds() {
-        embeds.clear();
-        embedsChanged = true;
+    public StringBuilder appendToStringBuilder(String content) {
+        contentChanged = true;
+        return getStringBuilder().append(content);
     }
 
     @Override
-    public void addEmbeds(List<EmbedBuilder> embeds) {
-        embeds.forEach(this::addEmbed);
-    }
-
-    @Override
-    public void removeEmbed(EmbedBuilder embed) {
-        this.embeds.remove(embed);
-        embedsChanged = true;
-    }
-
-    @Override
-    public void removeEmbeds(EmbedBuilder... embeds) {
-        this.embeds.removeAll(Arrays.asList(embeds));
-        embedsChanged = true;
-    }
-
-    @Override
-    public void removeComponent(int index) {
-        components.remove(index);
-        componentsChanged = true;
-    }
-
-    @Override
-    public void removeComponent(HighLevelComponent component) {
-        components.remove(component);
-        componentsChanged = true;
-    }
-
-    @Override
-    public void removeAllComponents() {
-        components.clear();
-        componentsChanged = true;
+    public void appendNamedLink(final String name, final String url) {
+        getStringBuilder()
+                .append("[")
+                .append(name)
+                .append("]")
+                .append("(")
+                .append(url)
+                .append(")");
+        contentChanged = true;
     }
 
     @Override
@@ -325,29 +282,29 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     }
 
     @Override
-    public void addAttachment(File file, String description) {
+    public void addAttachment(File file, String description, boolean spoiler) {
         if (file == null) {
             throw new IllegalArgumentException("file cannot be null!");
         }
-        newAttachments.add(new FileContainer(file, description));
+        newAttachments.add(new FileContainer(file, spoiler, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(Icon icon, String description) {
+    public void addAttachment(Icon icon, String description, boolean spoiler) {
         if (icon == null) {
             throw new IllegalArgumentException("icon cannot be null!");
         }
-        newAttachments.add(new FileContainer(icon, description));
+        newAttachments.add(new FileContainer(icon, spoiler, description));
         attachmentsChanged = true;
     }
 
     @Override
-    public void addAttachment(URL url, String description) {
+    public void addAttachment(URL url, String description, boolean spoiler) {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null!");
         }
-        newAttachments.add(new FileContainer(url, description));
+        newAttachments.add(new FileContainer(url, spoiler, description));
         attachmentsChanged = true;
     }
 
@@ -366,33 +323,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
             throw new IllegalArgumentException("stream and fileName cannot be null!");
         }
         newAttachments.add(new FileContainer(stream, fileName, description));
-        attachmentsChanged = true;
-    }
-
-    @Override
-    public void addAttachmentAsSpoiler(File file, String description) {
-        if (file == null) {
-            throw new IllegalArgumentException("file cannot be null!");
-        }
-        newAttachments.add(new FileContainer(file, true, description));
-        attachmentsChanged = true;
-    }
-
-    @Override
-    public void addAttachmentAsSpoiler(Icon icon, String description) {
-        if (icon == null) {
-            throw new IllegalArgumentException("icon cannot be null!");
-        }
-        newAttachments.add(new FileContainer(icon, true, description));
-        attachmentsChanged = true;
-    }
-
-    @Override
-    public void addAttachmentAsSpoiler(URL url, String description) {
-        if (url == null) {
-            throw new IllegalArgumentException("url cannot be null!");
-        }
-        newAttachments.add(new FileContainer(url, true, description));
         attachmentsChanged = true;
     }
 
@@ -428,6 +358,11 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     @Override
     public StringBuilder getStringBuilder() {
         return strBuilder;
+    }
+
+    @Override
+    public String toString() {
+        return getStringBuilder().toString();
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -489,7 +424,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         RestRequest<Message> request = new RestRequest<Message>(channel.getApi(), RestMethod.POST, RestEndpoint.MESSAGE)
                 .setUrlParameters(channel.getIdAsString());
-        return checkForAttachmentsAndExecuteRequest(channel, body, request, false);
+        return checkForAttachmentsAndExecuteRequest(jsonNode -> channel, body, request);
     }
 
     @Override
@@ -523,8 +458,8 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
         prepareComponents(body);
 
-        if (strBuilder.length() != 0) {
-            body.put("content", strBuilder.toString());
+        if (getStringBuilder().length() != 0) {
+            body.put("content", getStringBuilder().toString());
         }
 
         RestRequest<Message> request =
@@ -545,7 +480,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                                 ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
                     }
 
-                    addMultipartBodyToRequest(request, body, tempAttachments, api);
+                    addMultipartBodyToRequest(request, body, tempAttachments);
 
                     executeWebhookRest(request, wait, future, api);
                 } catch (Throwable t) {
@@ -600,7 +535,7 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         ObjectNode body = JsonNodeFactory.instance.objectNode();
 
         if (updateAll || contentChanged) {
-            body.put("content", strBuilder.toString());
+            body.put("content", getStringBuilder().toString());
         }
 
         prepareAllowedMentions(body);
@@ -617,9 +552,9 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                         Long.toUnsignedString(message.getId()));
 
         if (updateAll || attachmentsChanged) {
-            return checkForAttachmentsAndExecuteRequest(message.getChannel(), body, request, true);
+            return checkForAttachmentsAndExecuteRequest(jsonNode -> message.getChannel(), body, request);
         } else {
-            return executeRequestWithoutNewAttachments(message.getChannel(), body, request);
+            return executeRequestWithoutNewAttachments(jsonNode -> message.getChannel(), body, request);
         }
     }
 
@@ -627,17 +562,17 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
     // Internal MessageBuilder utility methods
     ////////////////////////////////////////////////////////////////////////////////
 
-    private CompletableFuture<Message> checkForAttachmentsAndExecuteRequest(TextChannel channel,
-                                                                            ObjectNode body,
-                                                                            RestRequest<Message> request,
-                                                                            boolean clearAttachmentsIfAppropriate) {
+    protected CompletableFuture<Message> checkForAttachmentsAndExecuteRequest(
+            Function<JsonNode, TextChannel> channelSupplier,
+            ObjectNode body,
+            RestRequest<Message> request) {
         if (newAttachments.isEmpty() && embeds.stream().noneMatch(EmbedBuilder::requiresAttachments)) {
-            return executeRequestWithoutNewAttachments(channel, body, request);
+            return executeRequestWithoutNewAttachments(channelSupplier, body, request);
         }
 
         CompletableFuture<Message> future = new CompletableFuture<>();
         // We access files etc. so this should be async
-        channel.getApi().getThreadPool().getExecutorService().submit(() -> {
+        request.getApi().getThreadPool().getExecutorService().submit(() -> {
             try {
                 List<FileContainer> tempAttachments = new ArrayList<>(newAttachments);
                 // Add the attachments required for the embeds
@@ -646,10 +581,10 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
                             ((EmbedBuilderDelegateImpl) embed.getDelegate()).getRequiredAttachments());
                 }
 
-                addMultipartBodyToRequest(request, body, tempAttachments, channel.getApi());
+                addMultipartBodyToRequest(request, body, tempAttachments);
 
-                request.execute(result -> ((DiscordApiImpl) channel.getApi())
-                                .getOrCreateMessage(channel, result.getJsonBody()))
+                request.execute(result -> request.getApi()
+                                .getOrCreateMessage(channelSupplier.apply(result.getJsonBody()), result.getJsonBody()))
                         .whenComplete((newMessage, throwable) -> {
                             if (throwable != null) {
                                 future.completeExceptionally(throwable);
@@ -664,12 +599,14 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
         return future;
     }
 
-    private CompletableFuture<Message> executeRequestWithoutNewAttachments(TextChannel channel,
-                                                                           ObjectNode body,
-                                                                           RestRequest<Message> request) {
+    private CompletableFuture<Message> executeRequestWithoutNewAttachments(
+            Function<JsonNode, TextChannel> channelSupplier,
+            ObjectNode body,
+            RestRequest<Message> request) {
         request.setBody(body);
         return request.execute(
-                result -> ((DiscordApiImpl) channel.getApi()).getOrCreateMessage(channel, result.getJsonBody()));
+                result -> request.getApi()
+                        .getOrCreateMessage(channelSupplier.apply(result.getJsonBody()), result.getJsonBody()));
     }
 
     private void prepareAllowedMentions(ObjectNode body) {
@@ -709,15 +646,13 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
      * @param request     The RestRequest to add the MultipartBody to
      * @param body        The body to use as base for the MultipartBody
      * @param attachments The List of FileContainers to add as attachments
-     * @param api         The api instance needed to add the attachments
      */
-    protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body,
-                                             List<FileContainer> attachments, DiscordApi api) {
+    protected void addMultipartBodyToRequest(RestRequest<?> request, ObjectNode body, List<FileContainer> attachments) {
         MultipartBody.Builder multipartBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
         Collections.reverse(attachments);
         for (int i = 0; i < attachments.size(); i++) {
             FileContainer fileContainer = attachments.get(i);
-            byte[] bytes = fileContainer.asByteArray(api).join();
+            byte[] bytes = fileContainer.asByteArray(request.getApi()).join();
             String mediaType = URLConnection
                     .guessContentTypeFromName(fileContainer.getFileTypeOrName());
             if (mediaType == null) {
@@ -740,8 +675,12 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
 
     protected void prepareCommonWebhookMessageBodyParts(ObjectNode body) {
         body.put("tts", this.tts);
-        if (strBuilder.length() != 0) {
-            body.put("content", strBuilder.toString());
+        if (null != messageFlags) {
+            body.put("flags", messageFlags.stream()
+                    .mapToInt(MessageFlag::getId).sum());
+        }
+        if (getStringBuilder().length() != 0) {
+            body.put("content", getStringBuilder().toString());
         }
         prepareAllowedMentions(body);
         prepareEmbeds(body, embedsChanged);
@@ -755,11 +694,6 @@ public class MessageBuilderBaseDelegateImpl implements MessageBuilderBaseDelegat
             }
             body.set("embeds", embedsNode);
         }
-    }
-
-    @Override
-    public String toString() {
-        return strBuilder.toString();
     }
 
     protected void prepareComponents(ObjectNode body) {

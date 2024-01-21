@@ -7,8 +7,9 @@ import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 import java.util.concurrent.CompletableFuture;
 
 public class InteractionImmediateResponseBuilderImpl
-        extends ExtendedInteractionMessageBuilderBaseImpl<InteractionImmediateResponseBuilder>
+        extends InteractionMessageBuilderBaseImpl<InteractionImmediateResponseBuilder>
         implements InteractionImmediateResponseBuilder {
+
     private final InteractionImpl interaction;
 
     /**
@@ -17,7 +18,6 @@ public class InteractionImmediateResponseBuilderImpl
      * @param interaction The interaction to use.
      */
     public InteractionImmediateResponseBuilderImpl(InteractionBase interaction) {
-        super(InteractionImmediateResponseBuilder.class);
         this.interaction = (InteractionImpl) interaction;
     }
 
@@ -27,7 +27,7 @@ public class InteractionImmediateResponseBuilderImpl
 
         CompletableFuture<Void> job = delegate.sendInitialResponse(interaction)
                 .thenRun(() -> {
-                    future.complete(new InteractionOriginalResponseUpdaterImpl(interaction, delegate));
+                    future.complete(new InteractionOriginalResponseUpdaterImpl(interaction));
                 })
                 .exceptionally(e -> {
                     future.completeExceptionally(e);

@@ -17,6 +17,7 @@ public enum MessageFlag {
 
     /**
      * Do not include any embeds when serializing this message.
+     * This can be used when sending a message.
      */
     SUPPRESS_EMBEDS(1 << 2),
 
@@ -37,6 +38,7 @@ public enum MessageFlag {
 
     /**
      * This message is only visible to the user who invoked the Interaction.
+     * This can only be used when sending a message in response to an interaction.
      */
     EPHEMERAL(1 << 6),
 
@@ -52,6 +54,7 @@ public enum MessageFlag {
 
     /**
      * This message will not trigger push and desktop notifications.
+     * This can be used when sending a message.
      */
     SUPPRESS_NOTIFICATIONS(1 << 12),
 
