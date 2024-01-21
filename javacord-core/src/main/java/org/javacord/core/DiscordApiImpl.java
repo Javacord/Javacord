@@ -258,7 +258,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Controls who is mentioned if a message contains a ping.
      */
-    private AllowedMentions allowedMentions;
+    private AllowedMentions defaultAllowedMentions;
 
     /**
      * Whether Javacord should wait for all servers to become available on startup or not.
@@ -558,7 +558,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param unspecifiedListeners       The listeners of unspecified types to pre-register.
      * @param userCacheEnabled           Whether the user cache should be enabled.
      * @param dispatchEvents             Whether events can be dispatched.
-     * @param allowedMentions            Controls who will be mentioned if mentions exist in a message.
+     * @param defaultAllowedMentions            Controls who will be mentioned if mentions exist in a message.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
@@ -583,7 +583,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners,
             boolean userCacheEnabled,
             boolean dispatchEvents,
-            AllowedMentions allowedMentions
+            AllowedMentions defaultAllowedMentions
     ) {
         this.token = token;
         this.currentShard = currentShard;
@@ -598,7 +598,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.trustAllCertificates = trustAllCertificates;
         this.userCacheEnabled = userCacheEnabled;
         this.dispatchEvents = dispatchEvents;
-        this.allowedMentions = allowedMentions;
+        this.defaultAllowedMentions = defaultAllowedMentions;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
         //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
@@ -746,13 +746,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     }
 
     @Override
-    public void setAllowedMentions(AllowedMentions allowedMentions) {
-        this.allowedMentions = allowedMentions;
+    public void setDefaultAllowedMentions(AllowedMentions allowedMentions) {
+        this.defaultAllowedMentions = allowedMentions;
     }
 
     @Override
-    public Optional<AllowedMentions> getAllowedMentions() {
-        return Optional.ofNullable(allowedMentions);
+    public Optional<AllowedMentions> getDefaultAllowedMentions() {
+        return Optional.ofNullable(defaultAllowedMentions);
     }
 
     /**

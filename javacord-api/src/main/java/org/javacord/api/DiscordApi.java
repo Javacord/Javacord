@@ -123,7 +123,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @param allowedMentions The mention object.
      */
-    void setAllowedMentions(AllowedMentions allowedMentions);
+    void setDefaultAllowedMentions(AllowedMentions allowedMentions);
 
     /**
      * Controls who will be mentioned if mentions exist in a message.
@@ -131,7 +131,7 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
      *
      * @return The mention object.
      */
-    Optional<AllowedMentions> getAllowedMentions();
+    Optional<AllowedMentions> getDefaultAllowedMentions();
 
     /**
      * Gets all global commands for the application.

@@ -459,19 +459,9 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      * @param allowedMentions The mention object.
      * @return The current instance in order to chain call methods.
      */
-    public DiscordApiBuilder setAllowedMentions(AllowedMentions allowedMentions) {
-        delegate.setAllowedMentions(allowedMentions);
+    public DiscordApiBuilder setDefaultAllowedMentions(AllowedMentions allowedMentions) {
+        delegate.setDefaultAllowedMentions(allowedMentions);
         return this;
-    }
-
-    /**
-     * Controls who will be mentioned if mentions exist in a message.
-     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
-     *
-     * @return The mention object.
-     */
-    public Optional<AllowedMentions> getAllowedMentions() {
-        return delegate.getAllowedMentions();
     }
 
     /**

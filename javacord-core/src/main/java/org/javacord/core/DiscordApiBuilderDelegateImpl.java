@@ -406,13 +406,8 @@ public class DiscordApiBuilderDelegateImpl implements DiscordApiBuilderDelegate 
     }
 
     @Override
-    public void setAllowedMentions(AllowedMentions allowedMentions) {
+    public void setDefaultAllowedMentions(AllowedMentions allowedMentions) {
         this.allowedMentions = allowedMentions;
-    }
-
-    @Override
-    public Optional<AllowedMentions> getAllowedMentions() {
-        return Optional.ofNullable(allowedMentions);
     }
 
     @Override

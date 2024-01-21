@@ -185,15 +185,7 @@ public interface DiscordApiBuilderDelegate {
      *
      * @param allowedMentions The mention object.
      */
-    void setAllowedMentions(AllowedMentions allowedMentions);
-
-    /**
-     * Controls who will be mentioned if mentions exist in a message.
-     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
-     *
-     * @return The mention object.
-     */
-    Optional<AllowedMentions> getAllowedMentions();
+    void setDefaultAllowedMentions(AllowedMentions allowedMentions);
 
     /**
      * Sets whether the user cache should be enabled.

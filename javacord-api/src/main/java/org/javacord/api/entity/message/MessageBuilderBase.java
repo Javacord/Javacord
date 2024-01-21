@@ -519,7 +519,7 @@ abstract class MessageBuilderBase<T> {
 
     /**
      * Controls who will be mentioned if mentions exist in the message.
-     * Defaults to {@link DiscordApi#getAllowedMentions()}.
+     * Defaults to {@link DiscordApi#getDefaultAllowedMentions()}.
      *
      * @param allowedMentions The mention object.
      * @return The current instance in order to chain call methods.
