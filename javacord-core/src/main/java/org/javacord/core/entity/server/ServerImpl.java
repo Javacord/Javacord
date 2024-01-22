@@ -921,13 +921,11 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         long id = Long.parseLong(data.get("id").asText());
         ChannelType type = ChannelType.fromId(data.get("type").asInt());
         synchronized (this) {
-            switch (type) {
-                case SERVER_FORUM_CHANNEL:
-                    return getForumChannelById(id).orElseGet(() -> new ServerForumChannelImpl(api, this, data));
-                default:
-                    // Invalid channel type
-                    return null;
+            if (type == ChannelType.SERVER_FORUM_CHANNEL) {
+                return getForumChannelById(id).orElseGet(() -> new ServerForumChannelImpl(api, this, data));
             }
+            // Invalid channel type
+            return null;
         }
     }
 
