@@ -1,6 +1,8 @@
 package org.javacord.api;
 
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.event.server.ServerBecomesAvailableEvent;
 import org.javacord.api.internal.DiscordApiBuilderDelegate;
 import org.javacord.api.listener.ChainableGloballyAttachableListenerManager;
@@ -447,6 +449,18 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      */
     public DiscordApiBuilder setAllIntentsWhere(Predicate<Intent> condition) {
         delegate.setAllIntentsWhere(condition);
+        return this;
+    }
+
+    /**
+     * Controls who will be mentioned if mentions exist in a message.
+     * This is overriden with {@link MessageBuilder#setAllowedMentions(AllowedMentions)}
+     *
+     * @param allowedMentions The mention object.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setDefaultAllowedMentions(AllowedMentions allowedMentions) {
+        delegate.setDefaultAllowedMentions(allowedMentions);
         return this;
     }
 
