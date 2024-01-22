@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -25,21 +26,21 @@ public interface EmbedImage {
      *
      * @return The proxy url of the image.
      */
-    URL getProxyUrl();
+    Optional<URL> getProxyUrl();
 
     /**
      * Gets the height of the image.
      *
      * @return The height of the image.
      */
-    int getHeight();
+    Optional<Integer> getHeight();
 
     /**
      * Gets the width of the image.
      *
      * @return The width of the image.
      */
-    int getWidth();
+    Optional<Integer> getWidth();
 
     /**
      * Downloads the image as a {@code BufferedImage}.

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -26,8 +27,8 @@ public class EmbedImageImpl implements EmbedImage {
 
     private final String url;
     private final String proxyUrl;
-    private final int height;
-    private final int width;
+    private final Integer height;
+    private final Integer width;
 
     /**
      * Creates a new embed image.
@@ -37,15 +38,12 @@ public class EmbedImageImpl implements EmbedImage {
     public EmbedImageImpl(JsonNode data) {
         url = data.has("url") ? data.get("url").asText() : null;
         proxyUrl = data.has("proxy_url") ? data.get("proxy_url").asText() : null;
-        height = data.has("height") ? data.get("height").asInt() : -1;
-        width = data.has("width") ? data.get("width").asInt() : -1;
+        height = data.hasNonNull("height") ? data.get("height").asInt() : null;
+        width = data.hasNonNull("width") ? data.get("width").asInt() : null;
     }
 
     @Override
     public URL getUrl() {
-        if (url == null) {
-            return null;
-        }
         try {
             return new URL(url);
         } catch (MalformedURLException e) {
@@ -55,26 +53,26 @@ public class EmbedImageImpl implements EmbedImage {
     }
 
     @Override
-    public URL getProxyUrl() {
+    public Optional<URL> getProxyUrl() {
         if (proxyUrl == null) {
-            return null;
+            return Optional.empty();
         }
         try {
-            return new URL(proxyUrl);
+            return Optional.of(new URL(proxyUrl));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the proxy url of the embed image is malformed! Please contact the developer!", e);
-            return null;
+            return Optional.empty();
         }
     }
 
     @Override
-    public int getHeight() {
-        return height;
+    public Optional<Integer> getHeight() {
+        return Optional.ofNullable(height);
     }
 
     @Override
-    public int getWidth() {
-        return width;
+    public Optional<Integer> getWidth() {
+        return Optional.ofNullable(width);
     }
 
     @Override
