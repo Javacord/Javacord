@@ -1,6 +1,7 @@
 package org.javacord.core.entity.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.channel.TextChannel;
@@ -179,6 +180,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     private final Integer position;
 
     /**
+     * The message JSON as a String.
+     */
+    private final ObjectNode messageJson;
+
+    /**
      * Creates a new message object.
      *
      * @param api     The discord api instance.
@@ -188,6 +194,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public MessageImpl(DiscordApiImpl api, TextChannel channel, JsonNode data) {
         this.api = api;
         this.channel = channel;
+
+        messageJson = api.getSaveMessageJsonAsString() ? data.deepCopy() : null;
 
         id = data.get("id").asLong();
 
@@ -213,8 +221,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                 : null;
 
         messageInteraction = data.hasNonNull("interaction")
-            ? new MessageInteractionImpl(this, data.get("interaction"))
-            : null;
+                ? new MessageInteractionImpl(this, data.get("interaction"))
+                : null;
 
         position = data.hasNonNull("position") ? data.get("position").asInt() : null;
 
@@ -227,29 +235,30 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     /**
      * Create a new message with the given data.
      *
-     * @param api               The discord api instance.
-     * @param channel           The channel of the message.
-     * @param id                The id of the message.
-     * @param type              The type of the message.
-     * @param author            The author of the message.
-     * @param activity          The activity of the message.
-     * @param content           The content of the message.
-     * @param nonce             The nonce of the message.
-     * @param referencedMessage The message referenced via message reply.
-     * @param messageReference  The message reference.
+     * @param api                The discord api instance.
+     * @param channel            The channel of the message.
+     * @param id                 The id of the message.
+     * @param type               The type of the message.
+     * @param author             The author of the message.
+     * @param activity           The activity of the message.
+     * @param content            The content of the message.
+     * @param nonce              The nonce of the message.
+     * @param referencedMessage  The message referenced via message reply.
+     * @param messageReference   The message reference.
      * @param messageInteraction The reference to the interaction that the message responds to.
-     * @param pinned            The pinned flag of the message.
-     * @param tts               The text-to-speech flag of the message.
-     * @param mentionsEveryone  If the message mentions everyone or not.
-     * @param lastEditTime      The last edit time.
-     * @param components        The components of the message.
-     * @param embeds            The embeds of the message.
-     * @param reactions         The reactions of the message.
-     * @param attachments       The attachments of the message.
-     * @param mentions          The users mentioned in this message.
-     * @param roleMentions      The roles mentioned in this message.
-     * @param stickerItems      The sticker items in this message.
-     * @param position          The position in this message
+     * @param pinned             The pinned flag of the message.
+     * @param tts                The text-to-speech flag of the message.
+     * @param mentionsEveryone   If the message mentions everyone or not.
+     * @param lastEditTime       The last edit time.
+     * @param components         The components of the message.
+     * @param embeds             The embeds of the message.
+     * @param reactions          The reactions of the message.
+     * @param attachments        The attachments of the message.
+     * @param mentions           The users mentioned in this message.
+     * @param roleMentions       The roles mentioned in this message.
+     * @param stickerItems       The sticker items in this message.
+     * @param messageJson        The message JSON.
+     * @param position           The position in this message
      */
     private MessageImpl(DiscordApiImpl api, TextChannel channel, long id, MessageType type,
                         MessageAuthor author, MessageActivityImpl activity, String content,
@@ -258,8 +267,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
                         Instant lastEditTime, List<HighLevelComponent> components,
                         List<Embed> embeds, List<Reaction> reactions,
                         List<MessageAttachment> attachments, List<User> mentions,
-                        List<Role> roleMentions, Set<StickerItem> stickerItems, MessageInteraction messageInteraction,
-                        Integer position) {
+                        List<Role> roleMentions, Set<StickerItem> stickerItems, ObjectNode messageJson,
+                        MessageInteraction messageInteraction, Integer position) {
         this.api = api;
         this.channel = channel;
         this.id = id;
@@ -275,6 +284,7 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
         this.tts = tts;
         this.mentionsEveryone = mentionsEveryone;
         this.lastEditTime = lastEditTime;
+        this.messageJson = null != messageJson ? messageJson.deepCopy() : null;
         this.components.addAll(components);
         this.embeds.addAll(embeds);
         this.reactions.addAll(reactions);
@@ -293,7 +303,8 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public MessageImpl copyMessage() {
         return new MessageImpl(api, channel, id, type, author, activity, content, nonce, referencedMessage,
                 messageReference, pinned, tts, mentionsEveryone, lastEditTime, components,
-                embeds, reactions, attachments, mentions, roleMentions, stickerItems, messageInteraction, position);
+                embeds, reactions, attachments, mentions, roleMentions, stickerItems, messageJson, messageInteraction,
+                position);
     }
 
     /**
@@ -302,6 +313,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
      * @param data The json data of the message.
      */
     public void setUpdatableFields(JsonNode data) {
+        if (null != messageJson) {
+            ObjectNode updateNode = data.deepCopy();
+            messageJson.setAll(updateNode);
+        }
+
         if (data.has("content")) {
             content = data.get("content").asText("");
         }
@@ -659,6 +675,11 @@ public class MessageImpl implements Message, InternalMessageAttachableListenerMa
     public CompletableFuture<Void> removeOwnReactionsByEmoji(String... unicodeEmojis) {
         return removeOwnReactionsByEmoji(
                 Arrays.stream(unicodeEmojis).map(UnicodeEmojiImpl::fromString).toArray(Emoji[]::new));
+    }
+
+    @Override
+    public Optional<String> getMessageJsonString() {
+        return null == messageJson ? Optional.empty() : Optional.of(messageJson.toString());
     }
 
     @Override
