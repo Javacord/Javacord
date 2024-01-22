@@ -19,6 +19,9 @@ import org.javacord.core.util.event.DispatchQueueSelector;
 import org.javacord.core.util.gateway.PacketHandler;
 import org.javacord.core.util.logging.LoggerUtil;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -77,7 +80,17 @@ public class MessageReactionAddHandler extends PacketHandler {
             emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
         }
 
-        message.ifPresent(msg -> ((MessageImpl) msg).addReaction(emoji, userId == api.getYourself().getId()));
+        boolean isSuperReaction = packet.get("burst").asBoolean();
+        List<Color> burstColors = new ArrayList<>();
+
+        if (packet.has("burst_colors")) {
+            for (JsonNode color : packet.get("burst_colors")) {
+                burstColors.add(Color.decode(color.asText()));
+            }
+        }
+
+        message.ifPresent(msg -> ((MessageImpl) msg).addReaction(emoji, userId == api.getYourself().getId(),
+                isSuperReaction, burstColors));
 
         ReactionAddEvent event =
                 new ReactionAddEventImpl(api, messageId, channel, emoji, userId, member, messageAuthorId);

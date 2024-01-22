@@ -65,7 +65,10 @@ public class MessageReactionRemoveHandler extends PacketHandler {
             emoji = api.getKnownCustomEmojiOrCreateCustomEmoji(emojiJson);
         }
 
-        message.ifPresent(msg -> ((MessageImpl) msg).removeReaction(emoji, userId == api.getYourself().getId()));
+        boolean isSuperReaction = packet.get("burst").asBoolean();
+
+        message.ifPresent(msg -> ((MessageImpl) msg).removeReaction(emoji, userId == api.getYourself().getId(),
+                isSuperReaction));
 
         ReactionRemoveEvent event = new ReactionRemoveEventImpl(api, messageId, channel, emoji, userId);
 

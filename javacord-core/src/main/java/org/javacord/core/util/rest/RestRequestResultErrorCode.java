@@ -214,6 +214,7 @@ public enum RestRequestResultErrorCode {
     TWO_FACTOR_IS_REQUIRED_FOR_THIS_OPERATION(60003, "Two factor is required for this operation"),
     NO_USERS_WITH_DISCORDTAGS_EXIST(80004, "No users with DiscordTags exist"),
     REACTION_BLOCKED(90001, "Reaction blocked", ReactionBlockedException::new, RestRequestHttpResponseCode.FORBIDDEN),
+    USER_CAN_NOT_USE_BURST_REACTION(90002, "User can not use burst reaction"),
     APPLICATION_NOT_YET_AVAILABLE(110001, "\tApplication not yet available. Try again later"),
     API_RESOURCE_IS_CURRENTLY_OVERLOADED(130000, "API resource is currently overloaded. Try again a little later"),
     THE_STAGE_IS_ALREADY_OPEN(150006, "The Stage is already open"),
