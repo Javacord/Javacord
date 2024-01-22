@@ -1,5 +1,6 @@
 package org.javacord.core.interaction;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.Icon;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.message.Message;
@@ -11,6 +12,7 @@ import org.javacord.api.entity.message.internal.InteractionMessageBuilderDelegat
 import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.interaction.InteractionBase;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -53,8 +55,13 @@ public class InteractionOriginalResponseUpdaterImpl
     }
 
     @Override
-    public CompletableFuture<Void> delete() {
-        return this.delegate.deleteInitialResponse(interaction);
+    public DiscordApi getApi() {
+        return this.interaction.getApi();
+    }
+
+    @Override
+    public CompletableFuture<Void> delete(String reason) {
+        return this.delegate.deleteInitialResponse(interaction, reason);
     }
 
     @Override

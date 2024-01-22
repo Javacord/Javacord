@@ -3,6 +3,7 @@ package org.javacord.api.entity.message.internal;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.interaction.InteractionBase;
+
 import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,7 +30,18 @@ public interface InteractionMessageBuilderDelegate extends MessageBuilderBaseDel
      * @param interaction The interaction.
      * @return The completable future when the message has been deleted.
      */
-    CompletableFuture<Void> deleteInitialResponse(InteractionBase interaction);
+    default CompletableFuture<Void> deleteInitialResponse(InteractionBase interaction) {
+        return deleteInitialResponse(interaction, null);
+    }
+
+    /**
+     * Delete the original response message.
+     *
+     * @param interaction The interaction.
+     * @param auditLogMessage The audit log message to attach.
+     * @return The completable future when the message has been deleted.
+     */
+    CompletableFuture<Void> deleteInitialResponse(InteractionBase interaction, String auditLogMessage);
 
     /**
      * Edits the message.
