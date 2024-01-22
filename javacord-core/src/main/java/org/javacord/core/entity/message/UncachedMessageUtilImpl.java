@@ -217,7 +217,8 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     public CompletableFuture<Message> edit(String channelId, String messageId, String content,
                                            boolean updateContent, List<EmbedBuilder> embeds, boolean updateEmbed) {
         try {
-            return edit(Long.parseLong(channelId), Long.parseLong(messageId), content, true, embeds, true);
+            return edit(Long.parseLong(channelId), Long.parseLong(messageId), content, updateContent, embeds,
+                    updateEmbed);
         } catch (NumberFormatException e) {
             CompletableFuture<Message> future = new CompletableFuture<>();
             future.completeExceptionally(e);
