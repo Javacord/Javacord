@@ -28,6 +28,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.SelectMenuDefaultValueBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.TextInputBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
@@ -170,6 +171,15 @@ public class DelegateFactory {
      */
     public static SelectMenuOptionBuilderDelegate createSelectMenuOptionBuilderDelegate() {
         return delegateFactoryDelegate.createSelectMenuOptionBuilderDelegate();
+    }
+
+    /**
+     * Creates a new select menu default value builder delegate.
+     *
+     * @return A new select menu default value builder delegate.
+     */
+    public static SelectMenuDefaultValueBuilderDelegate createSelectMenuDefaultValueBuilderDelegate() {
+        return delegateFactoryDelegate.createSelectMenuDefaultValueBuilderDelegate();
     }
 
     /**
