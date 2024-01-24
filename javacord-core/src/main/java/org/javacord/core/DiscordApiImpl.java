@@ -35,6 +35,7 @@ import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageSet;
 import org.javacord.api.entity.message.UncachedMessageUtil;
+import org.javacord.api.entity.message.mention.AllowedMentions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.server.invite.Invite;
 import org.javacord.api.entity.sticker.Sticker;
@@ -253,6 +254,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * Whether events can be dispatched.
      */
     private boolean dispatchEvents = true;
+
+    /**
+     * Controls who is mentioned if a message contains a ping.
+     */
+    private AllowedMentions defaultAllowedMentions;
 
     /**
      * Whether Javacord should wait for all servers to become available on startup or not.
@@ -475,7 +481,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     ) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false, true);
+                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false, true, null);
     }
 
     /**
@@ -520,7 +526,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Dns dns) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false, true);
+                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false, true, null);
     }
 
     /**
@@ -552,6 +558,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param unspecifiedListeners       The listeners of unspecified types to pre-register.
      * @param userCacheEnabled           Whether the user cache should be enabled.
      * @param dispatchEvents             Whether events can be dispatched.
+     * @param defaultAllowedMentions     Controls who will be mentioned if mentions exist in a message.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
@@ -575,7 +582,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                     > listenerSourceMap,
             List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners,
             boolean userCacheEnabled,
-            boolean dispatchEvents
+            boolean dispatchEvents,
+            AllowedMentions defaultAllowedMentions
     ) {
         this.token = token;
         this.currentShard = currentShard;
@@ -590,6 +598,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         this.trustAllCertificates = trustAllCertificates;
         this.userCacheEnabled = userCacheEnabled;
         this.dispatchEvents = dispatchEvents;
+        this.defaultAllowedMentions = defaultAllowedMentions;
         this.reconnectDelayProvider = x ->
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
         //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
@@ -734,6 +743,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     @Override
     public boolean canDispatchEvents() {
         return dispatchEvents;
+    }
+
+    @Override
+    public void setDefaultAllowedMentions(AllowedMentions allowedMentions) {
+        this.defaultAllowedMentions = allowedMentions;
+    }
+
+    @Override
+    public Optional<AllowedMentions> getDefaultAllowedMentions() {
+        return Optional.ofNullable(defaultAllowedMentions);
     }
 
     /**
