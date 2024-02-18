@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
 import org.javacord.api.entity.Nameable;
 import org.javacord.api.entity.activity.Activity;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.server.Server;
@@ -928,17 +929,13 @@ public class DiscordWebSocketAdapter extends WebSocketAdapter {
                 .putNull("since");
 
         ObjectNode activityJson = data.putObject("game");
-        activityJson.put("name", activity.map(Nameable::getName).orElse(null));
-        activityJson.put("type", activity.flatMap(g -> {
-            int type = g.getType().getId();
-            if (type == 4) {
-                logger.warn("Can't set the activity to ActivityType.CUSTOM"
-                        + ", using ActivityType.PLAYING instead");
-                return Optional.empty();
-            } else {
-                return Optional.of(type);
-            }
-        }).orElse(0));
+        String name = activity.map(Nameable::getName).orElse(null);
+        activityJson.put("name", name);
+        if (activity.map((g) -> g.getType() == ActivityType.CUSTOM).orElse(false)) {
+            // Custom uses state instead of name, but it still requires name to be present.
+            activityJson.put("state", name);
+        }
+        activityJson.put("type", activity.map((g) -> g.getType().getId()).orElse(0));
         activity.flatMap(Activity::getStreamingUrl).ifPresent(url -> activityJson.put("url", url));
         logger.debug("Updating status (content: {})", updateStatus);
         sendTextFrame(updateStatus.toString());
