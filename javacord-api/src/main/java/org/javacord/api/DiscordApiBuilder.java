@@ -1,5 +1,6 @@
 package org.javacord.api;
 
+import org.javacord.api.entity.activity.Activity;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.mention.AllowedMentions;
@@ -230,6 +231,17 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     }
 
     /**
+     * Sets the activity of the bot.
+     *
+     * @param activity The activity to set.
+     * @return The current instance in order to chain call methods.
+     */
+    public DiscordApiBuilder setActivity(Activity activity) {
+        delegate.setActivity(activity);
+        return this;
+    }
+
+    /**
      * Gets the token that will be used to login.
      *
      * @return The token.
@@ -237,6 +249,16 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
      */
     public Optional<String> getToken() {
         return delegate.getToken();
+    }
+
+    /**
+     * Gets the activity that will be used to log in.
+     *
+     * @return The activity.
+     * @see #setActivity(Activity) 
+     */
+    public Optional<Activity> getActivity() {
+        return delegate.getActivity();
     }
 
     /**

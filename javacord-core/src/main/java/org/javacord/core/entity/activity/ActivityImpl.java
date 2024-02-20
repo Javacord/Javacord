@@ -17,6 +17,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * The implementation of {@link Activity}.
@@ -97,21 +98,38 @@ public class ActivityImpl implements Activity {
      * @param type         The type of the activity.
      * @param name         The name of the activity.
      * @param streamingUrl The streamingUrl of the activity.
+     * @param state        The user's party status.
      */
-    public ActivityImpl(ActivityType type, String name, String streamingUrl) {
+    public ActivityImpl(ActivityType type, String name, String streamingUrl, String state) {
+        final Pattern allowedStreamingUrls = Pattern.compile(
+                "https?://(www\\.)?(twitch\\.tv/|youtube\\.com/watch\\?v=).+", Pattern.CASE_INSENSITIVE);
+
+        if (name != null && name.length() > 128) {
+            throw new IllegalArgumentException("The name of the activity must not be longer than 128 characters!");
+        }
+
+        if (streamingUrl != null && !allowedStreamingUrls.matcher(streamingUrl).matches()) {
+            throw new IllegalArgumentException("The url must be a valid twitch or youtube url!");
+        }
+
+        if (state != null && state.length() > 128) {
+            throw new IllegalArgumentException(
+                    "The state of the activity must not be longer than 128 characters!");
+        }
+
         this.type = type;
         this.name = name;
         this.streamingUrl = streamingUrl;
+        this.state = state;
+        this.emoji = null;
         this.createdAt = null;
         this.details = null;
-        this.state = null;
         this.party = null;
         this.assets = null;
         this.secrets = null;
         this.applicationId = null;
         this.startTime = null;
         this.endTime = null;
-        this.emoji = null;
         this.instance = null;
     }
 
