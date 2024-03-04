@@ -25,11 +25,11 @@ public class UserChangeMutedEventImpl extends ServerUserEventImpl implements Use
 
     @Override
     public boolean isNewMuted() {
-        return newMember.getServer().isSelfMuted(newMember.getUser());
+        return newMember.isMuted();
     }
 
     @Override
     public boolean isOldMuted() {
-        return !isNewMuted();
+        return oldMember.isMuted();
     }
 }
