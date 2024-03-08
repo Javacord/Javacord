@@ -489,7 +489,21 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
                 // This log should happen almost never but should protect any guilds from failing creation due to
                 // mismatching guild data from Discord. https://github.com/discord/discord-api-docs/issues/4455
                 if (channel.isPresent()) {
-                    channel.get().addConnectedUser(voiceStateJson.get("user_id").asLong());
+                    long userId = voiceStateJson.get("user_id").asLong();
+
+                    channel.get().addConnectedUser(userId);
+
+                    MemberImpl oldMember = (MemberImpl) getRealMemberById(userId).orElse(null);
+
+                    if (oldMember != null)  {
+                        MemberImpl newMember = oldMember
+                                .setMuted(voiceStateJson.get("mute").asBoolean())
+                                .setDeafened(voiceStateJson.get("deaf").asBoolean())
+                                .setSelfMuted(voiceStateJson.get("self_mute").asBoolean())
+                                .setSelfDeafened(voiceStateJson.get("self_deaf").asBoolean());
+
+                        api.addMemberToCacheOrReplaceExisting(newMember);
+                    }
                 } else {
                     logger.warn("Channel " + voiceStateJson.get("channel_id").asLong()
                             + " was found in the voice_states property for server " + this.id
