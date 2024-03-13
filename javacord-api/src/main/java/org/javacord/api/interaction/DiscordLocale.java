@@ -14,6 +14,7 @@ public enum DiscordLocale {
     ENGLISH_UK("en-GB"),
     ENGLISH_US("en-US"),
     SPANISH("es-ES"),
+    SPANISH_LATAM("es-419"),
     FRENCH("fr"),
     CROATIAN("hr"),
     ITALIAN("it"),
