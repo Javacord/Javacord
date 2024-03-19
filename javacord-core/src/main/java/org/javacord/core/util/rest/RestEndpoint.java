@@ -43,6 +43,7 @@ public enum RestEndpoint {
     WEBHOOK_MESSAGE("/webhooks/%s/%s/messages/%s",0),
     INVITE("/invites/%s"),
     BAN("/guilds/%s/bans", 0),
+    BULK_BAN("/guilds/%s/bulk-ban", 0),
     CURRENT_USER("/users/@me"),
     AUDIT_LOG("/guilds/%s/audit-logs", 0),
     CUSTOM_EMOJI("/guilds/%s/emojis", 0),

@@ -244,7 +244,8 @@ public enum RestRequestResultErrorCode {
             "Webhooks posted to forum channels cannot have both a thread_name and thread_id"),
     WEBHOOKS_CAN_ONLY_CREATE_THREADS_IN_FORUM_CHANNELS(220003, "Webhooks can only create threads in forum channels"),
     WEBHOOK_SERVICES_CANNOT_BE_USED_IN_FORUM_CHANNELS(220004, "Webhook services cannot be used in forum channels"),
-    MESSAGE_BLOCKED_BY_HARMFUL_LINKS_FILTER(240000, "Message blocked by harmful links filter");
+    MESSAGE_BLOCKED_BY_HARMFUL_LINKS_FILTER(240000, "Message blocked by harmful links filter"),
+    FAILED_TO_BAN_USERS(500000, "Failed to ban users");
 
     /**
      * A map for retrieving the enum instances by code.
