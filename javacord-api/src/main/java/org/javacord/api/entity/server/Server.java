@@ -67,6 +67,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 /**
  * The class represents a Discord server, sometimes also called guild.
@@ -2281,6 +2282,55 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
     default CompletableFuture<Void> banUser(long userId, Duration duration, String reason) {
         return banUser(Long.toUnsignedString(userId), duration, reason);
     }
+
+    /**
+     * Bans the given users from the server.
+     *
+     * @param userIds The ids of the users to ban.
+     * @return A future returning details about the bulk ban.
+     */
+    default CompletableFuture<BulkBanResponse> bulkBanUsers(long... userIds) {
+        return bulkBanUsers(
+                LongStream.of(userIds).mapToObj(Long::toUnsignedString).collect(Collectors.toList()),
+                0, TimeUnit.SECONDS, null);
+    }
+
+    /**
+     * Bans the given users from the server.
+     *
+     * @param userIds The ids of the users to ban.
+     * @return A future returning details about the bulk ban.
+     */
+    default CompletableFuture<BulkBanResponse> bulkBanUsers(String... userIds) {
+        return bulkBanUsers(Arrays.asList(userIds), 0, TimeUnit.SECONDS, null);
+    }
+
+    /**
+     * Bans the given users from the server.
+     *
+     * @param userIds               The ids of the users to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @return A future returning details about the bulk ban.
+     */
+    default CompletableFuture<BulkBanResponse> bulkBanUsers(Collection<String> userIds, long deleteMessageDuration,
+                                                            TimeUnit unit) {
+        return bulkBanUsers(userIds, 0, TimeUnit.SECONDS, null);
+    }
+
+    /**
+     * Bans the given users from the server.
+     *
+     * @param userIds               The ids of the users to ban.
+     * @param deleteMessageDuration The number of messages to delete within the duration.
+     *                              (Between 0 and 604800 seconds (7 days))
+     * @param unit                  The unit of time for the duration.
+     * @param reason                The Audit Log reason for the bulk ban.
+     * @return A future returning details about the bulk ban.
+     */
+    CompletableFuture<BulkBanResponse> bulkBanUsers(Collection<String> userIds, long deleteMessageDuration,
+                                                    TimeUnit unit, String reason);
 
     /**
      * Unbans the given user from the server.

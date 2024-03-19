@@ -3,6 +3,7 @@ package org.javacord.core.entity.server;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.Javacord;
@@ -35,6 +36,7 @@ import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.ActiveThreads;
 import org.javacord.api.entity.server.Ban;
 import org.javacord.api.entity.server.BoostLevel;
+import org.javacord.api.entity.server.BulkBanResponse;
 import org.javacord.api.entity.server.DefaultMessageNotificationLevel;
 import org.javacord.api.entity.server.ExplicitContentFilterLevel;
 import org.javacord.api.entity.server.MultiFactorAuthenticationLevel;
@@ -1744,6 +1746,27 @@ public class ServerImpl implements Server, Cleanupable, InternalServerAttachable
         }
 
         return request.execute(result -> null);
+    }
+
+    @Override
+    public CompletableFuture<BulkBanResponse> bulkBanUsers(
+            Collection<String> userIds,
+            long deleteMessageDuration,
+            TimeUnit unit,
+            String reason
+    ) {
+        ObjectNode body = JsonNodeFactory.instance.objectNode();
+        ArrayNode users = body.putArray("user_ids");
+        userIds.forEach(users::add);
+        if (deleteMessageDuration > 0) {
+            body.put("delete_message_seconds", unit.toSeconds(deleteMessageDuration));
+        }
+
+        return new RestRequest<BulkBanResponse>(getApi(), RestMethod.POST, RestEndpoint.BULK_BAN)
+                .setUrlParameters(getIdAsString())
+                .setAuditLogReason(reason)
+                .setBody(body)
+                .execute(result -> new BulkBanResponseImpl(result.getJsonBody()));
     }
 
     @Override
