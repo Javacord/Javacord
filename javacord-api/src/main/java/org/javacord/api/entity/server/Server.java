@@ -2172,7 +2172,7 @@ public interface Server extends DiscordEntity, Nameable, Deletable, UpdatableFro
      * @return A future to check if the ban was successful.
      */
     default CompletableFuture<Void> banUser(String userId) {
-        return banUser(userId, null);
+        return banUser(userId, Duration.ZERO);
     }
 
     /**
