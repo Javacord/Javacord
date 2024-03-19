@@ -83,6 +83,7 @@ public enum AuditLogChangeType implements Nameable {
     DEAF("deaf"),
     MUTE("mute"),
     NICK("nick"),
+    COMMUNICATION_DISABLED_UNTIL("communication_disabled_until"),
 
     // integration
     ENABLE_EMOTICONS("enable_emoticons"),
