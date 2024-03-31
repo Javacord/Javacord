@@ -181,6 +181,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "stackpan",
+      "name": "Ivan Rizkyanto",
+      "avatar_url": "https://avatars.githubusercontent.com/u/55195033?v=4",
+      "profile": "http://stackpan.live",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "projectName": "Javacord",
