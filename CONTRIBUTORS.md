@@ -30,6 +30,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Goooler"><img src="https://avatars.githubusercontent.com/u/10363352?v=4?s=100" width="100px;" alt="Goooler"/><br /><sub><b>Goooler</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=Goooler" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/End45"><img src="https://avatars.githubusercontent.com/u/71291438?v=4?s=100" width="100px;" alt="End45"/><br /><sub><b>End45</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=End45" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://stackpan.live"><img src="https://avatars.githubusercontent.com/u/55195033?v=4?s=100" width="100px;" alt="Ivan Rizkyanto"/><br /><sub><b>Ivan Rizkyanto</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=stackpan" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kyleyannelli"><img src="https://avatars.githubusercontent.com/u/32677784?v=4?s=100" width="100px;" alt="Kyle Yannelli"/><br /><sub><b>Kyle Yannelli</b></sub></a><br /><a href="https://github.com/Javacord/Javacord/commits?author=kyleyannelli" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
