@@ -3,12 +3,14 @@ package org.javacord.api.interaction;
 import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.message.component.ComponentType;
+import org.javacord.api.entity.message.component.SelectMenuDefaultValue;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface SelectMenuInteraction extends MessageComponentInteraction {
 
@@ -89,4 +91,19 @@ public interface SelectMenuInteraction extends MessageComponentInteraction {
      */
     int getMaximumValues();
 
+    /**
+     * Get all default values from the select menu.
+     * Only available if the select menu is of type
+     *
+     * <p>{@link ComponentType#SELECT_MENU_USER},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_ROLE},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_MENTIONABLE} or
+     *
+     * <p>{@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @return All default values.
+     */
+    Set<SelectMenuDefaultValue> getDefaultValues();
 }

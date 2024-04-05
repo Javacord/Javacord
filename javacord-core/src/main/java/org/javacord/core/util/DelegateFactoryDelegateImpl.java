@@ -28,6 +28,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.SelectMenuDefaultValueBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.TextInputBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
@@ -89,6 +90,7 @@ import org.javacord.core.entity.message.WebhookMessageBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.ActionRowBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.ButtonBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.SelectMenuBuilderDelegateImpl;
+import org.javacord.core.entity.message.component.internal.SelectMenuDefaultValueBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.SelectMenuOptionBuilderDelegateImpl;
 import org.javacord.core.entity.message.component.internal.TextInputBuilderDelegateImpl;
 import org.javacord.core.entity.message.embed.EmbedBuilderDelegateImpl;
@@ -360,6 +362,11 @@ public class DelegateFactoryDelegateImpl implements DelegateFactoryDelegate {
     @Override
     public SelectMenuOptionBuilderDelegate createSelectMenuOptionBuilderDelegate() {
         return new SelectMenuOptionBuilderDelegateImpl();
+    }
+
+    @Override
+    public SelectMenuDefaultValueBuilderDelegate createSelectMenuDefaultValueBuilderDelegate() {
+        return new SelectMenuDefaultValueBuilderDelegateImpl();
     }
 
     @Override

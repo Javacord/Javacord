@@ -3,14 +3,17 @@ package org.javacord.core.entity.message.component.internal;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.SelectMenuDefaultValue;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
 import org.javacord.core.entity.message.component.SelectMenuImpl;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate {
     private ComponentType type = null;
@@ -28,6 +31,8 @@ public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate 
     private String customId = null;
 
     private boolean isDisabled = false;
+
+    private Set<SelectMenuDefaultValue> defaultValues = new HashSet<>();
 
     @Override
     public ComponentType getType() {
@@ -49,6 +54,7 @@ public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate 
         this.options = selectMenu.getOptions();
         this.channelTypes = selectMenu.getChannelTypes();
         this.type = selectMenu.getType();
+        this.defaultValues = selectMenu.getDefaultValues();
 
         placeholder.ifPresent(this::setPlaceholder);
     }
@@ -94,14 +100,29 @@ public class SelectMenuBuilderDelegateImpl implements SelectMenuBuilderDelegate 
     }
 
     @Override
+    public void addDefaultValue(SelectMenuDefaultValue defaultValue) {
+        this.defaultValues.add(defaultValue);
+    }
+
+    @Override
+    public void removeDefaultValue(SelectMenuDefaultValue defaultValue) {
+        this.defaultValues.remove(defaultValue);
+    }
+
+    @Override
     public SelectMenu build() {
         return new SelectMenuImpl(type, options, placeholder, customId, minimumValues, maximumValues, isDisabled,
-                channelTypes);
+                channelTypes, defaultValues);
     }
 
     @Override
     public void removeAllOptions() {
         this.options.clear();
+    }
+
+    @Override
+    public void removeAllDefaultValues() {
+        this.defaultValues.clear();
     }
 
     @Override

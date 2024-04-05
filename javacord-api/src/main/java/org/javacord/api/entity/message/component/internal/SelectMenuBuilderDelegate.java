@@ -3,6 +3,7 @@ package org.javacord.api.entity.message.component.internal;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.ComponentType;
 import org.javacord.api.entity.message.component.SelectMenu;
+import org.javacord.api.entity.message.component.SelectMenuDefaultValue;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 
 public interface SelectMenuBuilderDelegate extends ComponentBuilderDelegate {
@@ -85,6 +86,20 @@ public interface SelectMenuBuilderDelegate extends ComponentBuilderDelegate {
     void setDisabled(boolean disabled);
 
     /**
+     * Add a default value to the select menu.
+     *
+     * @param defaultValue The default value to add.
+     */
+    void addDefaultValue(SelectMenuDefaultValue defaultValue);
+
+    /**
+     * Remove a default value from the select menu.
+     *
+     * @param defaultValue The default value to remove.
+     */
+    void removeDefaultValue(SelectMenuDefaultValue defaultValue);
+
+    /**
      * Creates a {@link SelectMenu} instance with the given values.
      *
      * @return The created select menu instance.
@@ -95,6 +110,11 @@ public interface SelectMenuBuilderDelegate extends ComponentBuilderDelegate {
      * Removes all options from the select menu.
      */
     void removeAllOptions();
+
+    /**
+     * Removes all default values from the select menu.
+     */
+    void removeAllDefaultValues();
 
     /**
      * Get the custom ID of the select menu.

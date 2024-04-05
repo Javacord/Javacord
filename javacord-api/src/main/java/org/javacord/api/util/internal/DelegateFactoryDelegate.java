@@ -28,6 +28,7 @@ import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.ButtonBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
+import org.javacord.api.entity.message.component.internal.SelectMenuDefaultValueBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.SelectMenuOptionBuilderDelegate;
 import org.javacord.api.entity.message.component.internal.TextInputBuilderDelegate;
 import org.javacord.api.entity.message.embed.internal.EmbedBuilderDelegate;
@@ -447,6 +448,13 @@ public interface DelegateFactoryDelegate {
      * @return A new select menu option builder delegate.
      */
     SelectMenuOptionBuilderDelegate createSelectMenuOptionBuilderDelegate();
+
+    /**
+     * Creates a new select menu default value builder delegate.
+     *
+     * @return A new select menu default value builder delegate.
+     */
+    SelectMenuDefaultValueBuilderDelegate createSelectMenuDefaultValueBuilderDelegate();
 
     /**
      * Creates a new sticker builder delegate.

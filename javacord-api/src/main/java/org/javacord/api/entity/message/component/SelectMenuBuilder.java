@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.message.component.internal.SelectMenuBuilderDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
 import java.util.List;
+import java.util.Set;
 
 public class SelectMenuBuilder implements LowLevelComponentBuilder {
     private final SelectMenuBuilderDelegate delegate = DelegateFactory.createSelectMenuBuilderDelegate();
@@ -165,6 +166,89 @@ public class SelectMenuBuilder implements LowLevelComponentBuilder {
      */
     public SelectMenuBuilder setDisabled(boolean isDisabled) {
         delegate.setDisabled(isDisabled);
+        return this;
+    }
+
+    /**
+     * Add a default value to the select menu.
+     *
+     * <p>Only usable with
+     *
+     * <p>{@link ComponentType#SELECT_MENU_USER},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_ROLE},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_MENTIONABLE} or
+     *
+     * <p>{@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @param defaultValue The default value.
+     * @return The builder.
+     */
+    public SelectMenuBuilder addDefaultValue(SelectMenuDefaultValue defaultValue) {
+        delegate.addDefaultValue(defaultValue);
+        return this;
+    }
+
+    /**
+     * Removes a default value from the select menu.
+     *
+     * <p>Only usable with
+     *
+     * <p>{@link ComponentType#SELECT_MENU_USER},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_ROLE},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_MENTIONABLE} or
+     *
+     * <p>{@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @param defaultValue The default value.
+     * @return The builder.
+     */
+    public SelectMenuBuilder removeDefaultValue(SelectMenuDefaultValue defaultValue) {
+        delegate.removeDefaultValue(defaultValue);
+        return this;
+    }
+
+    /**
+     * Adds all given default values to the select menu.
+     *
+     * <p>Only usable with
+     *
+     * <p>{@link ComponentType#SELECT_MENU_USER},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_ROLE},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_MENTIONABLE} or
+     *
+     * <p>{@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @param defaultValues The default values.
+     * @return The builder.
+     */
+    public SelectMenuBuilder addDefaultValues(Set<SelectMenuDefaultValue> defaultValues) {
+        defaultValues.forEach(delegate::addDefaultValue);
+        return this;
+    }
+
+    /**
+     * Removes all default values from the select menu.
+     *
+     * <p>Only usable with
+     *
+     * <p>{@link ComponentType#SELECT_MENU_USER},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_ROLE},
+     *
+     * <p>{@link ComponentType#SELECT_MENU_MENTIONABLE} or
+     *
+     * <p>{@link ComponentType#SELECT_MENU_CHANNEL}.
+     *
+     * @return The builder.
+     */
+    public SelectMenuBuilder removeAllDefaultValues() {
+        delegate.removeAllDefaultValues();
         return this;
     }
 

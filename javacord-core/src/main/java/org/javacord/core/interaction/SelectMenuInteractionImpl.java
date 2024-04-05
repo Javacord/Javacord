@@ -6,11 +6,13 @@ import org.javacord.api.entity.Mentionable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.component.ComponentType;
+import org.javacord.api.entity.message.component.SelectMenuDefaultValue;
 import org.javacord.api.entity.message.component.SelectMenuOption;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.interaction.SelectMenuInteraction;
 import org.javacord.core.DiscordApiImpl;
+import org.javacord.core.entity.message.component.SelectMenuDefaultValueImpl;
 import org.javacord.core.entity.message.component.SelectMenuOptionImpl;
 import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.entity.user.MemberImpl;
@@ -18,8 +20,10 @@ import org.javacord.core.entity.user.UserImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl implements SelectMenuInteraction {
@@ -34,6 +38,7 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
     private String placeholder;
     private int minimumValues;
     private int maximumValues;
+    private final Set<SelectMenuDefaultValue> defaultValues = new HashSet<>();
     private final ComponentType componentType;
 
     /**
@@ -70,6 +75,11 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
                     if (lowLevelComponent.hasNonNull("options")) {
                         for (JsonNode optionObject : lowLevelComponent.get("options")) {
                             selectMenuOptions.add(new SelectMenuOptionImpl(optionObject));
+                        }
+                    }
+                    if (lowLevelComponent.hasNonNull("default_values")) {
+                        for (JsonNode defaultValueObject : lowLevelComponent.get("default_values")) {
+                            defaultValues.add(new SelectMenuDefaultValueImpl(defaultValueObject));
                         }
                     }
                     break outerLoop;
@@ -205,5 +215,10 @@ public class SelectMenuInteractionImpl extends MessageComponentInteractionImpl i
     @Override
     public int getMaximumValues() {
         return maximumValues;
+    }
+
+    @Override
+    public Set<SelectMenuDefaultValue> getDefaultValues() {
+        return defaultValues;
     }
 }
