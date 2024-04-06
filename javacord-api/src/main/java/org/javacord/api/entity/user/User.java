@@ -53,7 +53,10 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * Gets the discriminator of the user.
      *
      * @return The discriminator of the user.
+     * @deprecated Use {@link #getName()} to get the username and
+     * {@link #getGlobalName()} to get the user's global name.
      */
+    @Deprecated
     String getDiscriminator();
 
     /**
@@ -300,6 +303,13 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
      * @return All mutual servers with this user.
      */
     Set<Server> getMutualServers();
+
+    /**
+     * Gets the display name of the user.
+     *
+     * @return The display name of the user.
+     */
+    Optional<String> getGlobalName();
 
     /**
      * Gets the display name of the user.
