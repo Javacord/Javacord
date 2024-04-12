@@ -7,6 +7,7 @@ import org.javacord.core.util.logging.LoggerUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * The implementation of {@link EmbedProvider}.
@@ -28,24 +29,24 @@ public class EmbedProviderImpl implements EmbedProvider {
      */
     public EmbedProviderImpl(JsonNode data) {
         name = data.has("name") ? data.get("name").asText() : null;
-        url = data.has("url") && !data.get("url").isNull() ? data.get("url").asText() : null;
+        url = data.hasNonNull("url") ? data.get("url").asText() : null;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
     }
 
     @Override
-    public URL getUrl() {
+    public Optional<URL> getUrl() {
         if (url == null) {
-            return null;
+            return Optional.empty();
         }
         try {
-            return new URL(url);
+            return Optional.of(new URL(url));
         } catch (MalformedURLException e) {
             logger.warn("Seems like the url of the embed provider is malformed! Please contact the developer!", e);
-            return null;
+            return Optional.empty();
         }
     }
 }
