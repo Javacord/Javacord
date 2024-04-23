@@ -4,6 +4,8 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.user.User;
 
+import java.awt.Color;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -104,9 +106,9 @@ public interface Reaction {
     Emoji getEmoji();
 
     /**
-     * Gets the amount of users who used this reaction.
+     * Gets the number of users who used this reaction.
      *
-     * @return The amount of users who used this reaction.
+     * @return The number of users who used this reaction.
      */
     int getCount();
 
@@ -116,6 +118,27 @@ public interface Reaction {
      * @return Whether this reaction is used by you or not.
      */
     boolean containsYou();
+
+    /**
+     * Checks if you (the current account) used this super reaction.
+     *
+     * @return Whether this super reaction is used by you or not.
+     */
+    boolean containsYouSuper();
+
+    /**
+     * Gets the details of the count.
+     *
+     * @return The details of the count.
+     */
+    CountDetails getCountDetails();
+
+    /**
+     * Gets the colors of the super reaction.
+     *
+     * @return The colors of the super reaction.
+     */
+    List<Color> getBurstColors();
 
     /**
      * Removes the user of the connected account from the list of reactors.
