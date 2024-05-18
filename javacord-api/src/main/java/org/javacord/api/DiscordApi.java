@@ -1217,6 +1217,21 @@ public interface DiscordApi extends GloballyAttachableListenerManager {
     }
 
     /**
+     * Sets whether the JSON of a message should be saved as a String in a message.
+     * If set to true {@link Message#getMessageJsonString()} will always contain the JSON as a String.
+     *
+     * @param saveMessageJsonAsString Whether the message saves its JSON as a String.
+     */
+    void setSaveMessageJsonAsString(boolean saveMessageJsonAsString);
+
+    /**
+     * Gets whether the JSON of a message should be saved.
+     *
+     * @return Whether the message save its JSON as a String.
+     */
+    boolean getSaveMessageJsonAsString();
+
+    /**
      * Gets a message by its id, if it exists and belongs to the given channel.
      *
      * @param id The id of the message.
