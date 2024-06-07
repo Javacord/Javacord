@@ -9,9 +9,21 @@ import org.javacord.api.entity.message.component.SelectMenu;
 import org.javacord.api.entity.message.component.SelectMenuBuilder;
 import org.javacord.api.entity.message.component.internal.ActionRowBuilderDelegate;
 import org.javacord.core.entity.message.component.ActionRowImpl;
+import org.javacord.core.entity.message.component.ButtonImpl;
+import org.javacord.core.entity.message.component.EditableButtonImpl;
+import org.javacord.core.entity.message.component.EditableSelectMenuImpl;
+import org.javacord.core.entity.message.component.EditableTextInputImpl;
+import org.javacord.core.entity.message.component.SelectMenuImpl;
+import org.javacord.core.entity.message.component.TextInputImpl;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+/**
+ * The implementation of {@link ActionRowBuilderDelegate}.
+ */
 public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
     private final ComponentType type = ComponentType.ACTION_ROW;
 
@@ -20,6 +32,35 @@ public class ActionRowBuilderDelegateImpl implements ActionRowBuilderDelegate {
     @Override
     public void addComponents(List<LowLevelComponent> components) {
         this.components.addAll(components);
+    }
+
+    @Override
+    public void updateComponents(Predicate<LowLevelComponent> predicate, Consumer<LowLevelComponent> updater) {
+        components.stream()
+                .filter(predicate)
+                .map(lowLevelComponent -> {
+                    if (lowLevelComponent.isButton()) {
+                        return new EditableButtonImpl((ButtonImpl) lowLevelComponent);
+                    } else if (lowLevelComponent.isSelectMenu()) {
+                        return new EditableSelectMenuImpl((SelectMenuImpl) lowLevelComponent);
+                    } else if (lowLevelComponent.isTextInput()) {
+                        return new EditableTextInputImpl((TextInputImpl) lowLevelComponent);
+                    } else {
+                        throw new IllegalStateException("Unknown low-level component type");
+                    }
+                })
+                .forEach(lowLevelComponent -> {
+                    if (lowLevelComponent instanceof EditableButtonImpl) {
+                        updater.andThen(button -> ((EditableButtonImpl) button).clearDelegate())
+                                .accept(lowLevelComponent);
+                    } else if (lowLevelComponent instanceof EditableSelectMenuImpl) {
+                        updater.andThen(selectMenu -> ((EditableSelectMenuImpl) selectMenu).clearDelegate())
+                                .accept(lowLevelComponent);
+                    } else {
+                        updater.andThen(textInput -> ((EditableTextInputImpl) textInput).clearDelegate())
+                                .accept(lowLevelComponent);
+                    }
+                });
     }
 
     @Override
