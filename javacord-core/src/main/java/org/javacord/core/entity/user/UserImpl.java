@@ -43,12 +43,14 @@ import java.util.concurrent.CompletableFuture;
 public class UserImpl implements User, InternalUserAttachableListenerManager {
 
     private static final int DEFAULT_AVATAR_SIZE = 1024;
+    private static final int DEFAULT_BANNER_SIZE = 1024;
 
     private final DiscordApiImpl api;
     private final Long id;
     private final String name;
     private final String discriminator;
     private final String avatarHash;
+    private final String bannerHash;
     private EnumSet<UserFlag> userFlags = EnumSet.noneOf(UserFlag.class);
     private final boolean bot;
     private final MemberImpl member;
@@ -71,6 +73,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             avatarHash = data.get("avatar").asText();
         } else {
             avatarHash = null;
+        }
+        if (data.hasNonNull("banner")) {
+            bannerHash = data.get("banner").asText();
+        } else {
+            bannerHash = null;
         }
         if (data.has("public_flags")) {
             int flags = data.get("public_flags").asInt();
@@ -107,6 +114,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         } else {
             avatarHash = null;
         }
+        if (data.hasNonNull("banner")) {
+            bannerHash = data.get("banner").asText();
+        } else {
+            bannerHash = null;
+        }
         if (data.has("public_flags")) {
             int flags = data.get("public_flags").asInt();
             for (UserFlag flag : UserFlag.values()) {
@@ -120,13 +132,14 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         member = new MemberImpl(api, server, memberJson, this);
     }
 
-    private UserImpl(DiscordApiImpl api, Long id, String name, String discriminator, String avatarHash, boolean bot,
+    private UserImpl(DiscordApiImpl api, Long id, String name, String discriminator, String avatarHash, String bannerHash, boolean bot,
                      MemberImpl member) {
         this.api = api;
         this.id = id;
         this.name = name;
         this.discriminator = discriminator;
         this.avatarHash = avatarHash;
+        this.bannerHash = bannerHash;
         this.bot = bot;
         this.member = member;
     }
@@ -156,7 +169,12 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             avatarHash = partialUserJson.get("avatar").asText();
         }
 
-        return new UserImpl(api, id, name, discriminator, avatarHash, bot, member);
+        String bannerHash = this.bannerHash;
+        if (partialUserJson.hasNonNull("banner")) {
+            bannerHash = partialUserJson.get("banner").asText();
+        }
+
+        return new UserImpl(api, id, name, discriminator, avatarHash, bannerHash, bot, member);
     }
 
     /**
@@ -171,6 +189,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     @Override
     public Optional<String> getAvatarHash() {
         return Optional.ofNullable(avatarHash);
+    }
+
+    @Override
+    public Optional<String> getBannerHash() {
+        return Optional.ofNullable(bannerHash);
     }
 
     @Override
@@ -239,6 +262,54 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             throw new AssertionError("Found a malformed avatar url. Please update to the latest Javacord "
                     + "version or create an issue on GitHub if you are already using the latest one.");
         }
+    }
+
+    /**
+     * Gets the banner for the given details.
+     *
+     * @param api The discord api instance.
+     * @param bannerHash The avatar hash or {@code null} for user without a banner.
+     * @param userId The user id.
+     * @param size The size of the image. Must be any power of 2 between 16 and 4096.
+     * @return The banner for the given details.
+     */
+    public static Optional<Icon> getBanner(DiscordApi api, String bannerHash, long userId, int size) {
+        StringBuilder url = new StringBuilder("https://" + Javacord.DISCORD_CDN_DOMAIN + "/");
+        if (bannerHash != null) {
+            url.append("banners/")
+                    .append(userId).append('/').append(bannerHash)
+                    .append(bannerHash.startsWith("a_") ? ".gif" : ".png");
+            url.append("?size=").append(size);
+            try {
+                return Optional.of(new IconImpl(api, new URL(url.toString())));
+            } catch (MalformedURLException e) {
+                throw new AssertionError("Found a malformed banner url. Please update to the latest Javacord "
+                        + "version or create an issue on GitHub if you are already using the latest one.");
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Gets the banner for the given details.
+     *
+     * @param api The discord api instance.
+     * @param bannerHash The banner hash or {@code null} for user without a banner.
+     * @param userId The user id.
+     * @return The banner for the given details.
+     */
+    public static Optional<Icon> getBanner(DiscordApi api, String bannerHash, long userId) {
+        return getBanner(api, bannerHash, userId, DEFAULT_BANNER_SIZE);
+    }
+
+    @Override
+    public Optional<Icon> getBanner() {
+        return getBanner(api, bannerHash, getId());
+    }
+
+    @Override
+    public Optional<Icon> getBanner(int size) {
+        return getBanner(api, bannerHash, getId(), size);
     }
 
     @Override
