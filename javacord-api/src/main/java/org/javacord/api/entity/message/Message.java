@@ -218,9 +218,12 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @param messageId The id of the message.
      * @param content   The new content of the message.
      * @return A future to check if the update was successful.
+     * @see #editContent(DiscordApi, long, long, String)
+     * @deprecated Use {@link #editContent(DiscordApi, long, long, String)} instead.
      */
+    @Deprecated
     static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, String content) {
-        return api.getUncachedMessageUtil().edit(channelId, messageId, content);
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, Collections.emptyList(), false);
     }
 
     /**
@@ -231,7 +234,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @param messageId The id of the message.
      * @param content   The new content of the message.
      * @return A future to check if the update was successful.
+     * @see #editContent(DiscordApi, String, String, String)
+     * @deprecated Use {@link #editContent(DiscordApi, String, String, String)} instead.
      */
+    @Deprecated
     static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, String content) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, Collections.emptyList(), false);
     }
@@ -244,7 +250,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @param messageId The id of the message.
      * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
+     * @see #editEmbed(DiscordApi, long, long, EmbedBuilder...)
+     * @deprecated Use {@link #editEmbed(DiscordApi, long, long, EmbedBuilder...)} instead.
      */
+    @Deprecated
     static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, EmbedBuilder... embeds) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false,
                 Arrays.asList(embeds), true);
@@ -258,7 +267,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @param messageId The id of the message.
      * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
+     * @see #editEmbed(DiscordApi, long, long, List)
+     * @deprecated Use {@link #editEmbed(DiscordApi, long, long, List)} instead.
      */
+    @Deprecated
     static CompletableFuture<Message> edit(DiscordApi api, long channelId, long messageId, List<EmbedBuilder> embeds) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embeds, true);
     }
@@ -271,7 +283,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @param messageId The id of the message.
      * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
+     * @see #editEmbed(DiscordApi, String, String, EmbedBuilder...)
+     * @deprecated Use {@link #editEmbed(DiscordApi, String, String, EmbedBuilder...)} instead.
      */
+    @Deprecated
     static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId, EmbedBuilder... embeds) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, Arrays.asList(embeds), true);
     }
@@ -284,7 +299,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      * @param messageId The id of the message.
      * @param embeds    An array of the new embeds of the message.
      * @return A future to check if the update was successful.
+     * @see #editEmbed(DiscordApi, String, String, List)
+     * @deprecated Use {@link #editEmbed(DiscordApi, String, String, List)} instead.
      */
+    @Deprecated
     static CompletableFuture<Message> edit(DiscordApi api, String channelId, String messageId,
                                            List<EmbedBuilder> embeds) {
         return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embeds, true);
@@ -389,7 +407,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      *
      * @param content The new content of the message.
      * @return A future to check if the update was successful.
+     * @see #editContent(String)
+     * @deprecated Use {@link #editContent(String)} instead.
      */
+    @Deprecated
     default CompletableFuture<Message> edit(String content) {
         return new MessageUpdater(this).setContent(content).applyChanges();
     }
@@ -399,7 +420,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      *
      * @param embeds An array of the new embeds of the message.
      * @return A future to check if the update was successful.
+     * @see #editEmbed(EmbedBuilder...)
+     * @deprecated Use {@link #editEmbed(EmbedBuilder...)} instead.
      */
+    @Deprecated
     default CompletableFuture<Message> edit(EmbedBuilder... embeds) {
         return new MessageUpdater(this).addEmbeds(Arrays.asList(embeds)).applyChanges();
     }
@@ -409,7 +433,10 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      *
      * @param embeds An array of the new embeds of the message.
      * @return A future to check if the update was successful.
+     * @see #editEmbed(List)
+     * @deprecated Use {@link #editEmbed(List)} instead.
      */
+    @Deprecated
     default CompletableFuture<Message> edit(List<EmbedBuilder> embeds) {
         return new MessageUpdater(this).addEmbeds(embeds).applyChanges();
     }
@@ -434,6 +461,119 @@ public interface Message extends DiscordEntity, Deletable, Comparable<Message>, 
      */
     default CompletableFuture<Message> edit(String content, List<EmbedBuilder> embeds) {
         return new MessageUpdater(this).setContent(content).addEmbeds(embeds).applyChanges();
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content   The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> editContent(DiscordApi api, long channelId, long messageId, String content) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content);
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param content   The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> editContent(DiscordApi api, String channelId, String messageId, String content) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, content, true, Collections.emptyList(), false);
+    }
+
+    /**
+     * Updates the content of the message.
+     *
+     * @param content The new content of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> editContent(String content) {
+        return new MessageUpdater(this).setContent(content).applyChanges();
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> editEmbed(DiscordApi api, long channelId, long messageId,
+                                                EmbedBuilder... embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false,
+                Arrays.asList(embeds), true);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> editEmbed(DiscordApi api, long channelId, long messageId,
+                                                List<EmbedBuilder> embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embeds, true);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> editEmbed(DiscordApi api, String channelId, String messageId,
+                                                EmbedBuilder... embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, Arrays.asList(embeds), true);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param api       The discord api instance.
+     * @param channelId The id of the message's channel.
+     * @param messageId The id of the message.
+     * @param embeds    An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    static CompletableFuture<Message> editEmbed(DiscordApi api, String channelId, String messageId,
+                                                List<EmbedBuilder> embeds) {
+        return api.getUncachedMessageUtil().edit(channelId, messageId, null, false, embeds, true);
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param embeds An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> editEmbed(EmbedBuilder... embeds) {
+        return new MessageUpdater(this).addEmbeds(Arrays.asList(embeds)).applyChanges();
+    }
+
+    /**
+     * Updates the embed of the message.
+     *
+     * @param embeds An array of the new embeds of the message.
+     * @return A future to check if the update was successful.
+     */
+    default CompletableFuture<Message> editEmbed(List<EmbedBuilder> embeds) {
+        return new MessageUpdater(this).addEmbeds(embeds).applyChanges();
     }
 
     /**
