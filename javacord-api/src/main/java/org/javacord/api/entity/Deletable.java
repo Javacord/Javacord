@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * An entity that can be deleted.
+ *
+ * <p>Note that not all entities implementing this might actually support giving an audit reason. If this is the case,
+ * the audit reason will silently be dropped - or rather sent to and ignored by discords side.</p>
  */
 public interface Deletable {
 
@@ -30,7 +33,7 @@ public interface Deletable {
     /**
      * Deletes the entity.
      *
-     * @param reason The audit log reason for the deletion.
+     * @param reason The audit log reason for the deletion, if supported.
      * @return A future to tell if the deletion was successful.
      */
     CompletableFuture<Void> delete(String reason);
@@ -55,7 +58,7 @@ public interface Deletable {
      *
      * @param duration The duration.
      * @param unit The unit for the duration.
-     * @param auditLogReason The reason to log for the audit log.
+     * @param auditLogReason The reason to log for the audit log, if supported.
      * @return A future that completes when the entity has been deleted.
      */
     default CompletableFuture<Void> deleteAfter(long duration, TimeUnit unit, String auditLogReason) {
@@ -80,7 +83,7 @@ public interface Deletable {
      * <p><b>Caution:</b> If the bot shuts down before the scheduled time, the entity will not be deleted.</p>
      *
      * @param duration The duration.
-     * @param auditLogReason The reason to log for the audit log.
+     * @param auditLogReason The reason to log for the audit log, if supported.
      * @return A future that completes when the entity has been deleted.
      */
     default CompletableFuture<Void> deleteAfter(Duration duration, String auditLogReason) {
