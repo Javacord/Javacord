@@ -1,6 +1,7 @@
 package org.javacord.api.util.auth;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,5 +49,12 @@ public interface Request {
     default Optional<String> getBody() throws IOException {
         return Optional.empty();
     }
+
+    /**
+     * The URL of the request.
+     *
+     * @return The URL of the request.
+     */
+    URL getUrl();
 
 }

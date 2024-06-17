@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.apache.logging.log4j.Logger;
+import org.javacord.core.util.auth.OkHttpResponseImpl;
 import org.javacord.core.util.logging.LoggerUtil;
 
 import java.io.IOException;
@@ -23,38 +24,31 @@ public class RestRequestResult {
     private static final Logger logger = LoggerUtil.getLogger(RestRequestResult.class);
 
     private final RestRequest<?> request;
-    private final Response response;
-    private final ResponseBody body;
-    private final String stringBody;
+    private final OkHttpResponseImpl okHttpResponse;
     private final JsonNode jsonBody;
 
     /**
      * Creates a new RestRequestResult.
      *
-     * @param request The request of the result.
-     * @param response The response of the RestRequest.
+     * @param request  The request of the result.
+     * @param okHttpResponse The okHttpResponse of the RestRequest.
      * @throws IOException Passed on from {@link ResponseBody#string()}.
      */
-    public RestRequestResult(RestRequest<?> request, Response response) throws IOException {
+    public RestRequestResult(RestRequest<?> request, OkHttpResponseImpl okHttpResponse) throws IOException {
         this.request = request;
-        this.response = response;
-        this.body = response.body();
-        if (body == null) {
-            stringBody = null;
-            jsonBody = NullNode.getInstance();
-        } else {
-            stringBody = body.string();
-            ObjectMapper mapper = request.getApi().getObjectMapper();
-            JsonNode jsonBody;
-            try {
-                jsonBody = mapper.readTree(stringBody);
-            } catch (JsonParseException e) {
-                // This can happen if Discord sends garbage (see https://github.com/Javacord/Javacord/issues/526)
-                logger.debug("Failed to parse json response", e);
-                jsonBody = null;
+        this.okHttpResponse = okHttpResponse;
+
+        ObjectMapper mapper = request.getApi().getObjectMapper();
+        JsonNode jsonBody = null;
+        try {
+            if (okHttpResponse.getStringBody().isPresent()) {
+                jsonBody = mapper.readTree(okHttpResponse.getStringBody().orElseThrow(AssertionError::new));
             }
-            this.jsonBody = jsonBody == null ? NullNode.getInstance() : jsonBody;
+        } catch (JsonParseException e) {
+            // This can happen if Discord sends garbage (see https://github.com/Javacord/Javacord/issues/526)
+            logger.debug("Failed to parse json okHttpResponse", e);
         }
+        this.jsonBody = jsonBody == null ? NullNode.getInstance() : jsonBody;
     }
 
     /**
@@ -72,7 +66,7 @@ public class RestRequestResult {
      * @return The response of the RestRequest.
      */
     public Response getResponse() {
-        return response;
+        return okHttpResponse.getResponse();
     }
 
     /**
@@ -80,17 +74,8 @@ public class RestRequestResult {
      *
      * @return The body of the response.
      */
-    public Optional<ResponseBody> getBody() {
-        return Optional.ofNullable(body);
-    }
-
-    /**
-     * Gets the string body of the response.
-     *
-     * @return The string body of the response.
-     */
     public Optional<String> getStringBody() {
-        return Optional.ofNullable(stringBody);
+        return okHttpResponse.getStringBody();
     }
 
     /**

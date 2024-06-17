@@ -4,6 +4,7 @@ import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import org.javacord.core.util.auth.OkHttpResponseImpl
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -22,9 +23,10 @@ class RestRequestResultTest extends Specification {
                     .message('')
                     .body(ResponseBody.create('', null))
                     .build()
+            def okHttpResponse = new OkHttpResponseImpl(response)
 
         when:
-            def result = new RestRequestResult(Stub(RestRequest), response)
+            def result = new RestRequestResult(Stub(RestRequest), okHttpResponse)
 
         then:
             result.jsonBody != null
