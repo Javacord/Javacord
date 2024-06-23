@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The implementation of {@link ServerThreadChannel}.
@@ -94,7 +95,7 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
         lastMessageId = data.hasNonNull("last_message_id") ? data.get("last_message_id").asLong() : 0;
         rateLimitPerUser = data.get("rate_limit_per_user").asInt(0);
 
-        members = new HashSet<>();
+        members = ConcurrentHashMap.newKeySet();
         if (data.hasNonNull("member")) {
             // If userId is not included, that means this came from a GUILD_CREATE event
             // This means the userId is the bot's and the thread id is from this thread

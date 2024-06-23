@@ -11,11 +11,11 @@ import org.javacord.core.entity.server.ServerImpl;
 import org.javacord.core.listener.channel.server.voice.InternalServerVoiceChannelAttachableListenerManager;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -37,7 +37,7 @@ public class ServerVoiceChannelImpl extends TextableRegularServerChannelImpl
     /**
      * The ids of the connected users of this server voice channel.
      */
-    private final Set<Long> connectedUsers = new HashSet<>();
+    private final Set<Long> connectedUsers = ConcurrentHashMap.newKeySet();
 
     /**
      * Creates a new server voice channel object.
