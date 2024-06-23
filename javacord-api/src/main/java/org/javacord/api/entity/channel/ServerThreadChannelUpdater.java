@@ -1,7 +1,10 @@
 package org.javacord.api.entity.channel;
 
+import org.javacord.api.entity.channel.forum.ForumTag;
 import org.javacord.api.entity.channel.internal.ServerThreadChannelUpdaterDelegate;
 import org.javacord.api.util.internal.DelegateFactory;
+
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -76,6 +79,17 @@ public class ServerThreadChannelUpdater extends ServerChannelUpdater<ServerThrea
      */
     public ServerThreadChannelUpdater setSlowmodeDelayInSeconds(int delay) {
         delegate.setSlowmodeDelayInSeconds(delay);
+        return this;
+    }
+
+    /**
+     * Queues the (forum) thread's forum tags to be updated.
+     *
+     * @param forumTags The new forum tags of the thread.
+     * @return The current instance in order to chain call methods.
+     */
+    public ServerThreadChannelUpdater setForumTags(Set<ForumTag> forumTags) {
+        delegate.setForumTags(forumTags);
         return this;
     }
 

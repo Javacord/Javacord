@@ -1,6 +1,7 @@
 package org.javacord.api.entity.channel;
 
 import org.javacord.api.entity.Mentionable;
+import org.javacord.api.entity.channel.forum.ForumTag;
 import org.javacord.api.entity.channel.thread.ThreadMetadata;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.user.User;
@@ -182,6 +183,13 @@ public interface ServerThreadChannel extends ServerChannel, TextChannel, Mention
      * @return The members of the current thread.
      */
     Set<ThreadMember> getMembers();
+
+    /**
+     * Gets the forum tags of the thread.
+     *
+     * @return The forum tags of the thread.
+     */
+    Set<ForumTag> getForumTags();
 
     @Override
     default Optional<ServerThreadChannel> getCurrentCachedInstance() {
