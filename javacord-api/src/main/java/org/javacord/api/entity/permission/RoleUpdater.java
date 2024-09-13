@@ -66,6 +66,8 @@ public class RoleUpdater {
     /**
      * Queues the color to be updated.
      *
+     * <p>{@link Color#BLACK} is reserved for the default role color.
+     *
      * @param color The new color of the role.
      * @return The current instance in order to chain call methods.
      */

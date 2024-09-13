@@ -41,6 +41,8 @@ public interface RoleUpdaterDelegate {
     /**
      * Queues the color to be updated.
      *
+     * <p>{@link Color#BLACK} is reserved for the default role color.
+     *
      * @param color The new color of the role.
      */
     void setColor(Color color);
