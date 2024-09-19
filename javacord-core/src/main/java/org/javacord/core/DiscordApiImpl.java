@@ -59,7 +59,6 @@ import org.javacord.api.util.event.ListenerManager;
 import org.javacord.api.util.ratelimit.LocalRatelimiter;
 import org.javacord.api.util.ratelimit.Ratelimiter;
 import org.javacord.core.audio.AudioConnectionImpl;
-import org.javacord.core.entity.activity.ActivityImpl;
 import org.javacord.core.entity.activity.ApplicationInfoImpl;
 import org.javacord.core.entity.emoji.CustomEmojiImpl;
 import org.javacord.core.entity.emoji.KnownCustomEmojiImpl;
@@ -433,12 +432,14 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param proxyAuthenticator         The authenticator that should be used to authenticate against proxies that
      *                                   require it.
      * @param trustAllCertificates       Whether to trust all SSL certificates.
+     * @param activity                   The activity of the bot.
      */
     public DiscordApiImpl(String token, Ratelimiter globalRatelimiter, Ratelimiter gatewayIdentifyRatelimiter,
                           ProxySelector proxySelector, Proxy proxy, Authenticator proxyAuthenticator,
-                          boolean trustAllCertificates) {
+                          boolean trustAllCertificates, Activity activity) {
         this(token, 0, 1, Collections.emptySet(), true, false, globalRatelimiter,
-                gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null);
+                gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator, trustAllCertificates, null,
+                activity);
     }
 
     /**
@@ -463,6 +464,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param trustAllCertificates       Whether to trust all SSL certificates.
      * @param ready                      The future which will be completed when the connection to Discord was
      *                                   successful.
+     * @param activity                   The activity of the bot.
      */
     public DiscordApiImpl(
             String token,
@@ -477,11 +479,13 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Proxy proxy,
             Authenticator proxyAuthenticator,
             boolean trustAllCertificates,
-            CompletableFuture<DiscordApi> ready
+            CompletableFuture<DiscordApi> ready,
+            Activity activity
     ) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false, true, null);
+                trustAllCertificates, ready, null, Collections.emptyMap(), Collections.emptyList(), false,
+                true, null, activity);
     }
 
     /**
@@ -508,6 +512,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      *                                   successful.
      * @param dns                        The DNS instance to use in the OkHttp client. This should only be used in
      *                                   testing.
+     * @param activity                   The activity of the bot.
      */
     private DiscordApiImpl(
             String token,
@@ -523,10 +528,12 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             Authenticator proxyAuthenticator,
             boolean trustAllCertificates,
             CompletableFuture<DiscordApi> ready,
-            Dns dns) {
+            Dns dns,
+            Activity activity) {
         this(token, currentShard, totalShards, intents, waitForServersOnStartup, waitForUsersOnStartup,
                 true, globalRatelimiter, gatewayIdentifyRatelimiter, proxySelector, proxy, proxyAuthenticator,
-                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false, true, null);
+                trustAllCertificates, ready, dns, Collections.emptyMap(), Collections.emptyList(), false,
+                true, null, activity);
     }
 
     /**
@@ -559,6 +566,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
      * @param userCacheEnabled           Whether the user cache should be enabled.
      * @param dispatchEvents             Whether events can be dispatched.
      * @param defaultAllowedMentions     Controls who will be mentioned if mentions exist in a message.
+     * @param activity                   The activity of the bot.
      */
     @SuppressWarnings("unchecked")
     public DiscordApiImpl(
@@ -583,7 +591,8 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
             List<Function<DiscordApi, GloballyAttachableListener>> unspecifiedListeners,
             boolean userCacheEnabled,
             boolean dispatchEvents,
-            AllowedMentions defaultAllowedMentions
+            AllowedMentions defaultAllowedMentions,
+            Activity activity
     ) {
         this.token = token;
         this.currentShard = currentShard;
@@ -603,6 +612,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 (int) Math.round(Math.pow(x, 1.5) - (1 / (1 / (0.1 * x) + 1)) * Math.pow(x, 1.5));
         //Always add the GUILDS intent unless it is not required anymore for Javacord to be functional.
         this.intents = Stream.concat(intents.stream(), Stream.of(Intent.GUILDS)).collect(Collectors.toSet());
+        this.activity = activity;
 
         if ((proxySelector != null) && (proxy != null)) {
             throw new IllegalStateException("proxy and proxySelector must not be configured both");
@@ -622,6 +632,7 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
                 )
                 .proxyAuthenticator(new ProxyAuthenticator(proxyAuthenticator))
                 .proxy(proxy);
+
         if (proxySelector != null) {
             httpClientBuilder.proxySelector(proxySelector);
         }
@@ -1840,40 +1851,41 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     /**
      * Sets the current activity, along with type and streaming Url.
      *
-     * @param type         The activity's type.
-     * @param name         The name of the activity.
-     * @param streamingUrl The Url used for streaming.
+     * @param activity The activity to set.
      */
-    private void updateActivity(ActivityType type, String name, String streamingUrl) {
-        if (name == null) {
-            activity = null;
-        } else if (streamingUrl == null) {
-            activity = new ActivityImpl(type, name, null);
-        } else {
-            activity = new ActivityImpl(type, name, streamingUrl);
-        }
+    private void updateActivity(Activity activity) {
+        this.activity = activity;
         websocketAdapter.updateStatus();
     }
 
-
     @Override
     public void updateActivity(String name) {
-        updateActivity(ActivityType.PLAYING, name, null);
+        updateActivity(BotActivity.playing(name));
     }
 
     @Override
     public void updateActivity(ActivityType type, String name) {
-        updateActivity(type, name, null);
+        updateActivity(BotActivity.of(type, name));
+    }
+
+    @Override
+    public void updateActivity(ActivityType type, String name, String state) {
+        updateActivity(BotActivity.of(type, name, state));
     }
 
     @Override
     public void updateActivity(String name, String streamingUrl) {
-        updateActivity(ActivityType.STREAMING, name, streamingUrl);
+        updateActivity(BotActivity.streaming(name, streamingUrl));
+    }
+
+    @Override
+    public void updateActivity(String name, String streamingUrl, String state) {
+        updateActivity(BotActivity.streaming(name, streamingUrl, state));
     }
 
     @Override
     public void unsetActivity() {
-        updateActivity(null);
+        this.updateActivity((Activity) null);
     }
 
     @Override
