@@ -50,6 +50,13 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     }
 
     /**
+     * Gets the global name of the user.
+     *
+     * @return The global name of the user.
+     */
+    Optional<String> getGlobalName();
+
+    /**
      * Gets the discriminator of the user.
      *
      * @return The discriminator of the user.

@@ -47,6 +47,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     private final DiscordApiImpl api;
     private final Long id;
     private final String name;
+    private final String globalName;
     private final String discriminator;
     private final String avatarHash;
     private EnumSet<UserFlag> userFlags = EnumSet.noneOf(UserFlag.class);
@@ -66,6 +67,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         this.api = api;
         id = data.get("id").asLong();
         name = data.get("username").asText();
+        if (data.hasNonNull("global_name")) {
+            globalName = data.get("global_name").asText();
+        } else {
+            globalName = null;
+        }
         discriminator = data.get("discriminator").asText();
         if (data.hasNonNull("avatar")) {
             avatarHash = data.get("avatar").asText();
@@ -101,6 +107,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         this.api = api;
         id = data.get("id").asLong();
         name = data.get("username").asText();
+        if (data.hasNonNull("global_name")) {
+            globalName = data.get("global_name").asText();
+        } else {
+            globalName = null;
+        }
         discriminator = data.get("discriminator").asText();
         if (data.hasNonNull("avatar")) {
             avatarHash = data.get("avatar").asText();
@@ -120,11 +131,12 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
         member = new MemberImpl(api, server, memberJson, this);
     }
 
-    private UserImpl(DiscordApiImpl api, Long id, String name, String discriminator, String avatarHash, boolean bot,
-                     MemberImpl member) {
+    private UserImpl(DiscordApiImpl api, Long id, String name, String globalName,
+                     String discriminator, String avatarHash, boolean bot, MemberImpl member) {
         this.api = api;
         this.id = id;
         this.name = name;
+        this.globalName = globalName;
         this.discriminator = discriminator;
         this.avatarHash = avatarHash;
         this.bot = bot;
@@ -146,6 +158,12 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             name = partialUserJson.get("username").asText();
         }
 
+        String globalName = this.globalName;
+        if (partialUserJson.has("global_name")) {
+            JsonNode globalNameNode = partialUserJson.get("global_name");
+            globalName = globalNameNode.isNull() ? null : globalNameNode.asText();
+        }
+
         String discriminator = this.discriminator;
         if (partialUserJson.hasNonNull("discriminator")) {
             discriminator = partialUserJson.get("discriminator").asText();
@@ -156,7 +174,7 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
             avatarHash = partialUserJson.get("avatar").asText();
         }
 
-        return new UserImpl(api, id, name, discriminator, avatarHash, bot, member);
+        return new UserImpl(api, id, name, globalName, discriminator, avatarHash, bot, member);
     }
 
     /**
@@ -186,6 +204,11 @@ public class UserImpl implements User, InternalUserAttachableListenerManager {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Optional<String> getGlobalName() {
+        return Optional.ofNullable(globalName);
     }
 
     @Override
