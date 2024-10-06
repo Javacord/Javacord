@@ -60,16 +60,16 @@ public final class MemberImpl implements Member {
         this.selfMuted = false;
         this.selfDeafened = false;
 
+        if (data.hasNonNull("user") && data.get("user").hasNonNull("global_name")) {
+            nickname = data.get("user").get("global_name").asText();
+        } else {
+            nickname = null;
+        }
+
         if (data.hasNonNull("user")) {
             this.user = new UserImpl(api, data.get("user"), this, null);
         } else {
             this.user = user;
-        }
-
-        if (data.hasNonNull("nick")) {
-            nickname = data.get("nick").asText();
-        } else {
-            nickname = null;
         }
 
         roleIds = new ArrayList<>();
