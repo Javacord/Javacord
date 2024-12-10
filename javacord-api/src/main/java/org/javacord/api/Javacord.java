@@ -99,7 +99,7 @@ public class Javacord {
      * A list with all voice gateway versions can be found
      * <a href="https://discord.com/developers/docs/topics/voice-connections#voice-gateway-versioning">here</a>.
      */
-    public static final String DISCORD_VOICE_GATEWAY_VERSION = "4";
+    public static final String DISCORD_VOICE_GATEWAY_VERSION = "8";
 
     /**
      * The API version from Discord which we are using.
