@@ -13,6 +13,8 @@ dependencies {
     api(project(":javacord-api")) {
         isTransitive = true
     }
+    // to support XChaCha20
+    implementation("com.google.crypto.tink:tink:1.15.0")
 
     // OkHttp for REST-calls
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.3"))

@@ -3,6 +3,7 @@ package org.javacord.core.util.gateway;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.audio.AudioSourceBase;
+import org.javacord.api.util.crypto.AudioEncrypter;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.entity.server.ServerImpl;
@@ -27,6 +28,7 @@ public class AudioUdpSocket {
 
     private final AudioConnectionImpl connection;
     private final InetSocketAddress address;
+    private final AudioEncrypter audioEncrypter;
     private final int ssrc;
 
     private volatile boolean shouldSend = false;
@@ -50,10 +52,11 @@ public class AudioUdpSocket {
      * @throws SocketException If the socket could not be opened,
      *                         or the socket could not bind to the specified local port.
      */
-    public AudioUdpSocket(AudioConnectionImpl connection, InetSocketAddress address, int ssrc) throws SocketException {
+    public AudioUdpSocket(AudioConnectionImpl connection, InetSocketAddress address, int ssrc, AudioEncrypter audioEncrypter) throws SocketException {
         this.connection = connection;
         this.address = address;
         this.ssrc = ssrc;
+        this.audioEncrypter = audioEncrypter;
 
         socket = new DatagramSocket();
         threadName = String.format("Javacord Audio Send Thread (%#s)", connection.getServer());
@@ -148,7 +151,14 @@ public class AudioUdpSocket {
                             speaking = true;
                             connection.setSpeaking(true);
                         }
-                        packet = new AudioPacket(frame, ssrc, sequence, ((int) sequence) * 960);
+
+                        // get encrypter ready to generate the next header
+                        this.audioEncrypter
+                                .setTimestamp(((int) sequence) * 960)
+                                .setSsrc(ssrc)
+                                .setSequence(sequence);
+                        packet = new AudioPacket(frame, this.audioEncrypter);
+
                         // We can stop sending frames of silence after 5 frames
                         if (frame == null) {
                             framesOfSilenceToPlay--;
@@ -166,7 +176,13 @@ public class AudioUdpSocket {
                     sequence++;
 
                     if (packet != null) {
-                        packet.encrypt(secretKey);
+                        try {
+                            packet.encrypt(secretKey);
+                        } catch (RuntimeException e) {
+                            logger.error("Could not encrypt audio packet. Disconnecting: ", e);
+                            connection.close(); // Is this correct? What do we want to do when a packet can't encrypt?
+                            return;
+                        }
                     }
                     try {
                         if (dontSleep) {
