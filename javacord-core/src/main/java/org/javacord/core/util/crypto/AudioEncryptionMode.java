@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.util.crypto.AudioEncrypter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ public enum AudioEncryptionMode {
 
     private final String mode;
 
-    private static final List<AudioEncryptionMode> priorityOrder = List.of(
+    private static final List<AudioEncryptionMode> priorityOrder = Arrays.asList(
             AEAD_AES256_GCM_RTPSIZE,
             AEAD_XCHACHA20_POLY1305_RTPSIZE,
             XSALSA20_POLY1305
