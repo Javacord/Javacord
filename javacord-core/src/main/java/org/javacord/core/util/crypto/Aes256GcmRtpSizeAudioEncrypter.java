@@ -13,7 +13,7 @@ public class Aes256GcmRtpSizeAudioEncrypter extends AeadAudioEncrypter {
     private static final int TAG_LENGTH_BITS = 128;
 
     /**
-     * Creates an encrypter for the XChaCha20Poly1305-RTPSIZE mode provided a nonce length.
+     * Creates an encrypter for the Aes256Gcm-RTPSIZE mode provided a nonce length.
      * @param nonceLength in bytes
      */
     public Aes256GcmRtpSizeAudioEncrypter(int nonceLength) {

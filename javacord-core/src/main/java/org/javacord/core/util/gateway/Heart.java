@@ -129,7 +129,7 @@ public class Heart {
         WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
         heartbeatFrameSender.accept(heartbeatFrame);
         lastHeartbeatSentTimeNanos = System.nanoTime();
-
+        // Ba boom, ba boom, ba boom, ba boom, ...
         stethoscope.debug("Sent heartbeat (voice: {}, packet: {})", voice, heartbeatPacket);
     }
 
