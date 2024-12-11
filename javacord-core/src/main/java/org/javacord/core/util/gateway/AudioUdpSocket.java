@@ -49,10 +49,14 @@ public class AudioUdpSocket {
      * @param connection The audio connection that uses the socket.
      * @param address    The address to connect to.
      * @param ssrc       The ssrc.
+     * @param audioEncrypter The AudioEncrypter to seal the audio frames.
      * @throws SocketException If the socket could not be opened,
      *                         or the socket could not bind to the specified local port.
      */
-    public AudioUdpSocket(AudioConnectionImpl connection, InetSocketAddress address, int ssrc, AudioEncrypter audioEncrypter) throws SocketException {
+    public AudioUdpSocket(AudioConnectionImpl connection,
+                          InetSocketAddress address,
+                          int ssrc,
+                          AudioEncrypter audioEncrypter) throws SocketException {
         this.connection = connection;
         this.address = address;
         this.ssrc = ssrc;

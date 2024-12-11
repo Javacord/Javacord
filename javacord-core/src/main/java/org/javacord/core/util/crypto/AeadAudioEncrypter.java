@@ -11,6 +11,10 @@ public abstract class AeadAudioEncrypter extends  AudioEncrypterImpl {
     protected byte[] encrypted = new byte[0];
     protected int nonceCounter = Integer.MIN_VALUE; // would take 2.7 years to overflow given 20ms intervals
 
+    /**
+     * Generic AEAD encrypter.
+     * @param nonceLength in bytes
+     */
     public AeadAudioEncrypter(int nonceLength) {
         this.nonceLength = nonceLength;
     }

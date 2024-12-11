@@ -9,13 +9,15 @@ repositories {
     mavenCentral()
 }
 
+// XChaCha20 from google tink introduces jsr305 which conflicts for javax.annotations.
+configurations.all {
+    exclude(group = "com.google.code.findbugs", module = "jsr305")
+}
+
 dependencies {
     api(project(":javacord-api")) {
         isTransitive = true
     }
-    // to support XChaCha20
-    implementation("com.google.crypto.tink:tink:1.15.0")
-
     // OkHttp for REST-calls
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.9.3"))
 
@@ -33,6 +35,8 @@ dependencies {
 
     // voice encryption
     implementation("com.codahale:xsalsa20poly1305:0.11.0")
+    // to support XChaCha20
+    implementation("com.google.crypto.tink:tink:1.15.0")
 
     // logging
     implementation("org.apache.logging.log4j:log4j-api:2.17.2")

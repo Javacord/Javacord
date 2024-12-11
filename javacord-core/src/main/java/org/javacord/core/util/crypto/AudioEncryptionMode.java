@@ -33,7 +33,7 @@ public enum AudioEncryptionMode {
     /**
      * Picks the "best" mode based on order found in the <a href="https://discord.com/developers/docs/topics/voice-connections#transport-encryption-modes">discord documentation</a>.
      * @param modes provided directly from the socket data
-     * @return Optional<AudioEncryptionMode>
+     * @return Optional AudioEncryptionMode
      */
     public static Optional<AudioEncryptionMode> getBestMode(JsonNode modes) {
         List<String> strModes = new ArrayList<>();
@@ -48,6 +48,8 @@ public enum AudioEncryptionMode {
     }
 
     /**
+     * The String identifier that discord uses for the encryption mode.
+     *
      * @return String identifier for the mode.
      */
     @Override
@@ -58,7 +60,7 @@ public enum AudioEncryptionMode {
     /**
      * Creates a new {@link AudioEncrypter} instance for this encryption mode.
      *
-     * @return Optional<AudioEncrypter> containing the configured audio encrypter,
+     * @return Optional AudioEncrypter containing the configured audio encrypter,
      */
     public Optional<AudioEncrypter> getAudioEncrypter() {
         switch (this) {
@@ -68,7 +70,8 @@ public enum AudioEncryptionMode {
                 return Optional.of(new Aes256GcmRtpSizeAudioEncrypter(12));
             case AEAD_XCHACHA20_POLY1305_RTPSIZE:
                 return Optional.of(new XChaCha20Poly1305RtpSizeAudioEncrypter(24));
+            default:
+                return Optional.empty();
         }
-        return Optional.empty();
     }
 }

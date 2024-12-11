@@ -120,8 +120,12 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
                 logger.debug("Voice encryption modes available {}", modes);
                 Optional<AudioEncryptionMode> encryptionMode = AudioEncryptionMode.getBestMode(modes);
-                if (encryptionMode.isEmpty()) {
-                    logger.error("None of the received encryption modes {} are able to be used by Javacord! Please contact the developer!", modes);
+                if (!encryptionMode.isPresent()) {
+                    logger.error(
+                            "None of the received encryption modes {} are able to be used by Javacord!"
+                                    + "Please contact the developer!",
+                            modes
+                    );
                     connection.close();
                     return;
                 } else {
@@ -129,8 +133,13 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 }
 
                 Optional<AudioEncrypter> audioEncrypter = encryptionMode.get().getAudioEncrypter();
-                if (audioEncrypter.isEmpty()) {
-                    logger.error("There is no associated AudioEncrypter for mode {}. Therefore, a connection cannot be established. Please contact the developer!", encryptionMode.get());
+                if (!audioEncrypter.isPresent()) {
+                    logger.error(
+                            "There is no associated AudioEncrypter for mode {}. "
+                                    + "Therefore, a connection cannot be established."
+                                    + "Please contact the developer!",
+                            encryptionMode.get()
+                    );
                     connection.close();
                     return;
                 } else {

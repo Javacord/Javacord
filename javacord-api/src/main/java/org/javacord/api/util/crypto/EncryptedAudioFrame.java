@@ -7,6 +7,11 @@ public class EncryptedAudioFrame {
     private final byte[] header;
     private final byte[] audioFrame;
 
+    /**
+     * Constructs the AudioFrame given an RTP header and encrypted audio frame.
+     * @param header RTP byte[] header
+     * @param encryptedFrame Encrypted audio frame byte[]
+     */
     public EncryptedAudioFrame(byte[] header, byte[] encryptedFrame) {
         this.header = header;
         this.audioFrame = encryptedFrame;

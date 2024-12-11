@@ -15,7 +15,8 @@ public abstract class AudioEncrypterImpl implements  AudioEncrypter {
     protected static final byte RTP_VERSION = (byte) 0x78;
     protected static final int RTP_HEADER_LENGTH = 12;
 
-    protected int ssrc, timestamp;
+    protected int ssrc;
+    protected int timestamp;
     protected char sequence;
 
     /**

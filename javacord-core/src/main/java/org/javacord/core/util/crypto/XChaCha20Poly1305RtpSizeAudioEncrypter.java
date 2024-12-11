@@ -8,6 +8,10 @@ import org.javacord.api.util.crypto.EncryptedAudioFrame;
  */
 public class XChaCha20Poly1305RtpSizeAudioEncrypter extends AeadAudioEncrypter {
 
+    /**
+     * Creates an encrypter for the XChaCha20Poly1305-RTPSIZE mode provided a nonce length.
+     * @param nonceLength in bytes
+     */
     public XChaCha20Poly1305RtpSizeAudioEncrypter(int nonceLength) {
         super(nonceLength);
     }

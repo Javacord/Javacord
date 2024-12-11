@@ -17,6 +17,7 @@ public class AudioPacket {
      * Creates a new audio packet.
      *
      * @param audioFrame A byte array containing 20ms of audio
+     * @param audioEncrypter The encrypter that will seal the frame.
      */
     public AudioPacket(byte[] audioFrame, AudioEncrypter audioEncrypter) {
         if (audioFrame == null) {
@@ -43,8 +44,20 @@ public class AudioPacket {
      */
     public DatagramPacket asUdpPacket(InetSocketAddress address) {
         byte[] packet = new byte[this.encryptedFrame.getHeader().length + this.encryptedFrame.getAudioFrame().length];
-        System.arraycopy(this.encryptedFrame.getHeader(), 0, packet, 0, this.encryptedFrame.getHeader().length);
-        System.arraycopy(this.encryptedFrame.getAudioFrame(), 0, packet, this.encryptedFrame.getHeader().length, this.encryptedFrame.getAudioFrame().length);
+        System.arraycopy(
+                this.encryptedFrame.getHeader(),
+                0,
+                packet,
+                0,
+                this.encryptedFrame.getHeader().length
+        );
+        System.arraycopy(
+                this.encryptedFrame.getAudioFrame(),
+                0,
+                packet,
+                this.encryptedFrame.getHeader().length,
+                this.encryptedFrame.getAudioFrame().length
+        );
         return new DatagramPacket(packet, packet.length, address);
     }
 }
