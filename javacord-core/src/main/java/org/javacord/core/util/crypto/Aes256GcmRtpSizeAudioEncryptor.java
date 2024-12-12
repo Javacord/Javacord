@@ -1,7 +1,5 @@
 package org.javacord.core.util.crypto;
 
-import org.javacord.api.util.crypto.EncryptedAudioFrame;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -9,14 +7,14 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Implements audio encryption using AEAD-AES-256-GCM with RTP size.
  */
-public class Aes256GcmRtpSizeAudioEncrypter extends AeadAudioEncrypter {
+public class Aes256GcmRtpSizeAudioEncryptor extends AeadAudioEncryptorImpl {
     private static final int TAG_LENGTH_BITS = 128;
 
     /**
-     * Creates an encrypter for the Aes256Gcm-RTPSIZE mode provided a nonce length.
+     * Creates an encryptor for the Aes256Gcm-RTPSIZE mode provided a nonce length.
      * @param nonceLength in bytes
      */
-    public Aes256GcmRtpSizeAudioEncrypter(int nonceLength) {
+    public Aes256GcmRtpSizeAudioEncryptor(int nonceLength) {
         super(nonceLength);
     }
 
@@ -34,8 +32,7 @@ public class Aes256GcmRtpSizeAudioEncrypter extends AeadAudioEncrypter {
      * @throws RuntimeException if encryption fails due to any encryption failure.
      */
     @Override
-    public EncryptedAudioFrame seal(byte[] key, byte[] audioFrame) throws RuntimeException {
-        byte[] header = this.nextHeader();
+    public byte[] seal(byte[] header, byte[] key, byte[] audioFrame) throws RuntimeException {
         byte[] nonce = this.nextNonce();
 
         Cipher cipher;
@@ -52,6 +49,6 @@ public class Aes256GcmRtpSizeAudioEncrypter extends AeadAudioEncrypter {
             throw new RuntimeException("Failed to encrypt audio frame: ", e);
         }
 
-        return new EncryptedAudioFrame(header, this.getCombined());
+        return this.getCombined();
     }
 }

@@ -1,18 +1,17 @@
 package org.javacord.core.util.crypto;
 
 import com.google.crypto.tink.aead.internal.InsecureNonceXChaCha20Poly1305;
-import org.javacord.api.util.crypto.EncryptedAudioFrame;
 
 /**
  * Implements audio encryption using AEAD-XChaCha20-Poly1305 with RTP size.
  */
-public class XChaCha20Poly1305RtpSizeAudioEncrypter extends AeadAudioEncrypter {
+public class XChaCha20Poly1305RtpSizeAudioEncryptor extends AeadAudioEncryptorImpl {
 
     /**
-     * Creates an encrypter for the XChaCha20Poly1305-RTPSIZE mode provided a nonce length.
+     * Creates an encryptor for the XChaCha20Poly1305-RTPSIZE mode provided a nonce length.
      * @param nonceLength in bytes
      */
-    public XChaCha20Poly1305RtpSizeAudioEncrypter(int nonceLength) {
+    public XChaCha20Poly1305RtpSizeAudioEncryptor(int nonceLength) {
         super(nonceLength);
     }
 
@@ -29,8 +28,7 @@ public class XChaCha20Poly1305RtpSizeAudioEncrypter extends AeadAudioEncrypter {
      * @throws RuntimeException if encryption fails due to encryption failure.
      */
     @Override
-    public EncryptedAudioFrame seal(byte[] key, byte[] audioFrame) throws RuntimeException {
-        byte[] header = this.nextHeader();
+    public byte[] seal(byte[] header, byte[] key, byte[] audioFrame) throws RuntimeException {
         byte[] nonce = this.nextNonce();
 
         try {
@@ -40,6 +38,6 @@ public class XChaCha20Poly1305RtpSizeAudioEncrypter extends AeadAudioEncrypter {
             throw new RuntimeException("Failed to encrypt audio frame: ", e);
         }
 
-        return new EncryptedAudioFrame(header, this.getCombined());
+        return this.getCombined();
     }
 }

@@ -1,21 +1,23 @@
 package org.javacord.core.util.crypto;
 
+import org.javacord.api.util.crypto.AudioEncryptor;
+
 import java.nio.ByteBuffer;
 
 /**
  * Base implementation for any given AEAD encryption.
  */
-public abstract class AeadAudioEncrypter extends  AudioEncrypterImpl {
+public abstract class AeadAudioEncryptorImpl implements AudioEncryptor {
     private final int nonceLength;
 
     protected byte[] encrypted = new byte[0];
     protected int nonceCounter = Integer.MIN_VALUE; // would take 2.7 years to overflow given 20ms intervals
 
     /**
-     * Generic AEAD encrypter.
+     * Generic AEAD encryptor.
      * @param nonceLength in bytes
      */
-    public AeadAudioEncrypter(int nonceLength) {
+    public AeadAudioEncryptorImpl(int nonceLength) {
         this.nonceLength = nonceLength;
     }
 

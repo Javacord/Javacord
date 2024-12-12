@@ -1,7 +1,7 @@
 package org.javacord.core.util.crypto;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.javacord.api.util.crypto.AudioEncrypter;
+import org.javacord.api.util.crypto.AudioEncryptor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,20 +11,18 @@ import java.util.Optional;
 /**
  * Represents the supported audio encryption modes.
  *
- * <p>Provides functionality to select and create appropriate encrypters based on
+ * <p>Provides functionality to select and create appropriate encryptors based on
  * Discord's supported encryption modes found in the <a href="https://discord.com/developers/docs/topics/voice-connections#transport-encryption-modes">discord documentation</a>.
  */
 public enum AudioEncryptionMode {
     AEAD_AES256_GCM_RTPSIZE("aead_aes256_gcm_rtpsize"),
-    AEAD_XCHACHA20_POLY1305_RTPSIZE("aead_xchacha20_poly1305_rtpsize"),
-    XSALSA20_POLY1305("xsalsa20_poly1305");
+    AEAD_XCHACHA20_POLY1305_RTPSIZE("aead_xchacha20_poly1305_rtpsize");
 
     private final String mode;
 
     private static final List<AudioEncryptionMode> priorityOrder = Arrays.asList(
             AEAD_AES256_GCM_RTPSIZE,
-            AEAD_XCHACHA20_POLY1305_RTPSIZE,
-            XSALSA20_POLY1305
+            AEAD_XCHACHA20_POLY1305_RTPSIZE
     );
 
     AudioEncryptionMode(String mode) {
@@ -59,18 +57,16 @@ public enum AudioEncryptionMode {
     }
 
     /**
-     * Creates a new {@link AudioEncrypter} instance for this encryption mode.
+     * Creates a new {@link AudioEncryptor} instance for this encryption mode.
      *
-     * @return Optional AudioEncrypter containing the configured audio encrypter,
+     * @return Optional AudioEncryptor containing the configured audio encryptor,
      */
-    public Optional<AudioEncrypter> getAudioEncrypter() {
+    public Optional<AudioEncryptor> getAudioEncryptor() {
         switch (this) {
-            case XSALSA20_POLY1305:
-                return Optional.of(new XSalsa20Poly1305AudioEncrypter());
             case AEAD_AES256_GCM_RTPSIZE:
-                return Optional.of(new Aes256GcmRtpSizeAudioEncrypter(12));
+                return Optional.of(new Aes256GcmRtpSizeAudioEncryptor(12));
             case AEAD_XCHACHA20_POLY1305_RTPSIZE:
-                return Optional.of(new XChaCha20Poly1305RtpSizeAudioEncrypter(24));
+                return Optional.of(new XChaCha20Poly1305RtpSizeAudioEncryptor(24));
             default:
                 return Optional.empty();
         }

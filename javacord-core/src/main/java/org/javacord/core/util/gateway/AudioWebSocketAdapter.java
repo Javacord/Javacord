@@ -11,7 +11,7 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
 import org.javacord.api.audio.SpeakingFlag;
-import org.javacord.api.util.crypto.AudioEncrypter;
+import org.javacord.api.util.crypto.AudioEncryptor;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
 import org.javacord.core.util.crypto.AudioEncryptionMode;
@@ -132,10 +132,10 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                     logger.debug("Voice encryption mode {} selected.", encryptionMode.get());
                 }
 
-                Optional<AudioEncrypter> audioEncrypter = encryptionMode.get().getAudioEncrypter();
-                if (!audioEncrypter.isPresent()) {
+                Optional<AudioEncryptor> audioEncryptor = encryptionMode.get().getAudioEncryptor();
+                if (!audioEncryptor.isPresent()) {
                     logger.error(
-                            "There is no associated AudioEncrypter for mode {}. "
+                            "There is no associated AudioEncryptor for mode {}. "
                                     + "Therefore, a connection cannot be established."
                                     + "Please contact the developer!",
                             encryptionMode.get()
@@ -143,10 +143,10 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                     connection.close();
                     return;
                 } else {
-                    logger.debug("Using AudioEncrypter {}", audioEncrypter.get().getClass());
+                    logger.debug("Using AudioEncryptor {}", audioEncryptor.get().getClass());
                 }
 
-                socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc, audioEncrypter.get());
+                socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc, audioEncryptor.get());
 
                 sendSelectProtocol(websocket, encryptionMode.get());
                 break;

@@ -1,30 +1,50 @@
 package org.javacord.core.util.gateway;
 
 import org.javacord.api.audio.SilentAudioSource;
-import org.javacord.api.util.crypto.AudioEncrypter;
-import org.javacord.api.util.crypto.EncryptedAudioFrame;
+import org.javacord.api.util.crypto.AudioEncryptor;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 
 public class AudioPacket {
-    private final AudioEncrypter audioEncrypter;
-    private final byte[] audioFrame;
+    private static final byte RTP_TYPE = (byte) 0x80;
+    private static final byte RTP_VERSION = (byte) 0x78;
+    private static final int RTP_HEADER_LENGTH = 12;
 
-    private EncryptedAudioFrame encryptedFrame;
+    private final AudioEncryptor audioEncryptor;
+    private final byte[] header;
+
+    private byte[] audioFrame;
 
     /**
      * Creates a new audio packet.
      *
      * @param audioFrame A byte array containing 20ms of audio
-     * @param audioEncrypter The encrypter that will seal the frame.
+     * @param sequence The 16 bit sequence number
+     * @param timestamp The RTP timestamp value
+     * @param ssrc The 32 bit synchronization source identifier
+     * @param audioEncryptor The encryptor that will seal the frame.
      */
-    public AudioPacket(byte[] audioFrame, AudioEncrypter audioEncrypter) {
+    public AudioPacket(byte[] audioFrame,
+                       char sequence,
+                       int timestamp,
+                       int ssrc,
+                       AudioEncryptor audioEncryptor) {
         if (audioFrame == null) {
             audioFrame = SilentAudioSource.SILENCE_FRAME;
         }
+
+        ByteBuffer buffer = ByteBuffer.allocate(RTP_HEADER_LENGTH)
+                .put(0, RTP_TYPE)
+                .put(1, RTP_VERSION)
+                .putChar(2, sequence)
+                .putInt(4, timestamp)
+                .putInt(8, ssrc);
+        this.header = buffer.array();
+
         this.audioFrame = audioFrame;
-        this.audioEncrypter = audioEncrypter;
+        this.audioEncryptor = audioEncryptor;
     }
 
     /**
@@ -33,7 +53,7 @@ public class AudioPacket {
      * @param key The key used to encrypt the packet.
      */
     public void encrypt(byte[] key) {
-        this.encryptedFrame = this.audioEncrypter.seal(key, this.audioFrame);
+        this.audioFrame = this.audioEncryptor.seal(this.header, key, this.audioFrame);
     }
 
     /**
@@ -43,20 +63,20 @@ public class AudioPacket {
      * @return The created datagram packet.
      */
     public DatagramPacket asUdpPacket(InetSocketAddress address) {
-        byte[] packet = new byte[this.encryptedFrame.getHeader().length + this.encryptedFrame.getAudioFrame().length];
+        byte[] packet = new byte[this.header.length + this.audioFrame.length];
         System.arraycopy(
-                this.encryptedFrame.getHeader(),
+                this.header,
                 0,
                 packet,
                 0,
-                this.encryptedFrame.getHeader().length
+                this.header.length
         );
         System.arraycopy(
-                this.encryptedFrame.getAudioFrame(),
+                this.audioFrame,
                 0,
                 packet,
-                this.encryptedFrame.getHeader().length,
-                this.encryptedFrame.getAudioFrame().length
+                this.header.length,
+                this.audioFrame.length
         );
         return new DatagramPacket(packet, packet.length, address);
     }
