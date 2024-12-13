@@ -1,7 +1,7 @@
 @SuppressWarnings("requires-transitive-automatic")
 module org.javacord.core {
     requires okhttp3.logging;
-    requires com.codahale.xsalsa20poly1305;
+    requires com.google.crypto.tink;
 
     requires java.logging;
 

@@ -33,9 +33,7 @@ dependencies {
     // the web socket
     implementation("com.neovisionaries:nv-websocket-client:2.14")
 
-    // voice encryption
-    implementation("com.codahale:xsalsa20poly1305:0.11.0")
-    // to support XChaCha20
+    // voice encryption to support XChaCha20
     implementation("com.google.crypto.tink:tink:1.15.0")
 
     // logging
