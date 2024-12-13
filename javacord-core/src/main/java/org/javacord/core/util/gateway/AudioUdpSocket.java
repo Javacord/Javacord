@@ -159,8 +159,8 @@ public class AudioUdpSocket {
                         packet = new AudioPacket(
                                 frame,
                                 sequence,
-                                ssrc,
                                 ((int) sequence * 960),
+                                ssrc,
                                 this.audioEncryptor
                         );
 
