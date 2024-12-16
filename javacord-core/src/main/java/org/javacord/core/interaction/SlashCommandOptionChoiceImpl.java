@@ -51,8 +51,9 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
      *
      * @param name The name of the choice.
      * @param nameLocalizations The name localizations of this choice.
-     * @param stringValue The string value of the choice or null if it is an int value.
-     * @param longValue The long value of the choice or null if it is a string value.
+     * @param stringValue The string value of the choice or null if it is an int or double value.
+     * @param longValue The long value of the choice or null if it is a string or double value.
+     * @param doubleValue The double value of the choice or null if it is a string or long value.
      */
     public SlashCommandOptionChoiceImpl(String name, Map<DiscordLocale, String> nameLocalizations,
                                         String stringValue, Long longValue, Double doubleValue) {
