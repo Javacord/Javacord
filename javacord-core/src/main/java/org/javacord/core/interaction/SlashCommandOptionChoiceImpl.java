@@ -17,6 +17,7 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
     private final Map<DiscordLocale, String> nameLocalizations;
     private final String stringValue;
     private final Long longValue;
+    private final Double doubleValue;
 
     /**
      * Class constructor.
@@ -38,6 +39,11 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
         } else {
             longValue = null;
         }
+        if (data.get("value").isDouble()) {
+            doubleValue = data.get("value").asDouble();
+        } else {
+            doubleValue = null;
+        }
     }
 
     /**
@@ -49,11 +55,12 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
      * @param longValue The long value of the choice or null if it is a string value.
      */
     public SlashCommandOptionChoiceImpl(String name, Map<DiscordLocale, String> nameLocalizations,
-                                        String stringValue, Long longValue) {
+                                        String stringValue, Long longValue, Double doubleValue) {
         this.name = name;
         this.nameLocalizations = nameLocalizations;
         this.stringValue = stringValue;
         this.longValue = longValue;
+        this.doubleValue = doubleValue;
     }
 
     @Override
@@ -76,6 +83,11 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
         return Optional.ofNullable(longValue);
     }
 
+    @Override
+    public Optional<Double> getDoubleValue() {
+        return Optional.ofNullable(doubleValue);
+    }
+
     /**
      * Creates a json node with the choice's data.
      *
@@ -91,6 +103,7 @@ public class SlashCommandOptionChoiceImpl implements SlashCommandOptionChoice {
         }
         getLongValue().ifPresent(value -> node.put("value", value));
         getStringValue().ifPresent(value -> node.put("value", value));
+        getDoubleValue().ifPresent(value -> node.put("value", value));
         return node;
     }
 }

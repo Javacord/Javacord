@@ -25,7 +25,7 @@ public interface SlashCommandOptionChoice {
     /**
      * Gets the string value of this choice.
      *
-     * <p>If this option is an integer choice, the optional will be empty.
+     * <p>If this option is an integer or long choice, the optional will be empty.
      *
      * @return The string value of this choice.
      */
@@ -34,11 +34,20 @@ public interface SlashCommandOptionChoice {
     /**
      * Gets the long value of this choice.
      *
-     * <p>If this option is a string choice, the optional will be empty.
+     * <p>If this option is a string or double choice, the optional will be empty.
      *
      * @return The long value of this choice.
      */
     Optional<Long> getLongValue();
+
+    /**
+     * Gets the double value of this choice.
+     *
+     * <p>If this option is a string or long choice, the optional will be empty.
+     *
+     * @return The double value of this choice.
+     */
+    Optional<Double> getDoubleValue();
 
     /**
      * Gets the value of this choice as a string.
@@ -76,6 +85,20 @@ public interface SlashCommandOptionChoice {
      * @return The new choice builder.
      */
     static SlashCommandOptionChoice create(String name, long value) {
+        return new SlashCommandOptionChoiceBuilder()
+            .setName(name)
+            .setValue(value)
+            .build();
+    }
+
+    /**
+     * Create a new option choice builder to be used with a command option builder.
+     *
+     * @param name The name of the choice.
+     * @param value The value of the choice. Can be any double between -2^53 and 2^53.
+     * @return The new choice builder.
+     */
+    static SlashCommandOptionChoice create(String name, double value) {
         return new SlashCommandOptionChoiceBuilder()
             .setName(name)
             .setValue(value)
