@@ -1,3 +1,7 @@
+## ⚠ This project has ceased development ⚠
+
+![After careful consideration and internal discussions, we have made the difficult decision to sunset Javacord. Maintaining an open-source project such as Javacord demands significant time and energy, which we can no longer sustain. This trend has been apparent for some time. Rather than allowing the project to continue stagnating—with unresolved issues, unmerged pull requests, and unimplemented new Discord features—we believe it is more responsible to officially retire it. With this decision, we intend to stop new users from choosing a library that is minimally supported while giving existing users ample time to transition to one of the many great alternative libraries available.](https://github.com/user-attachments/assets/d5e8b4fe-60d1-4dcb-95e7-cf95933d1193)
+
 ![](https://javacord.org/img/javacord3_banner.png)
 # Javacord [![Latest version](https://shields.io/github/release/Javacord/Javacord.svg?label=Version&colorB=brightgreen&style=flat-square)](https://github.com/Javacord/Javacord/releases/latest) [![Latest JavaDocs](https://shields.io/badge/JavaDoc-Latest-yellow.svg?style=flat-square)](https://docs.javacord.org/api/v/latest/) [![Javacord Wiki](https://shields.io/badge/Wiki-Home-red.svg?style=flat-square)](https://javacord.org/wiki/) [![Javacord Discord server](https://shields.io/discord/151037561152733184.svg?colorB=%237289DA&label=Discord&style=flat-square)](https://discord.gg/0qJ2jjyneLEgG7y3)
 
