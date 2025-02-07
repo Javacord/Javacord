@@ -13,6 +13,7 @@ public class SlashCommandOptionChoiceBuilderDelegateImpl implements SlashCommand
     private Map<DiscordLocale, String> nameLocalizations = new HashMap<>();
     private String stringValue;
     private Long longValue;
+    private Double doubleValue;
 
     @Override
     public void setName(String name) {
@@ -28,16 +29,25 @@ public class SlashCommandOptionChoiceBuilderDelegateImpl implements SlashCommand
     public void setValue(String value) {
         stringValue = value;
         longValue = null;
+        doubleValue = null;
     }
 
     @Override
     public void setValue(long value) {
         stringValue = null;
         longValue = value;
+        doubleValue = null;
+    }
+
+    @Override
+    public void setValue(double value) {
+        stringValue = null;
+        longValue = null;
+        doubleValue = value;
     }
 
     @Override
     public SlashCommandOptionChoice build() {
-        return new SlashCommandOptionChoiceImpl(name, nameLocalizations, stringValue, longValue);
+        return new SlashCommandOptionChoiceImpl(name, nameLocalizations, stringValue, longValue, doubleValue);
     }
 }

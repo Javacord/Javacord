@@ -41,10 +41,17 @@ public interface SlashCommandOptionChoiceBuilderDelegate {
     void setValue(long value);
 
     /**
+     * Sets the double value of the slash command option choice.
+     * Can be any double between -2^53 and 2^53.
+     *
+     * @param value The value.
+     */
+    void setValue(double value);
+
+    /**
      * Builds the slash command option choice.
      *
      * @return The slash command option choice.
      */
     SlashCommandOptionChoice build();
-
 }

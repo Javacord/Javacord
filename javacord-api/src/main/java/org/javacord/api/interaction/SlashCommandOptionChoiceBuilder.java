@@ -60,6 +60,18 @@ public class SlashCommandOptionChoiceBuilder {
     }
 
     /**
+     * Sets the double value of the slash command option choice.
+     * Can be any double between -2^53 and 2^53.
+     *
+     * @param value The value.
+     * @return The current instance in order to chain call methods.
+     */
+    public SlashCommandOptionChoiceBuilder setValue(double value) {
+        delegate.setValue(value);
+        return this;
+    }
+
+    /**
      * Builds the slash command option choice.
      *
      * @return The slash command option choice.
