@@ -216,6 +216,11 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
     private volatile Activity activity;
 
     /**
+     * A flag to control whether messages save its JSON as a String.
+     */
+    private volatile boolean saveMessageJsonAsString = false;
+
+    /**
      * The default message cache capacity which is applied for every newly created channel.
      */
     private volatile int defaultMessageCacheCapacity = 50;
@@ -2065,6 +2070,16 @@ public class DiscordApiImpl implements DiscordApi, DispatchQueueSelector {
         } finally {
             messageCacheLock.unlock();
         }
+    }
+
+    @Override
+    public void setSaveMessageJsonAsString(boolean saveMessageJsonAsString) {
+        this.saveMessageJsonAsString = saveMessageJsonAsString;
+    }
+
+    @Override
+    public boolean getSaveMessageJsonAsString() {
+        return saveMessageJsonAsString;
     }
 
     @Override
