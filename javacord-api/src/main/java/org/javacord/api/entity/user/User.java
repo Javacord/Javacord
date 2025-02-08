@@ -242,6 +242,29 @@ public interface User extends DiscordEntity, Messageable, Nameable, Mentionable,
     Icon getAvatar(int size);
 
     /**
+     * Gets the banner hash of the user.
+     *
+     * @return The banner hash.
+     */
+    Optional<String> getBannerHash();
+
+    /**
+     * Gets the banner of the user.
+     *
+     * @return The banner of the user.
+     */
+    Optional<Icon> getBanner();
+
+    /**
+     * Gets the banner of the user.
+     *
+     * @param size the size of the image. must be any power of 2 between 16 and 4096
+     * @return The banner of the user.
+     */
+    Optional<Icon> getBanner(int size);
+
+
+    /**
      * Gets the member's server avatar hash.
      *
      * @param server The server.
