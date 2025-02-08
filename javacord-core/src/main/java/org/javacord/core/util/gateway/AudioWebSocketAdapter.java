@@ -11,8 +11,10 @@ import com.neovisionaries.ws.client.WebSocketFrame;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.Javacord;
 import org.javacord.api.audio.SpeakingFlag;
+import org.javacord.api.util.crypto.AudioEncryptor;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.audio.AudioConnectionImpl;
+import org.javacord.core.util.crypto.AudioEncryptionMode;
 import org.javacord.core.util.logging.LoggerUtil;
 import org.javacord.core.util.logging.WebSocketLogger;
 
@@ -96,13 +98,14 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
             return;
         }
 
+        JsonNode data;
         switch (opcode.get()) {
             case HELLO:
                 logger.debug("Received {} packet for {}", opcode.get().name(), connection);
                 if (!resuming) {
                     sendIdentify(websocket);
                 }
-                JsonNode data = packet.get("d");
+                data = packet.get("d");
                 int heartbeatInterval = data.get("heartbeat_interval").asInt();
                 heart.startBeating(heartbeatInterval);
                 break;
@@ -112,11 +115,40 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
 
                 String ip = data.get("ip").asText();
                 int port = data.get("port").asInt();
+                JsonNode modes = data.get("modes");
                 ssrc = data.get("ssrc").asInt();
 
-                socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc);
-                sendSelectProtocol(websocket);
-                Thread.sleep(1000);
+                logger.debug("Voice encryption modes available {}", modes);
+                Optional<AudioEncryptionMode> encryptionMode = AudioEncryptionMode.getBestMode(modes);
+                if (!encryptionMode.isPresent()) {
+                    logger.error(
+                            "None of the received encryption modes {} are able to be used by Javacord!"
+                                    + "Please contact the developer!",
+                            modes
+                    );
+                    connection.close();
+                    return;
+                } else {
+                    logger.debug("Voice encryption mode {} selected.", encryptionMode.get());
+                }
+
+                Optional<AudioEncryptor> audioEncryptor = encryptionMode.get().getAudioEncryptor();
+                if (!audioEncryptor.isPresent()) {
+                    logger.error(
+                            "There is no associated AudioEncryptor for mode {}. "
+                                    + "Therefore, a connection cannot be established."
+                                    + "Please contact the developer!",
+                            encryptionMode.get()
+                    );
+                    connection.close();
+                    return;
+                } else {
+                    logger.debug("Using AudioEncryptor {}", audioEncryptor.get().getClass());
+                }
+
+                socket = new AudioUdpSocket(connection, new InetSocketAddress(ip, port), ssrc, audioEncryptor.get());
+
+                sendSelectProtocol(websocket, encryptionMode.get());
                 break;
             case SESSION_DESCRIPTION:
                 sendSpeaking(websocket);
@@ -349,7 +381,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
      * @param websocket The websocket the packet should be sent to.
      * @throws IOException  If an I/O error occurs.
      */
-    private void sendSelectProtocol(WebSocket websocket) throws IOException {
+    private void sendSelectProtocol(WebSocket websocket, AudioEncryptionMode mode) throws IOException {
         InetSocketAddress address = socket.discoverIp();
         ObjectNode selectProtocolPacket = JsonNodeFactory.instance.objectNode();
         selectProtocolPacket
@@ -359,7 +391,7 @@ public class AudioWebSocketAdapter extends WebSocketAdapter {
                 .putObject("data")
                 .put("address", address.getHostString())
                 .put("port", address.getPort())
-                .put("mode", "xsalsa20_poly1305");
+                .put("mode", mode.toString());
         logger.debug("Sending select protocol packet for {}", connection);
         WebSocketFrame selectProtocolFrame = WebSocketFrame.createTextFrame(selectProtocolPacket.toString());
         websocket.sendFrame(selectProtocolFrame);

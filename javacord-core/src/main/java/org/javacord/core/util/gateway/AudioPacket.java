@@ -1,55 +1,50 @@
 package org.javacord.core.util.gateway;
 
-import com.codahale.xsalsa20poly1305.SecretBox;
 import org.javacord.api.audio.SilentAudioSource;
+import org.javacord.api.util.crypto.AudioEncryptor;
 
 import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 public class AudioPacket {
-
     private static final byte RTP_TYPE = (byte) 0x80;
     private static final byte RTP_VERSION = (byte) 0x78;
     private static final int RTP_HEADER_LENGTH = 12;
-    private static final int NONCE_LENGTH = 24;
 
-    private boolean encrypted;
-    private byte[] header;
+    private final AudioEncryptor audioEncryptor;
+    private final byte[] header;
+
     private byte[] audioFrame;
-
-    /**
-     * Creates a new silent audio packet.
-     *
-     * @param ssrc The ssrc.
-     * @param sequence The sequence.
-     * @param timestamp The timestamp.
-     */
-    public AudioPacket(int ssrc, char sequence, int timestamp) {
-        this(null, ssrc, sequence, timestamp);
-    }
 
     /**
      * Creates a new audio packet.
      *
      * @param audioFrame A byte array containing 20ms of audio
-     * @param ssrc The ssrc.
-     * @param sequence The sequence.
-     * @param timestamp The timestamp.
+     * @param sequence The 16 bit sequence number
+     * @param timestamp The RTP timestamp value
+     * @param ssrc The 32 bit synchronization source identifier
+     * @param audioEncryptor The encryptor that will seal the frame.
      */
-    public AudioPacket(byte[] audioFrame, int ssrc, char sequence, int timestamp) {
+    public AudioPacket(byte[] audioFrame,
+                       char sequence,
+                       int timestamp,
+                       int ssrc,
+                       AudioEncryptor audioEncryptor) {
         if (audioFrame == null) {
             audioFrame = SilentAudioSource.SILENCE_FRAME;
         }
-        this.audioFrame = audioFrame;
-        // See https://discord.com/developers/docs/topics/voice-connections#encrypting-and-sending-voice
+
         ByteBuffer buffer = ByteBuffer.allocate(RTP_HEADER_LENGTH)
                 .put(0, RTP_TYPE)
                 .put(1, RTP_VERSION)
                 .putChar(2, sequence)
                 .putInt(4, timestamp)
                 .putInt(8, ssrc);
-        header = buffer.array();
+        this.header = buffer.array();
+
+        this.audioFrame = audioFrame;
+        this.audioEncryptor = audioEncryptor;
     }
 
     /**
@@ -58,10 +53,7 @@ public class AudioPacket {
      * @param key The key used to encrypt the packet.
      */
     public void encrypt(byte[] key) {
-        byte[] nonce = new byte[NONCE_LENGTH];
-        System.arraycopy(header, 0, nonce, 0, RTP_HEADER_LENGTH);
-        audioFrame = new SecretBox(key).seal(nonce, audioFrame);
-        encrypted = true;
+        this.audioFrame = this.audioEncryptor.seal(this.header, key, this.audioFrame);
     }
 
     /**
@@ -71,19 +63,21 @@ public class AudioPacket {
      * @return The created datagram packet.
      */
     public DatagramPacket asUdpPacket(InetSocketAddress address) {
-        byte[] packet = new byte[header.length + audioFrame.length];
-        System.arraycopy(header, 0, packet, 0, header.length);
-        System.arraycopy(audioFrame, 0, packet, header.length, audioFrame.length);
+        byte[] packet = new byte[this.header.length + this.audioFrame.length];
+        System.arraycopy(
+                this.header,
+                0,
+                packet,
+                0,
+                this.header.length
+        );
+        System.arraycopy(
+                this.audioFrame,
+                0,
+                packet,
+                this.header.length,
+                this.audioFrame.length
+        );
         return new DatagramPacket(packet, packet.length, address);
     }
-
-    /**
-     * Checks if the audio packet has been encrypted using the {@link #encrypt(byte[])} method.
-     *
-     * @return Whether the audio packet is encrypted or not.
-     */
-    public boolean isEncrypted() {
-        return encrypted;
-    }
-
 }

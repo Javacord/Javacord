@@ -115,8 +115,17 @@ public class Heart {
      */
     public void beat() {
         ObjectNode heartbeatPacket = JsonNodeFactory.instance.objectNode()
-                .put("op", voice ? VoiceGatewayOpcode.HEARTBEAT.getCode() : GatewayOpcode.HEARTBEAT.getCode())
-                .put("d", voice ? (int) (Math.random() * Integer.MAX_VALUE) : lastSeq);
+                .put("op", voice ? VoiceGatewayOpcode.HEARTBEAT.getCode() : GatewayOpcode.HEARTBEAT.getCode());
+
+        // voice gateway v8 puts the beat inside d { t }
+        if (voice) {
+            ObjectNode dataNode = JsonNodeFactory.instance.objectNode()
+                    .put("t", System.currentTimeMillis());
+            heartbeatPacket.set("d", dataNode);
+        } else {
+            heartbeatPacket.put("d", lastSeq);
+        }
+
         WebSocketFrame heartbeatFrame = WebSocketFrame.createTextFrame(heartbeatPacket.toString());
         heartbeatFrameSender.accept(heartbeatFrame);
         lastHeartbeatSentTimeNanos = System.nanoTime();

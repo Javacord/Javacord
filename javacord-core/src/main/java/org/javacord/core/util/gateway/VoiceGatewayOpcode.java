@@ -88,14 +88,101 @@ public enum VoiceGatewayOpcode {
      *
      * <p>Sent by server
      */
-    CLIENT_CONNECT(12),
+    CLIENT_CONNECT(11),
 
     /**
      * a client has disconnected from the voice channel.
      *
      * <p>Sent by server
      */
-    CLIENT_DISCONNECT(13);
+    CLIENT_DISCONNECT(13),
+
+    /**
+     * downgrade from the DAVE protocol is coming.
+     *
+     * <p>Sent by server
+     */
+    DAVE_PREPARE_TRANSITION(21),
+
+    /**
+     * execute the previously announced transition.
+     *
+     * <p>Sent by server
+     */
+    DAVE_EXECUTE_TRANSITION(22),
+
+    /**
+     * acknowledge readiness for previous transition.
+     *
+     * <p>Sent by client
+     */
+    DAVE_TRANSITION_READY(23),
+
+    /**
+     * DAVE protocol version or group change is coming.
+     *
+     * <p>Sent by server
+     */
+    DAVE_PREPARE_EPOCH(24),
+
+    /**
+     * MLS external sender credentials and public key.
+     *
+     * <p>Binary
+     *
+     * <p>Sent by server
+     */
+    DAVE_MLS_EXTERNAL_SENDER(25),
+
+    /**
+     * key package for member pending add to MLS.
+     *
+     * <p>Binary
+     *
+     * <p>Sent by client
+     */
+    DAVE_MLS_KEY_PACKAGE(26),
+
+    /**
+     * MLS proposal to be added or removed.
+     *
+     * <p>Binary
+     *
+     * <p>Sent by server
+     */
+    DAVE_MLS_PROPOSALS(27),
+
+    /**
+     * MLS commit with optional message.
+     *
+     * <p>Binary
+     *
+     * <p>Sent by client
+     */
+    DAVE_MLS_COMMIT_WELCOME(28),
+
+    /**
+     * MLS commit for upcoming transition.
+     *
+     * <p>Sent by server
+     */
+    DAVE_MLS_COMMIT_TRANSITION(29),
+
+    /**
+     * MLS welcome to group for upcoming transition.
+     *
+     * <p>Binary
+     *
+     * <p>Sent by server
+     */
+    DAVE_MLS_WELCOME(30),
+
+    /**
+     * invalid commit or welcome, request re-add.
+     *
+     * <p>Sent by client
+     */
+    DAVE_MLS_INVALID_COMMIT(31);
 
     /**
      * A map for retrieving the enum instances by code.
