@@ -3,11 +3,16 @@ package org.javacord.core.entity.message;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.DiscordEntity;
 import org.javacord.api.entity.emoji.Emoji;
+import org.javacord.api.entity.message.CountDetails;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.Reaction;
 import org.javacord.core.DiscordApiImpl;
 import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,7 +31,7 @@ public class ReactionImpl implements Reaction {
     private final Emoji emoji;
 
     /**
-     * The amount of users who used this reaction.
+     * The number of users who used this reaction.
      */
     private final AtomicInteger count = new AtomicInteger();
 
@@ -34,6 +39,21 @@ public class ReactionImpl implements Reaction {
      * Whether this reaction is used by you or not.
      */
     private volatile boolean containsYou;
+
+    /**
+     * Whether this super reaction is used by you or not.
+     */
+    private volatile boolean containsYouSuper;
+
+    /**
+     * The reaction count details.
+     */
+    private volatile CountDetails countDetails;
+
+    /**
+     * The HEX colors used for super reactions.
+     */
+    private final List<Color> burstColors = new ArrayList<>();
 
     /**
      * Creates a new reaction.
@@ -45,6 +65,12 @@ public class ReactionImpl implements Reaction {
         this.message = message;
         this.count.set(data.get("count").asInt());
         this.containsYou = data.get("me").asBoolean();
+        this.containsYouSuper = data.get("me_burst").asBoolean();
+        this.countDetails = new CountDetailsImpl(data.get("count_details"));
+
+        for (JsonNode color : data.get("burst_colors")) {
+            burstColors.add(Color.decode(color.asText()));
+        }
 
         JsonNode emojiJson = data.get("emoji");
         if (!emojiJson.has("id") || emojiJson.get("id").isNull()) {
@@ -59,14 +85,22 @@ public class ReactionImpl implements Reaction {
      *
      * @param message The message, the reaction belongs to.
      * @param emoji The emoji of the reaction.
-     * @param count The amount of users who used this reaction.
+     * @param count The number of users who used this reaction.
      * @param you Whether this reaction is used by you or not.
+     * @param burstColors The HEX colors used for super reactions.
+     * @param countDetails The details about the count of reactions.
      */
-    public ReactionImpl(Message message, Emoji emoji, int count, boolean you) {
+    public ReactionImpl(Message message, Emoji emoji, int count, boolean you,
+                        CountDetails countDetails, List<Color> burstColors) {
         this.message = message;
         this.emoji = emoji;
         this.count.set(count);
         this.containsYou = you;
+        this.countDetails = countDetails;
+
+        if (burstColors != null && !burstColors.isEmpty()) {
+            this.burstColors.addAll(burstColors);
+        }
     }
 
     /**
@@ -116,6 +150,29 @@ public class ReactionImpl implements Reaction {
     @Override
     public boolean containsYou() {
         return containsYou;
+    }
+
+    @Override
+    public boolean containsYouSuper() {
+        return containsYouSuper;
+    }
+
+    @Override
+    public CountDetails getCountDetails() {
+        return countDetails;
+    }
+
+    @Override
+    public List<Color> getBurstColors() {
+        return Collections.unmodifiableList(burstColors);
+    }
+
+    /**
+     * Sets the new count details.
+     * @param countDetails The new count details.
+     */
+    public void setCountDetails(CountDetails countDetails) {
+        this.countDetails = countDetails;
     }
 
     @Override
