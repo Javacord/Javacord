@@ -1,11 +1,12 @@
 package org.javacord.api.interaction.callback;
 
+import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.message.Message;
 
 import java.util.concurrent.CompletableFuture;
 
 public interface InteractionOriginalResponseUpdater
-        extends ExtendedInteractionMessageBuilderBase<InteractionOriginalResponseUpdater> {
+        extends ExtendedInteractionMessageBuilderBase<InteractionOriginalResponseUpdater>, Deletable {
     /**
      * Updates your initial response to the interaction.
      * Note: You can not update the message using any of the edit methods on the message entity as
@@ -16,10 +17,4 @@ public interface InteractionOriginalResponseUpdater
      */
     CompletableFuture<Message> update();
 
-    /**
-     * Deletes your initial response permanently.
-     *
-     * @return A CompletableFuture that completes as soon as the message has been deleted.
-     */
-    CompletableFuture<Void> delete();
 }
