@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.javacord.api.entity.channel.RegularServerChannel;
 import org.javacord.api.entity.channel.ServerThreadChannel;
 import org.javacord.api.entity.channel.ThreadMember;
+import org.javacord.api.entity.channel.forum.ForumTag;
 import org.javacord.api.entity.channel.thread.ThreadMetadata;
 import org.javacord.api.util.cache.MessageCache;
 import org.javacord.core.DiscordApiImpl;
@@ -16,8 +17,10 @@ import org.javacord.core.util.rest.RestEndpoint;
 import org.javacord.core.util.rest.RestMethod;
 import org.javacord.core.util.rest.RestRequest;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -78,6 +81,11 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     private int totalNumberOfMessagesSent;
 
     /**
+     * The forum applied tags.
+     */
+    private Set<ForumTag> forumTags = new HashSet<>();
+
+    /**
      * Creates a new server text channel object.
      *
      * @param api    The discord api instance.
@@ -114,6 +122,23 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
                 api.isDefaultAutomaticMessageCacheCleanupEnabled());
 
         totalNumberOfMessagesSent = data.path("total_message_sent").asInt(0);
+
+        getParent().asServerForumChannel().ifPresent(forumChannel -> {
+            Set<ForumTag> allForumTags = forumChannel.getForumTags();
+
+            List<Long> appliedTagIds = new ArrayList<>();
+            if (data.hasNonNull("applied_tags")) {
+                for (JsonNode appliedTag : data.get("applied_tags")) {
+                    appliedTagIds.add(appliedTag.asLong());
+                }
+            }
+
+            for (ForumTag forumTag : allForumTags) {
+                if (appliedTagIds.contains(forumTag.getId())) {
+                    forumTags.add(forumTag);
+                }
+            }
+        });
     }
 
     /**
@@ -195,6 +220,20 @@ public class ServerThreadChannelImpl extends ServerChannelImpl implements Server
     @Override
     public Set<ThreadMember> getMembers() {
         return Collections.unmodifiableSet(members);
+    }
+
+    @Override
+    public Set<ForumTag> getForumTags() {
+        return forumTags;
+    }
+
+    /**
+     * Sets the forum tags of this ServerThreadChannel.
+     *
+     * @param newForumTags The new forum tags.
+     */
+    public void setForumTags(Set<ForumTag> newForumTags) {
+        forumTags = newForumTags;
     }
 
     @Override

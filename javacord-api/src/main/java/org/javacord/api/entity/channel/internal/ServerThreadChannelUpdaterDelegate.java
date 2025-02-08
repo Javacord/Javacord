@@ -2,6 +2,9 @@ package org.javacord.api.entity.channel.internal;
 
 import org.javacord.api.entity.channel.AutoArchiveDuration;
 import org.javacord.api.entity.channel.ServerThreadChannelUpdater;
+import org.javacord.api.entity.channel.forum.ForumTag;
+
+import java.util.Set;
 
 /**
  * This class is internally used by the {@link ServerThreadChannelUpdater} to update server thread channels.
@@ -44,4 +47,10 @@ public interface ServerThreadChannelUpdaterDelegate extends ServerChannelUpdater
      */
     void setSlowmodeDelayInSeconds(int delay);
 
+    /**
+     * Queues the (forum) thread's forum tags to be updated.
+     *
+     * @param forumTags The new forum tags of the thread.
+     */
+    void setForumTags(Set<ForumTag> forumTags);
 }

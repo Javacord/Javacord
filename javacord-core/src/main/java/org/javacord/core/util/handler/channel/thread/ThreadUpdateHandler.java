@@ -5,11 +5,13 @@ import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.channel.ThreadMember;
+import org.javacord.api.entity.channel.forum.ForumTag;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.thread.ServerPrivateThreadJoinEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeArchivedEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEvent;
+import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeForumTagsEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeInvitableEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLastMessageIdEvent;
 import org.javacord.api.event.channel.server.thread.ServerThreadChannelChangeLockedEvent;
@@ -26,6 +28,7 @@ import org.javacord.core.event.channel.server.thread.ServerPrivateThreadJoinEven
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchiveTimestampEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeArchivedEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeAutoArchiveDurationEventImpl;
+import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeForumTagsEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeInvitableEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLastMessageIdEventImpl;
 import org.javacord.core.event.channel.server.thread.ServerThreadChannelChangeLockedEventImpl;
@@ -39,7 +42,9 @@ import org.javacord.core.util.logging.LoggerUtil;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -240,5 +245,36 @@ public class ThreadUpdateHandler extends PacketHandler {
             api.getEventDispatcher().dispatchServerPrivateThreadJoinEvent(
                     (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
         }
+
+        thread.getParent().asServerForumChannel().ifPresent(forumChannel -> {
+            Set<ForumTag> allForumTags = forumChannel.getForumTags();
+
+            Set<ForumTag> oldForumTags = thread.getForumTags();
+            Set<ForumTag> newForumTags = new HashSet<>();
+
+            List<Long> newAppliedTagIds = new ArrayList<>();
+            if (jsonChannel.hasNonNull("applied_tags")) {
+                for (JsonNode appliedTag : jsonChannel.get("applied_tags")) {
+                    newAppliedTagIds.add(appliedTag.asLong());
+                }
+            }
+
+            for (ForumTag forumTag : allForumTags) {
+                if (newAppliedTagIds.contains(forumTag.getId())) {
+                    newForumTags.add(forumTag);
+                }
+            }
+
+
+            if (!Objects.deepEquals(oldForumTags, newForumTags)) {
+                thread.setForumTags(newForumTags);
+
+                final ServerThreadChannelChangeForumTagsEvent event =
+                        new ServerThreadChannelChangeForumTagsEventImpl(thread, newForumTags, oldForumTags);
+
+                api.getEventDispatcher().dispatchServerThreadChannelChangeForumTagsEvent(
+                        (DispatchQueueSelector) thread.getServer(), thread.getServer(), thread, event);
+            }
+        });
     }
 }
