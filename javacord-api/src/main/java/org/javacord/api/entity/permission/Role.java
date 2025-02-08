@@ -196,6 +196,8 @@ public interface Role extends DiscordEntity, Mentionable, Nameable, Deletable, P
     /**
      * Updates the color of the role.
      *
+     * <p>{@link Color#BLACK} is reserved for the default role color.
+     *
      * <p>If you want to update several settings at once, it's recommended to use the
      * {@link RoleUpdater} from {@link #createUpdater()} which provides a better performance!
      *

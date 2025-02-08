@@ -69,6 +69,8 @@ public class RoleBuilder {
     /**
      * Sets the color of the role.
      *
+     * <p>{@link Color#BLACK} is reserved for the default role color.
+     *
      * @param color The color of the role.
      * @return The current instance in order to chain call methods.
      */
