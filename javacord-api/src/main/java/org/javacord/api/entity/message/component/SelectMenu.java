@@ -4,6 +4,7 @@ import org.javacord.api.entity.channel.ChannelType;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface SelectMenu extends LowLevelComponent {
 
@@ -48,6 +49,13 @@ public interface SelectMenu extends LowLevelComponent {
      * @return The select menu's options.
      */
     List<SelectMenuOption> getOptions();
+
+    /**
+     * Get the select menu's default values.
+     *
+     * @return The select menu's default values.
+     */
+    Set<SelectMenuDefaultValue> getDefaultValues();
 
     /**
      * If the select menu is disabled.
@@ -287,12 +295,41 @@ public interface SelectMenu extends LowLevelComponent {
      * Creates a new select menu with the given values.
      *
      * @param customId     The custom ID for the select menu.
+     * @param defaultValue The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .addDefaultValue(defaultValue)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId     The custom ID for the select menu.
      * @param channelTypes The channel types which should be available in the select menu.
      * @return The created select menu.
      */
     static SelectMenu createChannelMenu(String customId, Iterable<ChannelType> channelTypes) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
                 .addChannelTypes(channelTypes)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId     The custom ID for the select menu.
+     * @param channelTypes The channel types which should be available in the select menu.
+     * @param defaultValue The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, Iterable<ChannelType> channelTypes,
+                                        SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .addChannelTypes(channelTypes)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -308,6 +345,24 @@ public interface SelectMenu extends LowLevelComponent {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
                 .addChannelTypes(channelTypes)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId     The custom ID for the select menu.
+     * @param channelTypes The channel types which should be available in the select menu.
+     * @param isDisabled   Set if the menu should be disabled.
+     * @param defaultValue The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, Iterable<ChannelType> channelTypes, boolean isDisabled,
+                                        SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .addChannelTypes(channelTypes)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -332,6 +387,24 @@ public interface SelectMenu extends LowLevelComponent {
      * @param customId     The custom ID for the select menu.
      * @param placeholder  The placeholder for the select menu.
      * @param channelTypes The channel types which should be available in the select menu.
+     * @param defaultValue The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, String placeholder, Iterable<ChannelType> channelTypes,
+                                        SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .setPlaceholder(placeholder)
+                .addChannelTypes(channelTypes)
+                .addDefaultValue(defaultValue)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId     The custom ID for the select menu.
+     * @param placeholder  The placeholder for the select menu.
+     * @param channelTypes The channel types which should be available in the select menu.
      * @param isDisabled   Set if the menu should be disabled.
      * @return The created select menu.
      */
@@ -341,6 +414,26 @@ public interface SelectMenu extends LowLevelComponent {
                 .setPlaceholder(placeholder)
                 .addChannelTypes(channelTypes)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId     The custom ID for the select menu.
+     * @param placeholder  The placeholder for the select menu.
+     * @param channelTypes The channel types which should be available in the select menu.
+     * @param isDisabled   Set if the menu should be disabled.
+     * @param defaultValue The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, String placeholder, Iterable<ChannelType> channelTypes,
+                                        boolean isDisabled, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .setPlaceholder(placeholder)
+                .addChannelTypes(channelTypes)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -372,6 +465,29 @@ public interface SelectMenu extends LowLevelComponent {
      * @param minimumValues The minimum amount of options which must be selected.
      * @param maximumValues The maximum amount of options which can be selected.
      * @param channelTypes  The channel types which should be available in the select menu.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, String placeholder, int minimumValues,
+                                        int maximumValues, Iterable<ChannelType> channelTypes,
+                                        Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .addChannelTypes(channelTypes)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
+     * @param channelTypes  The channel types which should be available in the select menu.
      * @param isDisabled    Set if the menu should be disabled.
      * @return The created select menu.
      */
@@ -389,11 +505,49 @@ public interface SelectMenu extends LowLevelComponent {
     /**
      * Creates a new select menu with the given values.
      *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
+     * @param channelTypes  The channel types which should be available in the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createChannelMenu(String customId, String placeholder, int minimumValues,
+                                        int maximumValues, Iterable<ChannelType> channelTypes, boolean isDisabled,
+                                        Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_CHANNEL, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .addChannelTypes(channelTypes)
+                .setDisabled(isDisabled)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
      * @param customId The custom ID for the select menu.
      * @return The created select menu.
      */
     static SelectMenu createRoleMenu(String customId) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId).build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createRoleMenu(String customId, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
+                .addDefaultValue(defaultValue)
+                .build();
     }
 
     /**
@@ -406,6 +560,21 @@ public interface SelectMenu extends LowLevelComponent {
     static SelectMenu createRoleMenu(String customId, boolean isDisabled) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createRoleMenu(String customId, boolean isDisabled, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -425,6 +594,21 @@ public interface SelectMenu extends LowLevelComponent {
     /**
      * Creates a new select menu with the given values.
      *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createRoleMenu(String customId, String placeholder, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
+                .setPlaceholder(placeholder)
+                .addDefaultValue(defaultValue)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
      * @param customId    The custom ID for the select menu.
      * @param placeholder The placeholder for the select menu.
      * @param isDisabled  Set if the menu should be disabled.
@@ -434,6 +618,24 @@ public interface SelectMenu extends LowLevelComponent {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
                 .setPlaceholder(placeholder)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createRoleMenu(String customId, String placeholder, boolean isDisabled,
+                                     SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
+                .setPlaceholder(placeholder)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -461,6 +663,26 @@ public interface SelectMenu extends LowLevelComponent {
      * @param placeholder   The placeholder for the select menu
      * @param minimumValues The minimum amount of options which must be selected.
      * @param maximumValues The maximum amount of options which can be selected.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createRoleMenu(String customId, String placeholder, int minimumValues, int maximumValues,
+                                     Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
      * @param isDisabled    Set if the menu should be disabled.
      * @return The created select menu.
      */
@@ -477,11 +699,46 @@ public interface SelectMenu extends LowLevelComponent {
     /**
      * Creates a new select menu with the given values.
      *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createRoleMenu(String customId, String placeholder, int minimumValues,
+                                     int maximumValues, boolean isDisabled, Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_ROLE, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .setDisabled(isDisabled)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
      * @param customId The custom ID for the select menu.
      * @return The created select menu.
      */
     static SelectMenu createMentionableMenu(String customId) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId).build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createMentionableMenu(String customId, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
+                .addDefaultValue(defaultValue)
+                .build();
     }
 
     /**
@@ -494,6 +751,21 @@ public interface SelectMenu extends LowLevelComponent {
     static SelectMenu createMentionableMenu(String customId, boolean isDisabled) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createMentionableMenu(String customId, boolean isDisabled, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -513,6 +785,22 @@ public interface SelectMenu extends LowLevelComponent {
     /**
      * Creates a new select menu with the given values.
      *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createMentionableMenu(String customId, String placeholder, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
+                .setPlaceholder(placeholder)
+                .addDefaultValue(defaultValue)
+                .build();
+    }
+
+
+    /**
+     * Creates a new select menu with the given values.
+     *
      * @param customId    The custom ID for the select menu.
      * @param placeholder The placeholder for the select menu.
      * @param isDisabled  Set if the menu should be disabled.
@@ -522,6 +810,24 @@ public interface SelectMenu extends LowLevelComponent {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
                 .setPlaceholder(placeholder)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createMentionableMenu(String customId, String placeholder, boolean isDisabled,
+                                            SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
+                .setPlaceholder(placeholder)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -549,6 +855,26 @@ public interface SelectMenu extends LowLevelComponent {
      * @param placeholder   The placeholder for the select menu
      * @param minimumValues The minimum amount of options which must be selected.
      * @param maximumValues The maximum amount of options which can be selected.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createMentionableMenu(String customId, String placeholder, int minimumValues, int maximumValues,
+                                            Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
      * @param isDisabled    Set if the menu should be disabled.
      * @return The created select menu.
      */
@@ -565,11 +891,47 @@ public interface SelectMenu extends LowLevelComponent {
     /**
      * Creates a new select menu with the given values.
      *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createMentionableMenu(String customId, String placeholder, int minimumValues,
+                                            int maximumValues, boolean isDisabled,
+                                            Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_MENTIONABLE, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .setDisabled(isDisabled)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
      * @param customId The custom ID for the select menu.
      * @return The created select menu.
      */
     static SelectMenu createUserMenu(String customId) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId).build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createUserMenu(String customId, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
+                .addDefaultValue(defaultValue)
+                .build();
     }
 
     /**
@@ -582,6 +944,21 @@ public interface SelectMenu extends LowLevelComponent {
     static SelectMenu createUserMenu(String customId, boolean isDisabled) {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createUserMenu(String customId, boolean isDisabled, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -601,6 +978,21 @@ public interface SelectMenu extends LowLevelComponent {
     /**
      * Creates a new select menu with the given values.
      *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createUserMenu(String customId, String placeholder, SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
+                .setPlaceholder(placeholder)
+                .addDefaultValue(defaultValue)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
      * @param customId    The custom ID for the select menu.
      * @param placeholder The placeholder for the select menu.
      * @param isDisabled  Set if the menu should be disabled.
@@ -610,6 +1002,24 @@ public interface SelectMenu extends LowLevelComponent {
         return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
                 .setPlaceholder(placeholder)
                 .setDisabled(isDisabled)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValue  The select menu default value.
+     * @return The created select menu.
+     */
+    static SelectMenu createUserMenu(String customId, String placeholder, boolean isDisabled,
+                                     SelectMenuDefaultValue defaultValue) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
+                .setPlaceholder(placeholder)
+                .setDisabled(isDisabled)
+                .addDefaultValue(defaultValue)
                 .build();
     }
 
@@ -637,6 +1047,26 @@ public interface SelectMenu extends LowLevelComponent {
      * @param placeholder   The placeholder for the select menu
      * @param minimumValues The minimum amount of options which must be selected.
      * @param maximumValues The maximum amount of options which can be selected.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createUserMenu(String customId, String placeholder, int minimumValues, int maximumValues,
+                                     Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
+
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
      * @param isDisabled    Set if the menu should be disabled.
      * @return The created select menu.
      */
@@ -650,4 +1080,25 @@ public interface SelectMenu extends LowLevelComponent {
                 .build();
     }
 
+    /**
+     * Creates a new select menu with the given values.
+     *
+     * @param customId      The custom ID for the select menu.
+     * @param placeholder   The placeholder for the select menu
+     * @param minimumValues The minimum amount of options which must be selected.
+     * @param maximumValues The maximum amount of options which can be selected.
+     * @param isDisabled    Set if the menu should be disabled.
+     * @param defaultValues The select menu default values.
+     * @return The created select menu.
+     */
+    static SelectMenu createUserMenu(String customId, String placeholder, int minimumValues,
+                                     int maximumValues, boolean isDisabled, Set<SelectMenuDefaultValue> defaultValues) {
+        return new SelectMenuBuilder(ComponentType.SELECT_MENU_USER, customId)
+                .setPlaceholder(placeholder)
+                .setMinimumValues(minimumValues)
+                .setMaximumValues(maximumValues)
+                .setDisabled(isDisabled)
+                .addDefaultValues(defaultValues)
+                .build();
+    }
 }
