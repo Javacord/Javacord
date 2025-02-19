@@ -15,15 +15,19 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+
+/**
+ * The implementation of {@link SelectMenu}.
+ */
 public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
 
-    private final List<SelectMenuOption> options;
-    private final EnumSet<ChannelType> channelTypes;
-    private final String placeholder;
-    private final String customId;
-    private final int minimumValues;
-    private final int maximumValues;
-    private final boolean isDisabled;
+    private List<SelectMenuOption> options;
+    private EnumSet<ChannelType> channelTypes;
+    private String placeholder;
+    private String customId;
+    private int minimumValues;
+    private int maximumValues;
+    private boolean isDisabled;
 
     /**
      * Creates a new select menu.
@@ -76,6 +80,69 @@ public class SelectMenuImpl extends ComponentImpl implements SelectMenu {
         this.maximumValues = maximumValues;
         this.isDisabled = isDisabled;
         this.channelTypes = channelTypes;
+    }
+
+    /**
+     * Sets the channel types of the select menu.
+     *
+     * @param channelTypes The channel types of the select menu.
+     */
+    void setChannelTypes(EnumSet<ChannelType> channelTypes) {
+        this.channelTypes = channelTypes;
+    }
+
+    /**
+     * Sets the placeholder of the select menu.
+     *
+     * @param placeholder The placeholder of the select menu.
+     */
+    void setPlaceholder(String placeholder) {
+        this.placeholder = placeholder;
+    }
+
+    /**
+     * Sets the custom ID of the select menu.
+     *
+     * @param customId The custom ID of the select menu.
+     */
+    void setCustomId(String customId) {
+        this.customId = customId;
+    }
+
+    /**
+     * Sets the minimum values of the select menu.
+     *
+     * @param minimumValues The minimum values of the select menu.
+     */
+    void setMinimumValues(int minimumValues) {
+        this.minimumValues = minimumValues;
+    }
+
+    /**
+     * Sets the maximum values of the select menu.
+     *
+     * @param maximumValues The maximum values of the select menu.
+     */
+    void setMaximumValues(int maximumValues) {
+        this.maximumValues = maximumValues;
+    }
+
+    /**
+     * Sets whether the select menu should be disabled.
+     *
+     * @param disabled Whether the select menu should be disabled.
+     */
+    void setDisabled(boolean disabled) {
+        isDisabled = disabled;
+    }
+
+    /**
+     * Sets the options of the select menu.
+     *
+     * @param options The options of the select menu.
+     */
+    void setOptions(List<SelectMenuOption> options) {
+        this.options = options;
     }
 
     @Override

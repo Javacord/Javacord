@@ -13,19 +13,22 @@ import org.javacord.core.entity.emoji.UnicodeEmojiImpl;
 
 import java.util.Optional;
 
+/**
+ * The implementation of {@link Button}.
+ */
 public class ButtonImpl extends ComponentImpl implements Button {
 
-    private final ButtonStyle style;
+    private ButtonStyle style;
 
-    private final String label;
+    private String label;
 
-    private final String customId;
+    private String customId;
 
-    private final String url;
+    private String url;
 
-    private final Boolean disabled;
+    private Boolean disabled;
 
-    private final Emoji emoji;
+    private Emoji emoji;
 
     /**
      * Creates a new button.
@@ -60,12 +63,12 @@ public class ButtonImpl extends ComponentImpl implements Button {
     /**
      * Creates a new button.
      *
-     * @param style The button's style.
-     * @param label The button's label.
+     * @param style    The button's style.
+     * @param label    The button's label.
      * @param customId The button's custom ID.
-     * @param url The button's url.
+     * @param url      The button's url.
      * @param disabled Whether the button is disabled.
-     * @param emoji The button's emoji.
+     * @param emoji    The button's emoji.
      */
     public ButtonImpl(ButtonStyle style, String label, String customId, String url,
                       Boolean disabled, Emoji emoji) {
@@ -75,6 +78,60 @@ public class ButtonImpl extends ComponentImpl implements Button {
         this.customId = customId;
         this.url = url;
         this.disabled = disabled;
+        this.emoji = emoji;
+    }
+
+    /**
+     * Sets the style of the button.
+     *
+     * @param style The style of the button.
+     */
+    void setStyle(ButtonStyle style) {
+        this.style = style;
+    }
+
+    /**
+     * Sets the custom id of the button.
+     *
+     * @param customId The custom id of the button.
+     */
+    void setCustomId(String customId) {
+        this.customId = customId;
+    }
+
+    /**
+     * Sets the label of the button.
+     *
+     * @param label The label of the button.
+     */
+    void setLabel(String label) {
+        this.label = label;
+    }
+
+    /**
+     * Sets the url of the button.
+     *
+     * @param url The url of the button.
+     */
+    void setUrl(String url) {
+        this.url = url;
+    }
+
+    /**
+     * Sets whether the button is disabled.
+     *
+     * @param disabled Whether the button is disabled.
+     */
+    void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    /**
+     * Sets the emoji of the button.
+     *
+     * @param emoji The emoji of the button.
+     */
+    void setEmoji(Emoji emoji) {
         this.emoji = emoji;
     }
 
