@@ -226,6 +226,26 @@ public class UncachedMessageUtilImpl implements UncachedMessageUtil, InternalUnc
     }
 
     @Override
+    public CompletableFuture<Message> editContent(long channelId, long messageId, String content) {
+        return edit(channelId, messageId, content, true, null, false);
+    }
+
+    @Override
+    public CompletableFuture<Message> editContent(String channelId, String messageId, String content) {
+        return edit(channelId, messageId, content, true, null, false);
+    }
+
+    @Override
+    public CompletableFuture<Message> editEmbed(long channelId, long messageId, EmbedBuilder embed) {
+        return edit(channelId, messageId, null, false, embed, true);
+    }
+
+    @Override
+    public CompletableFuture<Message> editEmbed(String channelId, String messageId, EmbedBuilder embed) {
+        return edit(channelId, messageId, null, false, embed, true);
+    }
+
+    @Override
     public CompletableFuture<Message> removeContent(long channelId, long messageId) {
         return edit(channelId, messageId, "");
     }
