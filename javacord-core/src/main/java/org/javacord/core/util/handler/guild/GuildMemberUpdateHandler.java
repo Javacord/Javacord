@@ -10,6 +10,7 @@ import org.javacord.api.event.server.role.UserRoleAddEvent;
 import org.javacord.api.event.server.role.UserRoleRemoveEvent;
 import org.javacord.api.event.user.UserChangeAvatarEvent;
 import org.javacord.api.event.user.UserChangeDiscriminatorEvent;
+import org.javacord.api.event.user.UserChangeGlobalNameEvent;
 import org.javacord.api.event.user.UserChangeNameEvent;
 import org.javacord.api.event.user.UserChangeNicknameEvent;
 import org.javacord.api.event.user.UserChangePendingEvent;
@@ -23,6 +24,7 @@ import org.javacord.core.event.server.role.UserRoleAddEventImpl;
 import org.javacord.core.event.server.role.UserRoleRemoveEventImpl;
 import org.javacord.core.event.user.UserChangeAvatarEventImpl;
 import org.javacord.core.event.user.UserChangeDiscriminatorEventImpl;
+import org.javacord.core.event.user.UserChangeGlobalNameEventImpl;
 import org.javacord.core.event.user.UserChangeNameEventImpl;
 import org.javacord.core.event.user.UserChangeNicknameEventImpl;
 import org.javacord.core.event.user.UserChangePendingEventImpl;
@@ -185,6 +187,15 @@ public class GuildMemberUpdateHandler extends PacketHandler {
                                 userChanged = true;
                             }
                         }
+                        if (packet.get("user").has("global_name")) {
+                            JsonNode globalNameNode = packet.get("user").get("global_name");
+                            String newGlobalName = globalNameNode.isNull() ? null : globalNameNode.asText();
+                            String oldGlobalName = oldUser.getGlobalName().orElse(null);
+                            if (!Objects.equals(oldGlobalName, newGlobalName)) {
+                                dispatchUserChangeGlobalNameEvent(updatedUser, newGlobalName, oldGlobalName);
+                                userChanged = true;
+                            }
+                        }
                         if (packet.get("user").has("discriminator")) {
                             String newDiscriminator = packet.get("user").get("discriminator").asText();
                             String oldDiscriminator = oldUser.getDiscriminator();
@@ -213,6 +224,17 @@ public class GuildMemberUpdateHandler extends PacketHandler {
         UserChangeNameEvent event = new UserChangeNameEventImpl(user, newName, oldName);
 
         api.getEventDispatcher().dispatchUserChangeNameEvent(
+                api,
+                user.getMutualServers(),
+                Collections.singleton(user),
+                event
+        );
+    }
+
+    private void dispatchUserChangeGlobalNameEvent(User user, String newGlobalName, String oldGlobalName) {
+        UserChangeGlobalNameEvent event = new UserChangeGlobalNameEventImpl(user, newGlobalName, oldGlobalName);
+
+        api.getEventDispatcher().dispatchUserChangeGlobalNameEvent(
                 api,
                 user.getMutualServers(),
                 Collections.singleton(user),
