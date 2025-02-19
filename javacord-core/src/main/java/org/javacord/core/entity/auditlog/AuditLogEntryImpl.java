@@ -239,7 +239,7 @@ public class AuditLogEntryImpl implements AuditLogEntry {
                         if (actionType == AuditLogActionType.APPLICATION_COMMAND_PERMISSION_UPDATE) {
                             ApplicationCommandPermissionsImpl oldPermissionsValue = oldValue != null
                                     ? new ApplicationCommandPermissionsImpl(auditLog.getServer(), oldValue) : null;
-                            ApplicationCommandPermissionsImpl newPermissionsValue = oldValue != null
+                            ApplicationCommandPermissionsImpl newPermissionsValue = newValue != null
                                     ? new ApplicationCommandPermissionsImpl(auditLog.getServer(), newValue) : null;
 
                             change = new AuditLogChangeImpl<>(type, oldPermissionsValue, newPermissionsValue);
