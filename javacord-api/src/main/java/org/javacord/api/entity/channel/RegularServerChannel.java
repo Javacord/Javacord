@@ -246,8 +246,8 @@ public interface RegularServerChannel extends ServerChannel, Comparable<RegularS
      * @return An updater for this channel.
      */
     @Override
-    default RegularServerChannelUpdater createUpdater() {
-        return new RegularServerChannelUpdater(this);
+    default RegularServerChannelUpdater<?> createUpdater() {
+        return new RegularServerChannelUpdater<>(this);
     }
 
     @Override
