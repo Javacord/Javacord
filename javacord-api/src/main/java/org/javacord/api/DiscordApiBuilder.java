@@ -35,6 +35,42 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
     private final DiscordApiBuilderDelegate delegate = DelegateFactory.createDiscordApiBuilderDelegate();
 
     /**
+     * Default no-argument constructor.
+     */
+    public DiscordApiBuilder() {
+    }
+
+    /**
+     * Constructor that sets the bot token.
+     *
+     * @param token The bot token.
+     */
+    public DiscordApiBuilder(String token) {
+        this.setToken(token);
+    }
+
+    /**
+     * Static method that accepts the bot token and returns DiscordApi, ready for use. This method sets no intent.
+     *
+     * @param token The bot token.
+     * @return Resulting DiscordApi.
+     */
+    public static DiscordApi login(String token) {
+        return new DiscordApiBuilder(token).login().join();
+    }
+
+    /**
+     * Static method that accepts the bot token and returns DiscordApi with specified intents.
+     *
+     * @param token   The bot token.
+     * @param intents Intents of the bot.
+     * @return Resulting DiscordApi.
+     */
+    public static DiscordApi login(String token, Intent... intents) {
+        return new DiscordApiBuilder(token).setIntents(intents).login().join();
+    }
+
+    /**
      * Login to the account with the given token.
      *
      * @return A {@link CompletableFuture} which contains the DiscordApi.
@@ -512,7 +548,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(
-                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier) {
         delegate.addListener(listenerClass, listenerSupplier);
         return this;
     }
@@ -525,7 +561,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder addListener(
-                                Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
         delegate.addListener(listenerClass, listenerFunction);
         return this;
     }
@@ -556,7 +592,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder removeListenerSupplier(
-                                                            Class<T> listenerClass, Supplier<T> listenerSupplier) {
+            Class<T> listenerClass, Supplier<T> listenerSupplier) {
         delegate.removeListenerSupplier(listenerClass, listenerSupplier);
         return this;
     }
@@ -569,7 +605,7 @@ public class DiscordApiBuilder implements ChainableGloballyAttachableListenerMan
 
     @Override
     public <T extends GloballyAttachableListener> DiscordApiBuilder removeListenerFunction(
-                                                    Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
+            Class<T> listenerClass, Function<DiscordApi, T> listenerFunction) {
         delegate.removeListenerFunction(listenerClass, listenerFunction);
         return this;
     }
